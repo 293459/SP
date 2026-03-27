@@ -1,0 +1,438 @@
+% ============================================================
+%  CAPITOLO 3 -- PRESA D'ARIA A DOPPIA RAMPA
+% ============================================================
+\chapter{Presa d'Aria a Doppia Rampa}
+\label{cap:doppia_presa}
+
+\section{Descrizione del Caso Studio}
+\label{sec:presa_descrizione}
+
+Il secondo caso studio analizzato è una \textbf{presa d'aria supersonica a doppia rampa} (\textit{double-ramp inlet}), tipica dei sistemi propulsivi per velivoli supersonici.
+
+Il principio di funzionamento si basa sul fatto che una rampa inclinata rispetto al flusso
+genera un \emph{urto obliquo} attaccato al bordo della rampa stessa. Attraverso l'urto la
+corrente viene compressa isentropicamente (in prima approssimazione) e deflessa.
+Con \emph{due} rampe di inclinazione crescente si ottengono due urti obliqui successivi:
+il primo comprime moderatamente la corrente, il secondo comprime ulteriormente il flusso già
+rallentato; il risultato è un processo di compressione più efficiente rispetto a un singolo
+urto, con perdite di pressione totale minori.
+
+Le condizioni operative sono:
+\begin{itemize}
+  \item Numero di Mach di ingresso: $M_{\rm in} = 3$ (regime ipersonico basso)
+  \item Angolo di attacco: $\alpha = 0°$ (flusso parallelo all'asse $x$)
+  \item Il flusso in uscita è supersonico, pertanto la condizione di pressione statica
+    all'outlet non è applicata (la corrente non ha caratteristiche entranti dal bordo destro).
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=4.0, >=Stealth]
+    % Dominio esterno
+    \fill[blue!5] (-0.5,0) -- (-0.5,0.8) -- (0.832,0.8) -- (0.832,0.426)
+      -- (0.617,0.280) -- (0.797,0.310) -- (1,0.310) -- (1,0.204)
+      -- (0.720,0.207) -- (0.353,0.0623) -- (0,0) -- (-0.45,0) -- (-0.5,0) -- cycle;
+    % Rampe
+    \draw[very thick, gray!80] (-0.5,0) -- (-0.45,0) -- (0,0);
+    \draw[very thick, gray!80] (0,0) -- (0.353,0.0623); % Prima rampa
+    \draw[very thick, gray!80] (0.353,0.0623) -- (0.720,0.207); % Seconda rampa
+    \draw[very thick, gray!80] (0.720,0.207) -- (1,0.204); % Fondo canale
+    % Bordo superiore esterno
+    \draw[very thick, gray!80] (-0.5,0.8) -- (0.832,0.8);
+    \draw[very thick, gray!80] (0.832,0.8) -- (0.832,0.426) -- (0.617,0.280);
+    % Canale interno
+    \draw[very thick, gray!80] (0.797,0.310) -- (1,0.310);
+    \draw[very thick, gray!80] (1,0.310) -- (1,0.204);
+    \draw[very thick, gray!80] (0.617,0.280) -- (0.797,0.310);
+    % Inlet
+    \draw[very thick, green!60!black] (-0.5,0) -- (-0.5,0.8) node[midway,left,font=\tiny]{Inlet};
+    % Outlet
+    \draw[very thick, red!60!black] (1,0.204) -- (1,0.310) node[midway,right,font=\tiny]{Outlet};
+    % Urti obliqui (schematici)
+    \draw[dashed, orange!80!black, thick] (0,0) -- (0.55,0.8);
+    \draw[dashed, orange!80!black, thick] (0.353,0.0623) -- (0.75,0.8);
+    % Frecce flusso
+    \foreach \y in {0.2, 0.4, 0.6}
+      \draw[->, blue!60, thick] (-0.57,\y) -- (-0.5,\y);
+    \node[left, blue!60, font=\tiny] at (-0.57,0.4) {$M=3$};
+    % Label rampe
+    \node[below, font=\tiny] at (0.18,0.02) {1\textordfeminine~rampa};
+    \node[below, font=\tiny] at (0.54,0.12) {2\textordfeminine~rampa};
+    % Label urti
+    \node[right, orange!80!black, font=\tiny] at (0.55,0.75) {Urto 1};
+    \node[right, orange!80!black, font=\tiny] at (0.75,0.72) {Urto 2};
+  \end{tikzpicture}
+  \caption{Schema del dominio computazionale per la presa a doppia rampa (non in scala).
+           Le linee arancioni tratteggiare indicano gli urti obliqui attesi.}
+  \label{fig:dominio_presa}
+\end{figure}
+
+\section{Geometria -- Versione Reale e Semplificata}
+\label{sec:presa_geometrie}
+La modellazione della presa a doppia rampa presenta insidie legate alla complessa interazione fluidodinamica degli urti obliqui. Dal punto di vista fisico, il flusso incontra due rampe successive. Ciascuna rampa genera un'onda d'urto obliqua. Poiché la seconda rampa si trova a valle e ha un'inclinazione maggiore, l'urto generato da essa tende ad intersecare il primo urto in una certa regione del dominio. A rigore, si forma anche un terzo urto obliquo in corrispondenza del labbro della presa (il "cuneo" al punto 9), che va a sommarsi a questo complesso sistema di interazioni.
+
+La posizione esatta in cui questi urti si incontrano dipende fortemente dal \textbf{numero di Mach in ingresso}. All'aumentare del Mach, gli urti obliqui si "sdraiano" maggiormente (l'angolo dell'onda diminuisce), spostando il punto di intersezione più a valle verso l'uscita del dominio.
+
+\paragraph{Il problema del regime subsonico.} 
+Poiché la posizione di questa intersezione non è nota a priori senza aver prima risolto il campo, modellare l'intero dominio originale espone a un rischio numerico severo: a valle dell'intersezione degli urti obliqui, o a causa di un urto normale riflesso, potrebbe generarsi una \textbf{tasca di flusso subsonico}.
+Questo cambia radicalmente la natura matematica del problema. Le equazioni di Eulero stazionarie, infatti, sono:
+\begin{itemize}
+    \item \textbf{Iperboliche} in regime supersonico (le perturbazioni viaggiano in un "cono di Mach" orientato a valle);
+    \item \textbf{Ellittiche} in regime subsonico (le perturbazioni si propagano in tutte le direzioni).
+\end{itemize}
+Di conseguenza, nella regione subsonica le condizioni al contorno (soprattutto all'Outlet) andrebbero gestite in modo completamente diverso (imponendo la pressione statica di uscita e permettendo a un'onda caratteristica di rientrare nel dominio). 
+
+\paragraph{La geometria semplificata.}
+Per aggirare questo problema, si ricorre alla \texttt{doppia\_presa\_semplificata.geo}. Questa geometria taglia verticalmente il dominio \emph{prima} della zona di complessa interazione degli urti e della sezione interna problematica (chiudendo tra il labbro e il tetto). Ignorando la regione a valle del punto 9, garantiamo che l'intero dominio di calcolo rimanga in regime supersonico, permettendoci di imporre l'estrapolazione di tutte le variabili all'Outlet.
+
+\paragraph{Zone critiche per il raffinamento.}
+Alla luce di queste considerazioni, l'infittimento della mesh non deve essere uniforme. Nel campo non strutturato semplificato si è scelto di usare un \emph{Attractor} focalizzato su:
+\begin{itemize}
+    \item \textbf{Le due rampe (linee 3 e 4)}: ostacoli fisici che innescano variazioni discontinue (forti gradienti);
+    \item \textbf{Il labbro e la parte terminale (linee 7 e 8)}: per catturare la formazione del terzo urto e le condizioni di cattura della presa d'aria.
+\end{itemize}
+Al contrario, regioni come l'angolo superiore sinistro (Inlet-alto, vicino al punto 12) rappresentano il flusso a monte indisturbato e non necessitano di una risoluzione spinta. 
+Sono stati prodotti due file \texttt{.geo} distinti:
+\begin{itemize}
+  \item \texttt{doppia\_presa\_reale.geo}: geometria completa con il condotto di cattura
+    e la zona di uscita doppie (include la regione di separazione interna).
+  \item \texttt{doppia\_presa\_semplificata.geo}: versione semplificata con chiusura diretta
+    del dominio e raffinamento mesh ottimizzato per le simulazioni CFD.
+\end{itemize}
+
+\subsection{Geometria Reale -- File \texttt{doppia\_presa\_reale.geo}}
+\label{sec:presa_reale}
+
+\begin{lstlisting}[style=gmsh, caption={File \texttt{doppia\_presa\_reale.geo} -- geometria completa.}, label={lst:presa_reale}]
+Mesh.MshFileVersion = 2.2;
+
+// --- Lunghezza caratteristica globale (scalata sull'unita') ---
+lc = 1;
+
+// ============================================================
+// Definizione dei 12 punti della geometria
+// ============================================================
+// --- Linea di simmetria/fondo: punti da sinistra verso destra ---
+Point(1)  = {-0.500, 0,      0, lc}; // angolo inf. sinistro (Inlet-basso)
+Point(2)  = {-0.450, 0,      0, lc}; // bordo anteriore della prima rampa
+Point(3)  = {0,      0,      0, lc}; // piede della prima rampa (origine)
+Point(4)  = {0.353,  0.0623, 0, lc}; // ginocchio tra prima e seconda rampa
+                                      // pendenza 1a rampa: atan(0.0623/0.353)~10deg
+Point(5)  = {0.720,  0.207,  0, lc}; // ginocchio tra seconda rampa e fondo canale
+                                      // pendenza 2a rampa: atan((0.207-0.0623)/(0.720-0.353))~21.4deg
+Point(6)  = {1,      0.204,  0, lc}; // fondo del canale lato uscita (Outlet inf.)
+// --- Bordo superiore del canale ---
+Point(7)  = {1,      0.310,  0, lc}; // angolo sup. destro (Outlet sup.)
+Point(8)  = {0.797,  0.310,  0, lc}; // inizio del labbro superiore interno
+Point(9)  = {0.617,  0.280,  0, lc}; // bordo di cattura della presa (labbro)
+// --- Bordo superiore esterno ---
+Point(10) = {0.832,  0.426,  0, lc}; // angolo del bordo esterno superiore
+Point(11) = {0.832,  0.800,  0, lc}; // angolo sup. dell'esterno
+Point(12) = {-0.500, 0.800,  0, lc}; // angolo sup. sinistro (Inlet-alto)
+
+// ============================================================
+// Definizione delle 12 linee del contorno
+// ============================================================
+Line(1)  = {1,  2};  // piano d'ingresso inferiore (orizzontale)
+Line(2)  = {2,  3};  // zona piatta davanti alla prima rampa
+Line(3)  = {3,  4};  // prima rampa (pendenza ~10 deg)
+Line(4)  = {4,  5};  // seconda rampa (pendenza ~21 deg)
+Line(5)  = {5,  6};  // fondo orizzontale del canale
+Line(6)  = {6,  7};  // bordo destro del canale (Outlet)
+Line(7)  = {7,  8};  // bordo superiore del canale (uscita)
+Line(8)  = {8,  9};  // labbro superiore della presa
+Line(9)  = {9,  10}; // bordo esterno del labbro
+Line(10) = {10, 11}; // bordo esterno verticale
+Line(11) = {11, 12}; // bordo superiore esterno (orizzontale)
+Line(12) = {12, 1};  // Inlet (bordo sinistro verticale)
+
+// --- Chiusura del contorno e superficie ---
+Line Loop(1) = {1,2,3,4,5,6,7,8,9,10,11,12};
+Plane Surface(1) = {1};
+\end{lstlisting}
+
+\paragraph{Note sulla geometria reale.}
+La geometria include 12 punti e 12 linee che descrivono il profilo esterno della presa, il
+canale interno e la zona di uscita. I punti chiave sono:
+\begin{itemize}
+  \item \textbf{Punti 3--4}: la prima rampa ha pendenza
+    $\arctan(0.0623/0.353) \approx 10°$ rispetto all'orizzontale.
+  \item \textbf{Punti 4--5}: la seconda rampa ha pendenza
+    $\arctan\!\left(\frac{0.207-0.0623}{0.720-0.353}\right) \approx 21.4°$.
+  \item \textbf{Punto 9}: il \emph{labbro} della presa, che separa il flusso catturato da
+    quello che scorre esternamente.
+  \item \textbf{Punti 10--11}: il bordo superiore esterno che delimita la regione esterna
+    del dominio computazionale.
+\end{itemize}
+
+\subsection{Geometria Semplificata -- File \texttt{doppia\_presa\_semplificata.geo}}
+\label{sec:presa_semplificata}
+
+La versione semplificata riduce il numero di punti da 12 a 11, eliminando il punto 10
+(bordo esterno superiore) e collegando direttamente il labbro della presa al bordo superiore
+del dominio. Questa semplificazione riduce la complessità topologica del dominio senza
+alterare la fisica nella zona d'interesse (le rampe e il canale di cattura), e
+introduce un raffinamento della mesh ottimizzato per le zone di urto:
+
+\begin{lstlisting}[style=gmsh, caption={File \texttt{doppia\_presa\_semplificata.geo} -- geometria semplificata con raffinamento.}, label={lst:presa_sempl}]
+Mesh.MshFileVersion = 2.2;
+
+lc = 1; // lunghezza caratteristica di riferimento
+
+// ============================================================
+// 11 punti (vs 12 della versione reale)
+// ============================================================
+Point(1)  = {-0.500, 0,      0, lc};
+Point(2)  = {-0.450, 0,      0, lc};
+Point(3)  = {0,      0,      0, lc};
+Point(4)  = {0.353,  0.0623, 0, lc};
+Point(5)  = {0.720,  0.207,  0, lc};
+Point(6)  = {1,      0.204,  0, lc};
+Point(7)  = {1,      0.310,  0, lc};
+Point(8)  = {0.797,  0.310,  0, lc};
+Point(9)  = {0.617,  0.280,  0, lc}; // labbro della presa
+// DIFFERENZA rispetto alla versione reale:
+// Il punto 10 della versione reale (0.832, 0.426) e' eliminato
+Point(10) = {0.617,  0.800,  0, lc}; // direttamente sopra al labbro (stessa x di 9)
+Point(11) = {-0.500, 0.800,  0, lc}; // angolo sup. sinistro (= punto 12 della versione reale)
+
+// 11 linee
+Line(1)  = {1,  2};
+Line(2)  = {2,  3};
+Line(3)  = {3,  4};  // prima rampa
+Line(4)  = {4,  5};  // seconda rampa
+Line(5)  = {5,  6};  // fondo canale
+Line(6)  = {6,  7};  // Outlet
+Line(7)  = {7,  8};
+Line(8)  = {8,  9};  // labbro
+Line(9)  = {9,  10}; // chiusura verticale sopra il labbro (semplificazione)
+Line(10) = {10, 11}; // tetto
+Line(11) = {11, 1};  // Inlet
+
+Line Loop(1) = {1,2,3,4,5,6,7,8,9,10,11};
+Plane Surface(1) = {1};
+
+// ============================================================
+// MESH NON STRUTTURATA con raffinamento sulle zone di urto
+// ============================================================
+
+// --- Campo Attractor: infittisce la mesh vicino alle rampe e al canale ---
+Field[1] = Attractor;
+// Si attrae la mesh verso le linee geometricamente piu' importanti:
+// - Linea 3: prima rampa (genera il primo urto obliquo)
+// - Linea 4: seconda rampa (genera il secondo urto obliquo)
+// - Linea 5: fondo del canale (gradienti di strato limite)
+// - Linea 6: Outlet
+// - Linea 7: bordo superiore del canale
+// - Linea 8: labbro della presa (geometria critica)
+Field[1].EdgesList = {3, 4, 5, 6, 7, 8};
+
+// --- Campo Threshold ---
+Field[2] = Threshold;
+Field[2].IField  = 1;
+// lc nella zona vicina alle rampe: 5% della lunghezza di riferimento
+// => elementi piccoli per risolvere gli urti e i gradienti di parete
+Field[2].LcMin   = lc * 0.05;  // = 0.05
+// lc nella zona lontana dalle rampe: 10% della lunghezza di riferimento
+Field[2].LcMax   = lc * 0.10;  // = 0.10
+// Distanza di transizione:
+// - sotto lc/4 = 0.25 si usa LcMin (zona di urto e parete)
+// - oltre lc/2 = 0.50 si usa LcMax (zona indisturbata)
+Field[2].DistMin = lc / 4;
+Field[2].DistMax = lc / 2;
+
+Background Field = 2;
+
+// Conversione in quadrilateri
+Recombine Surface{1};
+\end{lstlisting}
+
+\paragraph{Motivazione della semplificazione geometrica.}
+La versione semplificata collega direttamente il punto 9 (labbro, coordinate $(0.617, 0.280)$)
+al punto $(0.617, 0.800)$ che si trova esattamente sopra di esso sulla stessa verticale.
+Questo elimina la rientranza angolata presente nella versione reale (punti 9--10--11), che
+avrebbe reso più difficile la generazione di una mesh di qualità in quell'angolo. Dal punto di
+vista fisico, la zona modificata è lontana dalle rampe di compressione e non influenza
+significativamente la fisica del flusso nella presa.
+
+\paragraph{Motivazione del raffinamento sulle linee 3--8.}
+Le linee selezionate come attrattori corrispondono alle zone fisicamente più critiche:
+\begin{itemize}
+  \item \textbf{Linee 3 e 4} (rampe): qui si attaccano gli urti obliqui. Una mesh fine è
+    necessaria per risolvere correttamente la discontinuità di pressione e la deflessione del
+    flusso.
+  \item \textbf{Linea 5} (fondo del canale): la corrente compressa scorre lungo questa superficie,
+    dove si sviluppa uno strato limite anche in assenza di viscosità (nel senso che i gradienti
+    normali alla parete sono comunque significativi).
+  \item \textbf{Linee 7 e 8} (bordo superiore e labbro della presa): in questa zona gli urti
+    riflessi e l'interazione con il labbro producono strutture di flusso complesse che richiedono
+    alta risoluzione.
+\end{itemize}
+
+Il rapporto $\texttt{LcMax}/\texttt{LcMin} = 2$ garantisce una transizione graduale nella
+dimensione delle celle, evitando elementi distorti o con rapporti di aspetto elevati.
+
+\section{Condizioni al Contorno e Parametri della Simulazione}
+\label{sec:presa_bc}
+
+\begin{table}[H]
+  \centering
+  \caption{Parametri di simulazione -- presa a doppia rampa.}
+  \label{tab:presa_param}
+  \begin{tabular}{llll}
+    \toprule
+    File & Parametro & Valore & Descrizione \\
+    \midrule
+    \multirow{4}{*}{\texttt{input.txt}}
+      & \texttt{KFINAL} & 300\,000 & Iterazioni massime \\
+      & \texttt{KINF}   & 100      & Frequenza output a schermo \\
+      & \texttt{KOUT}   & 100      & Frequenza salvataggio soluzione \\
+      & \texttt{CFL}    & 0.3      & Numero CFL \\
+    \midrule
+    \multirow{4}{*}{\texttt{inlet.txt}}
+      & $T^\circ_{\rm in}$ & 1  & Temperatura totale (adim.) \\
+      & $P^\circ_{\rm in}$ & 1  & Pressione totale (adim.) \\
+      & $\alpha$           & 0° & Flusso orizzontale \\
+      & $M_{\rm in}$       & 3  & Mach supersonico \\
+    \midrule
+    \texttt{outlet.txt}
+      & $P_{\rm exit}$ & 0.001 & Non utilizzato (uscita supersonica) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Osservazioni sulle condizioni.}
+\begin{itemize}
+  \item Poiché il flusso è supersonico all'ingresso ($M = 3$), tutte le caratteristiche
+    entrano nel dominio da sinistra: si impongono tutte e quattro le variabili conservative.
+  \item Con $\text{KINF} = 100$ (anziché 1000 come nel caso bump), la frequenza di output
+    è più alta: questo è necessario perché le simulazioni supersoniche convergono molto più
+    rapidamente (il dominio è quasi interamente in regime supersonico, e i transitori si
+    propagano a velocità elevata attraversando il dominio in poche iterazioni).
+  \item Il valore $P_{\rm exit} = 0.001$ è puramente indicativo: in uscita supersonica
+    il codice ignora questa condizione e estraprola tutte le variabili dall'interno.
+\end{itemize}
+
+\section{Analisi di Convergenza della Griglia}
+\label{sec:presa_convergenza}
+
+\subsection{Campo di Mach e Struttura degli Urti}
+
+A differenza del caso bump (dove il campo di moto è privo di urti), nella presa a doppia
+rampa sono presenti urti obliqui fisici. Pertanto:
+\begin{itemize}
+  \item L'entropia non è più identicamente nulla anche nella soluzione esatta;
+  \item L'analisi di convergenza tramite soluzione esatta nota non è applicabile;
+  \item Si utilizzano solo l'estrapolazione di Richardson con ordine teorico e ordine effettivo.
+\end{itemize}
+
+Il campo di Mach mostra chiaramente le strutture attese:
+\begin{enumerate}
+  \item Primo urto obliquo generato dal piede della prima rampa (punto 3), che deflette la
+    corrente di circa 10° e riduce $M$ da 3 a circa 2.5.
+  \item Secondo urto obliquo generato dal ginocchio (punto 4), che deflette ulteriormente la
+    corrente e riduce $M$ a circa 1.5.
+  \item Eventuale urto normale all'ingresso del canale o urto riflesso sul bordo superiore.
+\end{enumerate}
+
+Al raffinamento della griglia, gli urti diventano progressivamente più netti
+(la zona di smearing si riduce), e il metodo di Roe cattura meglio le discontinuità
+rispetto a Lax--Friedrichs.
+
+\subsection{Risultati dell'Estrapolazione di Richardson}
+
+\begin{table}[H]
+  \centering
+  \caption{Risultati dell'analisi di convergenza -- presa doppia rampa.}
+  \label{tab:presa_convergenza}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabular}{lccccc}
+    \toprule
+    Metodo & Tipo analisi & $p$ & $u_{\rm esatto}$ & $E$ & GCI \\
+    \midrule
+    Lax--Friedrichs & Ordine teorico   & 1.00  & $1.61\times10^{-2}$ & $3.61\times10^{-3}$ & $1.08\times10^{-2}$ \\
+    Roe             & Ordine teorico   & 1.00  & $1.42\times10^{-2}$ & $2.26\times10^{-3}$ & $6.79\times10^{-3}$ \\
+    \midrule
+    Lax--Friedrichs & Ordine effettivo & 0.234 & $4.79\times10^{-2}$ & $2.82\times10^{-2}$ & $8.47\times10^{-2}$ \\
+    Roe             & Ordine effettivo & 1.46  & $1.75\times10^{-2}$ & $1.03\times10^{-3}$ & $3.09\times10^{-3}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+I valori di $\norma{\bar{S}}_2$ usati nell'analisi sono:
+\begin{align*}
+  u_h   &= \begin{cases} 1.97\times10^{-2} & \text{Lax--Friedrichs} \\
+                         1.65\times10^{-2} & \text{Roe}\end{cases}, \quad
+  u_{2h} = \begin{cases} 2.47\times10^{-2} & \text{Lax--Friedrichs} \\
+                         1.83\times10^{-2} & \text{Roe}\end{cases}, \quad
+  u_{4h} = \begin{cases} 3.05\times10^{-2} & \text{Lax--Friedrichs} \\
+                         2.33\times10^{-2} & \text{Roe}\end{cases}
+\end{align*}
+
+\paragraph{Interpretazione.}
+Per lo schema di Roe l'ordine effettivo risulta $p \approx 1.46 > 1$: questo valore superiore
+all'ordine teorico è un artefatto dovuto al non aver ancora raggiunto la regione asintotica.
+Quando la griglia non è abbastanza fine, i termini di ordine superiore nello sviluppo
+dell'errore sono ancora significativi e possono aumentare apparentemente l'ordine stimato.
+Per Lax--Friedrichs l'ordine effettivo è molto basso ($p \approx 0.23$), riflettendo la
+maggiore dissipazione numerica e la scarsa capacità di catturare correttamente le
+discontinuità.
+
+\section{Confronto con Dati Sperimentali}
+\label{sec:presa_exp}
+
+I dati sperimentali disponibili forniscono la distribuzione di pressione sulla parete
+inferiore del condotto in funzione della coordinata assiale $x$. Per il confronto si estrae
+numericamente la pressione nelle celle di bordo con tag 99 (parete solida), si filtra
+per la parete inferiore imponendo una soglia sulla coordinata $y$, e si confronta
+$P_w/P^\circ$ con i dati sperimentali.
+
+I risultati mostrano che:
+\begin{itemize}
+  \item I casi inviscidi (sia il codice sviluppato con schema di Roe sia Fluent inviscido)
+    concordano bene tra loro nella distribuzione di pressione;
+  \item Le discrepanze maggiori con i dati sperimentali si trovano nella zona a valle degli
+    urti ($x > 0.5$), dove il campo è influenzato da interazioni onde d'urto--strato limite
+    (SBLI) non catturabili con un modello di Eulero;
+  \item Il modello RANS (Fluent viscoso con Spalart--Allmaras) è in grado di cogliere
+    parzialmente la separazione indotta dagli urti sulla parete, avvicinandosi maggiormente
+    ai dati sperimentali nella regione downstream.
+\end{itemize}
+
+\section{Analisi con ANSYS Fluent}
+\label{sec:presa_fluent}
+
+\subsection{Geometria e Mesh in ANSYS}
+
+La geometria è stata importata in ANSYS DesignModeler a partire dal file \texttt{.step}
+esportato da \texttt{gmsh} (con il comando \texttt{SetFactory("OpenCASCADE")}), applicando
+un fattore di scala di 1000 per convertire le unità da millimetri a metri.
+
+La mesh ANSYS è non strutturata con elementi quadrangolari, con le seguenti specifiche:
+\begin{itemize}
+  \item \texttt{Element size}: 0.008~m
+  \item \texttt{Inflation layers} (strati di inflazione sulla parete): massimo 15 strati
+  \item \texttt{Inflation Growth rate}: 1.2
+\end{itemize}
+
+\subsection{Impostazioni Fluent}
+
+\begin{itemize}
+  \item Solutore: \textit{density-based}, implicito, $P_{\rm ref} = 0$~Pa
+  \item Discretizzazione spaziale: secondo ordine upwind, schema di Roe
+  \item Numero di Courant: 5
+  \item Condizioni al contorno Inlet: $P^\circ = 100\,000$~Pa,
+    $P_{\rm static} = 2722.37$~Pa (corrispondente a $M = 3$), $T^\circ = 300$~K
+  \item Viscosità (caso RANS): $\mu = 1.4946 \times 10^{-5}$~N$\cdot$s/m$^2$,
+    ottenuta da:
+    \begin{equation}
+      \mu = \frac{\rho u L}{Re} = \frac{\rho u L}{1.3 \times 10^6}
+    \end{equation}
+\end{itemize}
+
+\paragraph{Analisi del $y^+$.}
+Il profilo di $y^+$ sulla parete inferiore mostra valori superiori alla soglia di $y^+ \le 5$
+nella maggior parte del dominio, indicando che lo strato limite non è completamente risolto.
+Sarebbe necessario aumentare il numero di strati di inflazione o ridurre l'altezza del primo
+strato per soddisfare il requisito $y^+ \le 5$ richiesto dal modello Spalart--Allmaras
+(che non prevede funzioni di parete e necessita di risolvere il sottostrato viscoso).
