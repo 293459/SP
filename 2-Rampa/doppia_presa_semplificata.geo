@@ -35,13 +35,13 @@ Line Loop(1) = {1,2,3,4,5,6,7,8,9,10,11};
 // Definizione Superficie
 Plane Surface(1) = {1} ; // si mette il numero della curva chiusa orientata
 
+
 // Attrattori 
 Field[1] = Attractor; // la tipologia del Field 1 è attractor
 // definisco un campo di distanza scalare rispetto a ciò che indico nella riga successiva
 Field[1].EdgesList = {3,4,5,6,7,8}; // voglio infittire la mesh in queste zone per gli urti e la geometria
 // capisce che sto prendendo le linee e non i punti perché uso "Edge"
 // se sono più di 1 lato bisogna scrivere "Edges" non "Edge"
-
 
 Field[2] = Threshold; // la tipologia è Threshold
 Field[2].IField = 1; // I = input dle campo
@@ -51,7 +51,16 @@ Field[2].DistMin = lc/4; // distanza minima della mesh
 Field[2].DistMax = lc/2; // distanza massima della mesh
 // potrei mettere altri campi con altri attrattori Field[3]ad esempio
 // potrei poi decidere di definire un campo minimo tra gli attrattori 
- 
 Background Field = 2 ; // il campo che ho scelto effettivamente 
-
 Recombine Surface{1}; // lo converto in rettangoli
+
+
+// Assegnazione Tag per le Boundary Conditions
+Physical Surface(1)= {1}; // assegnamo alla superficie 1 il tag 1 che è il DOMINIO
+// queesta non cambia rispetto al caso reale poiché la superficie è sempre la stessa
+Physical Line(99)= {1,2,3,4,5,7,8,10}; // assegnamo alle linee 1,2,3,4,5,7,8,9,11 il tag 99 che significa WALL
+Physical Line(2)= {11}; // assegnamo alla linea 12 il tag 2 che significa INLET
+// nella geometria reale era la linea 12 ma qui scala di 1 la numerazione
+Physical Line(3)= {6,9}; // assegnamo alle linee 6,9 il tag 3 che significa OUTLET
+// nel caso semplificato la linea 6 è identica al caso reale mentre 
+// la linea 10 scala a 9 per la numerazione 
