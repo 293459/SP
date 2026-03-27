@@ -1,0 +1,58 @@
+Mesh.MshFileVersion=2.2;
+// questo è un commento
+L = 1; 
+h = 0.3;
+lc = 0.05; // lunghezza caratteristica
+
+
+
+
+Point(1) = {0, 0, 0, lc};
+Point(2) = {L, 0, 0, lc};
+Point(3) = {L, h, 0, lc};
+Point(4) = {0, h, 0, lc};
+
+
+Point(5) = {L/2, h/10, 0, lc};
+Point(6) = {L/2-L/8, 0, 0, lc};
+Point(7) = {L/2+L/8, 0, 0, lc};
+
+
+Line(1) = {2, 3};
+Line(2) = {3, 4};
+Line(3) = {4, 1};
+
+Spline(4) = {1, 6, 5, 7, 2}; // input definito da una serie di punti
+
+Line Loop(1) = {1,2,3,4}; // bisogna dare un verso coerente tra le linee e formare una linea chiusa
+
+Plane Surface(1) = {1}; // definiamo sup con line loop
+
+
+// diamo informazioni più specifiche sulla mesh che vogliamo creare
+// definiamo dei campi - attrattore e threshold con obiettivo finale avere una mesh non strutturata infittendola nella zona del bump
+
+Field[1] = Attractor;
+Field[1].EdgesList = {4}; // campo attrattore definito dalla linea 4, passo quindi la curva che voglio utilizzare come attrattore che in questo caso è la linea 4
+
+Field[2] = Threshold;
+Field[2].IField = 1; // Threshold fallo per il campo 1 ovvero attrattore
+Field[2].LcMin = lc*0.1;
+Field[2].LcMax = lc*0.5;
+
+Field[2].DistMin = h/4;
+Field[2].DistMax = h/2;
+
+// per far funzionare attrattore bisogna definire background field
+Background Field = 2; // la mesh di background segue regole di field 2
+//Recombine Surface{1};
+
+
+Physical Surface(1) = 1;
+Physical Line(99) = {4, 2};
+Physical Line(2) = {3};
+Physical Line(3) = {1};
+
+
+
+

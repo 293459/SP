@@ -1,0 +1,50 @@
+Mesh.MshFileVersion=2.2;
+// questo è un commento
+L = 1; 
+h = 0.3;
+lc = 0.05; // lunghezza caratteristica
+//lc=1;
+
+n=3;
+
+
+Point(1) = {0, 0, 0, lc};
+Point(2) = {L, 0, 0, lc};
+Point(3) = {L, h, 0, lc};
+Point(4) = {0, h, 0, lc};
+
+
+Point(5) = {L/2, h/10, 0, lc};
+Point(6) = {L/2-L/8, 0, 0, lc};
+Point(7) = {L/2+L/8, 0, 0, lc};
+
+
+Line(1) = {2, 3};
+Line(2) = {3, 4};
+Line(3) = {4, 1};
+
+Spline(4) = {1, 6, 5, 7, 2}; // input definito da una serie di punti
+
+Line Loop(1) = {1,2,3,4}; // bisogna dare un verso coerente tra le linee e formare una linea chiusa
+
+Plane Surface(1) = {1}; // definiamo sup con line loop
+
+// vogliamo che la linea 1 sia una transferite line
+
+Transfinite Line{1} = 15*n; // su linea 1 metti 10 nodi di calcolo Progression 1.1 vuol dire che gli elementi a partire da punto iniziale della linea aumenta distanza del 10%
+Transfinite Line{-3} = 15*n; // '-' agisci su secondo elemento della linea
+Transfinite Line{2} = 50*n; // Bump divide linea in due, parte dal centro e la mesh diventa meno fitta all'allontanarsi dal centro
+Transfinite Line{4} = 50*n; // siamo interessati ad infittire al centro perchè ci aspettiamo un gradiente forte
+
+Transfinite Surface{1} = {1, 2, 3, 4}; // in questo modo abbiamo  mesh strutturata dando in ingresso le linee 
+
+//Recombine Surface{1}; // al posto di utilizzare dei triangoli utilizziamo dei quadrilateri
+
+// fine creazione mesh
+
+// operazione di tag degli elementi componenti la mesh
+
+Physical Surface(1) = 1; // sulla superficie 1 vogliamo inserire tag 1
+Physical Line (99) = {4, 2}; // sulla linea 4 e 2 poniamo tag 99 sugli elementi 
+Physical Line (2) = {3};
+Physical Line (3) = {1};

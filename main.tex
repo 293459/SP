@@ -1,0 +1,161 @@
+% ============================================================
+%  Fluidodinamica Computazionale dei Sistemi Propulsivi
+%  Report delle Esercitazioni -- Politecnico di Torino
+%  Ingegneria Aerospaziale, A.A. 2025/2026
+% ============================================================
+\documentclass[12pt, a4paper]{report}
+
+% --- Encoding e lingua ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% --- Layout ---
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% --- Matematica ---
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% --- Grafica ---
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
+
+% --- Tabelle ---
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+
+% --- Codice sorgente ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0.0,0.55,0.0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+\definecolor{keyblue}{rgb}{0.0,0.35,0.75}
+
+\lstdefinestyle{gmsh}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{keyblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{gray!40},
+    morekeywords={Point, Line, Spline, Line Loop, Plane Surface, Physical Surface,
+                  Physical Line, Transfinite Line, Transfinite Surface,
+                  Recombine, Field, Background, Using, Progression, Bump,
+                  Attractor, Threshold, EdgesList, EdgeList, IField,
+                  LcMin, LcMax, DistMin, DistMax, Mesh, MshFileVersion,
+                  Periodic, SetFactory},
+}
+
+\lstdefinestyle{fortran}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{keyblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    captionpos=b,
+    numbers=left,
+    numbersep=5pt,
+    frame=single,
+    rulecolor=\color{gray!40},
+    language=[90]Fortran,
+}
+
+% --- Link e riferimenti ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Fluidodinamica Computazionale dei Sistemi Propulsivi},
+    pdfauthor={},
+}
+
+% --- Intestazioni ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Fluidodinamica Computazionale dei Sistemi Propulsivi}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Comandi personalizzati ---
+\newcommand{\lc}{\ell_c}
+\newcommand{\norma}[1]{\left\|#1\right\|}
+\newcommand{\parziale}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\dt}{\Delta t}
+\newcommand{\dx}{\Delta x}
+\newcommand{\uvec}{\mathbf{u}}
+\newcommand{\fvec}{\mathbf{f}}
+\newcommand{\gvec}{\mathbf{g}}
+\newcommand{\Fvec}{\mathbf{F}}
+\newcommand{\nhat}{\hat{n}}
+
+% ============================================================
+\begin{document}
+
+% --- Frontespizio ---
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\Large\bfseries Politecnico di Torino}\\[0.3cm]
+  {\large Ingegneria Aerospaziale}\\[0.1cm]
+  {\large A.A.\ 2025/2026}\\[2.5cm]
+
+  {\Huge\bfseries Fluidodinamica Computazionale\\[0.4cm]
+  dei Sistemi Propulsivi}\\[0.5cm]
+  {\large Report delle Esercitazioni}\\[3cm]
+
+  \begin{tabular}{rl}
+    \textbf{Docente:} & Prof.\ Andrea Ferrero \\[0.3cm]
+    \textbf{Studente:} & Gabriel Cialdini\\
+  \end{tabular}
+
+  \vfill
+  {\large \today}
+\end{titlepage}
+
+% --- Indice ---
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+% ============================================================
+% CAPITOLI
+% ============================================================
+\input{introduzione}
+\input{bump}
+\input{doppia_presa}
+\input{progetto3}
+\input{progetto4}
+
+\end{document}
