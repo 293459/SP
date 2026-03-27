@@ -272,6 +272,45 @@ Le linee selezionate come attrattori corrispondono alle zone fisicamente più cr
 Il rapporto $\texttt{LcMax}/\texttt{LcMin} = 2$ garantisce una transizione graduale nella
 dimensione delle celle, evitando elementi distorti o con rapporti di aspetto elevati.
 
+\section{Raffinamento Mesh}
+
+\subsection{Mesh v1 -- Raffinamento Iniziale}
+\label{sec:presa_mesh_v1}
+
+Una prima versione della mesh è stata generata con i parametri di raffinamento riportati in \autoref{tab:presa_mesh_v1}.
+
+\begin{table}[H]
+  \centering
+  \caption{Parametri di raffinamento mesh -- versione v1.}
+  \label{tab:presa_mesh_v1}
+  \begin{tabular}{ll}
+    \toprule
+    Parametro & Valore \\
+    \midrule
+    \texttt{Field[2].LcMin} & $lc \times 0.01 = 0.01$ \\
+    \texttt{Field[2].LcMax} & $lc \times 0.10 = 0.10$ \\
+    \texttt{Field[2].DistMin} & $lc / 4 = 0.25$ \\
+    \texttt{Field[2].DistMax} & $lc / 2 = 0.50$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{SP/2-Rampa/mesh_v1.png}
+  \caption{Mesh v1 con raffinamento iniziale. Si osserva un infittimento in prossimità
+           delle rampe e del canale, tuttavia le zone di transizione tra la regione fitta e diradata della mesh è troppo distanti dalle pareti fisiche.}
+  \label{fig:mesh_v1}
+\end{figure}
+
+\paragraph{Osservazioni critiche sulla mesh v1.}
+Sebbene il raffinamento sia presente nelle regioni di interesse (rampe e labbro della presa),
+i parametri \texttt{DistMin} risulta eccessivamente ampio andando ad infittire anche zone che non lo necessiterebbero. 
+Si decide quindi di abbassare \texttt{DistMin} da 0.25 a 0.15. 
+Tuttavia questo non sarà sufficiente poiché occorrerà preoccuparsi di desrcivere adeguatamente la zona di interazione tra gli urti obliqui, che si trova a valle del punto 9 (labbro) e non è coperta da nessuna delle linee attrattori. %Evidentemente, non è possibile inserire un attrattore su una linea che non esiste (non c'è nessuna linea che attraversa la zona di interazione), pertanto si decide di inserire un secondo campo di tipo \texttt{Box} centrato sulla zona di interazione, con \texttt{LcMin} più piccolo rispetto al primo campo Attractor.
+
+
+
 \section{Condizioni al Contorno e Parametri della Simulazione}
 \label{sec:presa_bc}
 

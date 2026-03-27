@@ -49,7 +49,11 @@ Field[2].DistMin = h/4; // distanza minima della mesh
 Field[2].DistMax = h/2; // distanza massima della mesh
 // potrei mettere altri campi con altri attrattori Field[3]ad esempio
 // potrei poi decidere di definire un campo minimo tra gli attrattori 
- 
 Background Field = 2 ; // il campo che ho scelto effettivamente 
-
 Recombine Surface{1}; // lo converto in rettangoli
+
+// Assegnazione Tag per le Boundary Conditions
+Physical Surface(1)= {1}; // assegnamo alla superficie 1 il tag 1 che è il DOMINIO
+Physical Line(99)= {4,2}; // assegnamo alle linee 2,4 il tag 99 che significa WALL
+Physical Line(2)= {3}; // assegnamo alle linee 2,4 il tag 2 che significa INLET
+Physical Line(3)= {1}; // assegnamo alle linee 2,4 il tag 3 che significa OUTLET
