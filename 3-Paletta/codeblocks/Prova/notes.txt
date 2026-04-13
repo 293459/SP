@@ -1,7 +1,0 @@
-https://marketplace.visualstudio.com/items?itemName=fortran-lang.linter-gfortran
-pip install fortls
-
-alternative 
-Julia (fatto dall'MIT, linguaggio semplice come python ma compilato)
-estensioni per Python che fanno compilare il file
-rust (anche se origiariamente era usato come linguaggio system)
