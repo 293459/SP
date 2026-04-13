@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Fortran",
+            "type": "cppdbg", // Usa il motore C++ per il Fortran
+            "request": "launch",
+            // PUNTO 1: Qui punti all'eseguibile
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb", // O "lldb" se sei su Mac
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            // PUNTO 2: Questo lancia la compilazione PRIMA del debug
+            "preLaunchTask": "Compila Fortran" 
+        }
+    ]
+}
