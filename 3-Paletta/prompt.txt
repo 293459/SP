@@ -1,0 +1,12 @@
+1)aggiungi a visual studio code tutte le librerie per supportare Fortran
+2) verifica che ci sia il compilatore, il debugger etc...
+3)completa il file subroutines aggiungendo la funzione per il calcolo del baricentro e per il calcolo dell'area con la formula di Erone commentandole opportunaente in italiano, nella cartella 0-Reference\es_fortran troverai un esempio e puoi fare il codice riferendoti ad esso
+4)decidi se è meglio avere un singolo file per subroutine oppure uno che contenga entrambe 
+5)controlla il pdf nella directory Desktop/SP/0-Reference/CFD.pdf per estrapolare informazioni utili da rielaborare ed aggiungere al report finale. Modifica dunque il file .tex che trovi nella cartella C:\Users\gabri\Desktop\SP\0-Latex e se non trovi nessun file relativo alla paletta crealo
+6)sfrutta tutti i commenti testuali in italiano di tutti i file che trovvi nella directory C:\Users\gabri\Desktop\SP\3-Paletta che ho preso a lezione. Sfruttando questi commenti spiega la logica e i passaggi che sono stati seguiti ad esercitazione per svolgerla.
+7)ricordati di inserire tutte le immagini necessarie quali ad esempio quelle dove si vede la geometria della paletta, le immagine chiamate log1,log2 etc... che servono a far vedere cosa è stato fatto durante l'esercitazione (li si vedono i passaggi cruciali)
+8)specifica la procedura che è stata seguita per usare fortran su visual studio code, che differisce da quanto proposto ad esercitazione (dove si usava codeblocks) indicando i vantaggi
+9)aggiungi al mio file progetto latex cioè quello che si trova nella directory C:\Users\gabri\Desktop\SP\0-Latex tutte le informazioni del report che si trova nella cartella C:\Users\gabri\Desktop\SP\0-Reference anche su ciò che non è stato svolto ad esercitazione così da avere un report completo già da subito che serva anche come guida durante lo svolgimento dell'esercitazione e che possa guardare peer farmi un'idea di cosa verrà fatto
+10)mantieni la struttura logica e suddivisione in cartelle che ho proposto io anche se i contenuti so o estratti da file proposti da altri
+11)compila il progetto latex e verifica dal pdf che si genera che non ci ssiano problemi di impaginazione, layout etc.. e che in generale il pdf sia presentabile
+12)ogni volta che fai delle modifiche sostanziali e completi uno dei punti della lista fai un commit specificando per bene che modifiche hai fatto così da aggiornare la repo github correttamente 
