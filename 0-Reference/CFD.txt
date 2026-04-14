@@ -1,0 +1,4030 @@
+Politecnico di Torino
+Ingegneria Aerospaziale
+A.A. 2023/2024
+
+Fluidodinamica Computazionale
+dei sistemi propulsivi
+Docente
+
+Studente
+
+Andrea Ferrero
+
+Jafar Mohaddes Zadeh
+308343
+
+Indice
+Introduzione
+
+4
+
+Generazione di una Mesh
+1.1 Software gmsh . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.1.1 Griglie strutturate . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.1.2 Griglie non strutturate . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2 File .geo . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2.1 Definizione della geometria . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2.2 Definizione caratteristiche della mesh . . . . . . . . . . . . . . . . . . . .
+
+5
+5
+6
+6
+7
+7
+8
+
+Codice CFD
+2.1 Strutture . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2 Variabili . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3 Main . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.1 Subroutine input . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.2 Subroutine leggi gmsh . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.3 Subroutine processa elementi . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.4 Subroutine init . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.5 Subroutine compute dt . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.6 Subroutine compute fluxes . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3.7 Subroutine integ time . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+12
+12
+14
+15
+16
+18
+20
+23
+26
+27
+33
+
+Bump - mesh strutturata
+3.1 Inizializzazione . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.1 Caso 750 nodi . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.2 Caso 3000 nodi . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.3 Caso 6750 nodi . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.4 Caso 12000 nodi . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.2 Analisi di convergenza . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.2.1 Lax–Friedrichs vs. Roe . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.2.2 Valutazione dell’ordine di convergenza . . . . . . . . . . . . . . . . . . .
+
+34
+34
+35
+36
+37
+38
+39
+41
+42
+
+Paletta di turbina LS59
+45
+4.1 Inizializzazione . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+4.1.1 Campo di Mach e Velocità . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+2
+
+INDICE
+
+4.1.2 Campo di Entropia . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Analisi di convergenza . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Confronto con dati sperimentali . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Analisi con ANSYS Fluent . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.4.1 Realizzazione geometria . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.4.2 Realizzazione mesh . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.4.3 Analisi Fluent . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+52
+55
+57
+60
+60
+61
+62
+
+Presa doppia rampa
+5.1 Inizializzazione . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.1.1 Campo di Mach . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.1.2 Campo di Entropia . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.2 Analisi di convergenza . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.3 Confronto con dati sperimentali . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.4 Analisi con ANSYS Fluent . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.4.1 Realizzazione geometria . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.4.2 Realizzazione mesh . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.4.3 Analisi Fluent . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+66
+66
+68
+71
+74
+76
+78
+78
+79
+80
+
+Ottimizzazione di Forma
+6.1 Procedura . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+6.2 Software modeFRONTIER . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+6.3 Risultati . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+84
+84
+85
+88
+
+4.2
+4.3
+4.4
+
+3
+Jafar Mohaddes Zadeh
+
+Introduzione
+Lo scopo di questo documento è riportare il lavoro svolto nell’ambito delle esercitazioni del
+corso Fluidodinamica computazionale dei sistemi propulsivi. In queste esercitazioni si
+è affrontato lo sviluppo di un codice CFD tramite l’impiego del linguaggio di programmazione
+Fortran 90 e il confronto dello stesso con il software commerciale ANSYS Fluent. Vengono
+proposti in questo elaborato tutti gli step che hanno portato alla realizzazione del codice e le
+sue applicazioni su alcuni casi studio di interesse.
+
+4
+
+Generazione di una Mesh
+Prima dello sviluppo del codice CFD ci si pone il problema di creare un file di input allo stesso,
+in particolare è necessario, attraverso un software esterno, generare un dominio computazionale
+sul quale viene generata una mesh, nei cui nodi verrà valutata la soluzione delle equazioni.
+Dopo aver scelto il modello matematico-fisico descrittivo del problema in esame, è necessario
+discretizzare le equazioni per passare da un dominio continuo ad uno discreto. La scelta di
+questi punti è ciò che determina la griglia.
+
+1.1
+
+Software gmsh
+
+Per la generazione di una mesh ci si affida al software gmsh, il quale è open source ed ha al suo
+interno diversi ambienti disponibili tra cui un CAD, un generatore di mesh e un post processor.
+La discretizzazione nello spazio per mezzo di una griglia introduce un errore, la tendenza infatti
+sarebbe quella di avere una griglia molto fitta per tendere al caso continuo, questa strada però
+non è percorribile a causa dell’altissimo costo computazionale associato. Se si volesse ridurre il
+costo computazionale attraverso una griglia molto povera di punti, si incapperebbe ugualmente
+in delle problematiche in quanto si perderebbe in termini di risoluzione spaziale. La soluzione quindi sta nel popolare la griglia di un’alta quantità di punti laddove necessario, ovvero
+dove ci si aspetta la presenza di forti gradienti. I forti gradienti, nei casi di interesse, possono trovarsi ad esempio sulle pareti solide in cui si sviluppa uno strato limite o a valle di un urto.
+Prima di discutere in dettaglio come implementare questo tipo di logica nella definizione della
+nostra griglia computazionale, è bene soffermarsi su quali tipi di griglie è possibile realizzare,
+in particolare ne esistono di due tipi:
+• Griglie strutturate.
+• Griglie non strutturate.
+
+5
+
+Software gmsh
+
+1.1.1
+
+Griglie strutturate
+
+Le griglie strutturate sono delle griglie in cui ogni nodo di calcolo si trova all’intersezione di
+due linee coordinate.
+
+Figura 1.1: Griglia strutturata
+Uno dei vantaggi di questa tipologia di griglia è la facilità con la quale è possibile definire i
+vicini di un nodo j − esimo, infatti ogni elemento può essere indicato con due indici. Questa
+caratteristica elimina la necessità di una matrice di connectivity e quindi rendere il codice di
+calcolo più prestante. Un’altra definizione di griglia strutturata è:
+Detto N il numero di dimensioni, la griglia è detta strutturata se posso identificare
+N indici che scorrendo di un’unità identificano i vicini.
+Il codice risulta più prestante in caso di griglie strutturate anche a causa di come lavorano
+i calcolatori: quando vengono richieste le informazioni di un elemento il computer si aspetta
+che l’user richieda in seguito delle informazioni sugli elementi associati agli indici precedenti
+e successivi, e quindi le estrae in automatico. Per questo tipo di griglia quindi la logica implementata nei calcolatori consente alte prestazioni. Il difetto di queste griglie, però, è che
+per domini molto complessi non è possibile realizzarle, inoltre se si è interessati a conoscere la
+soluzione in un particolare punto non basta aggiungere quel punto, ma a causa delle proprietà
+della griglia stessa (linee coordinate) bisogna aggiungere molti punti, i quali aumentano il costo
+computazionale complessivo.
+
+1.1.2
+
+Griglie non strutturate
+
+Per griglie non strutturate, invece, i punti non sono più definiti come intersezione di linee
+coordinate, e questo infatti riduce la complessità di generazione della griglia, introduce la
+possibilità di introdurre liberamente nodi singoli dove necessario ed è possibile gestire geometrie
+più complesse. Come si può immaginare non è più possibile sfruttare una notazione a due indici
+come nel caso precedente e di conseguenza è necessario definire una matrice di connectivity,
+che il software dovrà interrogare quando svolgerà le operazioni di calcolo richieste, rendendo il
+processo meno prestante.
+
+6
+Jafar Mohaddes Zadeh
+
+File .geo
+
+Figura 1.2: Griglia non strutturata
+Nelle figure 1.1 e 1.2 vengono rappresentati degli elementi triangolari, ma le griglie possono
+avere una geometria poligonale diversa.
+
+1.2
+
+File .geo
+
+Il software gmsh legge un file di testo con estensione .geo, il quale contiene tutte le informazioni necessarie affinché il software generi una geometria con le caratteristiche richieste e delle
+specifiche per la mesh.
+
+1.2.1
+
+Definizione della geometria
+
+Per prima cosa si definiscono dei punti che verranno successivamente connessi da delle linee,
+per farlo si usa la sintassi del comando P oint :
+P oint(i) = {x, y, z, lc}
+Dove:
+• i rappresenta il tag univoco associato al punto.
+• x, y, z invece sono le coordinate nello spazio.
+• lc rappresenta la lunghezza caratteristica dell’elemento in prossimità di quel punto. Si
+può decidere di assegnare la stessa lunghezza caratteristica per tutti i punti e per infittire
+la griglia definire successivamente delle proprietà, oppure si può agire direttamente su
+questo parametro nella definizione dei punti. La seconda strategia risulta onerosa quando
+i punti sono molti.
+Dopo aver definito i punti che descrivono il corpo, si procede alla definizione degli elementi
+linea che uniscono due punti attraverso il comando Line, la cui sintassi è:
+Line(i) = {n, m}
+
+7
+Jafar Mohaddes Zadeh
+
+File .geo
+
+Dove:
+• i è il tag univoco associato alla linea.
+• n è il tag univoco del punto dal quale la linea parte.
+• m è il tag univoco del punto su cui la linea finisce.
+Come si può intuire dalla sintassi, la linea ha una certa direzione definita dai punti di partenza e
+arrivo. Questa direzione ha una sua importanza quando si definisce una linea chiusa, in quanto
+le linee che la costituiscono devono avere un verso coerente. Un altro tipo di linea che si può
+definire è una spline attraverso il comando Spline:
+Spline(i) = {n, m, p, q, . . . }
+Dove:
+• i è il tag univoco associato alla linea.
+• n, m, p, q, . . . sono i tag univoci della serie di punti che definiscono la curva, che come per
+il comando Line definiscono un certo verso di percorrenza in base al primo e ultimo tag
+forniti.
+Per la realizzazione di una linea chiusa si usa il comando Line Loop, il quale chiede di fornire i
+tag delle linee che dovrebbero comporre la linea chiusa. In questo tipo di comando è possibile
+combinare insieme elementi Line e Spline perché il linguaggio usato li considera elementi
+geometrici dello stesso tipo.
+Line Loop(i) = {n, m, p, q, . . . }
+Dopo aver definito una linea chiusa è possibile definire una superficie associata alla stessa
+attraverso il tag univoco n in ingresso.
+P lane Surf ace(i) = {n}
+A questo punto si sono fornite tutte le informazioni necessarie per la geometria e ci si interessa
+alla definizione della mesh associata.
+
+1.2.2
+
+Definizione caratteristiche della mesh
+
+Per la definizione della mesh si possono utilizzare due approcci:
+• Il primo approccio definisce il numero di punti associati ad una linea e una legge di
+progressione della distanza tra questi punti a partire da quello iniziale. Se si è interessati
+a far partire la legge di progressione dal punto finale della linea è sufficiente inserire un
+”-” quando si richiama il tag della linea. La sintassi per quanto descritto è:
+T ransf inite Line{i} = n U sing P rogession m
+
+8
+Jafar Mohaddes Zadeh
+
+File .geo
+
+Dove:
+– i è il tag univoco della linea sulla quale si posizionano i punti.
+– n è il numero di punti che si vogliono inserire.
+– m è un numero che determina la legge di progressione. A titolo di esempio se m = 1.1
+significa che sulla linea i ci sono n nodi di calcolo con Progression 1.1, ovvero, che la
+distanza tra elementi successivi aumenta del 10% rispetto alla precedente, a partire
+dal nodo iniziale.
+In alternativa alla progressione definita precedentemente, si può raffinare la griglia al
+centro di una certa linea e aumentare la distanza tra gli elementi allontanandosi da esso.
+Per realizzare questa progressione la sintassi rimane invariata ma anziché Progression si
+utilizza Bump:
+T ransf inite Line{i} = n U sing Bump m
+Se si è interessati ad una mesh strutturata, dopo aver dato questo comando si usa il comando T ransf inite Surf ace che chiede in ingresso i tag delle T ransf inite Line definite
+precedentemente.
+T ransf inite Surf ace{i} = {n, m, p, q, . . . }
+• Il secondo approccio invece prevede di definire delle proprietà dei campi, in particolare
+un attrattore e una soglia. L’idea è quella di riferirsi ad una o più linee già definite e
+renderle attrattori. Per definire invece la soglia a partire dall’attrattore si definiscono 3
+zone:
+– Una zona compresa tra la linea attrattore e una certa distanza definita come DistM in,
+nella quale la mesh sarà caratterizzata da una lunghezza caratteristica molto piccola
+che si manterrà costante all’interno di questa zona.
+– Una zona nella quale ci si aspetta che vi siano dei gradienti bassi. Questa zona parte
+da una certa distanza DistM ax dalla parete ed è caratterizzata da una lunghezza
+caratteristica maggiore che si mantiene costante.
+– Una zona di buffer che si trova tra le due precedentemente definite. Questa zona è caratterizzata da una griglia avente una lunghezza caratteristica crescente in modo proporzionale alla distanza. Naturalmente l’andamento della lunghezza caratteristica è
+tale da raccordarsi con i valori che si trovano negli estremi (fig. 1.3).
+Per definire quindi l’attrattore e le tre zone si usa la seguente sintassi:
+F ield[i] = Attractor
+F ield[i].EdgesList = {n, m, p, q}
+In questo modo si è dato il tag univoco i al campo definito come attrattore e si sono
+assegnate ad esso, attraverso n, m, p, q, i tag delle linee che svolgono la funzione di campo.
+
+9
+Jafar Mohaddes Zadeh
+
+File .geo
+
+Figura 1.3: Andamento lc in funzione della distanza da attrattore
+In seguito si definiscono la soglia e le proprietà delle zone che la compongono:
+F ield[i] = T hreshold
+F ield[i].IF ield = n
+Si definisce il campo i come T hreshold e lo si associa al campo n (attrattore). Sempre
+per il campo soglia i è necessario definire le lunghezze caratteristiche e le distanze che
+definiscono le tre zone:
+F ield[i].LcM in = . . .
+F ield[i].LcM ax = . . .
+F ield[i].DistM in = . . .
+F ield[i].DistM ax = . . .
+Infine è necessario definire quali regole segue la mesh di background e quindi attraverso
+il seguente comando:
+Background F ield = i
+Si fa in modo che la mesh di background segua le regole del campo i, che in questo caso
+è l’indice della soglia.
+Quando si è interessati a studiare lo strato limite attorno ad una superficie, è possibile definire un campo in modo analogo a quanto fatto per gli attrattori, ma definendo le
+grandezze caratteristiche dello strato limite:
+F ield[i] = BoundaryLayer
+F ield[i].EdgesList = n
+F ield[i].hwall n = . . .
+F ield[i].thickness = . . .
+F ield[i].ratio = . . .
+BoundaryLayerF ield = i
+10
+Jafar Mohaddes Zadeh
+
+File .geo
+
+L’ultima condizione di interesse che possiamo implementare è la condizione di superfici
+periodiche, infatti, quando siamo interessati ad esempio allo studio di una schiera palettata,
+anziché studiare l’intero campo possiamo studiare quello intorno ad un profilo e imporre che
+la superficie inferiore e quella superiore siano periodiche. Dal punto di vista della mesh questo
+comporta che le celle sul bordo superiore e inferiore del dominio devono essere caratterizzate
+da dei bordi esterni aventi la stessa lunghezza. In questo modo se si ripete il dominio uguale
+a sé stesso si avrà che la periodicità viene rispettata. Per farlo all’interno di gmsh è possibile
+sfruttare il comando:
+P eriodic Line{n} = {m}
+Il quale impone la condizione di periodicità tra le linee m ed n. Bisogna solo fare attenzione a
+come sono state definite queste due linee ed eventualmente porre un ”-” per far coincidere gli
+indici e garantire che esse siano definite nello stesso verso.
+Sapendo che il file di output di questo software sarà poi il file di input di un codice CFD
+si assegna ad ogni superficie e linea un tag che contrassegna cosa rappresenta ciascuna entità.
+In questo modo quando il codice leggerà il file e troverà i tag assegnati, saprà immediatamente
+quali condizioni applicare. Per farlo si usano due comandi:
+P hysical Surf ace(i) = tag
+P hysical Line(i) = {tag}
+
+11
+Jafar Mohaddes Zadeh
+
+Codice CFD
+Una volta realizzata la mesh in base alle caratteristiche del problema in esame, come descritto
+nel capitolo precedente, si sfrutta il risultato del software e lo si immette all’interno del codice
+CFD. Il codice che si intende sviluppare risolve le equazioni di Eulero 2D e il linguaggio di
+programmazione utilizzato è Fortran 90 date le sue alte prestazioni.
+
+2.1
+
+Strutture
+
+Il codice, per funzionare, ha bisogno di salvare i dati che arrivano dal file di gmsh in alcune
+variabili, che andranno opportunamente definite all’interno del codice. Per la loro definizione
+si è optato per utilizzare delle strutture, le quali permetteranno di sfruttare una notazione
+compatta per le operazioni.
+La prima struttura che si definisce è tipo elemento:
+module s t r u t t u r e
+i m p l i c i t none
+
+5
+
+type t i p o e l e m e n t o
+i n t e g e r : : nnodi , t i p o e l e
+i n t e g e r , dimension ( : ) , p o i n t e r : : nodi
+integer : : entity
+
+! t i p o e l e da gmsh
+! array di nodi a s s o c i a t o a l l ’ elemento
+
+end t y p e t i p o e l e m e n t o
+
+Al suo interno si trovano il numero di nodi che costituiscono l’elemento e il tipo di elemento che
+si ottiene dai tag di gmsh, che può essere ad esempio quadrilatero o triangolare. Si ha inoltre
+un array contenente i tag univoci dei nodi associati all’elemento stesso.
+Si definisce poi la struttura tipo nodo:
+
+5
+
+type tipo nodo
+r e a l ( 4 ) , dimension ( 2 ) : : x
+i n t e g e r : : nnghbrs , n e l e s
+i n t e g e r , dimension ( : ) , a l l o c a t a b l e
+i n t e g e r , dimension ( : ) , a l l o c a t a b l e
+
+: : nghbr
+: : ele
+
+end t y p e t i p o n o d o
+
+12
+
+Strutture
+
+Al suo interno si trovano le coordinate x e y come elementi del vettore reale x. nghbr rappresenta una lista contentente i tag dei nodi vicini e ele è vettore che contiene tag elementi che si
+affacciano su quel nodo.
+La terza struttura è tipo interfaccia:
+
+5
+
+10
+
+type t i p o i n t e r f a c c i a
+i n t e g e r : : e1 , e2
+i n t e g e r : : edge e1 , edge e2
+i n t e g e r : : nodo1 , nodo2
+r e a l ( 4 ) , d i m e n s i o n ( 2 ) : : normal , x0
+real (4) : : length
+integer : : entity
+r e a l ( 4 ) , dimension ( 4 ) : : f
+integer : : int perio
+
+! 0 a l l ’ ’ i n t e r n o , >0 s u i b o r d i
+! condizioni di tipo periodico
+
+end t y p e t i p o i n t e r f a c c i a
+
+Al suo interno troviamo i tag elementi associati a quella interfaccia con la convenzione che e1
+è quello di riferimento per la normale uscente. In questa struttura si ha anche l’informazione
+sui lati corrispondenti agli elementi separati all’interfaccia, nonché i tag nei nodi agli estremi.
+Si hanno anche delle quantità geometriche: il vettore contenente le componenti nx e ny della
+normale, le coordinate del baricentro x0 e la lunghezza dell’interfaccia.
+Dentro questa struttura vengono anche definiti il vettore dei flussi che attraversano l’interfaccia,
+che ha 4 elementi perché in Eulero 2D si hanno 4 variabili conservative.
+L’ultima struttura è tipo elemento solido:
+
+5
+
+10
+
+type t i p o e l e m e n t o s o l i d o
+i n t e g e r : : nnodi , t i p o e l e , n l a t i
+i n t e g e r , dimension ( : ) , a l l o c a t a b l e : : nodi
+i n t e g e r , d i m e n s i o n ( : , : ) , a l l o c a t a b l e : : edge
+i n t e g e r : : nnghbrs
+integer ,
+d i m e n s i o n ( : ) , a l l o c a t a b l e : : nghbr
+i n t e g e r , dimension ( : ) , a l l o c a t a b l e : : i n t e r f a c e s
+r e a l (4) : : area
+r e a l ( 4 ) , d i m e n s i o n ( 2 ) : : x0
+r e a l ( 4 ) , d i m e n s i o n ( 4 ) : : ucons
+r e a l ( 4 ) : : u , v , a , P , T, S
+r e a l ( 4 ) , dimension ( 4 ) : : d dt
+
+! numero nodi , t i p o e l e m e n t o e numero l a t i
+! l i s t a dei nodi d e l l ’ elemento
+! l i s t a dei l a t i d e l l ’ elemento
+! numero d e i v i c i n i d e l l ’ e l e m e n t o
+! l i s t a dei v i c i n i d e l l ’ elemento
+! l i s t a d e l l e i n t e r f a c c e d e l l ’ elemento
+! area d e l l ’ elemento
+! co or di nat e b a r i c e n t r o d e l l ’ elemento
+! grandezze primitive
+
+15
+
+end t y p e t i p o e l e m e n t o s o l i d o
+
+Oltre alle grandezze per le quali è presente un commento una grandezza di interesse introdotta
+è ucons che contiene al suo interno le 4 grandezze conservative:
+
+
+ρ·E 
+
+
+
+
+
+ρ
+ucons =
+ρ·u 
+
+
+
+
+
+ρ·v
+
+13
+Jafar Mohaddes Zadeh
+
+Variabili
+
+Un’altra grandezza di interesse è d dt la quale contiene le derivate temporali delle grandezze
+conservative:
+
+
+∂(ρ·E)
+
+
+
+
+∂t
+
+
+
+
+
+
+
+
+
+
+
+
+∂ρ
+
+ ∂t 
+
+d dt =
+
+∂(ρ·u) 
+
+
+
+
+
+
+∂t
+
+
+
+
+
+
+
+
+
+ ∂(ρ·v) 
+
+∂t
+
+Sono presenti nel codice ancora due tipologie di strutture, le quali però hanno utilità per il
+pre-processing e per la generazione della matrice di connectivity a partire dal file di input, che
+sono aspetti che non verranno discussi nell’ambito di questo documento.
+
+2.2
+
+Variabili
+
+Una volta definite le strutture, si passa alla definizione delle variabili che verranno impiegate
+in questo codice. Si definisce un nuovo modulo che richiama al suo interno il modulo strutture
+e presenta le seguenti variabili:
+Module V a r i a b i l i
+use s t r u t t u r e
+I m p l i c i t none
+save
+5
+
+I n t e g e r : : k , k i n f , kout , k f i n a l
+r e a l ( 4 ) : : gam , ga , gb , gc , gd , ge , g f , gg , gh , g i , g j
+r e a l ( 4 ) : : time , dt
+r e a l ( 4 ) : : CFL
+re al (4) : : periodo
+character (100) : : mesh file
+r e a l ( 4 ) : : t t o t i n , p t o t i n , alpha , p e x i t , machin
+i n t e g e r : : nnodi , n i n t e r f , n e l e , n e l e i n t e r n i , n e l e b o r d i , n e n t i t y , ndim , n e q s
+r e a l ( 4 ) , dimension ( 4 ) : : norm2 residuals , n o r m i n f r e s i d u a l s
+
+10
+
+15
+
+type ( tipo nodo ) , dimension ( : ) , a l l o c a t a b l e
+: : nodo
+type ( t i p o i n t e r f a c c i a ) , dimension ( : ) , a l l o c a t a b l e
+:: interf
+type ( t i p o e l e m e n t o ) , dimension ( : ) , a l l o c a t a b l e
+:: ele all
+type ( t i p o e l e m e n t o s o l i d o ) , dimension ( : ) , a l l o c a t a b l e
+: : ele
+type ( t i p o b o r d o ) , dimension ( : ) , a l l o c a t a b l e
+: : ele bordi
+
+20
+
+type ( t i p o e n t i t y ) , dimension ( 6 )
+
+::
+
+! 1D e 2D
+! 2D
+! 1D d i bordo
+
+entita
+
+i n t e g e r , dimension ( : ) , a l l o c a t a b l e : : n o d i v i s , n o d i a g g v i s
+integer : : nnodi vis , index perio1
+
+25
+
+End module
+
+Al suo interno si trovano una serie di variabili che non fanno uso delle strutture precedentemente
+definite e sono:
+• k, kinf, kout, kfinal gestiscono i passi temporali e le frequenze di output: k è il passo
+temporale di integrazione, kinf la frequenza di output della soluzione a schermo, kout
+ogni quanti passi salvare la soluzione e kfinal rappresenta l’ultimo passo temporale.
+
+14
+Jafar Mohaddes Zadeh
+
+Main
+• I diversi g riportati non sono altro che rapporti che coinvolgono γ e che servono per
+scrivere in modo compatto le varie equazioni che lo coinvolgono.
+• periodo rappresenta il passo lungo y ed è attivo solo quando si ha un problema di tipo
+periodico.
+• mesh file è una stringa che conterrà il nome del file che viene passato in input.
+• Le condizioni al contorno per il problema in esame.
+• Il numero delle varie entità geometriche, dimensioni ed equazioni.
+• I vettori contenenti la norma due e infinito dei residui.
+Vi sono poi definite una serie di variabili che fanno uso delle strutture in cui verranno allocate
+tutte le informazioni sulla mesh che verranno poi sfruttate nelle subroutine successivamente
+definite.
+
+2.3
+
+Main
+
+Una volta descritti i moduli del codice, si passa a quello che è il cuore vero e proprio del
+codice: il main nel quale vengono richiamate le diverse subroutine, che hanno lo scopo di
+valutare le grandezze di interesse e risolvere il campo. Dato che il main al suo interno richiama
+più funzioni, si è deciso di riportarlo nella sua interezza e poi di soffermarsi su ogni aspetto
+descrivendo dettagliatamente le diverse subroutine.
+Program t e s t 2 d
+Use V a r i a b i l i
+I m p l i c i t none
+5
+
+! c a l l system ( ” rm ∗ . p l t ” ) !ATTENZIONE: c a n c e l l a t u t t i i
+c a r t e l l a ! ( su l i n u x )
+c a l l system ( ” d e l ∗ . p l t ” ) !ATTENZIONE: c a n c e l l a t u t t i i
+c a r t e l l a ! ( su windows )
+
+file
+
+plt presenti nella
+
+file
+
+plt presenti nella
+
+c a l l input
+10
+
+c a l l leggi gmsh
+call processa elementi
+15
+
+! V e r i f i c a d e l l e c a r a t t e r i s t i c h e g e o m e t r i a p e r e l e m e n t o 10 e i n t e r f a c c i a 10
+w r i t e ( ∗ , ∗ ) ’ e l e ( 1 0 )%x0 = ’ , e l e ( 1 0 )%x0
+w r i t e ( ∗ , ∗ ) ’ e l e ( 1 0 )%a r e a = ’ , e l e ( 1 0 )%a r e a
+w r i t e ( ∗ , ∗ ) ’ i n t e r f ( 1 0 0 )%l e n g t h = ’ , i n t e r f ( 1 0 0 )%l e n g t h
+w r i t e ( ∗ , ∗ ) ’ i n t e r f ( 1 0 0 )%normal = ’ , i n t e r f ( 1 0 0 )%normal
+
+20
+
+call
+call
+
+init
+w r i t e t e c p l o t f i l e ( 0 , 0 . ) ! primo parametro d e t e r m i n a i l nome d e l f i l e , s e c o n d o
+parametro d e t e r m i n a l a t r a s l a z i o n e l u n g o y
+
+25
+
+time =0.
+do k=1 , k f i n a l
+
+15
+Jafar Mohaddes Zadeh
+
+Main
+
+c a l l compute dt
+c a l l compute fluxes
+ca ll integ time
+
+30
+
+time=time+dt
+35
+
+i f (mod( k , k i n f ) . eq . 0 ) then
+write (∗ ,∗) ’ ’
+w r i t e ( ∗ , ∗ ) ’ ∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗ ’
+w r i t e ( ∗ , ∗ ) ’ k , time , dt = ’ , k , time , dt
+c a l l compute norm residuals
+
+40
+
+end i f
+
+i f (mod( k , kout ) . eq . 0 ) then
+c a l l w r i t e t e c p l o t f i l e (k , 0 . )
+end i f
+
+45
+
+end do
+
+50
+
+End Program
+
+Il primo elemento che si incontra è call system(”del *.plt”), questo comando si occupa di eliminare tutti i file nella cartella con estensione .plt, che è l’estensione in cui viene salvata la
+soluzione. Questo comando è molto utile perché quando si fanno più simulazioni, cambiando
+alcuni dettagli come le condizioni o mesh, non viene a crearsi confusione con i file contenenti
+le soluzioni precedenti.
+
+2.3.1
+
+Subroutine input
+
+La prima subroutine che richiama attraverso call è input che è dedicata alla lettura del file di
+input e di due file contententi le condizioni al contorno di ingresso e uscita.
+subroutine input ! subroutine per l e t t u r a d e g l i input
+use V a r i a b i l i
+i m p l i c i t none
+5
+
+ndim=2 ! numero d i m e n s i o n i problema
+n e q s=4 ! numero e q u a z i o n i
+
+10
+
+15
+
+20
+
+25
+
+open ( u n i t =1 , f i l e = ’ i n p u t . t x t ’ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ ) m e s h f i l e
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ ) k f i n a l
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ ) k i n f
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+r e a d ( 1 , ∗ ) kout
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+r e a d ( 1 , ∗ ) CFL
+close (1)
+
+open ( u n i t =1 , f i l e = ’ i n l e t . t x t ’ )
+read ( 1 , ∗ )
+
+16
+Jafar Mohaddes Zadeh
+
+Main
+
+30
+
+35
+
+40
+
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+close (1)
+
+ttotin
+
+ptotin
+
+alpha
+
+machin
+
+a l p h a=a l p h a ∗ ( 4 . ∗ atan ( 1 . 0 ) ) / ( 1 8 0 . )
+45
+
+open ( u n i t =1 , f i l e = ’ o u t l e t . t x t ’ )
+read ( 1 , ∗ )
+read ( 1 , ∗ )
+read ( 1 , ∗ ) p e x i t
+close (1)
+
+50
+
+end s u b r o u t i n e
+
+Viene subito definito il numero di dimensioni e di equazioni del problema, che nell’ambito di
+questo codice è definito ed è fisso. Si ha poi la lettura di un file di testo dal quale si leggono le
+informazioni e si allocano le variabili corrispettive. Il file input.txt contiene al suo interno:
+• MESH FILE il nome del file contenente la mesh.
+• KFINAL il numero massimo di passi temporali da fare.
+• KINF la frequenza di print della soluzione a schermo.
+• KOUT la frequenza salvataggio in memoria della soluzione.
+• CFL la condizione CFL.
+Il file inlet.txt contiene al suo interno le condizioni al contorno da imporre all’inlet. Queste
+condizioni sono diverse a seconda che il flusso sia subsonico o supersonico, infatti a seconda di
+ciò il numero di linee caratteristiche entranti nel dominio cambiano e quindi anche il numero di
+condizioni. Nel caso di Eulero 2D si ha una condizione in più rispetto al caso unidimensionale,
+infatti è necessario fornire l’angolo associato al flusso in ingresso. Nel file saranno presenti le
+seguenti condizioni al contorno:
+◦
+• TIN
+: temperatura totale del flusso in ingresso.
+◦
+• PIN
+: pressione totale del flusso in ingresso.
+
+• α : angolo flusso in ingresso espresso in gradi.
+• MIN : Mach flusso in ingresso, se l’ingresso è subsonico questo valore viene ignorato nel
+calcolo, viene usato solo per inizializzazione.
+Per quanto riguarda il file outlet.txt esso contiene la condizione di uscita in termini di pressione
+statica che viene ignorata nel caso di condizione supersonica per le stesse considerazioni dell’inlet. Questa subroutine fornisce l’informazione sulla mesh da utilizzare, le informazioni per
+la gestione di output e memoria in termini di passi temporali e le condizioni al contorno.
+17
+Jafar Mohaddes Zadeh
+
+Main
+
+2.3.2
+
+Subroutine leggi gmsh
+
+Questa subroutine ha lo scopo di aprire il file .msh e riempire i vettori precedentemente definiti,
+definendo la connectivity nonché tutti gli elementi, i nodi associati e i rispettivi vicini.
+subroutine leggi gmsh
+use s t r u t t u r e
+use v a r i a b i l i
+i m p l i c i t none
+
+! apre i l
+
+f i l e e c o s t r u i s c e matrice di connectivity
+
+5
+
+10
+
+i n t e g e r : : i , j , n t a g s , j j , t i p o e l e , temp
+i n t e g e r , d i m e n s i o n ( 2 0 ) : : tempvet
+i n t e g e r , dimension (11) : : l e g g i i n t
+character : : car
+character (300) : : stringa
+l o g i c a l : : trovato
+r e a l ( 4 ) : : machinf2 , t e m p r e a l
+100 f o r m a t (A)
+
+15
+
+w r i t e ( ∗ , ∗ ) ’ Opening mesh f i l e :
+
+20
+
+open ( u n i t =1 , f i l e =m e s h f i l e )
+
+25
+
+read ( 1 , ∗ ) car
+read ( 1 , ∗ ) car
+read ( 1 , ∗ ) car
+read ( 1 , ∗ ) car
+
+’ , mesh file
+
+r e a d ( 1 , ∗ ) nnodi
+a l l o c a t e ( nodo ( nnodi ) )
+30
+
+do i =1 , nnodi
+r e a d ( 1 , ∗ ) j , nodo ( i )%x ( 1 ) , nodo ( i )%x ( 2 ) , t e m p r e a l
+end do
+35
+
+40
+
+read ( 1 , ∗ ) car
+w r i t e ( ∗ , ∗ ) ’ Reading nodes . . .
+
+OK ’
+
+! ∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗
+! Lettura elementi
+read ( 1 , ∗ ) car
+read ( 1 , ∗ ) n e l e
+n e n t i t y =0
+
+45
+
+n e l e b o r d i =0
+n e l e i n t e r n i =0
+allocate ( e l e a l l ( nele ) )
+do i =1 , n e l e
+
+50
+
+read (1 ,100) s t r i n g a
+read ( s t r i n ga , ∗ ) j , t i p o e l e , ntags
+55
+
+60
+
+i f ( t i p o e l e . eq . 1 ) then
+!SEGMENTO
+n e l e b o r d i=n e l e b o r d i +1
+e l e a l l ( i )%nnodi=2
+a l l o c a t e ( e l e a l l ( i )%n o d i ( e l e a l l ( i )%nnodi ) )
+e l s e i f ( t i p o e l e . eq . 2 ) then
+!TRIANGOLO LINEARE
+n e l e i n t e r n i=n e l e i n t e r n i +1
+e l e a l l ( i )%nnodi=3
+a l l o c a t e ( e l e a l l ( i )%n o d i ( e l e a l l ( i )%nnodi ) )
+e l s e i f ( t i p o e l e . eq . 3 ) then
+!QUADRILATERO LINEARE
+
+18
+Jafar Mohaddes Zadeh
+
+Main
+
+n e l e i n t e r n i=n e l e i n t e r n i +1
+e l e a l l ( i )%nnodi=4
+a l l o c a t e ( e l e a l l ( i )%n o d i ( e l e a l l ( i )%nnodi ) )
+
+65
+
+else
+
+70
+
+w r i t e ( ∗ , ∗ ) ’ Element ’ , i , ’UNKNOWN! ! ! ’
+stop
+end i f
+r e a d ( s t r i n g a , ∗ ) j , e l e a l l ( i )%t i p o e l e , n t a g s , e l e a l l ( i )%e n t i t y , l e g g i i n t ( 2 : n t a g s ) , e l e a l l ( i )%
+n o d i ( 1 : e l e a l l ( i )%nnodi )
+
+75
+
+end do
+! F i n o r a ho messo t u t t i
+
+g l i elementi in e l e a l : ora divido g l i
+
+i n t e r n i dai bordi
+
+80
+
+allocate ( ele ( nele interni ) )
+allocate ( ele bordi ( nele bordi ) )
+85
+
+n e l e i n t e r n i =0
+n e l e b o r d i =0
+do i =1 , n e l e
+90
+
+95
+
+100
+
+i f ( e l e a l l ( i )%t i p o e l e . eq . 1 ) then
+n e l e b o r d i=n e l e b o r d i +1
+e l e b o r d i ( n e l e b o r d i )%nnodi= e l e a l l ( i )%nnodi
+e l e b o r d i ( n e l e b o r d i )%e n t i t y= e l e a l l ( i )%e n t i t y
+t r o v a t o =. f a l s e .
+do j =1 , n e n t i t y
+i f ( e n t i t a ( j )%i n d x . eq . e l e a l l ( i )%e n t i t y ) then
+t r o v a t o =. t r u e .
+exit
+end i f
+end do
+i f ( t r o v a t o . eqv . . f a l s e . ) then
+n e n t i t y=n e n t i t y +1
+e n t i t a ( n e n t i t y )%i n d x= e l e a l l ( i )%e n t i t y
+end i f
+
+105
+
+110
+
+115
+
+120
+
+125
+
+a l l o c a t e ( e l e b o r d i ( n e l e b o r d i )%n o d i ( e l e b o r d i ( n e l e b o r d i )%nnodi ) )
+e l e b o r d i ( n e l e b o r d i )%n o d i= e l e a l l ( i )%n o d i
+e l e b o r d i ( n e l e b o r d i )%t i p o e l e= e l e a l l ( i )%t i p o e l e
+e l s e i f ( e l e a l l ( i )%t i p o e l e . eq . 2 . o r . e l e a l l ( i )%t i p o e l e . eq . 3 ) then
+n e l e i n t e r n i=n e l e i n t e r n i +1
+e l e ( n e l e i n t e r n i )%nnodi= e l e a l l ( i )%nnodi
+a l l o c a t e ( e l e ( n e l e i n t e r n i )%n o d i ( e l e ( n e l e i n t e r n i )%nnodi ) )
+e l e ( n e l e i n t e r n i )%n o d i= e l e a l l ( i )%n o d i
+e l e ( n e l e i n t e r n i )%t i p o e l e= e l e a l l ( i )%t i p o e l e
+i f ( e l e a l l ( i )%t i p o e l e . eq . 2 ) then
+e l e ( n e l e i n t e r n i )%nnghbrs=3
+e l s e i f ( e l e a l l ( i )%t i p o e l e . eq . 3 ) then
+e l e ( n e l e i n t e r n i )%nnghbrs=4
+end i f
+end i f
+end do
+read ( 1 , ∗ ) car
+w r i t e ( ∗ , ∗ ) ’ Reading e l e m e n t s
+end s u b r o u t i n e
+
+...
+
+OK ’
+
+19
+Jafar Mohaddes Zadeh
+
+Main
+
+Tramite questa subroutine è quindi possibile accedere alle informazioni di interesse riguardante
+la mesh e operare quindi delle valutazioni.
+
+2.3.3
+
+Subroutine processa elementi
+
+Questa subroutine ha al suo interno tutte le procedure per allocare tutte le variabili di interesse
+a partire dalle informazioni note dalla subroutine precedente. La subroutine è molto complessa
+nonché molto lunga da riportare, pertanto si è scelto di porre l’accento solo su alcune subroutine
+che vengono chiamate all’interno della stessa. In particolare si è interessati alle subroutine che
+si occupano della valutazione delle proprietà geometriche di ogni elemento e interfaccia presente
+nella mesh.
+! C a l c o l a b a r i c e n t r o e l e m e n t o i −esimo
+do i =1 , n e l e i n t e r n i
+c a l l compute center ele ( i )
+
+5
+
+end do
+
+10
+
+! C a l c o l a a r e a e l e m e n t o i −esimo
+do i =1 , n e l e i n t e r n i
+c a l l compute area ele ( i )
+
+15
+
+end do
+! C a l c o l a l u n g h e z z a e normale i n t e r f a c c i a i −esima
+20
+
+do i =1 , n i n t e r f
+c a l l compute length inte ( i )
+c a l l compute normal inte ( i )
+25
+
+end do
+
+compute center ele
+Questa subroutine si occupa di valutare le coordinate del baricentro per ogni elemento facendo
+la media aritmetica delle coordinate dei nodi appartenenti allo stesso.
+subroutine compute center ele ( i )
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i , j
+5
+
+e l e ( i )%x0 =0.
+do j =1 , e l e ( i )%nnodi
+10
+
+e l e ( i )%x0=nodo ( e l e ( i )%n o d i ( j ) )%x+e l e ( i )%x0
+end do
+15
+
+e l e ( i )%x0= e l e ( i )%x0 / e l e ( i )%nnodi
+end s u b r o u t i n e
+
+20
+Jafar Mohaddes Zadeh
+
+Main
+
+compute area ele
+Questa subroutine valuta l’area di ogni elemento attraverso la regola di Erone (figure 2.1,
+2.2. Gli elementi utilizzati infatti, possono essere sia dei triangoli che dei quadrilateri e di
+conseguenza è bene distinguere i casi attraverso delle condizioni if.
+
+Figura 2.1: Area triangolo - Erone
+
+Figura 2.2: Area quadrilatero - Erone
+
+5
+
+subroutine compute area ele ( i )
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+r e a l : : a , b , c , d , f , At1 , At2 , p1 , p2
+
+i f ( e l e ( i )%nnodi == 3 ) then
+10
+
+a = s q r t ( ( nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 1 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 2 ) ) ∗ ∗ 2 )
+b = s q r t ( ( nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 2 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 2 ) ) ∗ ∗ 2 )
+c = s q r t ( ( nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 3 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 2 ) ) ∗ ∗ 2 )
+p1 = ( a+b+c ) ∗ 0 . 5
+
+15
+
+21
+Jafar Mohaddes Zadeh
+
+Main
+
+e l e ( i )%a r e a=s q r t ( p1 ∗ ( p1−a ) ∗ ( p1−b ) ∗ ( p1−c ) )
+
+else
+20
+
+25
+
+a = s q r t ( ( nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 1 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 2 ) ) ∗ ∗ 2 )
+b = s q r t ( ( nodo ( e l e ( i )%n o d i ( 2 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 2 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 2 ) ) ∗ ∗ 2 )
+c = s q r t ( ( nodo ( e l e ( i )%n o d i ( 4 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 4 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 2 ) ) ∗ ∗ 2 )
+d = s q r t ( ( nodo ( e l e ( i )%n o d i ( 4 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 4 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 2 ) ) ∗ ∗ 2 )
+f = s q r t ( ( nodo ( e l e ( i )%n o d i ( 3 ) )%x ( 1 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 1 ) ) ∗∗2 + ( nodo ( e l e ( i )%n o d i ( 3 ) )%x
+( 2 )−nodo ( e l e ( i )%n o d i ( 1 ) )%x ( 2 ) ) ∗ ∗ 2 )
+p1 = ( a+b+f ) ∗ 0 . 5
+At1 = s q r t ( p1 ∗ ( p1−a ) ∗ ( p1−b ) ∗ ( p1−f ) )
+
+30
+
+p2 = ( c+d+f ) ∗ 0 . 5
+At2 = s q r t ( p2 ∗ ( p2−c ) ∗ ( p2−d ) ∗ ( p2−f ) )
+e l e ( i )%a r e a=At1+At2
+
+35
+
+end i f
+
+end s u b r o u t i n e
+
+compute length inte
+Questa subroutine si occupa di calcolare la lunghezza dell’interfaccia tra due elementi, per
+farlo si utilizza il teorema di Pitagora note le coordinate dei nodi di estremo che definiscono
+l’interfaccia stessa.
+
+5
+
+subroutine compute length inte ( i )
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+i n t e r f ( i )%l e n g t h = s q r t ( ( nodo ( i n t e r f ( i )%nodo1 )%x ( 1 )−nodo ( i n t e r f ( i )%nodo2 )%x ( 1 ) ) ∗∗2 +
+( nodo ( i n t e r f ( i )%nodo1 )%x ( 2 )−nodo ( i n t e r f ( i )%nodo2 )%x ( 2 ) ) ∗∗2 )
+
+10
+
+end s u b r o u t i n e
+
+compute normal inte
+In questa subroutine si calcolano le componenti del versore normale all’interfaccia. Per farlo però si parte dalla valutazione del versore tangente in quanto è già nota, dalla routine
+precedente, la lunghezza dell’interfaccia. Il versore tangente τ̂ è definito infatti come:
+
+
+x
+−
+x
+
+
+2
+1
+⃗t
+τ̂ =
+con ⃗t =
+⃗
+
+
+|t|
+y2 − y1
+
+22
+Jafar Mohaddes Zadeh
+
+Main
+
+Essendo che il versore tangente e quello normale devono essere perpendicolari tra loro, è possibile
+ˆ e n̂:
+definire una relazione tra le componenti di tau
+
+
+−τy
+n̂ · τ̂ = 0 =⇒ τx nx + τy ny = 0 =⇒ n̂ =
++τx
+
+5
+
+subroutine compute normal inte ( i )
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+r e a l : : tx , t y
+c a l l compute length inte ( i )
+
+10
+
+t x = ( nodo ( i n t e r f ( i )%nodo2 )%x ( 1 )−nodo ( i n t e r f ( i )%nodo1 )%x ( 1 ) ) / i n t e r f ( i )%l e n g t h
+t y = ( nodo ( i n t e r f ( i )%nodo2 )%x ( 2 )−nodo ( i n t e r f ( i )%nodo1 )%x ( 2 ) ) / i n t e r f ( i )%l e n g t h
+i n t e r f ( i )%normal ( 1 ) = −t y
+i n t e r f ( i )%normal ( 2 ) = t x
+
+15
+
+end s u b r o u t i n e
+
+2.3.4
+
+Subroutine init
+
+Attraverso questa subroutine si fa l’inizializzazione del campo di moto, questa operazione è
+necessaria perchè si fornisce al solutore una distribuzione di tentativo e questa andrà poi integrata nel tempo fino a convergenza. Prima di riportare l’estratto di codice che si occupa
+dell’inizializzazione delle variabili, è bene fare un focus sulle equazioni in gioco e le variabili
+presenti.
+Le equazioni di Eulero 2D possono essere scritte in diverse forme, quella conservativa differenziale può essere scritta come:
+∂
+∂
+∂
+{u} +
+{f } +
+{g} = 0
+∂t
+∂x
+∂y
+Dove:
+
+
+
+ρE
+
+
+
+
+
+
+ρ
+u=
+ρu 
+
+
+
+
+
+ρv
+
+
+
+u
+(P
++
+ρE)
+
+
+
+
+
+
+ρu
+f=
+P + ρu2 
+
+
+
+
+
+ρuv
+
+
+
+v
+(P
++
+ρE)
+
+
+
+
+
+
+ρv
+g=
+ρuv
+
+
+
+
+
+
+P + ρv 2
+
+La forma di queste equazioni è dimensionale, mentre nei diversi codici CFD queste vengono
+adimensionalizzate. La ragione per cui si preferisce la forma adimensionale risiede nel fatto che,
+quando gli elementi della matrice del sistema da risolvere ha gli elementi degli stessi ordini di
+grandezza, il numero di condizionamento associato a quella matrice si riduce. Avere un numero
+di condizionamento basso è fondamentale essendo esso un fattore di amplificazione dell’errore,
+inoltre avere le grandezze tutte dello stesso ordine permette in fase di debugging di individuare
+facilmente quali variabili possono essere la causa di problemi.
+23
+Jafar Mohaddes Zadeh
+
+Main
+
+Per adimensionalizzare le equazioni si definiscono delle grandezze di riferimento e si applica
+il rapporto:
+x
+y
+P
+T
+x̄ =
+ȳ =
+P =
+T =
+Lref
+Lref
+Pref
+Tref
+Definite queste grandezze di base è possibile derivare le mancanti attraverso queste:
+• Equazione dei gas perfetti:
+Pref = ρref RTref =⇒ ρref =
+
+Pref
+ρ
+P
+=⇒ ρ̄ =
+=
+RTref
+ρref
+T
+
+• Velocità di riferimento:
+s
+uref =
+• Velocità del suono:
+
+p
+Pref
+u
+= RTref =⇒ ū =
+ρref
+uref
+
+√
+q
+γRT
+ā =
+=p
+= γT
+uref
+RTref
+a
+
+• Tempo:
+tref =
+• Energia:
+Eref = u2ref
+
+E=
+
+Lref
+t
+=⇒ T =
+uref
+tref
+1
+e E = cv T + (u2 + v 2 )
+2
+⇓
+
+1
+E
+cv T
+1
+T
++ (ū2 + v̄ 2 )
+=
++ (ū2 + v̄ 2 ) =
+Eref
+RTref
+2
+γ−1 2
+⇓
+
+ρ̄E =
+
+ρ̄ · T
+1
+P
+1
++ ρ̄(ū2 + v̄ 2 ) =
++ ρ̄(ū2 + v̄ 2 )
+γ−1 2
+γ−1 2
+
+L’energia può anche essere espressa in termini di entropia e quindi:
+T dS = cp dT −
+
+dP
+=⇒ S = cp log T − R log P + S0
+ρ
+⇓
+
+S=
+
+S
+= γ log T − (γ − 1) log P + S0
+cv
+
+24
+Jafar Mohaddes Zadeh
+
+Si impone S0 = 0
+
+Main
+
+Adimensionalizzate le variabili è possibile adimensionale le equazioni:
+∂ρ ∂ρu ∂ρv
++
++
+=0
+∂t
+∂x
+∂y
+A questo punto si riscrivono le variabili dimensionali in funzione di quelle adimensionali:
+ρref ∂ ρ̄ ρref uref ∂ ρ̄ū ρref uref ∂ ρ̄v̄
+·
++
+·
++
+·
+=0
+tref ∂ t̄
+Lref
+∂ x̄
+Lref
+∂ ȳ
+Se si ricorda la definizione di tref ci si rende conto che tutti i termini che moltiplicano le derivate
+sono uguali e quindi si elidono ottenendo:
+∂ ρ̄ ∂ ρ̄ū ∂ ρ̄v̄
++
++
+=0
+∂ t̄
+∂ x̄
+∂ ȳ
+La conclusione a cui si arriva è che scrivere le equazione in termini dimensionali o adimensionali è indifferente in quanto le equazioni hanno la stessa forma. Se infatti si ripetesse la stessa
+sostituzione per le altre due equazioni si otterrebbe lo stesso esito.
+Sapendo quindi come adimensionalizzare le variabili, si procede a definire un campo di moto uniforme che farà riferimento alle condizioni di inlet e outlet definite nella sezione 2.3.1. Nei
+◦
+◦
+= 1,
+= 1 e TIN
+casi in esame si considereranno come temperatura e pressione di riferimento PIN
+questo renderà possibile scrivere ad esempio la pressione adimensionale come:
+P =
+
+P
+P
+P
+1
+P◦
+= ◦ =
+=
+=
+γ/(γ−1)
+γ/(γ−1)
+γ/(γ−1)
+Pref
+P
+M2
+1 + γ−1
+M2
+1 + γ−1
+M2
+P 1 + γ−1
+2
+2
+2
+
+Le stesse considerazioni possono essere ripetute per la temperatura totale.
+
+5
+
+subroutine i n i t
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+r e a l ( 4 ) : : rho , u , v , p , t
+
+gam=1.4 ! r a p p o r t o d e i c a l o r i
+10
+
+15
+
+20
+
+25
+
+specifici
+
+! v a r i a b i l i derivate dal rapporto dei c a l o r i
+GA=gam / ( gam−1.)
+GB=1./(gam−1.)
+GC=(gam+1.) / ( gam−1.)
+GD=(gam−1.) / 2 .
+GE=(gam+1.) / 2 .
+GF=s q r t ( gam )
+GG=2./(gam−1.)
+GH=(gam+1.) / ( 2 . ∗ gam )
+GI=(gam−1.) / ( 2 . ∗ gam )
+GJ=(gam−1.) /gam
+
+do i =1 , n e l e i n t e r n i
+e l e ( i )%P = p t o t i n / ( ( 1 . +GD∗ machin ∗ ∗ 2 ) ∗∗GA)
+e l e ( i )%T = t t o t i n / ( 1 . + GD ∗ machin ∗ ∗ 2 )
+e l e ( i )%a = s q r t ( gam∗ e l e ( i )%T)
+e l e ( i )%u = machin ∗ e l e ( i )%a ∗ c o s ( a l p h a )
+
+25
+Jafar Mohaddes Zadeh
+
+specifici
+
+! v a l i d a p e r p t ot I N = 1
+
+Main
+
+30
+
+e l e ( i )%v = machin ∗ e l e ( i )%a ∗ s i n ( a l p h a )
+e l e ( i )%S = gam ∗ l o g ( e l e ( i )%T) − ( gam−1.) ∗ l o g ( e l e ( i )%P)
+
+35
+
+e l e ( i )%ucons ( 2 ) = e l e ( i )%P/ e l e ( i )%T
+e l e ( i )%ucons ( 1 ) = GB∗ e l e ( i )%P +0.5 ∗ e l e ( i )%ucons ( 2 ) ∗ ( e l e ( i )%u ∗∗2 + e l e ( i )%v ∗ ∗ 2 )
+e l e ( i )%ucons ( 3 ) = e l e ( i )%P/ e l e ( i )%T ∗ e l e ( i )%u
+e l e ( i )%ucons ( 4 ) = e l e ( i )%P/ e l e ( i )%T ∗ e l e ( i )%v
+end do
+end s u b r o u t i n e
+
+2.3.5
+
+Subroutine compute dt
+
+Questa subroutine calcola il passo di integrazione dt. Inizialmente viene assunto un valore
+molto grande e poi si fa un ciclo su tutti gli elementi calcolando il valore ammissibile di dtloc
+nell’elemento. Il valore ammissibile locale viene confrontato con il valore di dt e se si ha che
+quello locale è minore di quello in memoria si impone:
+dt = dtloc
+Cosı̀ per tutti gli elementi fino a quando non si otterrà il valore minimo tra tutti gli elementi,
+infatti la condizione più restrittiva sarà quella che verrà imposta all’intero dominio di calcolo.
+Una volta individuato questo valore lo si riduce imponendo la condizione CFL, la quale in
+2D non può essere espressa in termini di ∆x ma√piuttosto si approssima una
+lunghezza di
+√
+3
+riferimento h. Se si avesse una cella isotropa h ∝ Area, in 3D sarebbe h ∝ V olume. Per
+quanto riguarda invece la velocità di propagazione massima in 1D sarebbe:
+λmax = |u| + a
+Mentre in 2D
+λmax = |q| + a
+λmax rappresenta la velocità di propagazione delle onde acustiche, nel caso di onde d’urto si sta sottostimando la velocità in quanto si ha una propagazione più veloce, infatti l’urto
+viaggia ad una velocità superiore a quella del suono. Nella valutazione del ∆t si stanno introducendo molte approssimazioni ma non è un problema in quando il valore di CFL è arbitrario
+e l’incertezza tiene conto delle approssimazioni introdotte, infatti maggiori le approssimazioni
+introdotte più restrittiva sarà la condizione. Il passo temporale è quindi:
+∆t = CF L
+
+h
+|λmax |
+
+Questo passo di integrazione viene aggiornato ad ogni iterazione.
+
+5
+
+s u b r o u t i n e compute dt
+use v a r i a b i l i
+i m p l i c i t none
+r e a l : : d t l o c , q , lambdamax
+integer : : i
+dt = huge ( 1 . )
+do i = 1 , n e l e i n t e r n i
+
+10
+
+26
+Jafar Mohaddes Zadeh
+
+Main
+
+q = s q r t ( ( e l e ( i )%u ∗∗2 + e l e ( i )%v ∗ ∗ 2 ) )
+lambdamax = q + e l e ( i )%a
+d t l o c = s q r t ( e l e ( i )%a r e a ) / lambdamax
+i f ( d t l o c . l t . dt ) dt = d t l o c
+15
+
+end do
+dt = CFL ∗ dt
+20
+
+end s u b r o u t i n e
+
+2.3.6
+
+Subroutine compute fluxes
+
+Questa subroutine si occupa della valutazione delle derivate temporali delle grandezze conservative, che andranno successivamente integrate per mezzo della prossima subroutine introdotta.
+In questa subroutine ne vengono chiamate al suo interno altre due che hanno lo scopo di valutare
+i flussi all’interfaccia tra elementi attraverso i solutori di Lax-Friedrichs locale o di Roe.
+subroutine compute fluxes
+use v a r i a b i l i
+i m p l i c i t none
+i n t e g e r : : i , e1 , e2 , j
+5
+
+do i =1 , n e l e i n t e r n i
+e l e ( i )%d d t ( : ) =0.
+end do
+10
+
+do i =1 , n i n t e r f
+e1=i n t e r f ( i )%e1
+e2=abs ( i n t e r f ( i )%e2 )
+i f ( e1 ∗ e2 . ne . 0 ) then
+
+15
+
+call compute internal flux ( i )
+! c a l l compute internal flux Roe ( i )
+else
+
+20
+
+c a l l compute boundary flux ( i )
+end i f
+25
+
+do j =1 ,4
+e l e ( e1 )%d d t ( j )=e l e ( e1 )%d d t ( j )− i n t e r f ( i )%F( j ) ∗ i n t e r f ( i )%l e n g t h / e l e ( e1 )%a r e a
+end do
+30
+
+i f ( e2 . g t . 0 ) then
+do j =1 ,4
+e l e ( e2 )%d d t ( j )=e l e ( e2 )%d d t ( j )+i n t e r f ( i )%F( j ) ∗ i n t e r f ( i )%l e n g t h / e l e ( e2
+)%a r e a
+end do
+
+35
+
+end i f
+end do
+40
+
+end s u b r o u t i n e
+
+27
+Jafar Mohaddes Zadeh
+
+Main
+
+compute internal fluxes
+Questa routine si occupa di calcolare i flussi all’interfaccia tra elementi attraverso il solutore
+di Lax-Friedrichs locale. È infatti possibile, in un problema a più dimensioni, valutare i flussi
+alle interfacce per mezzo di una proiezione portandosi in un sitema di riferimento locale, per
+poi tornare a quello globale per mezzo di una rotazione. Si parta dalle equazioni di Eulero 2D:
+∂
+∂
+∂
+{u} +
+{f } +
+{g} = 0
+∂t
+∂x
+∂y
+Dove:
+
+
+
+ρE
+
+
+
+
+
+
+ρ
+u=
+ρu 
+
+
+
+
+
+ρv
+
+
+
+u
+(P
++
+ρE)
+
+
+
+
+
+
+ρu
+f=
+P + ρu2 
+
+
+
+
+
+ρuv
+
+
+
+v
+(P
++
+ρE)
+
+
+
+
+
+
+ρv
+g=
+ρuv
+
+
+
+
+
+
+P + ρv 2
+
+Se si passa alla formulazione integrale:
+Z
+Z
+∂
+{u}dA = −
+({f }nx + {g}ny ) dS
+∂t A
+∂A
+Che nel caso della conservazione della massa è:
+Z
+Z
+∂
+(ρunx + ρvny ) dS
+ρdA = −
+∂t A
+∂A
+Dove:
+ρunx + ρvny = ρ (⃗q · n̂) = ρũ
+ũ rappresenta la proiezione della velocità ⃗q in direzione normale all’interfaccia. Se si analizza
+l’equazione dell’energia:
+Z
+Z
+∂
+ρEdA = −
+[u(P + ρE)nx + v(P + ρE)ny ] dS
+∂t A
+∂A
+Z
+=−
+
+Z
+[(unx + vny )(P + ρE)] dS = −
+
+∂A
+
+ũ(P + ρE)dS
+∂A
+
+Questi risultati fanno comprendere come la componente della velocità che è effettivamente
+presente nelle equazioni sia quella in direzione normale all’interfaccia e quindi si applica un
+cambio di sistema di riferimento.
+  
+ 
+ũ
+nx ny
+u
+=
+ṽ
+−ny nx
+v
+La matrice di rotazione del sistema di riferimento, come tutte le matrici di questo tipo, possiede
+la proprietà di ortogonalità per cui vale che l’inversa è pari alla trasposta. Se si è quindi
+interessati a passare dal sistema di riferimento ruotato locale a quello globale è sufficiente
+applicare la trasposta:
+  
+ 
+u
+nx −ny
+ũ
+=
+v
+ny nx
+ṽ
+28
+Jafar Mohaddes Zadeh
+
+Main
+
+Il solutore di Lax-Friedrichs si scrive in forma generale come:
+Fj+1/2 =
+
+FL + FR λmax
+−
+(UR − UL )
+2
+2
+
+Se si specializza la scrittura per le equazioni di massa ed energia:
+Fint =
+Fint =
+
+ρL ũL + ρR ũR λmax
+−
+(ρR − ρL )
+2
+2
+
+ũL (PL + ρL EL ) + ũR (PR + ρR ER ) λmax
+−
+(ρR ER − ρL EL )
+2
+2
+
+Dove:
+λmax = max(|uL | + aL , |uR | + aR )
+Le due equazioni analizzate sono delle equazioni scalari e quindi invarianti rispetto al sistema di
+riferimento, mentre per quanto riguarda la quantità di moto è necessario modificare le equazioni,
+valutando i flussi nel sistema proiettato e riportarli a quelli normali successivamente. Se si
+vogliono proiettare le equazioni scritte nel sistema (x, y) nel nuovo sistema (x̃, ỹ) si moltiplicano
+scalarmente le equazioni per i versori n̂ e τ̂ . In generale si ha:
+Z
+Z
+Z
+⃗
+[ρqũ + P n̂] dS
+[ρq(q · n̂) + P n̂] dS =
+F · n̂dS =
+∂A
+
+∂A
+
+∂A
+
+Specializzando per x̃ e ỹ:
+Z
+
+Z
+[ρq · n̂ũ + P n̂ · n̂] dS =
+
+x̃ :
+
+∂Ω
+
+∂Ω
+
+Z
+
+Z
+[ρq · τ̂ ũ + P n̂ · τ̂ ] dS =
+
+ỹ :
+
+ 2
+
+ρũ + P dS
+
+∂Ω
+
+[ρṽũ] dS
+∂Ω
+
+Quindi:
+FL,x̃ = PL + ρL ũ2L
+FL,ỹ = ρL ṽL ũL
+E di conseguenza:
+Fint,x̃ =
+
+ λmax
+1
+PL + ρL ũ2L + PR + ρR ũ2R −
+[ρR ũR − ρL ũL ]
+2
+2
+
+Fint,ỹ =
+
+1
+λmax
+[ρL ṽL ũL + ρR ṽR ũR ] −
+[ρR ṽR − ρL ṽL ]
+2
+2
+
+A questo punto è sufficiente passare da un sitema all’altro per mezzo della matrice di rotazione:
+
+ 
+
+
+Fint,x
+nx −ny
+Fint,x̃
+=
+Fint,x
+ny nx
+Fint,ỹ
+29
+Jafar Mohaddes Zadeh
+
+Main
+
+5
+
+10
+
+subroutine compute internal flux ( i )
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+r e a l ( 4 ) , dimension ( 4 ) : : uconsl , uconsr , f l u x e s
+r e a l ( 4 ) : : u t i l d e A , u t i l d e B , v t i l d e A , v t i l d e B , pa , pb , Ta , Tb , ua , ub , va , vb , lambda max
+
+u c o n s l = e l e ( i n t e r f ( i )%e1 )%ucons ( : )
+u c o n s r = e l e ( abs ( i n t e r f ( i )%e2 ) )%ucons ( : )
+! c a l c o l o grandezze primitive
+
+15
+
+ua = u c o n s l ( 3 ) / u c o n s l ( 2 )
+ub = u c o n s r ( 3 ) / u c o n s r ( 2 )
+va = u c o n s l ( 4 ) / u c o n s l ( 2 )
+vb = u c o n s r ( 4 ) / u c o n s r ( 2 )
+
+20
+
+pa = ( gam−1) ∗ ( u c o n s l ( 1 ) −0.5∗ u c o n s l ( 2 ) ∗ ( ua∗∗2+va ∗ ∗ 2 ) )
+pb = ( gam−1) ∗ ( u c o n s r ( 1 ) −0.5∗ u c o n s r ( 2 ) ∗ ( ub∗∗2+vb ∗ ∗ 2 ) )
+Ta = pa / u c o n s l ( 2 )
+Tb = pb/ u c o n s r ( 2 )
+
+25
+
+u t i l d e a = i n t e r f ( i )%normal ( 1 ) ∗ ua + i n t e r f ( i )%normal ( 2 ) ∗ va
+u t i l d e b = i n t e r f ( i )%normal ( 1 ) ∗ub + i n t e r f ( i )%normal ( 2 ) ∗vb
+30
+
+35
+
+40
+
+45
+
+v t i l d e a = − i n t e r f ( i )%normal ( 2 ) ∗ ua + i n t e r f ( i )%normal ( 1 ) ∗ va
+v t i l d e b = − i n t e r f ( i )%normal ( 2 ) ∗ub + i n t e r f ( i )%normal ( 1 ) ∗vb
+
+! c a l c o l o massima v e l o c i t a d i p r o p a g a z i o n e
+lambda max = max( abs ( u t i l d e A )+s q r t ( gam∗Ta ) , abs ( u t i l d e B )+s q r t ( gam∗Tb) )
+! F l u s s i n e l s i s t e m a r u o t a t o con metodo d i Lax−F r i e d r i c h s l o c a l e
+f l u x e s ( 1 ) = 0 . 5 ∗ ( u t i l d e A ∗ ( pa+u c o n s l ( 1 ) )+u t i l d e B ∗ ( pb+u c o n s r ( 1 ) ) ) − lambda max ∗ 0 . 5 ∗ ( u c o n s r ( 1 )−
+uconsl (1) )
+f l u x e s ( 2 ) = 0 . 5 ∗ ( u t i l d e A ∗ u c o n s l ( 2 )+ u t i l d e B ∗ u c o n s r ( 2 ) ) − lambda max ∗ 0 . 5 ∗ ( u c o n s r ( 2 )−u c o n s l ( 2 ) )
+f l u x e s ( 3 ) = 0 . 5 ∗ ( pa + u c o n s l ( 2 ) ∗ u t i l d e A ∗∗2 + pb + u c o n s r ( 2 ) ∗ u t i l d e B ∗ ∗ 2 ) − lambda max ∗ 0 . 5 ∗ (
+uconsr (2) ∗ utildeB − uconsl (2) ∗ utildeA )
+f l u x e s ( 4 ) = 0 . 5 ∗ ( u c o n s l ( 2 ) ∗ u t i l d e A ∗ v t i l d e A+u c o n s r ( 2 ) ∗ u t i l d e B ∗ v t i l d e B ) − lambda max ∗ 0 . 5 ∗ ( u c o n s r
+(2) ∗ vtildeB − uconsl (2) ∗ vtildeA )
+
+! trasformazione dei f l u s s i dal sistema l o c a l e a quello globale
+i n t e r f ( i )%F ( 1 ) = f l u x e s ( 1 )
+i n t e r f ( i )%F ( 2 ) = f l u x e s ( 2 )
+i n t e r f ( i )%F ( 3 ) = f l u x e s ( 3 ) ∗ i n t e r f ( i )%normal ( 1 ) − f l u x e s ( 4 ) ∗ i n t e r f ( i )%normal ( 2 )
+i n t e r f ( i )%F ( 4 ) = f l u x e s ( 3 ) ∗ i n t e r f ( i )%normal ( 2 ) + f l u x e s ( 4 ) ∗ i n t e r f ( i )%normal ( 1 )
+
+50
+
+end s u b r o u t i n e
+
+A questo punto sono noti i flussi, si procede con l’integrazione temporale.
+
+30
+Jafar Mohaddes Zadeh
+
+Main
+
+compute internal fluxes Roe
+Questa subroutine come la precedente si occupa del calcolo dei flussi all’interfaccia attraverso
+il metodo di Roe.
+
+5
+
+10
+
+15
+
+20
+
+25
+
+30
+
+35
+
+40
+
+45
+
+50
+
+55
+
+60
+
+s u b r o u t i n e Roe ( uL , uR , nx , ny , f l u x e s )
+r e a l : : uL ( 4 ) , uR ( 4 ) !
+I n p u t : c o n s e r v a t i v e v a r i a b l e s rho ∗ [ 1 , u , v , E ]
+r e a l : : nx , ny
+!
+I n p u t : f a c e normal v e c t o r , [ nx , ny ] ( L e f t −to−Right )
+real : : fluxes (4)
+! Output : Roe f l u x f u n c t i o n ( upwind )
+! Local constants
+r e a l : : gamma
+! Ratio o f s p e c i f i c heat .
+r e a l : : z e r o , f i f t h , h a l f , one , two
+! Numbers
+! Local v a r i a b l e s
+r e a l : : tx , t y
+! Tangent v e c t o r ( p e r p e n d i c u l a r t o t h e f a c e normal )
+r e a l : : vxL , vxR , vyL , vyR
+! V e l o c i t y components .
+r e a l : : rhoL , rhoR , pL , pR
+! Primitive variables .
+r e a l : : vnL , vnR , vtL , vtR
+! Normal and t a n g e n t v e l o c i t i e s
+r e a l : : aL , aR , HL, HR
+! Speeds o f sound .
+r e a l : : RT, rho , vx , vy , H, a , vn , v t
+! Roe−a v e r a g e s
+r e a l : : drho , dvx , dvy , dvn , dvt , dp , dV ( 4 )
+! Wave s t r e n g h s
+r e a l : : ws ( 4 ) , dws ( 4 ) , Rv ( 4 , 4 )
+! Wave s p e e d s and r i g h t −e i g e v e c t o r s
+r e a l : : fL ( 4 ) , fR ( 4 ) , d i s s ( 4 )
+! F l u x e s ad d i s s i p a t i o n term
+integer : : i , j
+! Constants .
+gamma = 1 . 4
+zero = 0.0
+f i f t h = 0.2
+half = 0.5
+one = 1 . 0
+two = 2 . 0
+! Tangent v e c t o r (Do you l i k e i t ? A c t u a l l y , Roe f l u x can be implemented
+! w i t h o u t any t a n g e n t v e c t o r . See ” I do l i k e CFD, VOL. 1 ” f o r d e t a i l s . )
+t x = −ny
+t y = nx
+! P r i m i t i v e and o t h e r v a r i a b l e s .
+!
+Left state
+rhoL = uL ( 1 )
+vxL = uL ( 2 ) /uL ( 1 )
+vyL = uL ( 3 ) /uL ( 1 )
+vnL = vxL∗nx+vyL∗ny
+vtL = vxL∗ t x+vyL∗ t y
+pL = (gamma−one ) ∗ ( uL ( 4 ) − h a l f ∗ rhoL ∗ ( vxL∗vxL+vyL∗vyL ) )
+aL = s q r t (gamma∗pL/ rhoL )
+HL = ( uL ( 4 ) + pL ) / rhoL
+!
+Right s t a t e
+rhoR = uR ( 1 )
+vxR = uR ( 2 ) /uR ( 1 )
+vyR = uR ( 3 ) /uR ( 1 )
+vnR = vxR∗nx+vyR∗ny
+vtR = vxR∗ t x+vyR∗ t y
+pR = (gamma−one ) ∗ ( uR ( 4 ) − h a l f ∗rhoR ∗ ( vxR∗vxR+vyR∗vyR ) )
+aR = s q r t (gamma∗pR/rhoR )
+HR = ( uR ( 4 ) + pR ) / rhoR
+! F i r s t compute t h e Roe A v e r a g e s
+RT = s q r t ( rhoR / rhoL )
+rho = RT∗ rhoL
+vx = ( vxL+RT∗vxR ) / ( one+RT)
+vy = ( vyL+RT∗vyR ) / ( one+RT)
+H = ( HL+RT∗ HR) / ( one+RT)
+a = s q r t ( (gamma−one ) ∗ (H−h a l f ∗ ( vx ∗ vx+vy ∗ vy ) ) )
+vn = vx ∗nx+vy ∗ny
+v t = vx ∗ t x+vy ∗ t y
+! Wave S t r e n g t h s
+
+31
+Jafar Mohaddes Zadeh
+
+Main
+
+65
+
+70
+
+75
+
+80
+
+85
+
+90
+
+95
+
+100
+
+105
+
+110
+
+drho = rhoR − rhoL
+dp =
+pR − pL
+dvn = vnR − vnL
+dvt = vtR − vtL
+dV ( 1 ) = ( dp − rho ∗ a ∗dvn ) / ( two ∗ a ∗ a )
+dV ( 2 ) = rho ∗ dvt / a
+dV ( 3 ) = drho − dp / ( a ∗ a )
+dV ( 4 ) = ( dp + rho ∗ a ∗dvn ) / ( two ∗ a ∗ a )
+! Wave Speed
+ws ( 1 ) = abs ( vn−a )
+ws ( 2 ) = abs ( vn )
+ws ( 3 ) = abs ( vn )
+ws ( 4 ) = abs ( vn+a )
+! Harten ’ s Entropy Fix JCP( 1 9 8 3 ) , 4 9 , pp357 −393:
+! only f o r the n o n l i n e a r f i e l d s .
+dws ( 1 ) = f i f t h
+i f ( ws ( 1 ) < dws ( 1 ) ) ws ( 1 ) = h a l f ∗ ( ws ( 1 ) ∗ws ( 1 ) /dws ( 1 )+dws ( 1 ) )
+dws ( 4 ) = f i f t h
+i f ( ws ( 4 ) < dws ( 4 ) ) ws ( 4 ) = h a l f ∗ ( ws ( 4 ) ∗ws ( 4 ) /dws ( 4 )+dws ( 4 ) )
+! Right E i g e n v e c t o r s
+Rv ( 1 , 1 ) = one
+Rv ( 2 , 1 ) = vx − a ∗nx
+Rv ( 3 , 1 ) = vy − a ∗ny
+Rv ( 4 , 1 ) = H − vn∗ a
+Rv ( 1 , 2 ) = z e r o
+Rv ( 2 , 2 ) = a ∗ t x
+Rv ( 3 , 2 ) = a ∗ t y
+Rv ( 4 , 2 ) = v t ∗ a
+Rv ( 1 , 3 ) = one
+Rv ( 2 , 3 ) = vx
+Rv ( 3 , 3 ) = vy
+Rv ( 4 , 3 ) = h a l f ∗ ( vx ∗ vx+vy ∗ vy )
+Rv ( 1 , 4 ) = one
+Rv ( 2 , 4 ) = vx + a ∗nx
+Rv ( 3 , 4 ) = vy + a ∗ny
+Rv ( 4 , 4 ) = H + vn∗ a
+! D i s s i p a t i o n Term
+diss = zero
+do i =1 ,4
+do j =1 ,4
+d i s s ( i ) = d i s s ( i ) + ws ( j ) ∗dV( j ) ∗Rv( i , j )
+end do
+end do
+
+115
+
+120
+
+! Compute t h e f l u x .
+fL ( 1 ) = rhoL ∗vnL
+fL ( 2 ) = rhoL ∗vnL ∗ vxL + pL∗nx
+fL ( 3 ) = rhoL ∗vnL ∗ vyL + pL∗ny
+fL ( 4 ) = rhoL ∗vnL ∗ HL
+
+125
+
+fR ( 1 ) = rhoR∗vnR
+fR ( 2 ) = rhoR∗vnR ∗ vxR + pR∗nx
+fR ( 3 ) = rhoR∗vnR ∗ vyR + pR∗ny
+fR ( 4 ) = rhoR∗vnR ∗ HR
+f l u x e s = h a l f ∗ ( fL + fR − d i s s )
+end s u b r o u t i n e
+
+32
+Jafar Mohaddes Zadeh
+
+Main
+
+2.3.7
+
+Subroutine integ time
+
+Noti i flussi si può valutare la derivata delle grandezze conservative come:
+Z
+Z
+∂
+⃗ui dΩi +
+F⃗ · n̂dS = 0
+∂t Ωi
+∂Ωi
+Se si approssima l’integrale con il valore medio e l’integrale di bordo come una sommatoria sul
+numero di lati, si può scrivere:
+X
+lij
+∂
+u⃗i +
+F⃗ij · n̂ij
+=0
+∂t
+Ωij
+n
+lati
+
+Se si usa Eulero esplicito:
+∂
+⃗ui k+1 − ⃗ui k
+u⃗i =
+∂t
+∆t
+Riarrangiando:
+⃗ui k+1 = ⃗ui k + ∆t
+
+X
+nlati
+
+lij
+F⃗ij · n̂ij
+Ωij
+
+Tutti i termini sono noti e quindi è sufficiente aggiornare il valore delle grandezze conservative
+e ricalcolare le grandezze primitive attraverso quelle conservative appena aggiornate, in modo
+da modicare la condizione sul passo temporale per l’integrazione successiva.
+
+5
+
+subroutine integ time
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i , j
+
+do i =1 , n e l e i n t e r n i
+10
+
+15
+
+20
+
+e l e ( i )%ucons ( : ) = e l e ( i )%ucons ( : ) + dt ∗ e l e ( i )%d d t ( : )
+
+e l e ( i )%u = e l e ( i )%ucons ( 3 ) / e l e ( i )%ucons ( 2 )
+e l e ( i )%v = e l e ( i )%ucons ( 4 ) / e l e ( i )%ucons ( 2 )
+e l e ( i )%p = ( gam−1) ∗ ( e l e ( i )%ucons ( 1 ) −0.5∗ e l e ( i )%ucons ( 2 ) ∗ ( e l e ( i )%u∗∗2+ e l e ( i )%v ∗ ∗ 2 ) )
+e l e ( i )%T = e l e ( i )%P/ e l e ( i )%ucons ( 2 )
+e l e ( i )%a = s q r t ( e l e ( i )%T ∗ gam )
+e l e ( i )%S = gam ∗ l o g ( e l e ( i )%T) − ( gam−1.) ∗ l o g ( e l e ( i )%P)
+end do
+end s u b r o u t i n e
+
+33
+Jafar Mohaddes Zadeh
+
+Bump - mesh strutturata
+Avendo sviluppato il codice CFD si passa a discutere dei casi studio di interesse. Il primo che
+si analizzerà riguarda un condotto con un bump, il quale sostanzialmente rappresenta metà di
+un condotto convergente divergente; se ne studia solo metà a causa della simmetria. In questo
+studycase si inizializzerà il campo come uniforme e lo si farà evolvere fino a convergenza. Questo
+calcolo verrà ripetuto diverse volte raffinando sempre di più griglia al fine di svolgere un’analisi
+di convergenza della stessa.
+
+3.1
+
+Inizializzazione
+
+Come discusso nell’analisi del codice CFD, è necessario fornire in ingresso al nostro codice
+alcuni parametri nonché il nome del file contenente la mesh. I parametri di ingresso sono:
+• input.txt:
+– MESH FILE: bump structured .msh, dato che si è interessati a compiere un’analisi
+di convergenza questo file verrà richiamato più volte, ma ad ogni simulazione si avrà
+un numero crescente di nodi costituenti la griglia.
+– KFINAL: 100000
+– KINF: 1000
+– KOUT: 1000
+– CFL: 0.3
+• inlet.txt:
+◦
+– TIN
+=1
+◦
+– PIN
+=1
+
+– α = 0◦
+– MIN = 0.3
+• outlet.txt:
+34
+
+Inizializzazione
+
+– Pexit = 0.9395, questo valore corrisponde alla pressione a Misentropico = 0.3.
+Per svolgere l’analisi di convergenza, che verrà discussa nel dettaglio più avanti, è sufficiente
+osservare che in questo caso non dovrebbe essere presente entropia nel campo trattandosi di
+Eulero e in assenza di onde d’urto, questa però invece risulterà presente e quindi potrà essere
+sfruttata per una valutazione quantitativa dell’errore.
+
+3.1.1
+
+Caso 750 nodi
+
+Il primo caso che si analizza è caratterizzato da una griglia grezza costituita da soli 750 nodi
+come rappresentato in figura 3.1.
+
+Figura 3.1: Mesh - 750 nodi
+Attraverso il software Visit è possibile visualizzare l’evoluzione temporale delle grandezze di
+interesse, per tutti i casi descritti verranno riportate le visualizzazioni del campo di moto in
+termini di Mach e il campo di entropia una volta evoluti fino al raggiungimento di KFINAL o
+quando verrà raggiunta la convergenza delle grandezze caratteristiche.
+
+Figura 3.2: Campo di Mach - 750 nodi
+Il campo di Mach ci si aspetterebbe che fosse simmetrico ma cosı̀ non è dalla rappresentazione,
+la ricerca della simmetria del campo di moto infatti ci fornisce un modo qualitativo per comprendere che stiamo commettendo un errore, come anticipato però l’entropia ci dà la possibilità
+di compiere un’analisi quantitativa.
+35
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 3.3: Campo di Entropia - 750 nodi
+L’entropia che sarebbe dovuta essere nulla su tutto il dominio non lo è.
+
+3.1.2
+
+Caso 3000 nodi
+
+Come per il caso precedente si riportano la mesh e i campi di Mach e entropia.
+
+Figura 3.4: Mesh - 3000 nodi
+
+Figura 3.5: Campo di Mach - 3000 nodi
+
+36
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 3.6: Campo di Entropia - 3000 nodi
+
+3.1.3
+
+Caso 6750 nodi
+
+Figura 3.7: Mesh - 6750 nodi
+
+Figura 3.8: Campo di Mach - 6750 nodi
+
+37
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 3.9: Campo di Entropia - 6750 nodi
+
+3.1.4
+
+Caso 12000 nodi
+
+Figura 3.10: Mesh - 12000 nodi
+
+Figura 3.11: Campo di Mach - 12000 nodi
+
+38
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+Figura 3.12: Campo di Entropia - 12000 nodi
+
+3.2
+
+Analisi di convergenza
+
+Come si può osservare nelle figure rappresentanti il campo di Mach, questo diventa più simmetrico all’aumentare del numero di nodi e analogamente per il campo di entropia la zona in cui
+è presente un gradiente diminuisce al crescere di nodi. Per valutare quantitativamente questo
+risultato si valuta la norma 2 (valore quadratico medio), questa infatti ci fornisce un valore che
+ci consente di comprendere qual è l’errore numerico introdotto. La norma è cosı̀ definita:
+sR
+(S)2 dΩ
+ΩR
+||S||2 =
+dΩ
+Ω
+Si discretizza questa espressione sostituendo gli integrali con delle sommatorie sul numero di
+elementi interni:
+sP
+(S)2 · Areai
+P i
+||S||2 =
+Areai
+Nel codice Fortran viene aggiunta quindi una funzione che ci consenta di valutare questa norma:
+
+5
+
+s u b r o u t i n e compute norm entropy
+use v a r i a b i l i
+i m p l i c i t none
+integer : : i
+r e a l ( 4 ) : : a r e a t o t , norm2 entropy
+norm2 entropy = 0 .
+a r e a t o t =0.
+
+10
+
+do i =1 , n e l e i n t e r n i
+norm2 entropy = norm2 entropy + e l e ( i )%S ∗∗2 ∗ e l e ( i )%a r e a
+a r e a t o t = a r e a t o t + e l e ( i )%a r e a
+
+15
+
+end do
+norm2 entropy = s q r t ( norm2 entropy / a r e a t o t )
+w r i t e ( ∗ , ∗ ) ’ Norm2 entropy = ’ , norm2 entropy
+end s u b r o u t i n e
+
+39
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+A questo punto si riporta l’andamento della norma al variare dei numeri di nodi e, come era
+auspicabile e deducibile con le visualizzazioni precedentemente proposte, si ha che la norma, e
+quindi l’errore, decresce con il raffinarsi della griglia. Si riporta anche l’andamento della norma
+con la lunghezza caratteristica che segue un andamento concorde con quello in funzione del
+numero di nodi.
+
+Figura 3.13: ||S||2 vs numero di nodi
+
+Figura 3.14: ||S||2 vs lc
+In questo caso si è fatto evolvere il sistema fino al raggiungimento della convergenza, infatti
+per ogni griglia il numero di iterazioni è stato diverso. Se si riduce ∆x, si riduce di conseguenza
+anche ∆t e quindi con una griglia più raffinata si ha un’evoluzione temporale ridotta rispetto ad
+una meno fitta, inoltre si ha una diffusività minore e quindi è necessario aumentare il numero
+di iterazioni.
+
+40
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+3.2.1
+
+Lax–Friedrichs vs. Roe
+
+Le analisi presentate nelle sezioni precedenti sono state tutte svolte valutando i flussi attraverso
+il metodo di Lax–Friedrichs, questo però non è l’unico applicabile, si vogliono infatti confrontare
+i risultati ottenuti con il metodo di Roe. Il metodo di Roe è un metodo upwind che tiene
+conto fortemente della fisica del problema, infatti tiene conto della propagazione ondosa delle
+equazioni a differenza di Lax–Friedrichs che è un metodo centrato, il metodo di Roe risulta
+inoltre meno dissipativo. Dalle simulazioni svolte, come in precedenza, si è valutata la norma
+due dell’entropia in modo da poter fare un confronto tra i due metodi:
+
+Figura 3.15: ||S||2 vs lc
+
+Figura 3.16: ||S||2 vs lc - log scale
+Come si può osservare dalle figure 3.15 e 3.16 il metodo di Roe porta a dei risultati migliori a
+parità di mesh essendo che sfrutta la fisicità del problema.
+41
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+3.2.2
+
+Valutazione dell’ordine di convergenza
+
+La valutazione della norma ci permette di comprendere quale sia l’errore di discretizzazione che
+si commette con la simulazione, un’altra quantità di cui si è interessati a conoscere è l’ordine
+di convergenza p. Infatti, vale che:
+E = uh − uo = k · hp + . . .
+Dove E è l’ordine di discretizzazione, uh è la soluzione numerica di una certa grandezza e uo
+è la soluzione esatta. Dall’altra parte dell’uguale si ha invece k una costante, h la dimensione
+caratteristica delle celle, p l’ordine di convergenza e . . . sono termini di ordine superiore. Tramite questa espressione è possibile quindi valutare l’ordine di convergenza nonché l’errore di
+discretizzazione che si sta compiendo in una certa simulazione.
+L’ordine di convergenza può essere al più pari a quello teorico del metodo, infatti bisogna
+valutare se ci si trova nelle condizioni per cui h è tale da garantire che p tenda a quello teorico.
+Se cosı̀ non fosse si potrebbe avere un ordine di convergenza molto basso e la causa potrebbe
+risiedere nella griglia utilizzata. Vale infatti:
+E = k · hp
+
+se h → 0 =⇒ p → pteorico
+
+Se però h non tende a 0 non si possono escludere i termini di ordine superiore e quindi non
+si può raggiungere il valore teorico. Si analizzano in seguito tre casi rappresentativi per la
+valutazione dell’ordine di convergenza.
+Soluzione esatta nota
+Qualora la soluzione esatta fosse nota come nel caso del bump trattato precedentemente è
+possibile trovare p sfruttando le proprietà dei logaritmi. Immaginando di aver svolto due
+simulazioni caratterizzate da delle lunghezze caratteristiche diverse si può scrivere:
+(
+ p
+E1 = k · hp1
+h1
+E1
+=
+p =⇒
+E2
+h2
+E2 = k · h2
+Applicando le proprietà dei logaritmi e un opportuno cambio di base si ottiene:
+ 
+1
+ln E
+E2
+p=  
+ln hh12
+Se è nota la soluzione esatta è quindi tutto noto e quindi è possibile stimare l’ordine di convergenza effettivo. Quando la soluzione esatta non è nota a priori, è necessario estrapolarla e per
+farlo si sfrutta l’estrapolazione di Richardson, la quale si divide in:
+• Con ordine teorico.
+• Con ordine effettivo.
+42
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+Estrapolazione di Richardson con ordine teorico
+Per prima cosa si ipotizza l’ordine effettivo sia pari a quello teorico e si immagina di svolgere
+due simulazioni aventi le seguenti lunghezze caratteristiche:
+(
+E1 = uh − uo = k · hp
+h1 = h
+=⇒
+h2 = rh con r > 1
+E2 = urh − uo = k · rp hp
+Si ha quindi un sistema 2x2 dove le incognite sono k e uo . Manipolando le equazioni si ottiene:
+uo =
+
+rp · uh − urh
+(rp − 1)
+
+Da cui è possibile stimare l’errore di discretizzazione:
+Eh = uh − uo
+Si può anche valutare un indice che è bene associare alle proprie simulazioni che è il GCI, ovvero
+il grid convergence index cosı̀ definito:
+GCI = Eh · Fs
+Dove Fs è un fattore di sicurezza solitamente pari a 3.
+Estrapolazione di Richardson con ordine effettivo
+Se invece non si è confidenti che la propria griglia raggiunga il p teorico si può ripetere quanto fatto precedentemente aggiungendo una terza equazione in modo da introdurre p come
+incognita.
+
+p
+
+h1 = h
+E1 = uh − uo = k · h
+h2 = 2h =⇒ E2 = u2h − uo = k · 2p hp
+
+
+h3 = 4h
+E3 = u4h − uo = k · 4p hp
+Ottenendo:
+ln
+p=
+
+
+
+u4h −u2h
+u2h −uh
+
+
+
+ln 2
+
+uo = uh +
+
+u2h − uh
+2p − 1
+
+Eh = uh − uo
+GCI = Eh · Fs
+
+43
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+Grandezze
+p
+
+uo
+
+E
+
+CGI
+
+Soluzione nota
+
+Lax–Friedrichs
+Roe
+
+0.603
+0.861
+
+0.00E+00
+0.00E+00
+
+1.45E-03
+9.11E-04
+
+4.36E-03
+2.73E-03
+
+Ordine teorico
+
+Lax–Friedrichs
+Roe
+
+1.00
+1.00
+
+9.37E-04
+8.25E-04
+
+5.16E-04
+8.59E-05
+
+1.55E-03
+2.58E-04
+
+Ordine effettivo
+
+Lax–Friedrichs
+Roe
+
+0.226
+0.350
+
+5.66E-03
+3.49E-03
+
+4.21E-03
+2.57E-03
+
+1.26E-02
+7.72E-03
+
+Tabella 3.1: Risultati Analisi di convergenza
+Per questa analisi sono stati usati i seguenti valori di uh :
+(
+1.45E − 03 Lax-Friedrichs
+uh =
+9.11E − 04 Roe
+(
+2.17E − 03 Lax-Friedrichs
+u2h =
+1.62E − 03 Roe
+(
+3.00E − 03 Lax-Friedrichs
+u4h =
+2.52E − 03 Roe
+
+Dalla tabella 3.1 è possibile osservare come Roe si comporti meglio in tutti i casi per quanto
+già discusso precedentemente, in particolare nel caso di soluzione esatta si può apprezzare che
+l’ordine di convergenza è prossimo a quello teorico.
+
+44
+Jafar Mohaddes Zadeh
+
+Paletta di turbina LS59
+In questo capitolo si analizza quello che è il campo di moto attorno al profilo di una paletta
+di turbina di alta pressione denominata LS59. Il campo di moto che si andrà a studiare, in
+verità, non è semplicemente quello di un profilo immerso in una corrente, ma quella dell’intera
+schiera di palette. Infatti, se si realizza un dominio attorno al profilo in modo da racchiuderlo
+e si impongono sulla parete inferiore e superiore delle condizioni di periodicità, si può ottenere
+con questa analisi il comportamento dell’intera schiera e quindi gli effetti di interazione tra
+profili. Dato che si tratta di una geometria complessa si utilizzerà in questo caso una mesh non
+strutturata e come per il caso del bumb verrà proposta un’analisi di convergenza della griglia
+ponendo a confronto il metodo di Lax–Friedrichs e quello di Roe.
+
+Figura 4.1: Dominio computazionale LS59
+
+45
+
+Inizializzazione
+
+4.1
+
+Inizializzazione
+
+I parametri di ingresso sono:
+• input.txt:
+– LS59.msh, dato che si è interessati a compiere un’analisi di convergenza questo file
+verrà richiamato più volte, ma ad ogni simulazione si avrà un numero crescente di
+nodi costituenti la griglia.
+– KFINAL: 300000
+– KINF: 1000
+– KOUT: 1000
+– CFL: 0.3
+• inlet.txt:
+◦
+– TIN
+=1
+◦
+– PIN
+=1
+
+– α = 30◦
+– MIN = 0.5
+• outlet.txt:
+– Pexit = 0.4124, questo valore corrisponde alla pressione a Misentropico = 1.2, infatti
+è più semplice imporre una condizione di uscita in termini di Mach piuttosto che
+di pressione. In questo caso quindi la condizione è stata imposta ipotizzando che si
+conservi la pressione totale e che quindi noto il Mach di uscita sia possibile valutare
+la pressione come:
+P◦
+Pexit =
+ γ
+Mis2 γ−1
+1 + γ−1
+2
+Dato che il flusso in uscita ci si aspetta che sia supersonico, la condizione di uscita
+di pressione non dovrebbe essere imposta, questo però non vale in questa situazione, in quanto se si scompone la velocità nelle sue due componenti, la componente
+perpendicolare al bordo di uscita del dominio risulta subsonica.
+In questo caso particolare è noto che la corrente in ingresso abbia incidenza α = 30◦ , e in uscita
+ci si aspetta che la corrente venga deflessa verso il basso per azione della paletta ottenendo
+α = −60◦ . Alla luce di queste considerazioni, al fine di ridurre il transitorio molto severo che
+può presentarsi quando si svolge l’analisi, si decide di imporre una condizione iniziale differente
+a seconda della coordinata x del dominio. In particolare:
+
+◦
+
+se x < 0
+α = 30
+◦
+α = −60
+se x > 1
+
+
+α = a + bx
+se 0 ≤ x ≤ 1
+46
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+In questo caso dato che non è noto come varia α con la coordinata x si è scelto di ipotizzare
+un’approssimazione lineare dove le costanti sono:
+a = 30◦
+
+b = −90◦ =⇒ α = a + bx = 30 − 90x
+
+se 0 ≤ x ≤ 1
+
+In termini di codice si è quindi introdotta nella subroutine init.f90 la seguente condizione:
+
+5
+
+10
+
+i f ( m e s h f i l e = = ’ LS59 . msh ’ ) then
+i f ( e l e ( i )%x0 ( 1 ) <= 0 ) then
+a l p h a i n i t = 30∗3.14/180
+e l s e i f ( e l e ( i )%x0 ( 1 ) > 0 . and . e l e ( i )%x0 ( 1 ) <= 1 ) then
+a l p h a i n i t = 3 0 ∗ 3 . 1 4 / 1 8 0 − 9 0 ∗ 3 . 1 4 / 1 8 0 ∗ e l e ( i )%x0 ( 1 )
+e l s e i f ( e l e ( i )%x0 ( 1 ) > 1 ) then
+a l p h a i n i t = −60∗3.14/180
+end i f
+alpha = a l p h a i n i t
+end i f
+
+Si riportano in seguito le visualizzazioni ottenute con il software Visit, tutte le analisi sono
+state realizzate fino a raggiungere la convergenza della griglia associata ad una certa lunghezza
+caratteristica.
+
+Figura 4.2: Mesh lc = 0.02
+
+Figura 4.3: Mesh lc = 0.01
+
+47
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.4: Mesh lc = 0.005
+
+4.1.1
+
+Campo di Mach e Velocità
+
+Figura 4.5: Campo di Mach lc = 0.02 -Lax Friedrichs
+
+Figura 4.6: Campo di Mach lc = 0.02 - Roe
+
+48
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.7: Campo di Mach lc = 0.01 -Lax Friedrichs
+
+Figura 4.8: Campo di Mach lc = 0.01 - Roe
+
+Figura 4.9: Campo di Mach lc = 0.005 -Lax Friedrichs
+
+49
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.10: Campo di Mach lc = 0.005 - Roe
+Osservando le diverse rappresentazioni del campo di Mach si evince che le analisi svolte con
+il metodo di Roe permettono di catturare meglio i due urti presenti al bordo di fuga rispetto a
+quelle svolte con Lax - Friedrichs, l’ultima analisi in particolare mostra una notevole differenza
+tra i due campi di moto. Gli urti presenti al bordo di fuga si generano perché la corrente deve
+avere la stessa direzione di uscita al bordo di fuga come si può apprezzare dalle rappresentazioni
+del campo di velocità riportate di seguito.
+
+Figura 4.11: Campo di Velocità lc = 0.02 -Lax Friedrichs
+
+50
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.12: Campo di Velocità lc = 0.02 - Roe
+
+Figura 4.13: Campo di Velocità lc = 0.01 -Lax Friedrichs
+
+Figura 4.14: Campo di Velocità lc = 0.01 - Roe
+
+51
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.15: Campo di Velocità lc = 0.005 -Lax Friedrichs
+
+Figura 4.16: Campo di Velocità lc = 0.005 - Roe
+
+4.1.2
+
+Campo di Entropia
+
+Nel caso in analisi, come si è potuto osservare dal campo di moto, vi sono degli urti e quindi
+l’entropia non sarà nulla su tutto il dominio come avveniva invece per il caso del bump. Il fatto
+che l’entropia non sia più nulla non consente più di valutare l’ordine di convergenza tramite la
+conoscenza della soluzione esatta, in quanto questa non è più nota. Inoltre in questo studycase,
+dato che si sta usando un solutore che fa uso delle equazioni di Eulero, le scie e le variazioni
+di entropia dovute agli urti non possono essere catturati, dato che il campo di monte da cui
+pescano le linee di corrente non presenta sorgenti di entropia. Vale infatti che:
+DS
+=0
+Dt
+L’entropia che si vede nelle figure successive è solo di natura numerica, infatti aumentando la
+risoluzione della griglia si osserva che si riduce.
+
+52
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.17: Campo di Entropia lc = 0.02 -Lax Friedrichs
+
+Figura 4.18: Campo di Entropia lc = 0.02 - Roe
+
+Figura 4.19: Campo di Entropia lc = 0.01 -Lax Friedrichs
+
+53
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 4.20: Campo di Entropia lc = 0.01 - Roe
+
+Figura 4.21: Campo di Entropia lc = 0.005 -Lax Friedrichs
+
+Figura 4.22: Campo di Entropia lc = 0.005 - Roe
+
+54
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+4.2
+
+Analisi di convergenza
+
+Per l’analisi di convergenza in questo studycase non si può più sfruttare l’informazione sull’entropia per una valutazione diretta dell’ordine di convergenza, per quello infatti attraverso
+l’estrapolazione di Richardson verranno valutati gli errori solo per ordine teorico ed effettivo.
+Comunque come evidente dalle visualizzazioni dell’entropia proposte precedentemente, è osservabile come al ridursi della lunghezza caratteristica la soluzione migliori. Si riportano quindi
+gli andamenti della norma 2 dell’entropia al variare della lunghezza caratteristica confrontando
+i due metodi. La norma è cosı̀ definita:
+sR
+(S)2 dΩ
+ΩR
+||S||2 =
+dΩ
+Ω
+Si discretizza questa espressione sostituendo gli integrali con delle sommatorie sul numero di
+elementi interni:
+sP
+(S)2i · Areai
+P
+||S||2 =
+Areai
+
+Figura 4.23: ||S||2 vs lc
+
+Estrapolazione di Richardson con ordine teorico
+Per prima cosa si ipotizza l’ordine effettivo sia pari a quello teorico e si immagina di svolgere
+due simulazioni aventi le seguenti lunghezze caratteristiche:
+(
+E1 = uh − uo = k · hp
+h1 = h
+=⇒
+h2 = rh con r > 1
+E2 = urh − uo = k · rp hp
+Si ha quindi un sistema 2x2 dove le incognite sono k e uo . Manipolando le equazioni si ottiene:
+uo =
+
+rp · uh − urh
+(rp − 1)
+55
+
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+Da cui è possibile stimare l’errore di discretizzazione:
+Eh = uh − uo
+Si può anche valutare un indice che è bene associare alle proprie simulazioni che è il GCI, ovvero
+il grid convergence index cosı̀ definito:
+GCI = Eh · Fs
+Dove Fs è un fattore di sicurezza solitamente pari a 3.
+Estrapolazione di Richardson con ordine effettivo
+Se invece non si è confidenti che la propria griglia raggiunga il p teorico si può ripetere quanto fatto precedentemente aggiungendo una terza equazione in modo da introdurre p come
+incognita.
+
+p
+
+h1 = h
+E1 = uh − uo = k · h
+h2 = 2h =⇒ E2 = u2h − uo = k · 2p hp
+
+
+h3 = 4h
+E3 = u4h − uo = k · 4p hp
+Ottenendo:
+ln
+p=
+
+
+
+u4h −u2h
+u2h −uh
+
+
+
+ln 2
+u2h − uh
+uo = uh + p
+2 −1
+Eh = uh − uo
+GCI = Eh · Fs
+In questo caso si è scelto di utilizzare la norma 2 dell’entropia come variabile u, ottenendo i
+risultati riportati in tabella 4.1.
+Grandezze
+p
+
+uo
+
+E
+
+CGI
+
+Ordine teorico
+
+Lax–Friedrichs
+Roe
+
+1.00
+1.00
+
+2.51E-02
+2.58E-02
+
+6.07E-03
+2.45E-03
+
+1.82E-02
+7.34E-03
+
+Ordine effettivo
+
+Lax–Friedrichs
+Roe
+
+1.04
+2.76
+
+3.67E-02
+2.48E-02
+
+5.63E-03
+1.64E-04
+
+1.69E-02
+4.92E-04
+
+Tabella 4.1: Risultati Analisi di convergenza
+I valori p risultano superiori a quelli teorici a causa del fatto che non si è raggiunta la regione
+asintotica. Per valutare correttamente l’ordine di convergenza della griglia sarebbe necessario
+
+56
+Jafar Mohaddes Zadeh
+
+Confronto con dati sperimentali
+
+includere i termini di ordine superiore, dei quali però non si ha nessuna informazione. Per
+questa analisi sono stati usati i seguenti valori di uh :
+(
+3.11E − 02 Lax-Friedrichs
+uh =
+2.82E − 02 Roe
+(
+3.71E − 02 Lax-Friedrichs
+u2h =
+2.92E − 02 Roe
+(
+4.93E − 02 Lax-Friedrichs
+u4h =
+3.56E − 02 Roe
+
+4.3
+
+Confronto con dati sperimentali
+
+Per verificare la bontà della simulazione è possibile confrontare le distribuzioni di pressione a
+parete con quelle ottenute sperimentalmente. Nel caso particolare di questa paletta sono disponibili i valori del Mach isentropico a parete in funzione della coordinata x rapportata alla corda
+in un sistema di riferimento ruotato rispetto a quello definito nelle simulazioni, sarà quindi
+necessario applicare un cambio di sistema di riferimento.
+Per poter confrontare i dati simulati con quelli sperimentali si procede realizzando una nuova subroutine, che salva all’interno di un file di testo i valori di pressione a parete nonché le
+coordinate dei punti associati.
+Subroutine save wall data
+Use V a r i a b i l i
+5
+
+I m p l i c i t none
+integer : : i
+
+10
+
+open ( u n i t =1 , f i l e = ’ w a l l d a t a . t x t ’ )
+do i =1 , n i n t e r f
+
+15
+
+i f ( i n t e r f ( i )%e n t i t y . eq . 9 9 ) then
+w r i t e ( 1 , ∗ ) i n t e r f ( i )%x0 , e l e ( i n t e r f ( i )%e1 )%P
+
+end i f
+20
+
+end do
+close (1)
+end S u b r o u t i n e
+
+Dato che si sta usando una mesh non strutturata, i dati salvati non saranno ordinati secondo
+delle coordinate x crescenti, per ordinarli è possibile aggiungere un algoritmo di ordinamento
+57
+Jafar Mohaddes Zadeh
+
+Confronto con dati sperimentali
+
+all’interno del codice stesso o implementare questa routine durante il post processing. Può
+essere interessante, inoltre, distinguere il dorso e il ventre del profilo e quindi filtrare i dati di
+pressione. Per realizzare questo filtro si definisce una soglia interpolando la geometria della
+linea media del profilo attraverso una parabola (fig. 4.24) e imponendo che le coordinate y al
+di sotto di essa facciano parte del ventre e viceversa quelle del dorso.
+
+Figura 4.24: Linea media interpolata
+A questo punto dato che i dati sperimentali sono forniti in termini di Mach isentropico si
+procede a valutarlo ricordando che P ◦ = 1 e avendo le informazioni su Pw dalle simulazioni.
+v
+#
+"  γ−1
+u
+u 2
+◦
+γ
+P
+−1
+Mis = t
+γ−1
+Pw
+A questo punto per completare l’analisi è necessario applicare una rotazione al sistema di
+riferimento utilizzato nelle simulazioni in modo da realizzare un confronto coerente tra i dati:
+β = 33.3◦
+x′ = x · cos β − y · sin β
+c = 1/ cos β
+In figura 4.25 si possono osservare i risultati ottenuti dal confronto dei dati ottenuti attraverso
+l’analisi con la griglia più raffinata e con il metodo di Roe che ha dimostrato essere quello più
+adatto. I risultati della simulazione si avvicinano molto a quelli sperimentali fatta eccezione per
+la parte dorsale verso il bordo di fuga, la causa di questa differenza può essere imputabile alla
+presenza di urti che potrebbero non essere catturati accuratamente dalla mesh impiegata. Per
+migliorare i risultati si potrebbe pensare di modificare la griglia applicando delle tecniche più
+sofisticate e catturando meglio il comportamento. In figura 4.26 si riporta il campo di pressione
+riferito al caso in questione.
+
+58
+Jafar Mohaddes Zadeh
+
+Confronto con dati sperimentali
+
+Figura 4.25: Confronto tra CFD e dati sperimentali LS59
+
+Figura 4.26: Campo di Pressione lc = 0.005
+
+59
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+4.4
+
+Analisi con ANSYS Fluent
+
+Si propone adesso di ripetere le analisi svolte precedentemente attraverso il software commerciale ANSYS Fluent, si ripeteranno infatti gli stessi passaggi compiuti per lo studio con il codice
+CFD sviluppato nell’ambito di questo corso ma facendo uso dei software integrati in ANSYS.
+
+4.4.1
+
+Realizzazione geometria
+
+Per la realizzazione della geometria si utilizza il programma CAD DesignModeler. Il software
+in questione consente di realizzare all’interno dello stesso le geometrie dei corpi che dovranno
+essere simulati oppure, come è più usuale nell’ambito industriale, permette di importare delle
+geometrie da file esterni. Nell’ambito industriale infatti, solitamente la geometria viene fornita
+a chi compie le simulazioni attraverso dei modelli 3D o dei file già predisposti. Nel caso in
+analisi è possibile ottenere un modello 3D a partire da gmsh, infatti aggiungendo al file .geo il
+comando:
+SetF actory(”OpenCASCADE”)
+Il software permetterà di salvare la geometria in un file CAD, in particolare si salverà il file con
+estensione standard .step. Una volta importato sarà necessario scalare le dimensioni del corpo
+in quanto gmsh riduce la scala di un fattore 1000.
+
+Figura 4.27: Geometria con DesignModeler
+
+60
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+4.4.2
+
+Realizzazione mesh
+
+Il passo successivo è la realizzazione di una mesh sulla geometria del corpo, in questo caso si
+utilizza il software Meshing che permette a partire di realizzare una griglia a partire dal corpo
+realizzato nell’ambiente precedente. Per la generazione di questa mesh si è deciso di utilizzarne
+una non strutturata composta da elementi quadrangolari quando possibile, inoltre si è scelto di
+includere un raffinamento sulla parete della paletta per cogliere lo strato limite, il quale servirà
+per lo studio attraverso un modello RANS. La mesh realizzata ha le seguenti proprietà:
+• Element size 0.01
+• Inflation layers max 30
+• Inflation Growth rate 1.2
+• Transition ratio 0.8
+
+Figura 4.28: Mesh attraverso il sofware Meshing
+Nell’ambiente Meshing è anche possibile associare alle varie superfici diversi label, i quali verranno riconosciuti dal software Fluent e nel momento in cui si definiranno le condizioni al
+contorno l’assegnazione sarà semplificata. In questo caso l’inlet è definito dal bordo verticale
+di sinistra, l’outlet dal bordo verticale di destra, la parete solida è la geometria del profilo e
+infine si definiscono come bordi periodici le pareti superiori e inferiori del dominio sulle quali
+verrà imposta successivamente una condizione di periodicità.
+
+61
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+4.4.3
+
+Analisi Fluent
+
+A questo punto si hanno tutti gli strumenti per avviare la simulazione con Fluent, si apre quindi
+il software e si definiscono alcuni parametri per avviare la simulazione. Nel caso in analisi si
+svolgerà una simulazione inviscida e una facendo uso delle RANS.
+Il primo passo una volta avviato il software è quello di scegliere che tipo di solutore si vuole
+utilizzare, in questo caso si usa un solutore density based il quale richiede la definizione di una
+pressione di riferimento. Questa pressione può essere scelta in diversi modi, in questo caso la si
+pone nulla al fine di ottenere dei valori di pressione assoluti e non relativi. Una volta definito
+il tipo di solutore si passa alla scelta del modello:
+• Se si analizza un caso non viscoso si sceglierà la voce inviscid.
+• Se si analizza un caso viscoso si hanno a disposizione diversi modelli, nell’ambito di questa
+analisi si sceglie Spalart - Allmaras.
+Sempre nell’ambiente modello è bene verificare che l’equazione dell’energia venga risolta e quindi se non è on bisogna renderla tale.
+Una volta definito il modello si passa all’assegnazione delle proprietà del materiale, in particolari quelle del fluido aria. Nel caso dell’analisi inviscida è sufficiente dire che la densità non
+è costante ma segue la legge dei gas perfetti, infatti in un caso inviscido imporre M equivale a
+imporre ρ e le proprietà dipendono solo da M . Quando si analizza invece un caso viscoso si ha
+che le proprietà dipendono non solo dal Mach ma anche da Re e di conseguenza bisogna agire
+su altre grandezze:
+ρucx / cos β
+Re =
+µ
+Se infatti si ha un numero di Re fissato si può agire o sulla lunghezza caratteristica oppure su
+µ dato che la densità e la velocità sono funzioni del Mach. Agire sulla lunghezza caratteristica
+una volta definita la geometria non è fattibile, di conseguenza non rimane che imporre il valore
+della viscosità.
+
+
+Re = 554140 =⇒ µ = 4.0819 · 10−4 N s/m2
+Si passa ora alla definizione delle condizioni al contorno, per farlo si distinguono le varie superfici
+facendo uso dei label assegnati nella fase di meshing e si impongono due condizioni all’inlet,
+essendo che il campo è subsonico, e una condizione all’outlet. Le condizioni all’inlet che si
+impongono sono:
+P ◦ = 100000 [P a]
+T ◦ = 300 [K]
+Per l’outlet invece si impone la pressione statica associata ad un Mach isentropico di 1.2:
+P = 41237.7 [P a]
+Bisogna inoltre assegnare la direzione del flusso in ingresso che in questo caso risulta inclinato
+di α = 30◦ .
+
+62
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+Bisogna scegliere il solution methods, in questo caso essendo già implementato si opta per
+un metodo implicito e si fa uso di Roe utilizzando una discretizzazione spaziale del secondo
+ordine upwind. Si sceglie inoltre un numero di Courant pari a 5, nonché un numero di iterazioni
+pari a 10000 al fine di raggiungere la convergenza.
+A questo punto è possibile avviare la simulazione e ottenere i risultati per i due casi. Oltre ad
+una rappresentazione del campo di moto in termini di Mach è possibile ottenere l’andamento
+della pressione a parete e confrontarla con i dati delle simulazioni precedenti svolte con il codice
+CFD, l’unico accorgimento da fare è che i valori di pressione ottenuti devono essere rapportati
+alla pressione totale in ingresso per ottenere dei dati coerenti con quelli precedenti.
+
+Figura 4.29: Isolivello Mach caso inviscido
+
+Figura 4.30: Isolivello Mach caso viscoso
+Se si mettono a confronto i risultati delle due simulazioni si osserva che gli andamenti delle soluzioni sono pressoché gli stessi. Questo è dovuto al fatto che in assenza separazioni le
+63
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+equazioni di Eulero colgono bene le distribuzioni di pressione a parete, che nel caso viscoso
+differiscono solo per la presenza dello strato limite, che per alti numeri di Reynolds risulta piccolo rispetto alle dimensioni del corpo. Se nel problema fossero state presenti delle separazioni
+allora Eulero non sarebbe stato in grado di catturarle. Nella figura 4.30 si può apprezzare la
+presenza di strato limite che porta il Mach ad essere nullo a parete, avendo una griglia tale
+da avere il baricentro di una cella di calcolo all’interno del sottostrato viscoso. Per risolvere
+accuratamente lo strato limite è necessario che la mesh sia tale da avere y + ≤ 5, si riporta in
+figura 4.31 l’andamento lungo la parete della pala.
+
+Figura 4.31: y + a parete
+Dal grafico si osserva che in tutte le coordinate si è al di sotto della soglia e che quindi lo
+strato limite risulta accuratamente risolto.
+
+Figura 4.32: Confronto tra dati sperimentali CFD e Fluent
+Come si osserva nella figura 4.32 tutti i casi si comportano all’incirca allo stesso modo nel
+cogliere i dati sperimentali, le uniche differenze tra tutti i modelli utilizzati le differenze si
+64
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+localizzano nel tratto finale del dominio, infatti la presenza di bordi di fuga e spigoli porta ad
+una generazione di entropia numerica e si ha la presenza di urti. Nelle due analisi, inoltre, sono
+stati impiegati due solutori con ordine differente e due griglie differenti, è quindi normale che
+gli andamenti presentino delle differenze, quello più accurato coglie meglio gli urti. L’utilizzo di
+un modello RANS consente di ottenere dei risultati più accurati avendo rilassato alcune ipotesi
+e avendo introdotto la viscosità. Si ricorda, infatti, che i calcoli CFD svolti sono affetti da
+due tipologie di errori, uno associato alla discretizzazione che si può controllare attraverso una
+griglia più fitta e pagando in termini di potenza di calcolo, l’altro errore è quello di modello che
+non può essere controllato poiché ogni modello è intrinsecamente sbagliato e di conseguenza se
+si vuole agire su di esso si deve cambiare modello utilizzandone uno più raffinato.
+
+65
+Jafar Mohaddes Zadeh
+
+Presa doppia rampa
+Il successivo caso di interesse è quello di una presa a doppia rampa soggetta ad un flusso supersonico, questo caso è interessante a causa della presenza di urti dovuti alla corrente incidente su
+una geometria di questo tipo. Come per i casi precedenti si svolgeranno delle analisi di convergenza della griglia per Roe e Lax-Friedrichs e si presenterà un confronto tra i dati sperimentali
+e quelli ottenuti dalle simulazioni per verificare la bontà dei conti.
+
+Figura 5.1: Dominio computazionale Doppia rampa
+
+5.1
+
+Inizializzazione
+
+I parametri di ingresso sono:
+• input.txt:
+– presa doppia rampa.msh, dato che si è interessati a compiere un’analisi di convergenza questo file verrà richiamato più volte, ma ad ogni simulazione si avrà un numero
+crescente di nodi costituenti la griglia.
+– KFINAL: 300000
+66
+
+Inizializzazione
+
+– KINF: 100
+– KOUT: 100
+– CFL: 0.3
+• inlet.txt:
+◦
+– TIN
+=1
+◦
+– PIN
+=1
+
+– α = 0◦
+– MIN = 3
+• outlet.txt:
+– Pexit = 0.001, il valore non verrà considerato dato che si avrà un flusso supersonico
+al bordo di uscita del dominio. In questo caso è buona norma mettere un valore
+basso per l’inizializzazione.
+
+Figura 5.2: Mesh lc = 0.02
+
+Figura 5.3: Mesh lc = 0.01
+
+67
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.4: Mesh lc = 0.005
+
+5.1.1
+
+Campo di Mach
+
+Figura 5.5: Campo di Mach lc = 0.02 -Lax Friedrichs
+
+Figura 5.6: Campo di Mach lc = 0.02 - Roe
+
+68
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.7: Campo di Mach lc = 0.01 -Lax Friedrichs
+
+Figura 5.8: Campo di Mach lc = 0.01 - Roe
+
+Figura 5.9: Campo di Mach lc = 0.005 -Lax Friedrichs
+
+69
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.10: Campo di Mach lc = 0.005 - Roe
+Dalle diverse rappresentazioni è possibile apprezzare la formazione dei due urti sulle due
+rampe, nonché quello presente sull’estremità superiore sul bordo. Un particolare che si osserva
+realizzando le simulazioni, è che tutte le griglie raggiungono la convergenza molto velocemente
+grazie al fatto che la maggior parte del dominio è in regime supersonico e quindi le evoluzioni
+del transitorio riguardano unicamente una zona limitata del dominio. Si riportano in seguito i
+campi di velocità rappresentati per il caso di griglia più raffinata.
+
+Figura 5.11: Campo di Velocità lc = 0.005 -Lax Friedrichs
+
+70
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.12: Campo di Velocità lc = 0.005 - Roe
+
+5.1.2
+
+Campo di Entropia
+
+Nel caso in analisi come si è potuto osservare dal campo di moto vi sono degli urti e quindi
+l’entropia non sarà nulla su tutto il dominio come avveniva invece per il caso del bump. Il fatto
+che l’entropia non sia più nulla non consente più di valutare l’ordine di convergenza tramite la
+conoscenza della soluzione esatta, in quanto questa non è più nota.
+
+71
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.13: Campo di Entropia lc = 0.02 -Lax Friedrichs
+
+Figura 5.14: Campo di Entropia lc = 0.02 - Roe
+
+Figura 5.15: Campo di Entropia lc = 0.01 -Lax Friedrichs
+
+72
+Jafar Mohaddes Zadeh
+
+Inizializzazione
+
+Figura 5.16: Campo di Entropia lc = 0.01 - Roe
+
+Figura 5.17: Campo di Entropia lc = 0.005 -Lax Friedrichs
+
+Figura 5.18: Campo di Entropia lc = 0.005 - Roe
+
+73
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+5.2
+
+Analisi di convergenza
+
+Per l’analisi di convergenza in questo studycase non si può più sfruttare l’informazione sull’entropia per una valutazione diretta dell’ordine di convergenza, per quello infatti attraverso
+l’estrapolazione di Richardson verranno valutati gli errori solo per ordine teorico ed effettivo.
+Comunque come evidente dalle visualizzazioni dell’entropia proposte precedentemente è osservabile come al ridursi della lunghezza caratteristica la soluzione migliori. Si riportano quindi
+gli andamenti della norma 2 dell’entropia al variare della lunghezza caratteristica confrontando
+i due metodi. La norma è cosı̀ definita:
+sR
+(S)2 dΩ
+ΩR
+||S||2 =
+dΩ
+Ω
+Si discretizza questa espressione sostituendo gli integrali con delle sommatorie sul numero di
+elementi interni:
+sP
+(S)2i · Areai
+P
+||S||2 =
+Areai
+
+Figura 5.19: ||S||2 vs lc
+
+Estrapolazione di Richardson con ordine teorico
+Per prima cosa si ipotizza l’ordine effettivo sia pari a quello teorico e si immagina di svolgere
+due simulazioni aventi le seguenti lunghezze caratteristiche:
+(
+E1 = uh − uo = k · hp
+h1 = h
+=⇒
+h2 = rh con r > 1
+E2 = urh − uo = k · rp hp
+Si ha quindi un sistema 2x2 dove le incognite sono k e uo . Manipolando le equazioni si ottiene:
+uo =
+
+rp · uh − urh
+(rp − 1)
+74
+
+Jafar Mohaddes Zadeh
+
+Analisi di convergenza
+
+Da cui è possibile stimare l’errore di discretizzazione:
+Eh = uh − uo
+Si può anche valutare un indice che è bene associare alle proprie simulazioni che è il GCI, ovvero
+il grid convergence index cosı̀ definito:
+GCI = Eh · Fs
+Dove Fs è un fattore di sicurezza solitamente pari a 3.
+Estrapolazione di Richardson con ordine effettivo
+Se invece non si è confidenti che la propria griglia raggiunga il p teorico si può ripetere quanto fatto precedentemente aggiungendo una terza equazione in modo da introdurre p come
+incognita.
+
+p
+
+h1 = h
+E1 = uh − uo = k · h
+h2 = 2h =⇒ E2 = u2h − uo = k · 2p hp
+
+
+h3 = 4h
+E3 = u4h − uo = k · 4p hp
+Ottenendo:
+ln
+p=
+
+
+
+u4h −u2h
+u2h −uh
+
+
+
+ln 2
+u2h − uh
+uo = uh + p
+2 −1
+Eh = uh − uo
+GCI = Eh · Fs
+In questo caso si è scelto di utilizzare la norma 2 dell’entropia come variabile u, ottenendo i
+risultati riportati in tabella 5.1.
+Grandezze
+p
+
+uo
+
+E
+
+CGI
+
+3.61E-03
+2.26E-03
+
+1.08E-02
+6.79E-03
+
+Ordine teorico
+
+Lax–Friedrichs
+Roe
+
+1.00
+1.00
+
+1.61E-02
+1.42E-02
+
+Ordine effettivo
+
+Lax–Friedrichs
+Roe
+
+0.234
+1.46
+
+4.79E-02 2.82E-02 8.47E-02
+1.75E-02 1.03E-03 3.09E-03
+
+Tabella 5.1: Risultati Analisi di convergenza
+Il valore di p nel caso di Roe risulta superiore a quello teorico a causa del fatto che non si è
+raggiunta la regione asintotica. Per valutare correttamente l’ordine di convergenza della griglia
+
+75
+Jafar Mohaddes Zadeh
+
+Confronto con dati sperimentali
+
+sarebbe necessario includere i termini di ordine superiore, dei quali però non si ha nessuna
+informazione. Per questa analisi sono stati usati i seguenti valori di uh :
+(
+1.97E − 02 Lax-Friedrichs
+uh =
+1.65E − 02 Roe
+(
+2.47E − 02 Lax-Friedrichs
+u2h =
+1.83E − 02 Roe
+(
+3.05E − 02 Lax-Friedrichs
+u4h =
+2.33E − 02 Roe
+
+5.3
+
+Confronto con dati sperimentali
+
+Per verificare la bontà della simulazione è possibile confrontare le distribuzioni di pressione a
+parete con quelle ottenute sperimentalmente. Per poter confrontare i dati simulati con quelli
+sperimentali, si procede inserendo realizzando una nuova subroutine che salva all’interno di un
+file di testo i valori di pressione a parete nonché le coordinate dei punti associati.
+Subroutine save wall data
+Use V a r i a b i l i
+5
+
+I m p l i c i t none
+integer : : i
+
+10
+
+open ( u n i t =1 , f i l e = ’ w a l l d a t a . t x t ’ )
+do i =1 , n i n t e r f
+
+15
+
+i f ( i n t e r f ( i )%e n t i t y . eq . 9 9 ) then
+w r i t e ( 1 , ∗ ) i n t e r f ( i )%x0 , e l e ( i n t e r f ( i )%e1 )%P
+
+end i f
+20
+
+end do
+close (1)
+end S u b r o u t i n e
+
+Dato che si sta usando una mesh non strutturata i dati salvati non saranno ordinati secondo
+delle coordinate x crescenti, per ordinarli è possibile aggiungere un algoritmo di ordinamento
+all’interno del codice stesso o implementare questa routine durante il post processing. Per
+valutare le pressioni a parete si devono filtrare i dati attraverso una soglia sulla coordinata y
+in modo da identificare solamente la parete fisica inferiore.
+
+76
+Jafar Mohaddes Zadeh
+
+Confronto con dati sperimentali
+
+In figura 5.20 si possono osservare i risultati ottenuti dal confronto dei dati ottenuti attraverso l’analisi con la griglia più raffinata e con il metodo di Roe che ha dimostrato essere
+quello più adatto. I risultati colgono abbastanza bene il profilo sperimentale sebbene non si
+sovrappongano perfettamente con questi utlimi, le differenze però se si presta attenzione alla
+scala sono piuttosto piccole e quindi l’errore commesso è basso. Come per il caso della LS59 le
+discrepanze maggiori si manifestano alla coordinata x a valle di un urto.In figura 5.21 si riporta
+il campo di pressione riferito al caso in questione.
+
+Figura 5.20: Confronto tra CFD e dati sperimentali presa doppia rampa
+
+Figura 5.21: Campo di Pressione lc = 0.005
+
+77
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+5.4
+
+Analisi con ANSYS Fluent
+
+Si propone adesso di ripetere le analisi svolte precedentemente attraverso il software commerciale ANSYS Fluent, si ripeteranno infatti gli stessi passaggi compiuti per lo studio con il codice
+CFD sviluppato nell’ambito di questo corso ma facendo uso dei software integrati in ANSYS.
+
+5.4.1
+
+Realizzazione geometria
+
+Per la realizzazione della geometria si utilizza il programma CAD DesignModeler. Il software
+in questione consente di realizzare all’interno dello stesso le geometrie dei corpi che dovranno
+essere simulati oppure, come è più usuale nell’ambito industriale, permette di importare delle
+geometrie da file esterni. Nell’ambito industriale infatti, solitamente la geometria viene fornita
+a chi compie le simulazioni attraverso dei modelli 3D o dei file già predisposti. Nel caso in
+analisi è possibile ottenere un modello 3D a partire da gmsh, infatti aggiungendo al file .geo il
+comando:
+SetF actory(”OpenCASCADE”)
+Il software permetterà di salvare la geometria in un file CAD, in particolare si salverà il file con
+estensione standard .step. Una volta importato sarà necessario scalare le dimensioni del corpo
+in quanto gmsh riduce la scala di un fattore 1000.
+
+Figura 5.22: Geometria con DesignModeler
+
+78
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+5.4.2
+
+Realizzazione mesh
+
+Il passo successivo è la realizzazione di una mesh sulla geometria del corpo, in questo caso si
+utilizza il software Meshing che permette a partire di realizzare una griglia a partire dal corpo
+realizzato nell’ambiente precedente. Per la generazione di questa mesh si è deciso di utilizzarne
+una non strutturata composta da elementi quadrangolari quando possibile, inoltre si è scelto
+di includere un raffinamento sullo strato inferiore per cogliere lo strato limite, il quale servirà
+per lo studio attraverso un modello RANS. Lo strato limite non si forma solo sulla parete
+inferiore ma anche in quella superiore all’interno del condotto della presa, tuttavia mettere un
+raffinamento in quella zona introdurrebbe delle complicazioni dato che il corpo presenta uno
+spigolo e raccordare la griglia in quel punto richiede delle accortezze che non sono oggetto del
+lavoro proposto. La mesh realizzata ha le seguenti proprietà:
+• Element size 0.008
+• Inflation layers max 15
+• Inflation Growth rate 1.2
+
+Figura 5.23: Mesh attraverso il sofware Meshing
+Nell’ambiente Meshing è anche possibile associare alle varie superfici diversi label, i quali verranno riconosciuti dal software Fluent e nel momento in cui si definiranno le condizioni al
+contorno l’assegnazione sarà semplificata. In questo caso l’inlet è definito dal bordo verticale
+di sinistra, l’outlet dai bordi verticali di destra, le pareti solide sono le rampe e le pareti del
+condotto e infine alla linea superiore e la prima linea che si incontra inferiormente vengono
+trattate come linee di corrente.
+79
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+5.4.3
+
+Analisi Fluent
+
+A questo punto si hanno tutti gli strumenti per avviare la simulazione con Fluent, si apre quindi
+il software e si definiscono alcuni parametri per avviare la simulazione. Nel caso in analisi si
+svolgerà una simulazione inviscida e una facendo uso delle RANS.
+Il primo passo una volta avviato il software è quello di scegliere che tipo di solutore si vuole
+utilizzare, in questo caso si usa un solutore density based il quale richiede la definizione di una
+pressione di riferimento. Questa pressione può essere scelta in diversi modi, in questo caso la si
+pone nulla al fine di ottenere dei valori di pressione assoluti e non relativi. Una volta definito
+il tipo di solutore si passa alla scelta del modello:
+• Se si analizza un caso non viscoso si sceglierà la voce inviscid.
+• Se si analizza un caso viscoso si hanno a disposizione diversi modelli, nell’ambito di questa
+analisi si sceglie Spalart - Allmaras.
+Sempre nell’ambiente modello è bene verificare che l’equazione dell’energia venga risolta e quindi se non è on bisogna renderla tale.
+Una volta definito il modello si passa all’assegnazione delle proprietà del materiale, in particolari quelle del fluido aria. Nel caso dell’analisi inviscida è sufficiente dire che la densità non
+è costante ma segue la legge dei gas perfetti, infatti in un caso inviscido imporre M equivale a
+imporre ρ e le proprietà dipendono solo da M . Quando si analizza invece un caso viscoso si ha
+che le proprietà dipendono non solo dal Mach ma anche da Re e di conseguenza bisogna agire
+su altre grandezze:
+ρuL
+Re =
+µ
+Se infatti si ha un numero di Re fissato si può agire o su L oppure su µ dato che la densità
+e la velocità sono funzioni del Mach. Agire sulla lunghezza caratteristica una volta definita la
+geometria non è fattibile, di conseguenza non rimane che imporre il valore della viscosità.
+
+
+Re = 1.3 · 106 =⇒ µ = 1.4946 · 10−5 N s/m2
+Si passa ora alla definizione delle condizioni al contorno, per farlo si distinguono le varie superfici
+facendo uso dei label assegnati nella fase di meshing e si impongono unicamente le condizioni
+al contorno all’inlet essendo che il campo all’outlet è supersonico. La condizione all’inlet che si
+impone è di pressione e si definiscono la pressione totale e quella statica in ingresso:
+P ◦ = 100000 [P a]
+
+P = 2722.37 [P a]
+
+T ◦ = 300 [K]
+
+La pressione statica riportata è ottenuta dalla definizione di totale con M = 3. Bisogna inoltre
+assegnare la direzione del flusso in ingresso che in questo caso risulta normale al bordo di inlet.
+
+80
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+Bisogna scegliere il solution methods, in questo caso essendo già implementato si opta per
+un metodo implicito e si fa uso di Roe, utilizzando una discretizzazione spaziale del secondo
+ordine upwind. Si sceglie inoltre un numero di Courant pari a 5, nonché un numero di iterazioni
+pari a 10000 al fine di raggiungere la convergenza.
+A questo punto è possibile avviare la simulazione e ottenere i risultati per i due casi, oltre
+ad una rappresentazione del campo di moto in termini di Mach è possibile ottenere l’andamento della pressione a parete e confrontarla con i dati delle simulazioni precedenti svolte con
+il codice CFD, l’unico accorgimento da fare è che i valori di pressione ottenuti devono essere
+rapportati alla pressione totale in ingresso per ottenere dei dati coerenti con quelli precedenti.
+
+Figura 5.24: Isolivello Mach caso inviscido
+
+Figura 5.25: Isolivello Mach caso viscoso
+Nella figura 5.25 si può apprezzare la presenza di strato limite che porta il Mach ad essere
+quasi nullo a parete, per averlo nullo del tutto è necessario che la griglia sia tale da avere il
+baricentro di una cella di calcolo all’interno del sottostrato viscoso. Per risolvere accuratamente
+
+81
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+lo strato limite è necessario che la mesh sia tale da avere y + ≤ 5, si riporta in figura 5.26
+l’andamento lungo la parete inferiore.
+
+Figura 5.26: y + a parete
+Dal grafico si osserva che nella maggior parte della parete si è al di sopra del valore di soglia
+tranne che per parte della porzione interna della rampa. Sarebbe stato necessario ripetere la
+simulazione aumentando i layers associati allo strato limite.
+
+Figura 5.27: Confronto tra dati sperimentali CFD e Fluent
+Come si osserva nella figura 5.27 tutti i casi si comportano all’incirca allo stesso modo nel
+cogliere i dati sperimentali, in particolare i casi inviscidi trovano riscontro diretto l’uno con
+l’altro, mentre quello viscoso si comporta differentemente nel tratto finale del dominio. Dato
+che però non sono presenti dei dati sperimentali nel tratto finale non è possibile comprendere
+chi si comporti più correttamente, tuttavia il metodo viscoso introduce delle equazioni in più e
+82
+Jafar Mohaddes Zadeh
+
+Analisi con ANSYS Fluent
+
+rilassa alcune delle ipotesi e quindi ci si aspetta che sia più rappresentativo della realtà, infatti
+il modello viscoso è in grado di cogliere la separazione che si genera all’interno della presa. Nelle
+due analisi, inoltre, sono stati impiegati due solutori con ordine differente e due griglie differenti,
+è quindi normale che gli andamenti presentino delle differenze, lo scopo comunque utilizzando
+un modello RANS è quello di ottenere dei risultati più accurati. Si ricorda, infatti, che i calcoli
+CFD svolti sono affetti da due tipologie di errori, uno associato alla discretizzazione che si può
+controllare attraverso una griglia più fitta e pagando in termini di potenza di calcolo, l’altro
+errore è quello di modello che non può essere controllato poiché ogni modello è intrinsecamente
+sbagliato e di conseguenza se si vuole agire su di esso si deve cambiare modello utilizzandone
+uno più raffinato.
+
+83
+Jafar Mohaddes Zadeh
+
+Ottimizzazione di Forma
+In questa esercitazione si propone uno studio di ottimizzazione di forma multiobiettivo di un
+ugello convergente divergente attraverso il software modeFRONTIER. L’obiettivo di questo
+studio di ottimizzazione è quello di trovare la combinazione di parametri che massimizzi la
+spinta e al contempo renda minimo il peso.
+
+6.1
+
+Procedura
+
+Il sistema che si analizzerà avrà come parametri liberi:
+• La lunghezza del tratto divergente
+
+10 ≤ L ≤ 17.
+
+• La pendenza della parabola nel punto iniziale B
+
+20◦ ≤ θ1 ≤ 40◦ .
+
+Figura 6.1: Ugello convergente-divergente
+Di questo ugello viene presa un’altezza di gola h unitaria e si fissa l’altezza nel punto C, dato
+che si tratta di un problema 2D non assialsimmetrico parlare in termini di altezze equivale a
+parlare in termini di aree. Avere fissato i valori delle altezze implica aver definito il rapporto
+di aree:
+he
+ε=
+h
+84
+
+Software modeFRONTIER
+
+Anziché ragionare in termini di spinta si preferisce ragionare in termini di coefficiente di spinta
+nel vuoto definito come:
+Z
+Fvac /b
+Fvac
+=
+Dove
+Fvac = (ρ (⃗u · n̂) ux + P nx ) dA
+CF,vac =
+Pc A t
+Pc h
+e
+Della spinta si prende la proiezione lungo la direzione assiale perché è quella che effettivamente
+realizza la propulsione, essa rappresenta l’indice prestazionale che si vuole massimizzare. La
+valutazione del CF,vac e della superficie del tratto superiore della camera di spinta viene realizzata attraverso delle subroutine aggiunte nel codice CFD discusso nelle sezioni precedenti.
+La superficie del tratto superiore della camera di spinta può essere direttamente correlato alla
+massa dell’ugello stesso.
+Gli obiettivi che si vogliono realizzare sono tra di loro in conflitto, dato che se si vuole rendere
+il peso minimo bisognerebbe andare verso una configurazione ad ugello conico, la quale però
+presenta delle perdite di divergenza notevoli rendendo CF,vac basso. Viceversa se si volesse
+un CF,vac molto alto bisognerebbe realizzare una configurazione avente un tratto di divergente
+più allungato che porterebbe il peso a salire, sarà quindi necessario trovare delle soluzioni di
+compromesso.
+
+6.2
+
+Software modeFRONTIER
+
+Il software utilizzato in questa esercitazione automatizzerà il processo che si è già svolto
+nell’analisi dei casi studio precedenti seguendo i seguenti passi:
+• Costruzione di una geometria.
+• Generazione di una mesh.
+• Simulazione CFD.
+All’interno del software infatti attraverso uno schema a blocchi è possibile integrare tra loro
+diverse task e sfruttare i risultati prodotti ad un certo step del workflow come input per lo
+step successivo. Il workflow viene ripetuto per diverse geometrie facendo variare i parametri
+di ingresso attraverso una logica dettata dall’algoritmo di ottimizzazione, ottenendo infine nello spazio dei parametri una rappresentazione delle possibili soluzioni nel rispetto dei vincoli
+imposti. Quando si svolge un processo di ottimizzazione vi sono due principali strade:
+• Design of Experiments (DOE): consiste nel raccogliere informazioni in tutto lo spazio
+delle soluzioni per realizzare un database ben strutturato per analisi statistica che è la
+base del design, comprendendo quali sono le variabili che hanno una maggiore influenza
+e soprattutto valutare se vi è una correlazione fisica tra le variabili, facilitando il design e
+orientandolo. In questo tipo di approccio non vi è una logica coinvolta, l’algoritmo genera
+una serie di design e attraverso le simulazioni si comprende quale sia il design di interesse,
+non si impone nessun obiettivo.
+• Ottimizzazione: viene utilizzato un DOE iniziale che ha lo scopo di indirizzare la ricerca
+dei design di ottimo, ma la logica di definizione dei design successivi da sperimentare sono
+definiti attraverso una logica interna dell’algoritmo di ottimizzazione stesso.
+85
+Jafar Mohaddes Zadeh
+
+Software modeFRONTIER
+
+Nel caso in esame l’algoritmo di risoluzione esplorerà lo spazio delle soluzioni a partire da
+un’analisi di un database prodotto da un DOE, da cui sarà possibile valutare le configurazioni
+di ottimo. In figura 6.2 viene riportato il workflow che il software segue, si procede a descriverne
+
+Figura 6.2: Workflow
+tutti gli elementi:
+• geom è un oggetto easydriver che consente di richiamare un eseguibile che utilizza come
+input e output dei file di testo. In questo caso l’eseguibile che viene richiamato è quello
+che si occupa di creare i punti della geometria dell’ugello. Questo oggetto è collegato ad
+altri tre in input e uno in output:
+– geom files è un insieme di file di progetto che vengono richiamati dall’oggetto easydriver geom, in questo caso l’unico file di supporto che viene fornito è l’eseguibile
+stesso.
+
+Figura 6.3: Project files geom files
+– L e theta1 sono gli input parameter
+86
+Jafar Mohaddes Zadeh
+
+Software modeFRONTIER
+
+Figura 6.4: Transferite files geom file
+– geom file è un blocco di tipo transferite file, ovvero esso trasporta il prodotto di un
+blocco ad un altro.
+All’interno dell’ambiente easydriver sono presenti 3 ulteriori ambienti:
+– input template: all’interno di questo ambiente vengono definite le regole di sostituzione degli input all’eseguibile.
+– Driver: contiene i comandi da eseguire, in questo caso vi è solamente ”write points.exe”.
+– output: definisce le regole di mining.
+• mesh è un elemento DOS batch che viene utilizzato per la generazione della mesh, per
+farlo si utilizza il software gmsh. Questo blocco è connsesso al file proveniente dalla
+generazione della geometria e da un altro project file contenente l’eseguibile gmsh e il file
+.geo.
+
+Figura 6.5: Project files mesh files
+Questo DOS batch una volta prodotta la mesh la trasferirà al blocco successivo per
+l’analisi CFD.
+
+87
+Jafar Mohaddes Zadeh
+
+Risultati
+
+Figura 6.6: Transferite files mesh file
+• CFD questo blocco easydriver si occupa di realizzare la simulazione CFD attraverso il
+software sviluppato precedentemente e riceverà in ingresso la mesh in output al passo
+precedente nonchè i project files e l’output prodotto saranno la spinta e la superficie.
+
+Figura 6.7: Project files BC files
+
+6.3
+
+Risultati
+
+A seguito delle diverse simulazioni è possibile rappresentare una matrice di interazione tra i
+parametri del problema come risultato del DOE nonché i risultati ottenuti nello spazio delle
+soluzioni attraverso un bubble chart. Se si osserva la matrice prodotta come risultato si osserva
+che la dipendenza tra θ1 e L non è esattamente zero e che i 30 design proposti forse non
+erano sufficienti, in ogni caso è possibile apprezzare le correlazioni fisiche che sussistono, come
+ci si aspetta, tra la superficie e la lunghezza del tratto divergente in quanto tra loro vi è una
+dipendenza indicata da un coefficiente prossimo a 1. Tra gli obiettivi invece si ha un coefficiente
+circa di 0.8, questo comporterà la presenza di un fronte di pareto; se le due funzioni obiettivo
+avessero avuto un coefficiente unitario l’analisi multiobiettivo non avrebbe avuto molto senso
+in quanto massimizzare o minimizzare uno dei due avrebbe portato lo stesso effetto sull’altro.
+
+88
+Jafar Mohaddes Zadeh
+
+Risultati
+
+Figura 6.8: Scatter Matrix DOE
+Focalizzandosi invece sulla figura 6.9 è possibile comprendere la strategia dell’algoritmo,
+infatti i punti blu che sono i primi ad essere analizzati sono molto esplorativi, mentre quelli
+rossi si posizionano sul fronte di pareto. Il fronte di Pareto si forma perché sono presenti due
+obiettivi tra loro contrastanti e questo fronte è definito come il luogo dei punti non dominati.
+Un punto si definisce non dominato se non esiste nessun altro punto che presenti valori migliori
+per tutte le funzioni obiettivo. Questo è l’insieme quindi delle soluzioni di compromesso lungo
+il quale bisogna indirizzare la soluzione.
+
+Figura 6.9: Spazio delle soluzioni
+Se si è interessati alle soluzioni migliori e quindi ad isolare il fronte è possibile applicare una
+funzione di filtro e rappresentare solamente il fronte di Pareto.
+
+89
+Jafar Mohaddes Zadeh
+
+Risultati
+
+Figura 6.10: Fronte di Pareto
+Il fronte non è del tutto pieno e quindi delle simulazioni ulteriori sarebbero state indicate per
+esplorare un numero maggiore di possibili design. Per scegliere tra i design del fronte quale sia
+il migliore per il trade off attraverso un parallel coordinates chart prendendo in considerazione
+tutte le variabili di input che quelle di output.
+
+Figura 6.11: Parallel coordinates chart - Pareto designs
+Ognuna delle polilinee rappresentate in figura 6.11 rappresenta un possibile design e questa
+interseca le linee verticali i valori delle variabili corrispondenti a quello specifico design. Attraverso questo chart è possibile operare dei filtraggi specifici per ogni variabile in base alle
+caratteristiche ricercate. Ad esempio se si volessero limitare i design a quelli caratterizzati
+da una massa contenuta e tra questi quelli dotati di una spinta alta, limitando il range delle
+90
+Jafar Mohaddes Zadeh
+
+Risultati
+
+variabili di output è possibile individuare i design che soddisfano i requisiti come in figura 6.12.
+
+Figura 6.12: Parallel coordinates chart - Pareto designs filtrati
+
+91
+Jafar Mohaddes Zadeh
+
+

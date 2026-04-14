@@ -1,24 +1,19 @@
 program hello
     implicit none
 
-    !print *, "Hello World!"
-    ! vogliamo leggere da file dei punti e chiamare una subroutine per il calcolo del baricentro ed area per un triangolo
-    ! prossima volta lo faremo per un quadrato cosa penso ci serva per discorsi legati alla mesh
+    ! Vogliamo leggere da file i tre vertici del triangolo e
+    ! chiamare due subroutine esterne per calcolare baricentro e area.
+    real(4), dimension(3,2) :: xy
+    integer :: i
+    real(4), dimension(2) :: x0
+    real(4) :: A
 
-
-    ! INPUT matrice di numeri reali
-    real(4),dimension(3,2)::xy ! sto usando singola precisione, creo una matrice 3x2 e nome matrice
-    integer::i
-    real(4),dimension(2)::x0 ! baricentro
-    real(4),dimension(1)::A ! area
-
-    ! dichiarazione stringa nome del file di input
-    character(200)::nome_file !character mi tengo largo con 200 caratteri e do nome file
+    ! Dichiaro il nome del file di input.
+    character(200) :: nome_file
     nome_file = "punti.txt"
 
-
-    ! Apertura e chiusura file
-    open(unit=1, file= nome_file)
+    ! Apertura, lettura e chiusura del file con le coordinate.
+    open(unit=1, file=nome_file)
 
     do i=1,3
         read(1,*) xy(i,:)
@@ -26,10 +21,11 @@ program hello
 
     close(1)
 
-    ! Ora chiamo le subroutines definite altrove per calcolare area e baricentro
-    call calcolo_baricentro(xy,x0) ! semplice media ponderata
-    call calcolo_area(xy,A)
+    ! Chiamo le subroutine definite in file separati.
+    call calcolo_baricentro(xy, x0)
+    call calcolo_area(xy, A)
 
+    print *, "Baricentro:", x0
+    print *, "Area:", A
 
 end program
-
