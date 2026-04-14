@@ -2,17 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Fortran",
-            "type": "cppdbg", // Usa il motore C++ per il Fortran
+            "name": "Debug Paletta",
+            "type": "cppdbg",
             "request": "launch",
-            // PUNTO 1: Qui punti all'eseguibile
-            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}\\3-Paletta\\bin\\Debug\\paletta.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}\\3-Paletta",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb", // O "lldb" se sei su Mac
+            "MIMode": "gdb",
+            "miDebuggerPath": "${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links\\gdb.exe",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -20,8 +20,7 @@
                     "ignoreFailures": true
                 }
             ],
-            // PUNTO 2: Questo lancia la compilazione PRIMA del debug
-            "preLaunchTask": "Compila Fortran" 
+            "preLaunchTask": "Compila Paletta"
         }
     ]
 }
