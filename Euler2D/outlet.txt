@@ -1,0 +1,4 @@
+*************************************************
+PEXIT (ATTENZIONE: se l'uscita è supersonica questo valore viene ignorato durante il calcolo)
+0.0001
+*************************************************

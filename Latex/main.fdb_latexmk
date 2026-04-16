@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1776330745.79178 "c:/Users/gabri/Desktop/SP/0-Latex/main.tex" "main.pdf" "main" 1776330762.77318 2
+["pdflatex"] 1776343905.79587 "c:/Users/gabri/Desktop/SP/Latex/main.tex" "main.pdf" "main" 1776343933.14076 2
   "C:/Users/gabri/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1774628254 82684 3a87f55ef758bc5fe6abfed9a40cca26 ""
   "C:/Users/gabri/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1741520763 12036129 3fd438e31fc9e3162107e078f9d265cf ""
   "C:/Users/gabri/AppData/Local/Programs/MiKTeX/fonts/tfm/jknappen/ec/ecbi1200.tfm" 993061910 2892 f5de7a62f7c1551b663588ecf7265280 ""
@@ -253,14 +253,15 @@
   "C:/Users/gabri/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "SP/2-Rampa/mesh_v1.png" 0 -1 0 ""
   "bump.tex" 1774622166 17078 5f59a3a3e9f30f0ce465db3384e00e73 ""
-  "c:/Users/gabri/Desktop/SP/0-Latex/main.tex" 1774622166 4363 33cb9435c20aba63345d57c4341ea482 ""
+  "c:/Users/gabri/Desktop/SP/Latex/main.tex" 1774622166 4363 33cb9435c20aba63345d57c4341ea482 ""
   "doppia_presa.tex" 1774629727 25344 49918dde972dadac8dcbb15256a6851b ""
-  "introduzione.tex" 1776330693 31692 f919b981aa3d3c82dad5fd82e9e2c971 ""
-  "main.aux" 1776330760 19573 cda0f9dfebf863105453bb2d6dbe5887 "pdflatex"
-  "main.lof" 1776330754 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "main.lot" 1776330754 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "introduzione.tex" 1776343894 8626 14a23748b31a9fbb9697f9c4e129f810 ""
+  "main.aux" 1776343926 14264 8cbb6a5819a36c086eb3083e95ba5bd5 "pdflatex"
+  "main.lof" 1776343922 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.lot" 1776343922 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.out" 1776343926 8491 8557ef55f9e29bea068adbc33abd02d9 "pdflatex"
   "main.tex" 1774622166 4363 33cb9435c20aba63345d57c4341ea482 ""
-  "main.toc" 1776330754 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.toc" 1776343922 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "progetto3.tex" 0 -1 0 ""
   (generated)
   "main.aux"

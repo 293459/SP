@@ -1,0 +1,195 @@
+\section{Il Codice CFD in Fortran~90}
+\label{sec:codice_cfd}
+
+\subsection{Equazioni di Governo: Eulero 2D}
+
+Il codice risolve le \textbf{equazioni di Eulero 2D}, che descrivono il moto di un fluido
+comprimibile non viscoso. Nella forma conservativa differenziale:
+
+\begin{equation}
+  \parziale{\uvec}{t}
+  + \parziale{\fvec}{x}
+  + \parziale{\gvec}{y} = \bm{0}
+  \label{eq:eulero_diff}
+\end{equation}
+
+dove il vettore delle variabili conservative e i vettori dei flussi sono:
+
+\begin{equation}
+  \uvec = \begin{pmatrix} \rho E \\ \rho \\ \rho u \\ \rho v \end{pmatrix}, \quad
+  \fvec = \begin{pmatrix} u(\rho E + P) \\ \rho u \\ \rho u^2 + P \\ \rho u v \end{pmatrix}, \quad
+  \gvec = \begin{pmatrix} v(\rho E + P) \\ \rho v \\ \rho u v \\ \rho v^2 + P \end{pmatrix}
+\end{equation}
+
+con $\rho$ densità, $u, v$ componenti di velocità, $P$ pressione, $E$ energia totale specifica.
+Il sistema è chiuso dall'equazione di stato dei gas perfetti:
+
+\begin{equation}
+  P = (\gamma - 1)\left(\rho E - \tfrac{1}{2}\rho(u^2+v^2)\right), \quad \gamma = 1.4
+\end{equation}
+
+\subsection{Adimensionalizzazione}
+
+Le equazioni vengono risolte in forma adimensionale. Scelti $P_{\rm ref} = P^\circ_{\rm in}$
+e $T_{\rm ref} = T^\circ_{\rm in}$ come grandezze di riferimento, le scale caratteristiche
+derivate sono:
+\begin{align*}
+  \rho_{\rm ref} &= \frac{P_{\rm ref}}{R T_{\rm ref}}, &
+  u_{\rm ref} &= \sqrt{R T_{\rm ref}}, &
+  t_{\rm ref} &= \frac{L_{\rm ref}}{u_{\rm ref}}
+\end{align*}
+
+Una proprietà fondamentale dell'adimensionalizzazione è che le equazioni di Eulero mantengono
+la stessa forma: i fattori di scala si elidono, e il codice lavora quindi con le stesse
+espressioni indipendentemente dall'adimensionalizzazione scelta. In pratica, fissando
+$P^\circ_{\rm in} = 1$ e $T^\circ_{\rm in} = 1$, le condizioni al contorno e le variabili
+di campo assumono valori $O(1)$, migliorando il condizionamento numerico del sistema.
+
+Le variabili adimensionalizzate rilevanti sono:
+\begin{align}
+  \bar{P} &= \frac{P}{P_{\rm ref}}, & \bar{T} &= \frac{T}{T_{\rm ref}}, &
+  \bar{\rho} &= \frac{\bar{P}}{\bar{T}}, \\
+  \bar{u} &= \frac{u}{u_{\rm ref}} = M \bar{a}, &
+  \bar{a} &= \sqrt{\gamma \bar{T}}, &
+  \bar{S} &= \gamma \ln \bar{T} - (\gamma-1)\ln \bar{P}
+\end{align}
+
+L'entropia adimensionale $\bar{S}$ è particolarmente utile per la validazione: in un campo
+di Eulero privo di onde d'urto, $\bar{S}$ è conservata lungo le linee di flusso, quindi
+ogni deviazione da zero è imputabile all'errore numerico di discretizzazione.
+
+\subsection{Discretizzazione a Volumi Finiti}
+
+Integrando l'equazione~\eqref{eq:eulero_diff} sul volume della cella $\Omega_i$:
+\begin{equation}
+  \parziale{}{t} \int_{\Omega_i} \uvec \, d\Omega
+  + \oint_{\partial\Omega_i} \left(\fvec n_x + \gvec n_y\right) dS = \bm{0}
+\end{equation}
+
+Approssimando con il valore medio sulla cella e la somma dei flussi sui lati:
+\begin{equation}
+  \parziale{\uvec_i}{t} = -\frac{1}{|\Omega_i|}\sum_{j \in \mathcal{N}(i)}
+    \Fvec_{ij} \cdot \nhat_{ij} \, l_{ij}
+  \label{eq:volumi_finiti}
+\end{equation}
+
+dove $\Fvec_{ij}$ è il flusso numerico all'interfaccia tra la cella $i$ e il suo vicino $j$,
+$\nhat_{ij}$ la normale uscente da $i$, e $l_{ij}$ la lunghezza dell'interfaccia.
+
+\subsection{Calcolo dei Flussi: Schema di Lax--Friedrichs e Schema di Roe}
+
+\subsubsection{Schema di Lax--Friedrichs Locale}
+
+Lo schema di Lax--Friedrichs è uno schema \emph{centrato} con dissipazione numerica
+proporzionale al massimo valore proprio locale:
+\begin{equation}
+  \Fvec_{ij} = \frac{1}{2}\left[F^L + F^R\right]
+               - \frac{\lambda_{\max}}{2}\left(\uvec^R - \uvec^L\right)
+\end{equation}
+dove $\lambda_{\max} = \max(|\tilde{u}^L|+a^L,\,|\tilde{u}^R|+a^R)$ è la velocità massima
+di propagazione e $\tilde{u} = \bm{q}\cdot\nhat$ è la velocità normale all'interfaccia.
+
+I flussi vengono calcolati nel sistema di riferimento \emph{ruotato} locale all'interfaccia,
+sfruttando la matrice di rotazione:
+\begin{equation}
+  \begin{pmatrix} \tilde{u} \\ \tilde{v} \end{pmatrix} =
+  \begin{pmatrix} n_x & n_y \\ -n_y & n_x \end{pmatrix}
+  \begin{pmatrix} u \\ v \end{pmatrix}
+\end{equation}
+e i flussi di quantità di moto vengono poi riportati nel sistema globale tramite la trasposta
+della stessa matrice (che è ortogonale: $R^{-1} = R^T$).
+
+\subsubsection{Schema di Roe (Upwind)}
+
+Lo schema di Roe è un metodo \emph{upwind} che tiene conto della propagazione direzionale
+delle onde caratteristiche. Il flusso è:
+\begin{equation}
+  \Fvec_{ij} = \frac{1}{2}\left[F^L + F^R\right]
+               - \frac{1}{2} \sum_{k=1}^{4} |\hat{\lambda}_k| \hat{\alpha}_k \hat{r}_k
+\end{equation}
+dove $\hat{\lambda}_k$, $\hat{r}_k$, $\hat{\alpha}_k$ sono rispettivamente i valori propri,
+i vettori propri destri e le \emph{wave strengths} della matrice Jacobiana di Roe, costruita
+utilizzando le medie di Roe tra gli stati $L$ e $R$:
+\begin{align}
+  \sqrt{\hat{\rho}} &= \sqrt{\rho^L\rho^R}, &
+  \hat{u} &= \frac{\sqrt{\rho^L}\,u^L + \sqrt{\rho^R}\,u^R}{\sqrt{\rho^L}+\sqrt{\rho^R}}, &
+  \hat{H} &= \frac{\sqrt{\rho^L}\,H^L + \sqrt{\rho^R}\,H^R}{\sqrt{\rho^L}+\sqrt{\rho^R}}
+\end{align}
+
+Lo schema di Roe è più accurato di Lax--Friedrichs perché è meno dissipativo e cattura
+meglio le discontinuità (onde d'urto) e le strutture fini del campo. Include la
+\textit{entropy fix} di Harten per correggere le singolarità in corrispondenza dei punti sonici.
+
+\subsection{Integrazione Temporale}
+
+L'integrazione nel tempo è esplicita con schema di Eulero in avanti:
+\begin{equation}
+  \uvec_i^{k+1} = \uvec_i^k + \dt \parziale{\uvec_i}{t}^k
+\end{equation}
+
+Il passo temporale $\dt$ è calcolato ad ogni iterazione imponendo la condizione CFL:
+\begin{equation}
+  \dt = \text{CFL} \cdot \min_i \frac{\sqrt{|\Omega_i|}}{\lambda_{\max,i}}
+  \label{eq:cfl}
+\end{equation}
+
+dove $\lambda_{\max,i} = |\bm{q}_i| + a_i$ è la velocità di propagazione massima nella
+cella $i$. Il fattore $\sqrt{|\Omega_i|}$ approssima la dimensione caratteristica della cella
+in 2D ($h \propto \sqrt{A}$, analogamente a $h \propto \sqrt[3]{V}$ in 3D).
+
+\subsection{Condizioni al Contorno}
+
+Le condizioni al contorno dipendono dalla direzione del flusso e dal regime:
+\begin{itemize}
+  \item \textbf{Inlet subsonico}: si impongono $T^\circ_{\rm in}$, $P^\circ_{\rm in}$,
+    $\alpha_{\rm in}$; il numero di Mach è estrapolato dall'interno.
+  \item \textbf{Inlet supersonico}: si impongono tutte e quattro le variabili conservative
+    (flusso completamente entrante, nessuna caratteristica uscente).
+  \item \textbf{Outlet subsonico}: si impone la pressione statica $P_{\rm exit}$;
+    le altre tre variabili sono estrapolate dall'interno.
+  \item \textbf{Outlet supersonico}: tutte le variabili sono estrapolate (nessuna
+    caratteristica entrante).
+  \item \textbf{Parete solida}: condizione di impermeabilità ($\bm{q}\cdot\nhat = 0$),
+    implementata con una cella specchio che annulla la componente normale della velocità.
+\end{itemize}
+
+\subsection{Analisi di Convergenza della Griglia}
+
+\subsubsection{Norma $L_2$ dell'Entropia}
+
+Per quantificare l'errore numerico si usa la norma $L_2$ dell'entropia adimensionale $\bar{S}$,
+che in un campo di Eulero senza onde d'urto dovrebbe essere identicamente nulla:
+\begin{equation}
+  \norma{\bar{S}}_2 = \sqrt{\frac{\displaystyle\sum_i \bar{S}_i^2 \cdot |\Omega_i|}
+                                  {\displaystyle\sum_i |\Omega_i|}}
+  \label{eq:norma_entropia}
+\end{equation}
+
+Questa norma è una misura dell'errore di discretizzazione: al raffinamento della griglia
+($\lc \to 0$) ci si aspetta che $\norma{\bar{S}}_2 \to 0$.
+
+\subsubsection{Ordine di Convergenza e Estrapolazione di Richardson}
+
+Assumendo che l'errore di discretizzazione si comporti come:
+\begin{equation}
+  E = u_h - u_{\rm esatto} = k \cdot h^p + \mathcal{O}(h^{p+1})
+\end{equation}
+dove $h$ è la lunghezza caratteristica e $p$ l'ordine di convergenza, da due simulazioni con
+$h_1$ e $h_2 = r h_1$ si ottiene:
+\begin{equation}
+  p = \frac{\ln(E_1/E_2)}{\ln(r)}, \quad
+  u_{\rm esatto} \approx \frac{r^p u_{h_1} - u_{h_2}}{r^p - 1}
+\end{equation}
+
+Se la soluzione esatta non è nota a priori, si usa l'estrapolazione di Richardson con
+\emph{ordine effettivo}: da tre simulazioni con $h$, $2h$, $4h$:
+\begin{equation}
+  p = \frac{\ln\!\left(\dfrac{u_{4h}-u_{2h}}{u_{2h}-u_h}\right)}{\ln 2}, \qquad
+  u_{\rm esatto} \approx u_h + \frac{u_{2h}-u_h}{2^p - 1}
+\end{equation}
+
+Il \textbf{Grid Convergence Index} (GCI) fornisce una stima conservativa dell'incertezza
+numerica:
+\begin{equation}
+  \text{GCI} = F_s \cdot |E_h|, \quad F_s = 3 \text{ (fattore di sicurezza)}
+\end{equation}

@@ -1,0 +1,42 @@
+
+\section{Configurazione del Sistema e Logica di Sviluppo}
+
+Per questo progetto è stata effettuata una migrazione dall'IDE tradizionale Code::Blocks verso l'ecosistema \textbf{Visual Studio Code (VS Code)}. Questa scelta permette una gestione più granulare degli strumenti di compilazione e una migliore integrazione con i moderni flussi di lavoro.
+
+\subsection{Passaggi Informatici per la Configurazione}
+La configurazione del workspace ha seguito i seguenti step fondamentali:
+\begin{itemize}
+    \item \textbf{Integrazione Toolchain:} Identificazione del compilatore \texttt{gfortran} e del debugger \texttt{gdb} all'interno della distribuzione \textit{Strawberry Perl}.
+    \item \textbf{Automazione Build (tasks.json):} Creazione di un task per la compilazione modulare che unisce i file sorgente (\texttt{main.f90}, \texttt{calcolo\_area.f90}, \texttt{calcolo\_baricentro.f90}) generando l'eseguibile nella directory \texttt{bin/Debug}.
+    \item \textbf{Setup Debugging (launch.json):} Collegamento del motore di debug di VS Code all'eseguibile \texttt{gdb.exe} tramite il percorso assoluto \texttt{C:/Strawberry/c/bin/gdb.exe}.
+    \item \textbf{Supporto Linguistico:} Configurazione del \textit{Language Server} \texttt{fortls} (via Python) per abilitare l'autocompletamento e il \textit{linting} in tempo reale.
+\end{itemize}
+
+\subsection{Logica dei Componenti}
+Il sistema si basa sulla cooperazione di tre elementi chiave:
+\begin{enumerate}
+    \item \textbf{Compiler (gfortran):} Trasforma il codice sorgente in linguaggio macchina binario. L'utilizzo tramite VS Code permette di esplicitare flag di debug come \texttt{-g}, fondamentali per l'analisi successiva.
+    \item \textbf{Debugger (gdb):} Consente di monitorare l'allocazione della memoria e il flusso di esecuzione, permettendo l'uso di \textit{Watch expressions} e l'analisi del \textit{Call Stack}.
+    \item \textbf{Linter:} Analizza staticamente il codice evidenziando errori formali prima della compilazione, migliorando la qualità del software prodotto.
+\end{enumerate}
+
+\subsection{Vantaggi rispetto a Code::Blocks}
+VS Code è stato preferito per la sua \textbf{modularità}: a differenza di Code::Blocks, non vincola lo sviluppatore a un compilatore interno, ma permette di mappare strumenti già presenti nel sistema (come quelli di Perl o WinLibs). Inoltre, la gestione dei terminali integrati e la trasparenza dei file JSON riducono i problemi di "percorsi oscuri" tipici dei vecchi IDE.
+
+\section{Descrizione dell'Esercitazione}
+
+\subsection{Scopo e Obiettivi}
+L'obiettivo dell'esercitazione è lo sviluppo di un software in \textbf{Fortran 90} per l'analisi di profili aerodinamici (pala di turbina). Il programma deve elaborare coordinate geometriche fornite esternamente per ricavare parametri fisici di base necessari alla successiva analisi strutturale.
+
+\subsection{Dettagli dell'Attuazione}
+Il software è stato strutturato in modo modulare:
+\begin{itemize}
+    \item \textbf{Main Program:} Gestisce il flusso di input/output, leggendo le coordinate dei vertici dal file \texttt{punti.txt}.
+    \item \textbf{Calcolo del Baricentro:} Una subroutine calcola il centro geometrico del profilo eseguendo la media vettoriale delle coordinate dei vertici: 
+    \[ \mathbf{x}_b = \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_i \]
+    \item \textbf{Calcolo dell'Area:} Implementato tramite la \textbf{Formula di Erone}. Il modulo calcola la distanza euclidea tra i vertici per ottenere i lati $a, b, c$ e successivamente l'area $A$:
+    \[ A = \sqrt{p(p-a)(p-b)(p-c)} \]
+    dove $p$ è il semiperimetro.
+\end{itemize}
+
+L'esercitazione ha confermato l'efficacia del linguaggio Fortran nel calcolo scientifico, garantendo alta precisione numerica e una gestione efficiente delle matrici di dati.
