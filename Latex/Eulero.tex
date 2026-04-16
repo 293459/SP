@@ -1,0 +1,211 @@
+\chapter{Eulero}
+
+Una volta realizzata la mesh in base alle caratteristiche del problema in esame, come descritto nel capitolo precedente, si sfrutta il risultato del software e lo si immette all'interno del codice CFD. Il codice che si intende sviluppare risolve le equazioni di Eulero 2D e il linguaggio di programmazione utilizzato è Fortran 90 date le sue alte prestazioni.
+
+\section{Strutture}
+
+Il codice, per funzionare, ha bisogno di salvare i dati che arrivano dal file di gmsh in alcune variabili, che andranno opportunamente definite all'interno del codice. Per la loro definizione si è optato per utilizzare delle strutture, le quali permetteranno di sfruttare una notazione compatta per le operazioni.
+
+La prima struttura che si definisce è \texttt{tipo\_elemento}:
+
+\begin{lstlisting}
+module strutture
+    implicit none
+    
+    type tipo_elemento
+        integer :: nnodi, tipo_ele ! tipo ele da gmsh
+        integer, dimension (:), pointer :: nodi ! array di nodi associato all elemento
+        integer :: entity
+    end type tipo_elemento
+\end{lstlisting}
+
+Al suo interno si trovano il numero di nodi che costituiscono l'elemento e il tipo di elemento che si ottiene dai tag di gmsh (es. quadrilatero o triangolare). Si ha inoltre un array contenente i tag univoci dei nodi associati all'elemento stesso.
+
+Si definisce poi la struttura \texttt{tipo\_nodo}:
+
+\begin{lstlisting}
+    type tipo_nodo
+        real (4), dimension (2) :: x
+        integer :: nnghbrs, neles
+        integer, dimension (:), allocatable :: nghbr
+        integer, dimension (:), allocatable :: ele
+    end type tipo_nodo
+\end{lstlisting}
+
+Al suo interno si trovano le coordinate $x$ e $y$ come elementi del vettore reale \texttt{x}. \texttt{nghbr} rappresenta una lista contenente i tag dei nodi vicini e \texttt{ele} è un vettore che contiene i tag degli elementi che si affacciano su quel nodo.
+
+La terza struttura è \texttt{tipo\_interfaccia}:
+
+\begin{lstlisting}
+    type tipo_interfaccia
+        integer :: e1, e2
+        integer :: edge_e1, edge_e2
+        integer :: nodo1, nodo2
+        real (4), dimension (2) :: normal, x0
+        real (4) :: length
+        integer :: entity
+        real (4), dimension (4) :: f
+        integer :: int_perio ! 10 interno, sub bordi condizioni periodiche
+    end type tipo_interfaccia
+\end{lstlisting}
+
+Al suo interno troviamo i tag degli elementi associati a quella interfaccia con la convenzione che $e_1$ è quello di riferimento per la normale uscente. Si hanno informazioni sui lati corrispondenti e i tag dei nodi agli estremi. Sono presenti quantità geometriche come il vettore normale ($n_x, n_y$), le coordinate del baricentro $x_0$ e la lunghezza dell'interfaccia. Vengono definiti anche i flussi che attraversano l'interfaccia (4 elementi per Eulero 2D).
+
+L'ultima struttura è \texttt{tipo\_elemento\_solido}:
+
+\begin{lstlisting}
+    type tipo_elemento_solido
+        integer :: nnodi, tipo_ele, nlati
+        integer, dimension(:), allocatable :: nodi
+        integer, dimension (:,:), allocatable :: edge
+        integer :: nnghbrs
+        integer, dimension(:), allocatable :: nghbr
+        integer, dimension (:), allocatable :: interfaces
+        real (4) :: area
+        real (4), dimension (2) :: x0
+        real (4), dimension (4) :: ucons
+        real (4) :: u, v, a, P, T, S
+        real (4), dimension (4) :: d_dt
+    end type tipo_elemento_solido
+\end{lstlisting}
+
+La grandezza \texttt{ucons} contiene le 4 variabili conservative:
+\[
+ucons = \begin{Bmatrix} \rho \cdot E \\ \rho \\ \rho \cdot u \\ \rho \cdot v \end{Bmatrix}
+\]
+
+La grandezza \texttt{d\_dt} contiene le derivate temporali delle grandezze conservative:
+\[
+\frac{d}{dt} = \begin{Bmatrix} \frac{\partial (\rho E)}{\partial t} \\ \frac{\partial \rho}{\partial t} \\ \frac{\partial (\rho u)}{\partial t} \\ \frac{\partial (\rho v)}{\partial t} \end{Bmatrix}
+\]
+
+\section{Variabili}
+
+Si definisce un nuovo modulo che richiama \texttt{strutture}:
+
+\begin{lstlisting}
+Module Variabili
+    use strutture
+    implicit none
+    save
+    
+    integer :: k, kinf, kout, kfinal
+    real (4) :: gam, GA, GB, GC, GD, GE, GF, GG, GH, GI, GJ
+    real (4) :: time, dt, CFL, periodo
+    character (100) :: mesh_file
+    real (4) :: ttotin, ptotin, alpha, pexit, machin
+    integer :: nnodi, ninterf, nele, nele_interni, nele_bordi, nentity, ndim, neqs
+    real (4), dimension (4) :: norm2_residuals, norminf_residuals
+    
+    type(tipo_nodo), dimension(:), allocatable :: nodo
+    type(tipo_interfaccia), dimension(:), allocatable :: interf
+    type(tipo_elemento), dimension(:), allocatable :: ele_all
+    type(tipo_elemento_solido), dimension(:), allocatable :: ele
+    type(tipo_bordo), dimension(:), allocatable :: ele_bordi
+    type(tipo_entity), dimension (6) :: entita
+End module
+\end{lstlisting}
+
+\section{Main}
+
+Il cuore del codice è il main, che richiama le diverse subroutine:
+
+\begin{lstlisting}
+Program test2d
+    Use Variabili
+    implicit none
+    
+    ! Pulizia file precedenti
+    call system("del *.plt") ! Su Windows
+    ! call system("rm *.plt") ! Su Linux
+    
+    call input
+    call leggi_gmsh
+    call processa_elementi
+    call init
+    
+    call write_tecplot_file(0, 0.)
+    time = 0.
+    
+    do k = 1, kfinal
+        call compute_dt
+        call compute_fluxes
+        call integ_time
+        time = time + dt
+        
+        if (mod(k, kinf) == 0) then
+            write(*,*) 'k, time, dt = ', k, time, dt
+            call compute_norm_residuals
+        end if
+        
+        if (mod(k, kout) == 0) then
+            call write_tecplot_file(k, 0.)
+        end if
+    end do
+End Program
+\end{lstlisting}
+
+\subsection{Subroutine input}
+
+Gestisce la lettura dei file \texttt{input.txt}, \texttt{inlet.txt} e \texttt{outlet.txt}.
+\begin{itemize}
+    \item \texttt{input.txt}: Nome mesh, \texttt{KFINAL}, \texttt{KINF}, \texttt{KOUT}, \texttt{CFL}.
+    \item \texttt{inlet.txt}: $T^\circ_{IN}$, $P^\circ_{IN}$, $\alpha$, $M_{IN}$.
+    \item \texttt{outlet.txt}: Pressione statica di uscita.
+\end{itemize}
+
+\subsection{Subroutine leggi\_gmsh}
+
+Apre il file \texttt{.msh} e costruisce la connettività, allocando nodi ed elementi. Distingue tra elementi interni (triangoli, quadrilateri) e di bordo.
+
+\subsection{Subroutine processa\_elementi}
+
+Calcola le proprietà geometriche:
+\begin{itemize}
+    \item \textbf{Baricentro}: media delle coordinate dei nodi.
+    \item \textbf{Area}: calcolata tramite la regola di Erone.
+    \item \textbf{Lunghezza e Normale}: per le interfacce, calcolate tramite Pitagora e perpendicolarità al versore tangente.
+\end{itemize}
+
+Per un triangolo di lati $a, b, c$ e semiperimetro $p = (a+b+c)/2$:
+\[ A = \sqrt{p(p-a)(p-b)(p-c)} \]
+
+\subsection{Subroutine init}
+
+Inizializza il campo di moto. Le equazioni di Eulero 2D in forma conservativa sono:
+\[ \frac{\partial \{u\}}{\partial t} + \frac{\partial \{f\}}{\partial x} + \frac{\partial \{g\}}{\partial y} = 0 \]
+Con:
+\[ u = \begin{Bmatrix} \rho E \\ \rho \\ \rho u \\ \rho v \end{Bmatrix}, \quad f = \begin{Bmatrix} u(P+\rho E) \\ \rho u \\ P+\rho u^2 \\ \rho uv \end{Bmatrix}, \quad g = \begin{Bmatrix} v(P+\rho E) \\ \rho v \\ \rho uv \\ P+\rho v^2 \end{Bmatrix} \]
+
+Le variabili vengono adimensionalizzate rispetto a valori di riferimento ($P_{IN}, T_{IN}$).
+
+\section{Subroutine compute\_dt}
+
+Calcola il passo temporale minimo basato sulla condizione CFL:
+\[ \Delta t = CFL \frac{h}{|q| + a} \]
+Dove $h \approx \sqrt{Area}$ e $\phi_{max} = |q| + a$ è la velocità massima di propagazione.
+
+\section{Subroutine compute\_fluxes}
+
+Valuta i flussi alle interfacce utilizzando solutori come Lax-Friedrichs o Roe. Integra le derivate temporali.
+
+\subsection{Subroutine integ\_time}
+
+Aggiorna le grandezze conservative usando Eulero esplicito:
+\[ (\rho u)^{k+1}_i = (\rho u)^k_i + \Delta t \sum_{nlati} F_{ij} \cdot \hat{n}_{ij} \frac{l_{ij}}{A_i} \]
+
+\begin{lstlisting}
+subroutine integ_time
+    use variabili
+    implicit none
+    integer :: i
+    
+    do i = 1, nele_interni
+        ele(i)%ucons(:) = ele(i)%ucons(:) + dt * ele(i)%d_dt(:)
+        ! Ricalcolo grandezze primitive dalle conservative
+        ele(i)%u = ele(i)%ucons(3) / ele(i)%ucons(2)
+        ele(i)%v = ele(i)%ucons(4) / ele(i)%ucons(2)
+        ! ... altri ricalcoli
+    end do
+end subroutine
+\end{lstlisting}
