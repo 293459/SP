@@ -5,14 +5,17 @@
             "name": "Debug Paletta",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\3-Paletta\\bin\\Debug\\paletta.exe",
+            "program": "${workspaceFolder}/3-Paletta/bin/Debug/paletta.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}\\3-Paletta",
+            "cwd": "${workspaceFolder}/3-Paletta",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links\\gdb.exe",
+            // PERCORSO AGGIORNATO:
+            "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
+            // di solito il debugger non è in questa cartella, ma nel mio caso si
+            //  perchè ho Perl per compilare Latex in locale su VSCode
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

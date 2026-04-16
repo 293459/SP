@@ -4,26 +4,22 @@
         {
             "label": "Compila Paletta",
             "type": "shell",
-            "command": "powershell",
+            "command": "gfortran",
             "args": [
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-Command",
-                "$candidates = @((Get-Command gfortran -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -First 1), \"$env:LOCALAPPDATA\\Microsoft\\WinGet\\Links\\gfortran.exe\", \"C:\\Program Files\\WinLibs\\bin\\gfortran.exe\", \"C:\\WinLibs\\bin\\gfortran.exe\") | Where-Object { $_ -and (Test-Path $_) }; if (-not $candidates) { throw 'gfortran non trovato. Installa la toolchain WinLibs oppure aggiorna i percorsi del workspace.' }; New-Item -ItemType Directory -Force -Path 'bin\\Debug' | Out-Null; & $candidates[0] '-g' 'main.f90' 'calcolo_area.f90' 'calcolo_baricentro.f90' '-o' 'bin\\Debug\\paletta.exe'"
+                "-g",
+                "main.f90",
+                "calcolo_area.f90",
+                "calcolo_baricentro.f90",
+                "-o",
+                "bin/Debug/paletta.exe"
             ],
             "options": {
-                "cwd": "${workspaceFolder}\\3-Paletta"
+                "cwd": "${workspaceFolder}/3-Paletta"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": "$gcc"
+                "reveal": "always"
+            }
         }
     ]
 }
