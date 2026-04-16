@@ -27,5 +27,13 @@ program hello
 
     print *, "Baricentro:", x0
     print *, "Area:", A
+    
+    ! crea un file con i risultati così da poterlo leggere con un editor di testo
+    ! aiuta anche per il debug così si può runnare ovunque senza preoccupari che 
+    ! i risultati scompaiano dalla console in una frazione di secondo.
+    open(unit=2, file="risultati.txt")
+    write(2,*) "Baricentro:", x0
+    write(2,*) "Area:", A
+    close(2)
 
 end program

@@ -1,4 +1,5 @@
 {
+    // Percorso del server linguistico per avere autocompletamento e suggerimenti
     "fortran.fortls.path": "C:\\Users\\gabri\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\fortls.exe",
     "fortran.linter.compiler": "gfortran",
     "fortran.linter.compilerPath": "C:\\Users\\gabri\\AppData\\Local\\Microsoft\\WinGet\\Links\\gfortran.exe",
@@ -6,9 +7,10 @@
         "${workspaceFolder}/3-Paletta/**"
     ],
     "files.associations": {
-        "*.f90": "FortranFreeForm"
+        "*.f90": "FortranFreeForm" // Assicura che i file .f90 siano trattati come Fortran moderno
     },
     "terminal.integrated.env.windows": {
+        // Aggiunge i percorsi dei compilatori al terminale di VS Code
         "PATH": "${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
     }
 }
