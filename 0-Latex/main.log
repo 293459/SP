@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.2) (preloaded format=pdflatex 2025.3.9)  27 MAR 2026 17:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.2) (preloaded format=pdflatex 2025.3.9)  16 APR 2026 11:12
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -943,7 +943,22 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[14]) (bump.tex
+[14]
+Overfull \hbox (2.94473pt too wide) in paragraph at lines 552--553
+\T1/cmr/m/n/12 Per que-sto pro-get-to è sta-ta ef-fet-tua-ta una mi-gra-zio-ne dal-l'I-DE tra-di-zio-na-le Co-de::Blocks
+ []
+
+
+Overfull \hbox (65.83902pt too wide) in paragraph at lines 558--559
+\T1/cmr/m/n/12 mo-du-la-re che uni-sce i fi-le sor-gen-te (\T1/cmtt/m/n/12 main.f90\T1/cmr/m/n/12 , \T1/cmtt/m/n/12 calcolo_area.f90\T1/cmr/m/n/12 , \T1/cmtt/m/n/12 calcolo_baricentro.f90\T1/cmr/m/n/12 )
+ []
+
+
+Overfull \hbox (24.64897pt too wide) in paragraph at lines 559--560
+\T1/cmr/m/n/12 de al-l'e-se-gui-bi-le \T1/cmtt/m/n/12 gdb.exe \T1/cmr/m/n/12 tra-mi-te il per-cor-so as-so-lu-to \T1/cmtt/m/n/12 C:/Strawberry/c/bin/gdb.exe\T1/cmr/m/n/12 . 
+ []
+
+
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -952,13 +967,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[15]
-Capitolo 2.
+[15]) (bump.tex
 
 
-[16
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-]
+[16]
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -968,15 +986,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [17]
+Capitolo 2.
 
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+[18
 
-[18]
+]
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1005,27 +1020,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [21]
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 320.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 320.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 320.
-
-
-LaTeX Warning: Reference `eq:norma_entropia' on page 22 undefined on input line 322.
-
-
-Overfull \hbox (184.21387pt too wide) detected at line 364
-[]
- []
-
-) (doppia_presa.tex
-
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -1043,6 +1037,45 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [23]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 320.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 320.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 320.
+
+
+LaTeX Warning: Reference `eq:norma_entropia' on page 24 undefined on input line 322.
+
+
+Overfull \hbox (184.21387pt too wide) detected at line 364
+[]
+ []
+
+) (doppia_presa.tex
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[24]
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[25]
 Capitolo 3.
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 23.
@@ -1053,7 +1086,7 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 23.
 Missing character: There is no ° in font cmr12!
 
 
-[24
+[26
 
 ]
 Overfull \hbox (125.65077pt too wide) in paragraph at lines 86--87
@@ -1069,7 +1102,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[25]
+[27]
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1078,7 +1111,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[26]
+[28]
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 159.
 
@@ -1107,27 +1140,27 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[27]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[28]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
 [29]
 
-LaTeX Warning: Reference `tab:presa_mesh_v1' on page 30 undefined on input line 280.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[30]
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[31]
+
+LaTeX Warning: Reference `tab:presa_mesh_v1' on page 32 undefined on input line 280.
 
 
 LaTeX Warning: File `SP/2-Rampa/mesh_v1.png' not found on input line 300.
@@ -1153,30 +1186,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[30]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[31]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
 [32]
-Overfull \hbox (162.33337pt too wide) detected at line 409
-[]
- []
-
-
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1194,7 +1204,30 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[34])
+[34]
+Overfull \hbox (162.33337pt too wide) detected at line 409
+[]
+ []
+
+
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[35]
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[36])
 
 ! LaTeX Error: File `progetto3.tex' not found.
 
@@ -1211,8 +1244,8 @@ l.158 \input{progetto3}
 
  
 Here is how much of TeX's memory you used:
- 37802 strings out of 473522
- 851231 string characters out of 5714610
+ 37814 strings out of 473522
+ 851368 string characters out of 5714610
  1680045 words of memory out of 5000000
  60029 multiletter control sequences out of 15000+600000
  588815 words of font info for 120 fonts, out of 8000000 for 9000
