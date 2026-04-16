@@ -1,0 +1,12 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Schematizzazione di griglia strutturata (sinistra) e non strutturata (destra).}}{7}{figure.0.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Andamento della lunghezza caratteristica $\ell _c$ in funzione della distanza dall'attrattore (campo \texttt {Threshold}).}}{10}{figure.0.2}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Schema del dominio computazionale per il caso bump (non in scala).}}{18}{figure.1.1}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Schema della mesh strutturata per il caso bump (30$\times $60 nodi, quadrilateri).}}{20}{figure.1.2}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Schema del dominio computazionale per la presa a doppia rampa (non in scala). Le linee arancioni tratteggiare indicano gli urti obliqui attesi.}}{25}{figure.2.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Mesh v1 con raffinamento iniziale. Si osserva un infittimento in prossimità delle rampe e del canale, tuttavia le zone di transizione tra la regione fitta e diradata della mesh è troppo distanti dalle pareti fisiche.}}{32}{figure.2.2}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
