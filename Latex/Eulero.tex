@@ -4,6 +4,12 @@ Una volta realizzata la mesh in base alle caratteristiche del problema in esame,
 
 \section{Strutture}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{schemi_esplicativi/strutture.png}
+    \caption{Rappresentazione grafica delle strutture dati utilizzate per memorizzare le informazioni sui nodi, elementi, interfacce e bordi.}
+\end{figure}
+
 Il codice, per funzionare, ha bisogno di salvare i dati che arrivano dal file di gmsh in alcune variabili, che andranno opportunamente definite all'interno del codice. Per la loro definizione si è optato per utilizzare delle strutture, le quali permetteranno di sfruttare una notazione compatta per le operazioni.
 
 La prima struttura che si definisce è \texttt{tipo\_elemento}:
@@ -80,6 +86,12 @@ La grandezza \texttt{d\_dt} contiene le derivate temporali delle grandezze conse
 \]
 
 \section{Variabili}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{schemi_esplicativi/strutture.png}
+    \caption{Rappresentazione grafica delle strutture dati utilizzate per memorizzare le informazioni sui nodi, elementi, interfacce e bordi.}
+\end{figure}
 
 Si definisce un nuovo modulo che richiama \texttt{strutture}:
 

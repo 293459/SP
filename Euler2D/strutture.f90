@@ -24,14 +24,15 @@ type tipo_nodo
 
 ! ******************************************************************************************************
 type tipo_interfaccia
-    integer:: e1, e2  !elementi associati(e1 è quello di riferimento per la normale uscente) - tag elementi associati a quella interfaccia
-    integer::edge_e1,edge_e2 !Lato corrispondente degli elementi separati dall''interfaccia
-    integer::nodo1,nodo2 !nodi agli estremi dell'interfaccia
-    real(4),dimension(2) ::normal,x0 !normale e centro dell'interfaccia - vettore normale nx e ny e x0 baricentro
-    real(4)::length !lunghezza dell'interfaccia
-    integer::entity !0 all''interno, >0 sui bordi
-    real(4),dimension(4)::f !flussi che attraversano l'interfaccia -- 4 elementi perchè in eulero 2d abbiamo 4 variabili conservative
-    integer::int_perio ! condizioni di tipo periodico
+    integer:: e1, e2                 ! elementi associati(e1 è quello di riferimento per la normale uscente) - 
+                                     ! tag elementi associati a quella interfaccia
+    integer::edge_e1,edge_e2         ! Lato corrispondente degli elementi separati dall''interfaccia
+    integer::nodo1,nodo2             ! nodi agli estremi dell'interfaccia
+    real(4),dimension(2) ::normal,x0 ! normale e centro dell'interfaccia - vettore normale nx e ny e x0 baricentro
+    real(4)::length                  ! lunghezza dell'interfaccia
+    integer::entity                  ! 0 all''interno, >0 sui bordi
+    real(4),dimension(4)::f          ! flussi che attraversano l'interfaccia -- 4 elementi perchè in eulero 2d abbiamo 4 variabili conservative
+    integer::int_perio               ! condizioni di tipo periodico
 end type tipo_interfaccia
 ! ******************************************************************************************************
 
