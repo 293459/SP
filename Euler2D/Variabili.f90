@@ -6,6 +6,7 @@ save ! la funzione save serve a mantenere il valore delle variabili anche dopo l
       
 ! ******************************************************************************************************
         ! in questo primo blocco vengono dichiarate tutte le variabili utilizzate nel programmae il loro tipo (intero, reale, carattere, ecc.) e dimensione (ad esempio scalare o vettore)
+        integer :: kfinal, kinf, kout, k
 		! k inf frequenza info a schermo -- k out frequenza salvataggio soluzione -- k final simulazione termina (se k = k final interrompi simulazione)
 		real(4) :: gam,ga,gb,gc,gd,ge,gf,gg,gh,gi,gj !rapporto dei valori specifici e variabili correlate ovvero le costanti che compaiono nelle equazioni 
 		! di stato e nei calcoli dei flussi, ad esempio gam è il rapporto dei calori specifici, ga,gb,... sono costanti 
