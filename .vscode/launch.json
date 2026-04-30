@@ -6,24 +6,18 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/3-Paletta/bin/Debug/paletta.exe",
-            "args": [],
-            "stopAtEntry": false,
             "cwd": "${workspaceFolder}/3-Paletta",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            // PERCORSO AGGIORNATO:
             "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
-            // di solito il debugger non è in questa cartella, ma nel mio caso si
-            //  perchè ho Perl per compilare Latex in locale su VSCode
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
             "preLaunchTask": "Compila Paletta"
+        },
+        {
+            "name": "Debug Euler2D",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Euler2D/solver2d.exe",
+            "cwd": "${workspaceFolder}/Euler2D",
+            "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
+            "preLaunchTask": "Compila Euler2D"
         }
     ]
 }
