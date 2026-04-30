@@ -65,7 +65,7 @@ Program test2d
 		if((norm2_residuals(2).lt.1E-4).and.(k.gt.1000)) then ! (CONDIZIONE DI ARRESTO)
 		! se la norma dei residui per la variabile 2 (ad esempio la pressione) è inferiore a 1E-4 e
 		! siamo oltre le prime 1000 iterazioni, allora interrompi la simulazione
-        call write_goal_functions ! salva le funzioni obiettivo, ad esempio per monitorare la forza di attrito o il coefficiente di pressione
+        ! call write_goal_functions ! salva le funzioni obiettivo, ad esempio per monitorare la forza di attrito o il coefficiente di pressione
         call write_tecplot_file(k,0.) ! salva la soluzione finale in un file tecplot
         exit
 		end if
