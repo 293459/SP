@@ -5,21 +5,26 @@
             "label": "Compila Paletta",
             "type": "shell",
             "command": "gfortran",
+            "args": ["-g", "main.f90", "calcolo_area.f90", "calcolo_baricentro.f90", "-o", "bin/Debug/paletta.exe"],
+            "options": { "cwd": "${workspaceFolder}/3-Paletta" },
+            "group": "build"
+        },
+        {
+            "label": "Compila Euler2D",
+            "type": "shell",
+            "command": "gfortran",
             "args": [
-                "-g",
-                "main.f90",
-                "calcolo_area.f90",
-                "calcolo_baricentro.f90",
-                "-o",
-                "bin/Debug/paletta.exe"
+                "-ffree-line-length-none",
+                "-O2",
+                "strutture.f90", "Variabili.f90", "leggi_gmsh.f90", 
+                "subroutine_geometria.f90", "processa_griglia.f90", 
+                "input.f90", "init.f90", "bordi.f90", 
+                "compute_dt.f90", "compute_fluxes.f90", 
+                "integ_time.f90", "output.f90", "main.f90",
+                "-o", "solver2d.exe"
             ],
-            "options": {
-                "cwd": "${workspaceFolder}/3-Paletta"
-            },
-            "group": "build",
-            "presentation": {
-                "reveal": "always"
-            }
+            "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Cartella del nuovo progetto[cite: 2]
+            "group": "build"
         }
     ]
 }
