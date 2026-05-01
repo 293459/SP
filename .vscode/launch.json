@@ -2,22 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Paletta",
+            "name": "Debug Bump",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/3-Paletta/bin/Debug/paletta.exe",
-            "cwd": "${workspaceFolder}/3-Paletta",
-            "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
-            "preLaunchTask": "Compila Paletta"
+            "program": "${workspaceFolder}/Euler2D/solver2d.exe", // Percorso fisso del solver centrale
+            "cwd": "${workspaceFolder}/CasiStudio/1-Bump",         // Cartella dove legge input e scrive output
+            "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",       // Nota: Assicurati che il percorso di gdb sia corretto
+            "preLaunchTask": "Build with Makefile"                 // Esegue il Makefile prima di avviare il debug
         },
         {
-            "name": "Debug Euler2D",
+            "name": "Debug Doppia Rampa",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Euler2D/solver2d.exe",
-            "cwd": "${workspaceFolder}/Euler2D",
+            "cwd": "${workspaceFolder}/CasiStudio/2-DoppiaRampa",
             "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
-            "preLaunchTask": "Compila Euler2D"
+            "preLaunchTask": "Build with Makefile"
+        },
+        {
+            "name": "Debug Paletta",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Euler2D/solver2d.exe",
+            "cwd": "${workspaceFolder}/CasiStudio/3-Paletta_LS59",
+            "miDebuggerPath": "C:/Strawberry/c/bin/gdb.exe",
+            "preLaunchTask": "Build with Makefile"
         }
     ]
 }
