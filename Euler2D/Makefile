@@ -32,18 +32,19 @@ TARGET = euler2d
 #  file che le referenzia con USE.
 # ============================================================
 SRCS = \
-    costanti.f90             \
     strutture.f90            \
     Variabili.f90            \
     leggi_gmsh.f90           \
-    calcola_area.f90         \
-    calcola_baricentri.f90   \
-    vicini.f90               \
-    BCs.f90                  \
-    calcola_derivate.f90     \
-    calcola_flussi.f90       \
-    calcola_passo_temporale.f90 \
-    output_tecplot.f90       \
+    subroutine_geometria.f90 \
+    processa_griglia.f90     \
+    bordi.f90                \
+    init.f90                 \
+    input.f90                \
+    compute_dt.f90           \
+    compute_fluxes.f90       \
+    integ_time.f90           \
+    bubble_sort.f90          \
+    output.f90               \
     main.f90
 
 OBJS = $(SRCS:.f90=.o)
