@@ -14,8 +14,12 @@
 FC = gfortran
 
 # --- Flag base ---
-FFLAGS_RELEASE = -O2 -Wall -Wextra -Wno-unused-dummy-argument
-FFLAGS_DEBUG   = -O0 -g -fcheck=bounds -fbacktrace -Wall -Wextra
+FFLAGS_RELEASE = -O2 -ffree-line-length-none -Wall -Wextra -Wno-unused-dummy-argument
+FFLAGS_DEBUG   = -O0 -ffree-line-length-none -g -fcheck=bounds -fbacktrace -Wall -Wextra
+# Nota: -ffree-line-length-none è necessario per evitare errori di compilazione con linee lunghe nei file .msh
+# -O2 stays for release for better performance, while -O0 is used for debug to make debugging easier and more accurate (no optimization that could rearrange code or remove variables)
+# -Wall -Wextra attivano tutti i warning, utili per identificare potenziali problemi nel codice, mentre -Wno-unused-dummy-argument disabilita i warning per argomenti formali non usati,
+# che possono essere comuni in subroutine con interfacce fisse (es. subroutine di geometria che devono avere una certa interfaccia ma non usano tutti gli argomenti)
 
 # Default: release
 FFLAGS = $(FFLAGS_RELEASE)
