@@ -1,0 +1,17 @@
+# ============================================================
+#  SP — Dipendenze Python (post-processing e analisi)
+#
+#  Installazione:
+#    pip install -r requirements.txt
+#
+#  Versione Python richiesta: >= 3.10
+# ============================================================
+
+# Calcolo numerico e array
+numpy>=1.24
+
+# Plotting
+matplotlib>=3.7
+
+# Calcolo scientifico (interpolazione, integrali, ottimizzazione)
+scipy>=1.11

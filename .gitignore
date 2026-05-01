@@ -1,7 +1,11 @@
+# ============================================================
+#  SP — Fluidodinamica Computazionale dei Sistemi Propulsivi
+#  .gitignore
+# ============================================================
+
 # --- LaTeX Temporary Files ---
 *.aux
 *.log
-*.out
 *.toc
 *.synctex.gz
 *.fdb_latexmk
@@ -15,10 +19,9 @@
 # --- Fortran & Compilation ---
 # Eseguibili
 *.exe
-*.out
 *.app
 
-# File oggetto e moduli
+# File oggetto e moduli Fortran
 *.o
 *.mod
 *.smod
@@ -27,22 +30,56 @@
 bin/
 obj/
 
-# --- Code::Blocks Junk ---
+# Eseguibile del solutore
+euler2d
+euler2d.exe
+
+# --- Output solutore CFD ---
+# File Tecplot ASCII (soluzioni, troppo grandi per il repo)
+*.dat
+
+# File Tecplot binari
+*.plt
+
+# Mesh generate (rigenerare con: gmsh <file>.geo -2)
+# NOTA: i file .geo (geometria sorgente) vanno invece committati
+*.msh
+
+# --- Gmsh binary (installare da https://gmsh.info) ---
+# Non committare l'eseguibile: è platform-specific e pesa ~80 MB
+gmsh-*/
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# --- Julia ---
+*.ji
+.julia/
+
+# --- Code::Blocks ---
 *.cbp
 *.layout
 *.depend
 
-# --- VS Code specific ---
+# --- VS Code ---
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# --- Operating System ---
+# --- Sistema Operativo ---
 Thumbs.db
 Desktop.ini
 .DS_Store
-
-# Grafici Tecplot
-.plt
+*~
