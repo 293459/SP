@@ -25,6 +25,13 @@
             ],
             "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Cartella del nuovo progetto[cite: 2]
             "group": "build"
+        },
+        {
+        "label": "Build with Makefile",
+        "type": "shell",
+        "command": "make",
+        "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Esegue make dove c'è il Makefile
+        "group": "build"
         }
     ]
 }
