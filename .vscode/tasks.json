@@ -29,7 +29,7 @@
         {
         "label": "Build with Makefile",
         "type": "shell",
-        "command": "make",
+        "command": "mingw32-make",
         "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Esegue make dove c'è il Makefile
         "group": "build"
         }
