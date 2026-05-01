@@ -12,12 +12,16 @@ Program test2d
 
     call processa_elementi
 
+	! salva in un file di testo queste caratteristiche per l'elemento 10 (aggiunta di mia volontà)
+	open(10,file='caratteristiche_elemento_10.txt', STATUS='REPLACE', ACTION='WRITE')
     !Verifica delle caratteristiche geometria per elemento 10 e interfaccia 10
     write(*,*)'ele(10)%x0 = ',ele(10)%x0 ! punto di riferimento dell'elemento 10
     write(*,*)'ele(10)%area = ',ele(10)%area ! area dell'elemento 10
     write(*,*)'interf(100)%length = ',interf(100)%length ! lunghezza dell'interfaccia 100
     write(*,*)'interf(100)%normal = ',interf(100)%normal ! normale dell'interfaccia 100
     write(*,*) 'lc = ', nodo(ele(1)%nodi(2))%x(1) - nodo(ele(1)%nodi(1))%x(1) 
+	close(10)
+
 	! questo comando serve per verificare che la lunghezza caratteristica lc sia corretta,
 	! in questo caso dovrebbe essere 0.1 dato che i nodi 1 e 2 dell'elemento 1 sono rispettivamente (0,0) e (0.1,0)
 

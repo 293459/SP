@@ -89,10 +89,20 @@ call compute_length_inte(i)
 
 tx = (nodo(interf(i)%nodo2)%x(1)-nodo(interf(i)%nodo1)%x(1))/interf(i)%length !sqrt((nodo(interf(i)%nodo1)%x(1)-nodo(interf(i)%nodo2)%x(1))**2 + (nodo(interf(i)%nodo1)%x(2)-nodo(interf(i)%nodo2)%x(2))**2 )
 ty = (nodo(interf(i)%nodo2)%x(2)-nodo(interf(i)%nodo1)%x(2))/interf(i)%length !sqrt((nodo(interf(i)%nodo1)%x(1)-nodo(interf(i)%nodo2)%x(1))**2 + (nodo(interf(i)%nodo1)%x(2)-nodo(interf(i)%nodo2)%x(2))**2 )
+! a lezione sono state presentate delle definizioni alternative di tx,ty come segue 
+! tx = (nodo(interf(i)%nodo2)%x(1)-nodo(interf(i)%nodo1)%x(1))/interf(i)
+! ty = (nodo(interf(i)%nodo2)%x(2)-nodo(interf(i)%nodo1)%x(2))/interf(i)
 
 
 interf(i)%normal(1) = -ty ! la componente x della normale è uguale a -ty, che è la componente y del versore tangente, con segno negativo per avere la normale che punta verso l'esterno dell'elemento
 interf(i)%normal(2) = tx ! la componente y della normale è uguale a tx, che è la componente x del versore tangente
 
+! a lezione sono state presentate delle definizioni alternative di interf come segue 
+! interf(i)%normal(1) = -ty/sqrt(tx**2+ty**2) ! la componente x della normale è uguale a -ty diviso la lunghezza del versore tangente, per avere una normale di lunghezza unitaria
+! interf(i)%normal(2) = tx/sqrt(tx**2+ty**2) ! la componente y della normale è uguale a tx diviso la lunghezza del versore tangente, per avere una normale di lunghezza unitaria
+
+! alla fine il risultato dovrebbe essere lo stesso, dato che tx e ty sono già normalizzati per la lunghezza dell'interfaccia, quindi interf(i)%normal dovrebbe essere già di lunghezza unitaria
+! nel codice si preferisce normalizzare prima già i versori tangenti tx e ty e poi da lì calcolare le normali (cosi da avere tutto di modulo unitario)
+! tuttavia l'alternativa del prof non è di per sè sbagliata poiché tanto della funzione ci interessano le normali che son o comunque corrette
 end subroutine
 
