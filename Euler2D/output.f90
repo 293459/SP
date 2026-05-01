@@ -227,7 +227,8 @@ do i=1,ninterf
 
 end do
 
-call bubble(nodi_vis,nnodi_vis)
+call bubble(nodi_vis,nnodi_vis) ! ordina in ordine crescente gli indici dei nodi da salvare su file,  
+                                ! in questo modo è più facile fare il ciclo sui nodi e trovare quelli da salvare su file
 
 allocate(temp(nnodi_vis))
 
@@ -243,50 +244,5 @@ write(*,*)'nnodi_vis = ',nnodi_vis
 
 end subroutine
 
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-SUBROUTINE Bubble (X,N)
-! X e' l'array da ordinare in verso decrescente, di dimensione N
-IMPLICIT NONE
-INTEGER :: N, J, I, JMAX, TEMP
-INTEGER :: X(N)
-JMAX=N-1
-spike1: DO I=1,N-1
-spike2: DO J=1,JMAX
-IF(X(J).GT.X(J+1)) GO TO 100
-TEMP=X(J)
-X(J)=X(J+1)
-X(J+1)=TEMP
-100 END DO spike2
-JMAX=JMAX-1
-END DO spike1
-RETURN
-END subroutine
 
 

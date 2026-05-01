@@ -195,7 +195,8 @@ end subroutine
 subroutine outsub(i)
 use Variabili
 implicit none
-integer::i,j,iele,iedge,kk,ielemento,ncoef
+integer::i,iele,iedge,ielemento
+integer::j,kk,ncoef ! seems that are not necessary
 real(8)::u1a,u2a,u3a,u5a,u6a,u7a,u8a,ud,vd,pd,ad,hd,utilde,utildeinf,ac,pc,f1,f2,f3,f4,segno,&
 &        r1b,r3a,sc,sd,tc,uc,vtilde,vc,rhoc,ec,f2dum,f3dum,td,rhod,r2dum,detj,jacobiano,&
 &        tauxx,tauyy,tauxy,dphii_dx,dphii_dy,u6_ij,mut,muturbSA,wtildea,kaa,muturbkw,mua
@@ -278,11 +279,6 @@ iedge=interf(i)%edge_e1
     interf(i)%f(3)=F2
     interf(i)%f(4)=F3
     interf(i)%f(1)=f4
-
-
-
-
-
 
 end subroutine
 
