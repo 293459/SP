@@ -1,40 +1,111 @@
-# 1. DEFINIZIONE VARIABILI (Così se cambi compilatore, lo fai in un punto solo)
-FC      = gfortran
-FFLAGS  = -ffree-line-length-none -O2
-EXE     = solver2d
+# ============================================================
+#  SP — Euler2D Solver
+#  Makefile
+#
+#  Uso:
+#    make            → compila in modalità release (euler2d)
+#    make debug      → compila con bound-checking e backtrace
+#    make clean      → rimuove oggetti, moduli ed eseguibile
+#
+#  Requisiti: gfortran >= 10  oppure  ifort/ifx (Intel oneAPI)
+# ============================================================
 
-# 2. LISTA FILE (L'ordine qui non è vitale, ma aiuta la lettura)
-SRCS    = strutture.f90 Variabili.f90 leggi_gmsh.f90 subroutine_geometria.f90 \
-          processa_griglia.f90 input.f90 init.f90 bordi.f90 \
-          compute_dt.f90 compute_fluxes.f90 integ_time.f90 output.f90 \
-          main.f90
+# --- Compilatore ---
+FC = gfortran
 
-# Trasforma la lista dei .f90 in una lista di .o (file oggetto intermedi)
-OBJS    = $(SRCS:.f90=.o)
+# --- Flag base ---
+FFLAGS_RELEASE = -O2 -Wall -Wextra -Wno-unused-dummy-argument
+FFLAGS_DEBUG   = -O0 -g -fcheck=bounds -fbacktrace -Wall -Wextra
 
-# 3. I "TARGET" (Gli obiettivi)
+# Default: release
+FFLAGS = $(FFLAGS_RELEASE)
 
-# Il primo target è quello eseguito di default quando scrivi solo 'make'
-all: $(EXE)
+# --- Eseguibile ---
+TARGET = euler2d
 
-# Regola per creare l'eseguibile: unisce tutti i file .o
-$(EXE): $(OBJS)
+# ============================================================
+#  Ordine di compilazione — rispetta le dipendenze USE Fortran
+#
+#  costanti  →  strutture  →  Variabili  →  [utility]  →  main
+#
+#  Le unit di modulo devono essere compilate prima di qualunque
+#  file che le referenzia con USE.
+# ============================================================
+SRCS = \
+    costanti.f90             \
+    strutture.f90            \
+    Variabili.f90            \
+    leggi_gmsh.f90           \
+    calcola_area.f90         \
+    calcola_baricentri.f90   \
+    vicini.f90               \
+    BCs.f90                  \
+    calcola_derivate.f90     \
+    calcola_flussi.f90       \
+    calcola_passo_temporale.f90 \
+    output_tecplot.f90       \
+    main.f90
+
+OBJS = $(SRCS:.f90=.o)
+
+# ============================================================
+#  Target principali
+# ============================================================
+
+.DEFAULT_GOAL := all
+
+.PHONY: all debug clean help
+
+all: $(TARGET)
+	@echo ""
+	@echo "  Build completato: ./$(TARGET)"
+	@echo "  Uso: ./$(TARGET) <percorso_mesh.msh>"
+	@echo ""
+
+debug: FFLAGS = $(FFLAGS_DEBUG)
+debug: clean $(TARGET)
+	@echo ""
+	@echo "  Build DEBUG completato: ./$(TARGET)"
+	@echo "  Bound checking e backtrace attivi."
+	@echo ""
+
+$(TARGET): $(OBJS)
 	$(FC) $(FFLAGS) -o $@ $^
 
-# 4. GESTIONE DIPENDENZE (Fondamentale in Fortran!)
-# I moduli creano file .mod. Se Variabili.f90 usa Strutture.f90, 
-# dobbiamo dire a make di compilare prima Strutture.
-
-strutture.o: strutture.f90
-	$(FC) $(FFLAGS) -c strutture.f90
-
-Variabili.o: Variabili.f90 strutture.o
-	$(FC) $(FFLAGS) -c Variabili.f90
-
-# Regola generica: come creare un .o da un .f90
-%.o: %.f90 Variabili.o
+# Regola generica: ogni .f90 → .o
+# gfortran produce automaticamente il .mod nella directory corrente
+%.o: %.f90
 	$(FC) $(FFLAGS) -c $<
 
-# Pulizia: 'make clean' elimina i file temporanei per ripartire da zero
 clean:
-	rm -f *.o *.mod $(EXE)
+	rm -f *.o *.mod *.smod $(TARGET) $(TARGET).exe
+	@echo "  Pulizia completata."
+
+help:
+	@echo ""
+	@echo "  Targets disponibili:"
+	@echo "    make          → release build (ottimizzato)"
+	@echo "    make debug    → debug build  (bound check + backtrace)"
+	@echo "    make clean    → rimuovi oggetti, moduli, eseguibile"
+	@echo ""
+
+# ============================================================
+#  Dipendenze esplicite dei moduli
+#  (necessarie perché Make non legge USE Fortran in automatico)
+# ============================================================
+strutture.o:               costanti.o
+Variabili.o:               strutture.o costanti.o
+leggi_gmsh.o:              Variabili.o strutture.o
+calcola_area.o:            Variabili.o strutture.o
+calcola_baricentri.o:      Variabili.o strutture.o
+vicini.o:                  Variabili.o strutture.o
+BCs.o:                     Variabili.o strutture.o costanti.o
+calcola_derivate.o:        Variabili.o strutture.o
+calcola_flussi.o:          Variabili.o strutture.o costanti.o
+calcola_passo_temporale.o: Variabili.o strutture.o costanti.o
+output_tecplot.o:          Variabili.o strutture.o
+main.o:                    output_tecplot.o calcola_passo_temporale.o \
+                           calcola_flussi.o calcola_derivate.o       \
+                           BCs.o vicini.o calcola_baricentri.o       \
+                           calcola_area.o leggi_gmsh.o Variabili.o   \
+                           strutture.o costanti.o
