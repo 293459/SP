@@ -227,7 +227,7 @@ do i=1,ninterf
 
 end do
 
-call bubble(nodi_vis,nnodi_vis) ! ordina in ordine crescente gli indici dei nodi da salvare su file,  
+call bubble_sort(nodi_vis,nnodi_vis) ! ordina in ordine crescente gli indici dei nodi da salvare su file,  
                                 ! in questo modo è più facile fare il ciclo sui nodi e trovare quelli da salvare su file
 
 allocate(temp(nnodi_vis))
