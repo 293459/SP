@@ -94,19 +94,8 @@ help:
 #  Dipendenze esplicite dei moduli
 #  (necessarie perché Make non legge USE Fortran in automatico)
 # ============================================================
-strutture.o:               costanti.o
-Variabili.o:               strutture.o costanti.o
-leggi_gmsh.o:              Variabili.o strutture.o
-calcola_area.o:            Variabili.o strutture.o
-calcola_baricentri.o:      Variabili.o strutture.o
-vicini.o:                  Variabili.o strutture.o
-BCs.o:                     Variabili.o strutture.o costanti.o
-calcola_derivate.o:        Variabili.o strutture.o
-calcola_flussi.o:          Variabili.o strutture.o costanti.o
-calcola_passo_temporale.o: Variabili.o strutture.o costanti.o
-output_tecplot.o:          Variabili.o strutture.o
-main.o:                    output_tecplot.o calcola_passo_temporale.o \
-                           calcola_flussi.o calcola_derivate.o       \
-                           BCs.o vicini.o calcola_baricentri.o       \
-                           calcola_area.o leggi_gmsh.o Variabili.o   \
-                           strutture.o costanti.o
+Variabili.o: strutture.o
+leggi_gmsh.o: Variabili.o strutture.o
+processa_griglia.o: Variabili.o strutture.o
+subroutine_geometria.o: Variabili.o strutture.o
+main.o: Variabili.o strutture.o output.o integ_time.o
