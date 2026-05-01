@@ -102,4 +102,5 @@ Variabili.o: strutture.o
 leggi_gmsh.o: Variabili.o strutture.o
 processa_griglia.o: Variabili.o strutture.o
 subroutine_geometria.o: Variabili.o strutture.o
+output.o: bubble_sort.o Variabili.o strutture.o
 main.o: Variabili.o strutture.o output.o integ_time.o
