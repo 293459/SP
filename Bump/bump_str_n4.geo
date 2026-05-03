@@ -33,14 +33,14 @@ Plane Surface(1) = {1} ; // si mette il numero della curva chiusa orientata
 
 
 // MESH STRUTTURATA
-Transfinite Line {1} = 30*n Using Progression 1.1; // 
+Transfinite Line {1} = 15*n Using Progression 1.1; // 
 // il primo valore è il numro di elementi di calcolo per linea
 // il secondo valore è il growth factor geometrico
-Transfinite Line {-3} = 30*n Using Progression 1.1; // 
+Transfinite Line {-3} = 15*n Using Progression 1.1; // 
 // il meno serve a far partire la serie geometrica dal lato opposto
-Transfinite Line {2} = 60*n Using Bump 3; //
+Transfinite Line {2} = 50*n Using Bump 3; //
 // Using Bump è una progressione geometrica di tipo bump centrata
-Transfinite Line {4} = 60*n Using Bump 3; //
+Transfinite Line {4} = 50*n Using Bump 3; //
 // Abbiamo addensato in basso perché ci sono gradienti maggiori
 Transfinite Surface {1} = {1,2,3,4}; // di default è triangolare
 Recombine Surface{1}; // trasforma i triangoli in rettangoli
