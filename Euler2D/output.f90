@@ -24,6 +24,26 @@ logical::trovato
 
 !--------------------------------------------------------------------------------
 
+integer :: n_digits ! Variabile per il numero di cifre necessarie per rappresentare k_file
+character(len=20) :: fmt_str ! Variabile per la stringa di formato dinamica
+
+! 1. Calcola il numero di cifre necessarie
+if (k_file > 0) then ! Se k_file è maggiore di 0, calcola il numero di cifre
+    n_digits = int(log10(real(k_file))) + 1 ! ad esempio, se k_file è 100, log10(100) è 2, quindi n_digits sarà 3 (per rappresentare 100)
+else
+    n_digits = 1 ! Se k_file è 0 o negativo, consideriamo che serve almeno 1 cifra (per rappresentare 0)
+end if
+
+! 2. Crea una stringa di formato dinamica, es: '(i5)'
+write(fmt_str, '(''(i'', i0, '')'')') n_digits 
+
+! 3. Scrivi il numero con il formato esatto (senza spazi iniziali)
+write(kcar, fmt_str) k_file
+
+! 4. Componi il nome del file (senza bisogno di cercare spazi con index)
+datafile_tec = trim(adjustl(kcar)) // '.plt'
+
+ "
  	if(k_file.lt.10) then
 	write(kcar,'(i1)') k_file
 	else if(k_file.lt.100) then
@@ -44,7 +64,7 @@ logical::trovato
 	write(kcar,'(i9)') k_file
     end if iposj2=index(kcar,' ')! trova la posizione del primo spazio vuoto, in questo modo riesco a prendere solo la parte numerica del nome del file, senza spazi vuoti
 	datafile_tec=kcar(1:iposj2-1)//'.plt' ! creo il nome del file tecplot, con estensione .plt, usando solo la parte numerica di kcar
-
+"
 !--------------------------------------------------------------------------------
 
  open(unit=1, file=datafile_tec) ! apertura del file tecplot, il nome del file è quello creato sopra
