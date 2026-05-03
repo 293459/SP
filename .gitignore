@@ -41,9 +41,6 @@ euler2d.exe
 # File Tecplot binari
 *.plt
 
-# Mesh generate (rigenerare con: gmsh <file>.geo -2)
-# NOTA: i file .geo (geometria sorgente) vanno invece committati
-*.msh
 
 # --- Gmsh binary (installare da https://gmsh.info) ---
 # Non committare l'eseguibile: è platform-specific e pesa ~80 MB
