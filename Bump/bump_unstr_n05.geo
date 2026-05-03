@@ -4,6 +4,7 @@ Mesh.MshFileVersion = 2.2;
 L=1; // lungheza del domionio
 h = 0.3; //altezza del dominio
 lc = 0.05; // lunghezza caratteristica della mesh
+n = 0.5; // serve a modulare la dimensione della mesh
 
 // Definizione Rettangolo
 Point(1) = {0,0,0,lc}; // volendo posso addensare la mesh in un punto specifico
@@ -43,8 +44,8 @@ Field[1].EdgeList = {4}; // La linea 4 fa parte del Field 1 quindi la linea è u
 
 Field[2] = Threshold; // la tipologia è Threshold
 Field[2].IField = 1; // I = input dle campo
-Field[2].LcMin = lc*0.1; // dimensione minima della mesh
-Field[2].LcMax = lc*0.5; // dimensione massima della mesh
+Field[2].LcMin = lc*0.1*n; // dimensione minima della mesh
+Field[2].LcMax = lc*0.5*n; // dimensione massima della mesh
 Field[2].DistMin = h/4; // distanza minima della mesh
 Field[2].DistMax = h/2; // distanza massima della mesh
 // potrei mettere altri campi con altri attrattori Field[3]ad esempio
