@@ -9,6 +9,7 @@
 - [Struttura del repository](#struttura-del-repository)
 - [Software richiesto](#software-richiesto)
 - [Estensioni VSCode raccomandate](#estensioni-vscode-raccomandate)
+- [Euler2D aggiornato](#euler2d-aggiornato)
 - [Quick Start](#quick-start)
 - [Test case](#test-case)
 - [Architettura del solutore](#architettura-del-solutore)
@@ -125,7 +126,66 @@ Le estensioni elencate in `.vscode/extensions.json` sono installabili automatica
 
 ---
 
+## Euler2D aggiornato
+
+Modifica 2026-05-06:
+
+- `Euler2D/Makefile` compila solo il solver Euler2D e il target `clean` funziona in PowerShell/MinGW senza dipendere da `rm`.
+- Il solver accetta `input_file` e `output_dir`: `euler2d.exe [input_file] [output_dir]`.
+- `Bump/run_all_meshes.ps1` non modifica piu' `Bump/input.txt`; genera un input dedicato per ogni mesh e scrive ogni run in `Bump/runs/batch_<timestamp>/<run_id>/`.
+- I file `wall_data.txt`, `norms.txt`, `RECAP_OUTPUT.csv`, `RECUP_SIMULAZIONE.txt` e `SIM_OUTPUT_<k>/` sono locali alla singola simulazione, quindi piu' processi possono girare in parallelo.
+- `RECUP_SIMULAZIONE.txt` include conteggi mesh, parametri di run, diagnostica elemento 10/interfaccia 100 e lista degli output Tecplot.
+
+Build Windows:
+
+```powershell
+cd Euler2D
+mingw32-make clean
+mingw32-make
+```
+
+Build debug:
+
+```powershell
+mingw32-make debug
+```
+
+Run singola:
+
+```powershell
+.\euler2d.exe ..\Bump\input.txt ..\Bump\runs\manual_test
+```
+
+Batch Bump sequenziale:
+
+```powershell
+cd ..\Bump
+powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1
+```
+
+Batch Bump parallelo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1 -Parallel -ThrottleLimit 2
+```
+
+Prova breve:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1 -KFinalOverride 1 -KInfOverride 1 -KOutOverride 1
+```
+
+Verifiche eseguite il 2026-05-06:
+
+- `mingw32-make clean`, `mingw32-make`, `mingw32-make debug`, `mingw32-make rebuild`: OK, senza warning di compilazione.
+- Batch breve su tutte le 6 mesh Bump con `KFINAL=1`: OK.
+- Run completa su `bump_unstr_n1.msh` con `KFINAL=1000`: OK.
+
 ## Quick Start
+
+> Nota: per il flusso Euler2D/Bump attuale su Windows usare prima la sezione
+> [Euler2D aggiornato](#euler2d-aggiornato). Le note sotto restano come traccia
+> generale del repository e possono riferirsi a nomi storici.
 
 ### 1. Clonare il repository
 
