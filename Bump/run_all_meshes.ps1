@@ -115,6 +115,10 @@ function New-SimulationCase {
     $runId = "{0:00}_{1}" -f $Index, $meshStem
     $runDir = Join-Path $BatchDir $runId
     New-Item -ItemType Directory -Force -Path $runDir | Out-Null
+    $runDirForRecap = $runDir
+    if ($runDir.StartsWith($ScriptDir, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $runDirForRecap = $runDir.Substring($ScriptDir.Length).TrimStart('\', '/')
+    }
 
     Copy-Item -Path $InletFile -Destination (Join-Path $runDir "inlet.txt") -Force
     Copy-Item -Path $OutletFile -Destination (Join-Path $runDir "outlet.txt") -Force
@@ -134,6 +138,7 @@ function New-SimulationCase {
         Mesh = $Mesh
         MeshPath = $meshPath
         RunDir = $runDir
+        RunDirForRecap = $runDirForRecap
         InputPath = $inputPath
     }
 }
@@ -204,10 +209,10 @@ function Complete-SolverCase {
         $nnodi,
         $ninterf,
         $neleInterni,
-        $Case.RunDir
+        $Case.RunDirForRecap
     ) | Add-Content -Path $GlobalRecap -Encoding ASCII
 
-    "$status | $($Case.RunId) | $($Case.Mesh) | exit $exitCode | ${elapsed}s | $($Case.RunDir)" |
+    "$status | $($Case.RunId) | $($Case.Mesh) | exit $exitCode | ${elapsed}s | $($Case.RunDirForRecap)" |
         Out-File -FilePath $LogFile -Append -Encoding ASCII
 
     if ($exitCode -eq 0) {
