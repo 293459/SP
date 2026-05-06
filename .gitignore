@@ -44,6 +44,8 @@ obj/
 
 # Batch Euler2D/Bump: cartelle generate localmente dagli script.
 Bump/runs/
+Bump/SIM_OUTPUT_*/
+Bump/caratteristiche_elemento_10.txt
 Bump/RECAP_SIMULAZIONI.csv.legacy_*.bak
 Bump/-p/
 
