@@ -81,7 +81,7 @@ subroutine compute_normal_inte(i) ! questa subroutine calcola la normale all'int
 use variabili
 implicit none
 integer::i ! variabile intera che rappresenta l'indice dell'interfaccia di cui vogliamo calcolare la normale
-real::tx,ty ! variabili reali che rappresentano le componenti x e y del versore tangente all'interfaccia, che useremo per calcolare la normale
+real(8)::tx,ty ! variabili reali che rappresentano le componenti x e y del versore tangente all'interfaccia, che useremo per calcolare la normale
 
 call compute_length_inte(i)
 

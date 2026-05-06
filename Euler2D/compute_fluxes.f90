@@ -25,13 +25,13 @@ do i=1,ninterf
 
 	do j=1,4
         !abbiamo - perchè elemento 1 ha normale uscente
-		ele(e1)%d_dt(j)=ele(e1)%d_dt(j)-interf(i)%F(j)*interf(i)%length/ele(e1)%area !calcolo integrale e aggiorno derivata du/dt = u_n - sum_su interfacce(flusso interfaccia j elemento i * l/area)
+		ele(e1)%d_dt(j)=ele(e1)%d_dt(j)-real(interf(i)%F(j)*interf(i)%length/ele(e1)%area, kind=4) !calcolo integrale e aggiorno derivata du/dt = u_n - sum_su interfacce(flusso interfaccia j elemento i * l/area)
 	end do
 
 
 	if(e2.gt.0)then
 		do j=1,4
-			ele(e2)%d_dt(j)=ele(e2)%d_dt(j)+interf(i)%F(j)*interf(i)%length/ele(e2)%area ! mettiamo + per elemento e2 essendo normale entrante
+			ele(e2)%d_dt(j)=ele(e2)%d_dt(j)+real(interf(i)%F(j)*interf(i)%length/ele(e2)%area, kind=4) ! mettiamo + per elemento e2 essendo normale entrante
 		end do
 	end if
 
@@ -45,8 +45,8 @@ subroutine compute_internal_flux(i)
 use variabili
 implicit none
 integer::i
-real(4),dimension(4)::uconsl,uconsr,fluxes
-real(4)::utildeA,utildeB,vtildeA,vtildeB,pa,pb,Ta,Tb,ua,ub,va,vb,lambda_max
+real(8),dimension(4)::uconsl,uconsr,fluxes
+real(8)::utildeA,utildeB,vtildeA,vtildeB,pa,pb,Ta,Tb,ua,ub,va,vb,lambda_max
 
 
 
@@ -101,7 +101,7 @@ subroutine compute_internal_flux_Roe(i)
 use variabili
 implicit none
 integer::i
-real,dimension(4)::ul,ur,fluxes
+real(8),dimension(4)::ul,ur,fluxes
 
 
 
@@ -129,22 +129,22 @@ end subroutine
 
 
 subroutine Roe(uL, uR, nx, ny,fluxes)
- real :: uL(4), uR(4) !  Input: conservative variables rho*[1, u, v, E]
- real :: nx, ny       !  Input: face normal vector, [nx, ny] (Left-to-Right)
- real :: fluxes(4)       ! Output: Roe flux function (upwind)
+ real(8) :: uL(4), uR(4) !  Input: conservative variables rho*[1, u, v, E]
+ real(8) :: nx, ny       !  Input: face normal vector, [nx, ny] (Left-to-Right)
+ real(8) :: fluxes(4)       ! Output: Roe flux function (upwind)
 !Local constants
- real :: gamma                          ! Ratio of specific heat.
- real :: zero, fifth, half, one, two    ! Numbers
+ real(8) :: gamma                          ! Ratio of specific heat.
+ real(8) :: zero, fifth, half, one, two    ! Numbers
 !Local variables
- real :: tx, ty       ! Tangent vector (perpendicular to the face normal)
- real :: vxL, vxR, vyL, vyR             ! Velocity components.
- real :: rhoL, rhoR, pL, pR             ! Primitive variables.
- real :: vnL, vnR, vtL, vtR             ! Normal and tangent velocities
- real :: aL, aR, HL, HR                 ! Speeds of sound.
- real :: RT,rho,vx,vy,H,a,vn, vt        ! Roe-averages
- real :: drho,dvx,dvy,dvn,dvt,dp,dV(4)  ! Wave strenghs
- real :: ws(4),dws(4), Rv(4,4)          ! Wave speeds and right-eigevectors
- real :: fL(4), fR(4), diss(4)          ! Fluxes ad dissipation term
+ real(8) :: tx, ty       ! Tangent vector (perpendicular to the face normal)
+ real(8) :: vxL, vxR, vyL, vyR             ! Velocity components.
+ real(8) :: rhoL, rhoR, pL, pR             ! Primitive variables.
+ real(8) :: vnL, vnR, vtL, vtR             ! Normal and tangent velocities
+ real(8) :: aL, aR, HL, HR                 ! Speeds of sound.
+ real(8) :: RT,rho,vx,vy,H,a,vn, vt        ! Roe-averages
+ real(8) :: drho,dvn,dvt,dp,dV(4)          ! Wave strenghs
+ real(8) :: ws(4),dws(4), Rv(4,4)          ! Wave speeds and right-eigevectors
+ real(8) :: fL(4), fR(4), diss(4)          ! Fluxes ad dissipation term
  integer :: i, j
 
 !Constants.
@@ -257,8 +257,6 @@ subroutine Roe(uL, uR, nx, ny,fluxes)
   fluxes = half * (fL + fR - diss)
 
  end subroutine
-
-
 
 
 

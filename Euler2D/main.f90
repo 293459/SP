@@ -1,87 +1,64 @@
 Program test2d
-    Use Variabili  ! utilizza tutto quello che � nel modulo variabili che a sua volta contiene Use strutture e quindi richiama il contenuto di quel file
+    Use Variabili
     Implicit none
 
-	!call system("rm *.plt") !ATTENZIONE: cancella tutti i file plt presenti nella cartella! (su linux)
-	call system("del *.plt") !ATTENZIONE: cancella tutti i file plt presenti nella cartella! (su windows) -- plt estensione in cui si salva la soluzione
-	! comando utile per mantenere un ordine e riferire il file di soluzione a quella che effettivamente si � utilizzata
+    ! [MODIFICA 2026-05-06]
+    ! Il solver non cancella piu' "*.plt" nella directory corrente. Ogni run
+    ! scrive nella propria output_dir, quindi piu' processi possono girare in
+    ! parallelo senza eliminare i risultati degli altri.
+    call setup_runtime_from_args
 
-    call input ! leggi il file di input e salva le informazioni nei parametri globali definiti nel modulo variabili
-
-    call leggi_gmsh ! leggi il file di mesh generato con gmsh e salva le informazioni nei vettori di tipo nodo, elemento e interfaccia
-
+    call input
+    call leggi_gmsh
     call processa_elementi
 
-	! salva in un file di testo queste caratteristiche per l'elemento 10 (aggiunta di mia volontà)
-	open(10,file='caratteristiche_elemento_10.txt', STATUS='REPLACE', ACTION='WRITE')
-    !Verifica delle caratteristiche geometria per elemento 10 e interfaccia 10
-    write(*,*)'ele(10)%x0 = ',ele(10)%x0 ! punto di riferimento dell'elemento 10
-    write(*,*)'ele(10)%area = ',ele(10)%area ! area dell'elemento 10
-    write(*,*)'interf(100)%length = ',interf(100)%length ! lunghezza dell'interfaccia 100
-    write(*,*)'interf(100)%normal = ',interf(100)%normal ! normale dell'interfaccia 100
-    write(*,*) 'lc = ', nodo(ele(1)%nodi(2))%x(1) - nodo(ele(1)%nodi(1))%x(1) 
-	close(10)
+    ! Le caratteristiche geometriche diagnostiche non vengono piu' salvate in
+    ! un file separato e ambiguo ("caratteristiche_elemento_10.txt"). Sono
+    ! archiviate nel recap della singola simulazione, insieme ai conteggi mesh.
+    call write_simulation_recap_header
 
-	! questo comando serve per verificare che la lunghezza caratteristica lc sia corretta,
-	! in questo caso dovrebbe essere 0.1 dato che i nodi 1 e 2 dell'elemento 1 sono rispettivamente (0,0) e (0.1,0)
+    call init
+    call write_tecplot_file(0,0.)
 
-	call init ! inizializza le variabili di stato, ad esempio per il primo passo temporale, e calcola i primi flussi
+    time=0.
+    norm2_residuals(:)=huge(1.0)
+    norminf_residuals(:)=huge(1.0)
 
-	call write_tecplot_file(0,0.) ! primo parametro determina il nome del file, secondo parametro determina la traslazione lungo y
+	do k=1,kfinal
 
+		call compute_dt
+		call compute_fluxes
+		call integ_time
 
-    time=0. ! inizializza il tempo a zero (non avrebbe molto senso partire da un tempo intermedio)
+		time=time+dt
 
-	do k=1,kfinal ! ciclo temporale che va da 1 a kfinal, dove kfinal � un parametro di input che determina il numero massimo di iterazioni temporali
-
-
-		call compute_dt   ! calcola dt ad ogni passo temporale attraverso la condizione CFL quindi abbiamo bisogno di aggiornare il dt ammissibile che � diverso per ogni passo nel tempo
-		call compute_fluxes ! calcolo dei flussi
-		call integ_time ! integrazione temporale esplicita, ad esempio con metodo di Eulero esplicito, quindi aggiorna le variabili di stato per il passo successivo
-
-		time=time+dt ! aggiorna il tempo sommando il dt appena calcolato
-
-
-		if(mod(k,kinf).eq.0)then ! fai output ogni volta che la divisione tra interi non ha resto, quindi ogni kinf iterazioni, 
-			                     ! dove kinf � un parametro di input che determina la frequenza di output a video
-			write(*,*)' ' ! stampa una riga vuota per separare i blocchi di output
+		if(mod(k,kinf).eq.0)then
+			write(*,*)' '
 			write(*,*)'*************************************************'
-			write(*,*)'k,time,dt = ',k,time,dt ! stampa il numero di iterazione, il tempo e il dt
+			write(*,*)'k,time,dt = ',k,time,dt
 
-			call compute_norm_residuals ! calcola la norma dei residui per monitorare la convergenza
-			!write(*,*)'norm2_residuals = ',norm2_residuals ! stampa la norma dei residui
-			call compute_norm_entropy ! calcola la norma dell'entropia per monitorare la convergenza
-			!write(*,*)'norm_entropy = ',norm_entropy ! stampa la norma dell'entropia
-			call save_wall_data ! salva i dati relativi alla parete, ad esempio per monitorare la forza di attrito o il coefficiente di pressione
-			!write(*,*)'wall_data = ',wall_data ! stampa i dati relativi alla parete
+			call compute_norm_residuals
+			call compute_norm_entropy
+			call save_wall_data
 			write(*,*)'*************************************************'
-
-
 		end if
 
-
-		if(mod(k,kout).eq.0)then ! fai output ogni volta che la divisione tra interi non ha resto, quindi ogni kout iterazioni, 
-			                     ! dove kout � un parametro di input che determina la frequenza di output su file
-			call write_tecplot_file(k,0.) ! salva la soluzione in un file tecplot, il primo parametro determina il nome del file,
-			                              ! secondo parametro determina la traslazione lungo y
+		if(mod(k,kout).eq.0)then
+			call write_tecplot_file(k,0.)
 		end if
 
-		if((norm2_residuals(2).lt.1E-4).and.(k.gt.1000)) then ! (CONDIZIONE DI ARRESTO)
-		! se la norma dei residui per la variabile 2 (ad esempio la pressione) è inferiore a 1E-4 e
-		! siamo oltre le prime 1000 iterazioni, allora interrompi la simulazione
-        ! call write_goal_functions ! salva le funzioni obiettivo, ad esempio per monitorare la forza di attrito o il coefficiente di pressione
-        call write_tecplot_file(k,0.) ! salva la soluzione finale in un file tecplot
-        exit
+        ! Fortran non garantisce lo short-circuit degli operatori logici:
+        ! separare i due test evita di leggere norm2_residuals prima che abbia
+        ! un valore fisicamente significativo.
+		if(k.gt.1000) then
+            if(norm2_residuals(2).lt.1E-4) then
+                call write_tecplot_file(k,0.)
+                exit
+            end if
 		end if
 
 	end do
 
-
+    call append_simulation_recap_footer
 
 End Program
-
-
-
-
-
-

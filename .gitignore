@@ -30,9 +30,10 @@
 bin/
 obj/
 
-# Eseguibile del solutore
-euler2d
-euler2d.exe
+# Eseguibile del solutore. Il pattern e' ancorato per non ignorare
+# accidentalmente la directory Euler2D su filesystem case-insensitive.
+/Euler2D/euler2d
+/Euler2D/euler2d.exe
 
 # --- Output solutore CFD ---
 # File Tecplot ASCII (soluzioni, troppo grandi per il repo)
@@ -40,6 +41,11 @@ euler2d.exe
 
 # File Tecplot binari
 *.plt
+
+# Batch Euler2D/Bump: cartelle generate localmente dagli script.
+Bump/runs/
+Bump/RECAP_SIMULAZIONI.csv.legacy_*.bak
+Bump/-p/
 
 
 # --- Gmsh binary (installare da https://gmsh.info) ---

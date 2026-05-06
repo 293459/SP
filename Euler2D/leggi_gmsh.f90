@@ -3,13 +3,12 @@ use strutture
 use variabili
 implicit none
 
-integer::i,j,ntags,jj,tipo_ele,temp
-integer,dimension(20)::tempvet
+integer::i,j,ntags,tipo_ele
 integer,dimension(11)::leggiint
 character::car
 character(300)::stringa
 logical::trovato
-real(4)::machinf2,temp_real
+real(4)::temp_real
 
 
 
@@ -140,5 +139,4 @@ write(*,*)'Reading elements ...           OK'
 
 
 end subroutine
-
 

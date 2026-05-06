@@ -1,11 +1,8 @@
 subroutine processa_elementi
 use variabili
 implicit none
-integer::i,j,j2,j3,j4,vtx1,vtx2,vtx3,vtx4,temp,iele,edge_ele,numnodi,numnodik,nodo1,nodo2,inte,contatore,nfs,nisw
-real(4)::deltax,deltay,lato,vetx,vety,omp_get_wtime,xmax,ymax,xmin,ymin,L,nx,ny
-real(4),dimension(2)::csi,xnodo
-real(4),dimension(:,:),allocatable::temp_vet,temp_vet2
-logical::file_exists
+integer::i,j,j2,j3,j4,kk,vtx1,vtx2,vtx3,vtx4,temp,numnodi,numnodik,nodo1,nodo2,nfs,nisw
+real(8)::vetx,vety
 write(*,*)' '
 write(*,*)'GRID PRE-PROCESSING...'
 
@@ -76,8 +73,8 @@ write(*,*)'Find how many elements share node i...'
        nodo(i)%neles=0
 
        do j=1,nele_interni
-           do k=1,ele(j)%nnodi
-           if(ele(j)%nodi(k).eq.i) nodo(i)%neles=nodo(i)%neles+1
+           do kk=1,ele(j)%nnodi
+           if(ele(j)%nodi(kk).eq.i) nodo(i)%neles=nodo(i)%neles+1
            end do
        end do
       allocate(nodo(i)%ele(nodo(i)%neles))
@@ -92,8 +89,8 @@ write(*,*)'Find how many elements share node i...'
        nodo(i)%neles=0
 
        do j=1,nele_interni
-           do k=1,ele(j)%nnodi
-           if(ele(j)%nodi(k).eq.i) then
+           do kk=1,ele(j)%nnodi
+           if(ele(j)%nodi(kk).eq.i) then
                 nodo(i)%neles=nodo(i)%neles+1
                 nodo(i)%ele(nodo(i)%neles)=j
            end if
@@ -154,23 +151,23 @@ write(*,*)'Find neighbours of element i...'
         ! j e j2 identificano i nodi all'estremo di un lato
         !ora bisogna cercare quali sono gli altri elementi che possiedono sia j che j2
 
-        do k=1,nele_interni
-        if(k.ne.i) then
-        numnodik=min(ele(k)%nnghbrs,ele(k)%nnodi)
+        do kk=1,nele_interni
+        if(kk.ne.i) then
+        numnodik=min(ele(kk)%nnghbrs,ele(kk)%nnodi)
 
                     do j3=1,numnodik
-                        if(ele(k)%nodi(j3).eq.ele(i)%nodi(j)) then !Ho trovato j
+                        if(ele(kk)%nodi(j3).eq.ele(i)%nodi(j)) then !Ho trovato j
                         do j4=1,numnodik !Cerco j2
-                            if(ele(k)%nodi(j4).eq.ele(i)%nodi(j2)) then !Ho trovato j2
+                            if(ele(kk)%nodi(j4).eq.ele(i)%nodi(j2)) then !Ho trovato j2
 
                                 if(j.eq.1) then
-                                    ele(i)%nghbr(1)=k
+                                    ele(i)%nghbr(1)=kk
                                 elseif(j.eq.2) then
-                                    ele(i)%nghbr(2)=k
+                                    ele(i)%nghbr(2)=kk
                                 elseif(j.eq.3) then
-                                    ele(i)%nghbr(3)=k
+                                    ele(i)%nghbr(3)=kk
                                 elseif(j.eq.4) then
-                                    ele(i)%nghbr(4)=k
+                                    ele(i)%nghbr(4)=kk
                                 end if
 
 
@@ -689,7 +686,7 @@ do j=1,nentity
     end if
 
 
-if(entita(j)%name.ne.'inside')write(*,*)entita(j)%name,' = ',entita(j)%nmembers,' members'
+if(entita(j)%indx.ne.0)write(*,*)'entity ',entita(j)%indx,' = ',entita(j)%nmembers,' members'
 end do
 
 
@@ -758,8 +755,13 @@ end subroutine
 subroutine prepare_periodicity
 use Variabili
 implicit none
-integer::i,j,perio1,perio2,intsopra,intsotto,l,m,mm,elesotto_int,elesotto,ent_outsub,inte
+integer::i,j,perio1,perio2,intsopra,intsotto,l,mm,elesotto_int,ent_outsub,inte
 real(8)::ymax,ymin
+
+perio1=-1
+perio2=-1
+ent_outsub=-1
+elesotto_int=-1
 
 ymin=huge(1.d0)
 ymax=-huge(1.d0)
@@ -771,6 +773,11 @@ do i=1,nentity
     if(entita(i)%indx.eq.40) perio1=i
     if(entita(i)%indx.eq.50) perio2=i
 end do
+
+if(perio1.lt.1 .or. perio2.lt.1) then
+    write(*,*)'ERRORE: periodicita richiesta ma entita 40/50 non trovate.'
+    stop 50
+end if
 
 
 do i=1,entita(perio1)%nmembers
@@ -814,6 +821,7 @@ do i=1,entita(perio1)%nmembers
 
             !Vai a mettere intsopra (negativa) nell'interfaccia di sotto dell'elemento di sotto
 
+                elesotto_int=-1
                 do mm=1,ele(interf(intsotto)%e1)%nnghbrs
 
                     if((ele(interf(intsotto)%e1)%interfaces(mm)).eq.intsotto) then
@@ -823,7 +831,10 @@ do i=1,entita(perio1)%nmembers
                 end do
 
 
-
+            if(elesotto_int.lt.1) then
+                write(*,*)'ERRORE: interfaccia periodica inferiore non trovata.'
+                stop 51
+            end if
             ele(interf(intsotto)%e1)%interfaces(elesotto_int)=-intsopra
 
 
@@ -854,6 +865,11 @@ do i=1,nentity
     if(entita(i)%indx.eq.3) ent_outsub=i
 end do
 
+if(ent_outsub.lt.1) then
+    write(*,*)'ERRORE: impossibile calcolare il periodo, outlet entity 3 assente.'
+    stop 52
+end if
+
 
 do i=1,entita(ent_outsub)%nmembers
     inte=entita(ent_outsub)%members(i)
@@ -865,11 +881,10 @@ do i=1,entita(ent_outsub)%nmembers
     if(nodo(interf(inte)%nodo2)%x(2).lt.ymin) ymin=nodo(interf(inte)%nodo2)%x(2)
 end do
 
-periodo=ymax-ymin
+periodo=real(ymax-ymin, kind=4)
 
 write(*,*)'Computed period = ',periodo
 
 
 
 end subroutine
-
