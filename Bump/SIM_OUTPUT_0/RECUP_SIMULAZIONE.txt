@@ -1,0 +1,9 @@
+=== RECUP SIMULAZIONE ===
+Numero elementi totali: 812
+Numero elementi interni: 686
+Numero elementi boundary: 126
+Numero interfacce: 1435
+Numero nodi: 750
+Numero nodi visibili: 750
+Elemento 10 - x0:    0.183501E-01   0.158243E+00
+Elemento 10 - area:    0.928186E-03
