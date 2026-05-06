@@ -23,15 +23,24 @@
                 "integ_time.f90", "output.f90", "main.f90",
                 "-o", "solver2d.exe"
             ],
-            "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Cartella del nuovo progetto[cite: 2]
+            "options": { "cwd": "${workspaceFolder}/Euler2D" },
             "group": "build"
         },
         {
-        "label": "Build with Makefile",
-        "type": "shell",
-        "command": "mingw32-make",
-        "options": { "cwd": "${workspaceFolder}/Euler2D" }, // Esegue make dove c'è il Makefile
-        "group": "build"
+            "label": "Build with Makefile (Clean + Build)",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": ["clean"],
+            "options": { "cwd": "${workspaceFolder}/Euler2D" },
+            "dependsOn": ["Build with Makefile (Make)"],
+            "group": "build"
+        },
+        {
+            "label": "Build with Makefile (Make)",
+            "type": "shell",
+            "command": "mingw32-make",
+            "options": { "cwd": "${workspaceFolder}/Euler2D" },
+            "group": "build"
         }
     ]
 }
