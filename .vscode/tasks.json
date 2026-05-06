@@ -2,45 +2,43 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Compila Paletta",
-            "type": "shell",
-            "command": "gfortran",
-            "args": ["-g", "main.f90", "calcolo_area.f90", "calcolo_baricentro.f90", "-o", "bin/Debug/paletta.exe"],
-            "options": { "cwd": "${workspaceFolder}/3-Paletta" },
-            "group": "build"
-        },
-        {
-            "label": "Compila Euler2D",
-            "type": "shell",
-            "command": "gfortran",
-            "args": [
-                "-ffree-line-length-none",
-                "-O2",
-                "strutture.f90", "Variabili.f90", "leggi_gmsh.f90", 
-                "subroutine_geometria.f90", "processa_griglia.f90", 
-                "input.f90", "init.f90", "bordi.f90", 
-                "compute_dt.f90", "compute_fluxes.f90", 
-                "integ_time.f90", "output.f90", "main.f90",
-                "-o", "solver2d.exe"
-            ],
-            "options": { "cwd": "${workspaceFolder}/Euler2D" },
-            "group": "build"
-        },
-        {
-            "label": "Build with Makefile (Clean + Build)",
+            "label": "Euler2D: clean",
             "type": "shell",
             "command": "mingw32-make",
             "args": ["clean"],
             "options": { "cwd": "${workspaceFolder}/Euler2D" },
-            "dependsOn": ["Build with Makefile (Make)"],
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
-            "label": "Build with Makefile (Make)",
+            "label": "Euler2D: build",
             "type": "shell",
             "command": "mingw32-make",
             "options": { "cwd": "${workspaceFolder}/Euler2D" },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Euler2D: clean + build",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Euler2D: clean",
+                "Euler2D: build"
+            ],
+            "problemMatcher": [],
             "group": "build"
+        },
+        {
+            "label": "Euler2D: debug build",
+            "type": "shell",
+            "command": "mingw32-make",
+            "args": ["debug"],
+            "options": { "cwd": "${workspaceFolder}/Euler2D" },
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

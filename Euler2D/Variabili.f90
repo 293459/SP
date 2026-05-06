@@ -15,7 +15,8 @@ save ! la funzione save serve a mantenere il valore delle variabili anche dopo l
 		real(4)::CFL ! Numero di CFL
 		real(4)::periodo ! passo lungo y in caso di problema periodico   -- attivo solo in caso di problemi periodici. Con lungo y si intende la distanza 
 		!tra i due bordi periodici, ad esempio se abbiamo un canale con lunghezza lungo y pari a 0.1, allora il periodo è 0.1
-		character(100)::mesh_file ! Nome del file mesh in formato Gmsh 2  -- ad esempio bump.msh
+		character(300)::mesh_file ! Nome del file mesh in formato Gmsh 2  -- ad esempio bump.msh
+		character(300)::input_file,input_dir,output_dir ! Percorsi runtime: permettono input separati e cartelle di output indipendenti
 		real(4)::ttotin,ptotin,alpha,pexit,machin ! Condizioni al contorno in ingresso, ad esempio la temperatura totale ttotin, la pressione totale ptotin,
 		! l'angolo di attacco alpha, la pressione in uscita pexit e il numero di Mach in ingresso machin
 		integer::nnodi,ninterf,nele,nele_interni,nele_bordi,nentity,ndim,neqs ! numero delle varie entità geometriche, dimensioni ed equazioni -- parte pre processing riferirsi a leggi_gmsh
@@ -42,7 +43,6 @@ save ! la funzione save serve a mantenere il valore delle variabili anche dopo l
 		! (utile per salvare la soluzione in formato Tecplot in caso di problemi periodici)
 ! ******************************************************************************************************
 End module
-
 
 
 

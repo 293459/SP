@@ -1,43 +1,38 @@
 # ============================================================
-#  SP — Euler2D Solver
-#  Makefile
+#  SP - Euler2D Solver
+#  Makefile minimale per Windows/MinGW e gfortran.
 #
-#  Uso:
-#    make            → compila in modalità release (euler2d)
-#    make debug      → compila con bound-checking e backtrace
-#    make clean      → rimuove oggetti, moduli ed eseguibile
+#  Target principali:
+#    mingw32-make          compila il solver in release
+#    mingw32-make debug    ricompila con check runtime e backtrace
+#    mingw32-make clean    rimuove solo artefatti del solver
+#    mingw32-make rebuild  clean + build release
 #
-#  Requisiti: gfortran >= 10  oppure  ifort/ifx (Intel oneAPI)
+#  Nota importante:
+#  Il vecchio target clean usava "rm -f". Su Windows, quando
+#  mingw32-make non trova un ambiente Unix nel PATH, "rm" non esiste
+#  e il clean fallisce prima ancora di cancellare i file. Qui usiamo
+#  "cmd /C del", quindi il target funziona nel terminale PowerShell
+#  standard di VS Code.
 # ============================================================
 
-# --- Compilatore ---
-FC = gfortran
+FC      = gfortran
+TARGET  = euler2d
+RM_CMD  = cmd /C "del /Q *.o *.mod *.smod $(TARGET) $(TARGET).exe 2>NUL || exit /B 0"
 
-# --- Flag base ---
-FFLAGS_RELEASE = -O2 -ffree-line-length-none -Wall -Wextra -Wno-unused-dummy-argument
-FFLAGS_DEBUG   = -O0 -ffree-line-length-none -g -fcheck=bounds -fbacktrace -Wall -Wextra
-# Nota: -ffree-line-length-none è necessario per evitare errori di compilazione con linee lunghe nei file .msh
-# -O2 stays for release for better performance, while -O0 is used for debug to make debugging easier and more accurate (no optimization that could rearrange code or remove variables)
-# -Wall -Wextra attivano tutti i warning, utili per identificare potenziali problemi nel codice, mentre -Wno-unused-dummy-argument disabilita i warning per argomenti formali non usati,
-# che possono essere comuni in subroutine con interfacce fisse (es. subroutine di geometria che devono avere una certa interfaccia ma non usano tutti gli argomenti)
+# -ffree-line-length-none evita errori sulle righe Fortran lunghe.
+# -Wno-tabs evita rumore dovuto alle tabulazioni storiche gia' presenti.
+# I warning su variabili inutilizzate restano attivi.
+FFLAGS_COMMON  = -ffree-line-length-none -Wall -Wextra -Wno-unused-dummy-argument -Wno-tabs
+FFLAGS_RELEASE = -O2 $(FFLAGS_COMMON)
+FFLAGS_DEBUG   = -O0 -g -fcheck=all -fbacktrace $(FFLAGS_COMMON)
+FFLAGS         = $(FFLAGS_RELEASE)
 
-# Default: release
-FFLAGS = $(FFLAGS_RELEASE)
-
-# --- Eseguibile ---
-TARGET = euler2d
-
-# ============================================================
-#  Ordine di compilazione — rispetta le dipendenze USE Fortran
-#
-#  costanti  →  strutture  →  Variabili  →  [utility]  →  main
-#
-#  Le unit di modulo devono essere compilate prima di qualunque
-#  file che le referenzia con USE.
-# ============================================================
+# Ordine compilazione: i moduli devono precedere i file che fanno USE.
 SRCS = \
     strutture.f90            \
     Variabili.f90            \
+    runtime_config.f90       \
     leggi_gmsh.f90           \
     subroutine_geometria.f90 \
     processa_griglia.f90     \
@@ -53,54 +48,49 @@ SRCS = \
 
 OBJS = $(SRCS:.f90=.o)
 
-# ============================================================
-#  Target principali
-# ============================================================
-
 .DEFAULT_GOAL := all
-
-.PHONY: all debug clean help
+.PHONY: all debug clean rebuild help
 
 all: $(TARGET)
-	@echo ""
-	@echo "  Build completato: ./$(TARGET)"
-	@echo "  Uso: ./$(TARGET) <percorso_mesh.msh>"
-	@echo ""
+	@echo.
+	@echo Build completato: .\$(TARGET).exe
+	@echo Uso: .\$(TARGET).exe [input_file] [output_dir]
+	@echo.
 
 debug: FFLAGS = $(FFLAGS_DEBUG)
 debug: clean $(TARGET)
-	@echo ""
-	@echo "  Build DEBUG completato: ./$(TARGET)"
-	@echo "  Bound checking e backtrace attivi."
-	@echo ""
+	@echo.
+	@echo Build DEBUG completato: .\$(TARGET).exe
+	@echo Runtime check e backtrace attivi.
+	@echo.
+
+rebuild: clean all
 
 $(TARGET): $(OBJS)
 	$(FC) $(FFLAGS) -o $@ $^
 
-# Regola generica: ogni .f90 → .o
-# gfortran produce automaticamente il .mod nella directory corrente
 %.o: %.f90
 	$(FC) $(FFLAGS) -c $<
 
 clean:
-	rm -f *.o *.mod *.smod $(TARGET) $(TARGET).exe
-	@echo "  Pulizia completata."
+	@$(RM_CMD)
+	@echo Pulizia completata.
 
 help:
-	@echo ""
-	@echo "  Targets disponibili:"
-	@echo "    make          → release build (ottimizzato)"
-	@echo "    make debug    → debug build  (bound check + backtrace)"
-	@echo "    make clean    → rimuovi oggetti, moduli, eseguibile"
-	@echo ""
+	@echo.
+	@echo Target disponibili:
+	@echo   mingw32-make          build release
+	@echo   mingw32-make debug    build debug con check runtime
+	@echo   mingw32-make clean    rimuove oggetti, moduli, eseguibile
+	@echo   mingw32-make rebuild  clean + build release
+	@echo.
 
-# ============================================================
-#  Dipendenze esplicite dei moduli
-#  (necessarie perché Make non legge USE Fortran in automatico)
-# ============================================================
+# Dipendenze esplicite principali dei moduli Fortran.
 Variabili.o: strutture.o
+runtime_config.o: Variabili.o strutture.o
 leggi_gmsh.o: Variabili.o strutture.o
 processa_griglia.o: Variabili.o strutture.o
 subroutine_geometria.o: Variabili.o strutture.o
-output.o: bubble_sort.o Variabili.o strutture.o
-main.o: Variabili.o strutture.o output.o integ_time.o
+output.o: bubble_sort.o runtime_config.o Variabili.o strutture.o
+input.o: runtime_config.o Variabili.o strutture.o
+main.o: runtime_config.o Variabili.o strutture.o output.o integ_time.o
