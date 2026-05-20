@@ -3,23 +3,24 @@ use variabili
 implicit none
 integer::i,e1,e2,j
 
-do i=1,nele_interni
-	ele(i)%d_dt(:)=0.
+do i=1,nele_interni    ! per ogni ELEMENTO interno della mesh calcolo la variazione della velocità nel tempo
+	ele(i)%d_dt(:)=0.    ! inizializza a zero la derivata du/dt per ogni elemento, in modo che i flussi calcolati in questo passo temporale possano essere sommati correttamente.
 end do
 
-do i=1,ninterf
+do i=1,ninterf         ! per ogni INTERFACCIA della mesh calcolo i flussi numerici e aggiorno la derivata du/dt per gli elementi adiacenti
 
-	e1=interf(i)%e1
-	e2=abs(interf(i)%e2)
+	e1=interf(i)%e1      ! elemento 1 che sta a sinistra dell'interfaccia
+	e2=abs(interf(i)%e2) ! elemento 2 che sta a destra mettiamo abs per includere casi con periodicità, se e2 è negativo significa che 
+                       ! l'interfaccia è un bordo periodico e quindi l'elemento adiacente è quello indicato da e2 con segno positivo.
 
-	if(e1*e2.ne.0) then
+	if(e1*e2.ne.0) then                  ! se nessuno dei due indici è zero, cioè se siamo sull'interfaccia (per come abbiamo scelto le convenzioni sugli indici), 
+                                       ! allora calcoliamo i flussi numerici usando il solutore di Lax-Friedrichs locale o di Roe, 
+		call compute_internal_flux(i)      ! calcola i flussi numerici per l'interfaccia i usando il solutore di Lax-Friedrichs locale (fatto da noi)
+		!call compute_internal_flux_Roe(i) ! calcola i flussi numerici per l'interfaccia i usando il solutore di Roe (importato come routine del prof)
 
-		call compute_internal_flux(i)
-		!call compute_internal_flux_Roe(i)
-
-	else
-
-		call compute_boundary_flux(i)
+	else                                 ! altrimenti siamo su un bordo (almeno 1 è zero) e calcoliamo i flussi numerici usando le condizioni al contorno.
+		call compute_boundary_flux(i)      ! la subroutine si trova nel file bordi.f90 insieme ad altre subroutines che implementano le condizioni al contorno specifiche per ogni tipo di bordo (parete, ingresso, uscita, etc.)
+                                       ! magari sarebbe stato comodo splittarle in vari file ma non mi andava di modificar troppo il codice per farlo.
 
 	end if
 
@@ -36,10 +37,8 @@ do i=1,ninterf
 	end if
 
 end do
-
-
-
 end subroutine
+
 
 subroutine compute_internal_flux(i)
 use variabili

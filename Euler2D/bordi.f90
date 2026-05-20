@@ -35,18 +35,23 @@ subroutine compute_boundary_flux(i)
     use Variabili
     implicit none
 
-    integer, intent(in) :: i
+    ! in realtà compute_boundary_flux è più uno smistatore che legge l'indice e capisce che subroutine usare per calcolare i flussi numerici di bordo, 
+    ! in base al tipo di bordo (parete, ingresso, uscita, etc.) identificato dal flag "entity" dell'interfaccia i. Tuttavia i calcoli effettivi sono poi svolti nelle routines.
+    integer, intent(in) :: i              ! indice dell'interfaccia su cui calcolare i flussi numerici di bordo, che è un'interfaccia con almeno un elemento adiacente nullo, quindi è un bordo della mesh.
 
-    if (interf(i)%entity == 99) then
+    if (interf(i)%entity == 99) then      ! il flag 99 è quello che abbiamo scelto per identificare le pareti, quindi se siamo su un'interfaccia con entity 99, 
+                                          ! allora calcoliamo i flussi numerici usando la subroutine swi, che implementa le condizioni al contorno per una parete inviscida.
         call swi(i)
-    else if (interf(i)%entity == 2) then
+    else if (interf(i)%entity == 2) then  ! il flag 2 è quello che abbiamo scelto per identificare gli ingressi, quindi se siamo su un'interfaccia con entity 2, 
+                                          ! allora calcoliamo i flussi numerici usando la subroutine insub, che implementa le condizioni al contorno per un ingresso subsonico con grandezze totali assegnate.
         call insub(i)
-    else if (interf(i)%entity == 3) then
+    else if (interf(i)%entity == 3) then  ! il flag 3 è quello che abbiamo scelto per identificare le uscite, quindi se siamo su un'interfaccia con entity 3, 
+                                          ! allora calcoliamo i flussi numerici usando la subroutine outsub, che implementa le condizioni al contorno per un'uscita subsonica con grandezze statiche assegnate.
         call outsub(i)
     else
-        write(*,*) 'ERRORE: condizione al contorno non gestita.'
-        write(*,*) 'Interfaccia = ', i, ' entity = ', interf(i)%entity
-        stop 40
+        write(*,*) 'ERRORE: condizione al contorno non gestita.'       ! se l'entity dell'interfaccia non è 99, 2 o 3, allora non sappiamo che tipo di condizione al contorno è e quindi stampiamo un messaggio di errore e fermiamo l'esecuzione.
+        write(*,*) 'Interfaccia = ', i, ' entity = ', interf(i)%entity ! stampiamo anche l'indice dell'interfaccia e il suo entity per aiutare a identificare il problema.
+        stop 40                                                        ! e fermiamo l'esecuzione.
     end if
 end subroutine compute_boundary_flux
 
