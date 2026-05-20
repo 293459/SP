@@ -28,5 +28,5 @@ do i = 1, nele_interni                     ! cerco per ogni elemento della mesh
 end do
 
 dt = CFL * dt ! alla fine si riduce il passo temporale globale moltiplicandolo per il numero di Courant-Friedrichs-Lewy (CFL), che è un fattore di sicurezza per garantire la stabilità numerica della simulazione.
-
+! ricordiamo che il CFL è definito altrove all'interno del file variabili
 end subroutine
