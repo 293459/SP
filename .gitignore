@@ -88,3 +88,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 *~
+
+# --- VisIt software ---
+LLNL/ # ignora i file della cartella ddi VisIt software
