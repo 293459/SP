@@ -24,13 +24,16 @@ do i=1,ninterf         ! per ogni INTERFACCIA della mesh calcolo i flussi numeri
 
 	end if
 
-	do j=1,4
-        !abbiamo - perchè elemento 1 ha normale uscente
-		ele(e1)%d_dt(j)=ele(e1)%d_dt(j)-real(interf(i)%F(j)*interf(i)%length/ele(e1)%area, kind=4) !calcolo integrale e aggiorno derivata du/dt = u_n - sum_su interfacce(flusso interfaccia j elemento i * l/area)
+	do j=1,4 ! la cella e1 c'è sicuramente, essendo l'interfaccia orientata con normale uscente da e1, quindi aggiorniamo la cella e1 con il flusso uscente,
+           ! abbiamo usato il "-" nel calcolo che segue perchè elemento 1 ha normale uscente
+		ele(e1)%d_dt(j)=ele(e1)%d_dt(j)-real(interf(i)%F(j)*interf(i)%length/ele(e1)%area, kind=4) 
+          !calcolo integrale e aggiorno derivata du/dt = u_n - sum_su interfacce(flusso interfaccia j elemento i * l/area)
 	end do
 
-
-	if(e2.gt.0)then
+! se la cella e2 è maggiore di zero, cioè se non siamo su un bordo periodico, allora aggiorniamo anche la cella e2 con il flusso entrante, 
+! altrimenti se e2 è negativo significa che siamo su un bordo periodico e quindi l'elemento adiacente è quello indicato da e2 con segno positivo, 
+! ma in questo caso non aggiorniamo la cella e2 perché sarà aggiornata quando si processerà l'altra interfaccia periodica che la collega all'elemento e1.
+	if(e2.gt.0)then  
 		do j=1,4
 			ele(e2)%d_dt(j)=ele(e2)%d_dt(j)+real(interf(i)%F(j)*interf(i)%length/ele(e2)%area, kind=4) ! mettiamo + per elemento e2 essendo normale entrante
 		end do
