@@ -26,7 +26,7 @@ Program test2d
                                    ! essere già scesi a valori fisicamente significativi.
     norminf_residuals(:)=huge(1.0) ! stesso discorso della norma 2 ma per la norma infinito.
 
-	do k=1,kfinal
+	do k=1,kfinal            ! siamo noi a scegliere il numero di pasi temporli (kfinal)
 
 		call compute_dt      ! calcola il passo temporale (CFL, viscosità numerica, etc.)
 		call compute_fluxes  ! calcola i flussi numerici per tutti gli elementi interni e di bordo

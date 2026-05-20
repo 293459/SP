@@ -40,7 +40,8 @@ do i = 1, nele_interni ! inizializza le condizioni iniziali per tutti gli elemen
     ele(i)%ucons(4) = ele(i)%ucons(2) * ele(i)%v                                          ! quantità di moto in y per unità di volume, che è la variabile conservativa di quantità di moto in y
     ! essendo eulero 2D non abbiamo la quantità di moto in z, quindi ucons(5) non viene usata.
     ! si è scelto di definirle in quest'ordine perché ucons(1), ucons(3) e ucons(4) sono più semplici da definire a partire da ucons(2) che a partire dalle variabili primitive.
-    !
+    
+    ! da capire ancora se questo blocco serve poiché non usato dal docente ad esercitazione
     if (trim(mesh_file) == 'LS59.msh') then !
         if (ele(i)%x0(1) <= 0.0) then !
             alpha_init = 30.0 * 3.14 / 180.0
