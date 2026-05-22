@@ -4,7 +4,9 @@ implicit none
 integer::i,e1,e2,j
 
 do i=1,nele_interni    ! per ogni ELEMENTO interno della mesh calcolo la variazione della velocità nel tempo
-	ele(i)%d_dt(:)=0.    ! inizializza a zero la derivata du/dt per ogni elemento, in modo che i flussi calcolati in questo passo temporale possano essere sommati correttamente.
+	ele(i)%d_dt(:)=0.    ! inizializza a zero la derivata du/dt per ogni elemento, in modo che i flussi calcolati
+                       ! in questo passo temporale possano essere sommati correttamente. Sottolineamo che la u qui
+                       ! è il vettore di variabili conservative (massa, q. di moto etc...) non la velocità
 end do
 
 do i=1,ninterf         ! per ogni INTERFACCIA della mesh calcolo i flussi numerici e aggiorno la derivata du/dt per gli elementi adiacenti
@@ -53,20 +55,19 @@ real(8)::utildeA,utildeB,vtildeA,vtildeB,pa,pb,Ta,Tb,ua,ub,va,vb,lambda_max
 
 
 ! In questa subroutine si calcolano i flussi all'interfaccia usando il solutore di Lax-Friedrichs locale o di Roe
+uconsl = ele(interf(i)%e1)%ucons(:)                       ! e1 elemento che sta a sinistra dell'interfacccia
+uconsr = ele(abs(interf(i)%e2))%ucons(:)                  ! e2 elemento a destra mettiamo abs per includere casi con periodicità
 
-uconsl = ele(interf(i)%e1)%ucons(:)       !e1 elmento che sta a sinistra dell'interfacccia
-uconsr = ele(abs(interf(i)%e2))%ucons(:)  !e2 elemento a destra mettiamo abs per includere casi con periodicità
+! Calcolo grandezze primitive
+ua = uconsl(3)/uconsl(2)  ! questa è la velocità in x del fluido a sinistra (che è in x lo capisco dalla u e che è a sinistra dalla a)
+ub = uconsr(3)/uconsr(2)  ! questa è la velocità in x del fluido a destra (che è in x lo capisco dalla u e che è a destra dalla b)
+! ricordiamo che ucons(2) è la densità e ucons(3) e ucons(4) sono le quantità di moto in x e y
 
-!calcolo grandezze primitive
+va = uconsl(4)/uconsl(2) ! questa è la velocità in y del fluido a sinistra (che è in y lo capisco dalla v e che è a sinistra dalla a)
+vb = uconsr(4)/uconsr(2) ! questa è la velocità in y del fluido a destra (che è in y lo capisco dalla v e che è a destra dalla b)
 
-ua = uconsl(3)/uconsl(2)
-ub = uconsr(3)/uconsr(2)
-
-va = uconsl(4)/uconsl(2)
-vb = uconsr(4)/uconsr(2)
-
-pa = (gam-1)*(uconsl(1)-0.5*uconsl(2)*(ua**2+va**2)) ! rho E = P/(gamm-1) +1/2 rho (u^2+v^2) guarda relazioni per adimensionalizzazione
-pb = (gam-1)*(uconsr(1)-0.5*uconsr(2)*(ub**2+vb**2))
+pa = (gam-1)*(uconsl(1)-0.5*uconsl(2)*(ua**2+va**2))      ! rho E = P/(gamm-1) +1/2 rho (u^2+v^2) guarda relazioni per adimensionalizzazione
+pb = (gam-1)*(uconsr(1)-0.5*uconsr(2)*(ub**2+vb**2))      ! al solito facciamo il calcolo a sinistra e destra
 
 Ta = pa/uconsl(2) ! P = rho T  ---> gas perfetti adimensionale
 Tb = pb/uconsr(2)
@@ -75,6 +76,7 @@ Tb = pb/uconsr(2)
 utildea = interf(i)%normal(1)*ua + interf(i)%normal(2)*va
 utildeb = interf(i)%normal(1)*ub + interf(i)%normal(2)*vb
 
+! 
 vtildea = -interf(i)%normal(2)*ua + interf(i)%normal(1)*va
 vtildeb = -interf(i)%normal(2)*ub + interf(i)%normal(1)*vb
 
@@ -88,8 +90,6 @@ fluxes(2) = 0.5*(utildeA*uconsl(2)+ utildeB*uconsr(2)) - lambda_max*0.5*(uconsr(
 fluxes(3) = 0.5*(pa + uconsl(2)*utildeA**2 + pb + uconsr(2)*utildeB**2) - lambda_max*0.5*(uconsr(2)*utildeB - uconsl(2)*utildeA)
 fluxes(4) = 0.5*(uconsl(2)*utildeA*vtildeA+uconsr(2)*utildeB*vtildeB) - lambda_max*0.5*(uconsr(2)*vtildeB - uconsl(2)*vtildeA)
 
-
-
 !trasformazione dei flussi dal sistema locale a quello globale
 interf(i)%F(1) = fluxes(1)
 interf(i)%F(2) = fluxes(2)
@@ -99,7 +99,7 @@ interf(i)%F(4) = fluxes(3)*interf(i)%normal(2) + fluxes(4)*interf(i)%normal(1)
 end subroutine
 
 
-subroutine compute_internal_flux_Roe(i)
+subroutine compute_internal_flux_Roe(i) ! questi li incolliamo da ciò ch il prof ha caricato sul portale
 use variabili
 implicit none
 integer::i
