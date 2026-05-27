@@ -371,3 +371,82 @@ Jacobiana, applicando la dissipazione corretta per ogni onda caratteristica. Il 
 un'interfaccia numerica più netta, con meno smearing delle strutture fisiche. Il costo
 computazionale aggiuntivo di Roe è moderato (decomposizione in autovettori a ogni interfaccia)
 e ampiamente compensato dall'accuratezza guadagnata.
+\section{Dati di Riferimento e Valutazione Grafica dell'Ordine}
+
+\subsection{Tabella della Soluzione Esatta Fornita}
+Nel tracciare l'analisi di convergenza, il docente fornisce un set di dati tabulari di riferimento in cui viene valutato l'errore per diversi livelli di griglia conoscendo la "soluzione esatta":
+
+\begin{table}[H]
+  \centering
+  \caption{Valutazione ordine di convergenza fornita per riferimento.}
+  \label{tab:rif_esatta}
+  \begin{tabular}{lcccc}
+    \toprule
+    $h$ & Err. Roe & order Roe & Err. LLF & order LLF \\
+    \midrule
+    $0.02$   & $0.00335$  & -          & $0.00343$  & - \\
+    $0.01$   & $0.002929$ & $0.193753$ & $0.002606$ & $0.396371$ \\
+    $0.005$  & $0.001728$ & $0.761305$ & $0.001830$ & $0.509993$ \\
+    $0.0025$ & $0.000924$ & $0.903138$ & $0.001180$ & $0.633057$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Scopo dei dati forniti.}
+Questi dati non devono essere calcolati da zero dallo studente. Vengono forniti perché ricavare analiticamente una soluzione esatta in forma chiusa per un dominio 2D con parete curva (bump) e flusso di Eulero è estremamente complesso. I valori di errore esatto (calcolati presumibilmente dal docente confrontando i risultati con una griglia enormemente più densa utilizzata come "verità") fungono da \textit{benchmark}. Servono come termine di paragone sicuro per validare la corretta implementazione delle routine di calcolo dell'errore e dell'ordine di convergenza sviluppate nel proprio codice Fortran.
+
+\subsection{Significato del Grafico Log-Log}
+Nello schema della relazione è presente un grafico che mostra l'andamento dell'errore in norma $L_2$ in funzione della lunghezza caratteristica $h$. 
+In questo grafico:
+\begin{itemize}
+    \item L'\textbf{ascissa (x)} rappresenta la lunghezza caratteristica $h$ in scala logaritmica.
+    \item L'\textbf{ordinata (y)} rappresenta l'errore (norma 2 dell'entropia) in scala logaritmica.
+    \item \textbf{Curva Rossa/Arancio (LLF)} e \textbf{Curva Blu (Roe)}: mostrano l'errore calcolato con i due schemi. La curva di Roe si assesta al di sotto di quella LLF, a conferma della minore dissipazione intrinseca del metodo upwind.
+    \item \textbf{Retta tratteggiata (Ideal 1st order slope)}: rappresenta la pendenza teorica ideale che il metodo dovrebbe avere ($p=1$). 
+\end{itemize}
+La rappresentazione in scala log-log è fondamentale perché trasforma la relazione polinomiale dell'errore $E = k \cdot h^p$ in un'equazione lineare $\log E = p \log h + \log k$. La pendenza geometrica delle curve tracciate è quindi esattamente pari all'ordine di convergenza $p$. Al diminuire di $h$ (verso sinistra), le curve dei metodi numerici devono tendere a disporsi parallelamente alla retta ideale, a dimostrazione che il codice è entrato nel regime asintotico teorico.
+
+% ============================================================
+\section{Studio della Stabilità al Variare della CFL}
+% ============================================================
+
+\subsection{Distinzione tra Convergenza Spaziale e Temporale}
+È fondamentale operare una distinzione teorica vitale rispetto ai report passati. La variazione della norma dell'entropia al variare di $h$ (numero di nodi) rappresenta la \textbf{convergenza spaziale di griglia}. Al contrario, la richiesta di valutare l'andamento dei residui e dell'entropia \textit{in funzione delle iterazioni} riguarda la \textbf{convergenza temporale verso lo stato stazionario} (stabilità numerica). Le due cose \textbf{non sono equivalenti}. Il report dell'anno precedente analizzava la convergenza spaziale; per rispondere a questa richiesta è invece necessario studiare la stabilità temporale su una singola griglia fissata.
+
+Dal punto di vista teorico, il flusso Euleriano puro (subsonico, invisicido e privo di urti) è isoentropico. Se inizializzato e alimentato con entropia nulla, la produzione teorica di entropia nel dominio è zero. L'incremento di entropia mostrato nel transitorio è generato interamente dalla viscosità numerica dello schema spaziale ed evolve iterazione dopo iterazione finché il calcolo non si assesta su una soluzione stazionaria.
+
+\subsection{Estrazione dei Dati dal Codice Fortran}
+Il codice Fortran di base valuta i residui, ma tipicamente non ne salva la storia passo-passo su un file per generare i grafici richiesti (residui vs iterazione e norma entropia vs iterazione). È necessario espandere il codice per esportare questi valori.
+
+Si propone l'inserimento o l'adattamento della seguente routine, da richiamare nel `main.f90` all'interno del loop temporale `do k = 1, kfinal`:
+
+\begin{lstlisting}[style=fortran, caption={Subroutine per il tracciamento della convergenza temporale.}, label={lst:storia_conv}]
+subroutine salva_storia_convergenza(k)
+    use Variabili
+    implicit none
+    integer, intent(in) :: k
+    real(4) :: norm2_entropy, areatot
+    integer :: i
+
+    ! Calcolo norma 2 dell'entropia allo step corrente
+    norm2_entropy = 0.0
+    areatot = 0.0
+    do i = 1, nele_interni
+        norm2_entropy = norm2_entropy + (ele(i)%S)**2 * ele(i)%area
+        areatot = areatot + ele(i)%area
+    end do
+    norm2_entropy = sqrt(norm2_entropy / areatot)
+
+    ! Apertura e scrittura su file di log (es. unit 15)
+    if (k == 1) then
+        open(unit=15, file='history.txt', status='replace')
+        write(15,*) 'Iter, Norm2_S, Res_Rho, Res_RhoU, Res_RhoV, Res_RhoE'
+    end if
+
+    ! Salvataggio dati ad ogni iterazione
+    write(15,*) k, norm2_entropy, norminf_residuals(1), &
+                norminf_residuals(2), norminf_residuals(3), norminf_residuals(4)
+end subroutine
+\end{lstlisting}
+
+Per lo studio della stabilità, fissando la mesh e il metodo numerico, si fa girare il codice con valori crescenti di CFL (es. 0.3, 0.6, 0.9, e uno oltre il limite teorico come 1.2). I dati prodotti nel file `history.txt` permetteranno di graficare direttamente le curve richieste, visualizzando come un valore di CFL elevato porti all'esplosione dei residui (instabilità) anziché all'asintoto.

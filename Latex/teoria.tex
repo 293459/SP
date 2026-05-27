@@ -186,44 +186,48 @@ Le condizioni al contorno dipendono dalla direzione del flusso e dal regime loca
 
 % ============================================================
 \section{Analisi di Convergenza della Griglia}
-% ============================================================
 
-\subsection{Norma $L_2$ dell'Entropia}
+\subsection{Valutazione dell'Ordine di Convergenza con la Norma $L_2$ dell'Entropia}
 
-Per quantificare l'errore numerico si usa la norma $L_2$ dell'entropia adimensionale
-$\bar{S}$, che in un campo di Eulero senza onde d'urto dovrebbe essere identicamente
-nulla:
+Per quantificare l'errore numerico di discretizzazione si utilizza la norma $L_2$ (valore quadratico medio) dell'entropia adimensionale $\bar{S}$. In un campo di moto Euleriano privo di onde d'urto (flusso puramente subsonico), l'entropia deve conservarsi costante lungo le linee di corrente. Assumendo un ingresso isentropico, il valore analitico esatto dell'entropia nel dominio è ovunque nullo ($S_{\rm esatto} = 0$). 
+
+Qualsiasi deviazione da questo valore misurata nella soluzione numerica rappresenta puramente l'errore di troncamento dovuto alla discretizzazione spaziale. La norma $L_2$ valuta questo errore integralmente su tutto il dominio:
 \begin{equation}
   \|\bar{S}\|_2 = \sqrt{\frac{\displaystyle\sum_i \bar{S}_i^2 \cdot |\Omega_i|}
                               {\displaystyle\sum_i |\Omega_i|}}
   \label{eq:norma_entropia}
 \end{equation}
 
-Questa norma è una misura dell'errore di discretizzazione: al raffinamento della
-griglia ($h \to 0$) ci si aspetta che $\|\bar{S}\|_2 \to 0$.
+Assumendo che l'errore segua un andamento asintotico del tipo $E = k \cdot h^p$, dove $h$ è la dimensione caratteristica della griglia e $p$ è l'ordine di convergenza effettivo, ci si aspetta che $\|\bar{S}\|_2 \to 0$ per $h \to 0$. Calcolando $\|\bar{S}\|_2$ su griglie via via più fitte, la pendenza della curva in un grafico log-log fornisce il valore dell'ordine di convergenza spaziale $p$.
 
-\subsection{Ordine di Convergenza ed Estrapolazione di Richardson}
+\subsection{Estrapolazione di Richardson}
 
-Assumendo che l'errore di discretizzazione si comporti come:
+L'estrapolazione di Richardson è una tecnica che permette di stimare il valore esatto di una grandezza (o un errore residuo) combinando i risultati ottenuti su griglie con livelli di raffinamento diversi. Può essere applicata in due modalità.
+
+\paragraph{1. Ordine assunto pari a quello teorico.}
+Se si ha forte confidenza che il metodo numerico stia operando nella regione asintotica, si può ipotizzare che l'ordine effettivo $p$ sia pari all'ordine formale teorico dello schema (ad esempio, $p=1$ per Lax-Friedrichs o Roe al primo ordine). Eseguendo due simulazioni con lunghezze caratteristiche $h_1$ e $h_2 = r h_1$ (con $r > 1$ rapporto di diradamento), l'errore si esprime come:
 \begin{equation}
-  E = u_h - u_{\rm esatto} = k \cdot h^p + \mathcal{O}(h^{p+1})
+  \begin{cases}
+    E_1 = u_{h_1} - u_{\rm esatto} = k \cdot h_1^p \\
+    E_2 = u_{h_2} - u_{\rm esatto} = k \cdot (r h_1)^p
+  \end{cases}
 \end{equation}
-dove $h$ è la lunghezza caratteristica e $p$ l'ordine di convergenza, da due
-simulazioni con $h_1$ e $h_2 = r h_1$ si ottiene:
+Risolvendo il sistema per l'incognita $u_{\rm esatto}$, si ottiene la formula di estrapolazione:
 \begin{equation}
-  p = \frac{\ln(E_1/E_2)}{\ln(r)}, \qquad
   u_{\rm esatto} \approx \frac{r^p u_{h_1} - u_{h_2}}{r^p - 1}
 \end{equation}
 
-Se la soluzione esatta non è nota a priori, si usa l'estrapolazione di Richardson
-con \emph{ordine effettivo}: da tre simulazioni con $h$, $2h$, $4h$:
+\paragraph{2. Ordine empirico (effettivo).}
+Se non si conosce a priori l'ordine reale del metodo sulla specifica griglia (ad esempio a causa di effetti di bordo o mesh non sufficientemente fitta), l'ordine $p$ diventa un'incognita. È necessario introdurre una terza simulazione per chiudere il sistema. Date tre griglie con passo $h$, $2h$ e $4h$ (rapporto costante $r=2$), si valuta prima l'ordine effettivo $p$:
 \begin{equation}
-  p = \frac{\ln\!\left(\dfrac{u_{4h}-u_{2h}}{u_{2h}-u_h}\right)}{\ln 2}, \qquad
+  p = \frac{\ln\!\left(\dfrac{u_{4h}-u_{2h}}{u_{2h}-u_h}\right)}{\ln 2}
+\end{equation}
+Una volta trovato $p$, lo si sostituisce nella formula dell'estrapolazione per ricavare la stima accurata della soluzione esatta:
+\begin{equation}
   u_{\rm esatto} \approx u_h + \frac{u_{2h}-u_h}{2^p - 1}
 \end{equation}
 
-Il \textbf{Grid Convergence Index} (GCI) fornisce una stima conservativa
-dell'incertezza numerica associata alla discretizzazione:
+Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa dell'incertezza numerica associata alla discretizzazione:
 \begin{equation}
-  \text{GCI} = F_s \cdot |E_h|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
+  \text{GCI} = F_s \cdot |u_h - u_{\rm esatto}|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
 \end{equation}

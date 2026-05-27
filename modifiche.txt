@@ -1,5 +1,5 @@
 Facendo riferimento al file chiamato schema relazione dove è spiegato cosa inserire nel report di quest'anno
-0)correggi jel file main il fatto che i nomi dei miei colleghi non siano allineeati al mio cosa che crea incoerenza grafica bruttada vedere
+0)correggi nel file main il fatto che i nomi dei miei colleghi non siano allineeati al mio cosa che crea incoerenza grafica bruttada vedere
 1)Spiega nel file latex di teoria come si valita l'ordine di convergenza con la morma 2 dell'entropia come riciesto nello schema relazione nella sezione analisi di convergenza di griglia punto a
 2)Spiega nel file latex di teoria come si fa l'estrapolazione di richardson con ordine assunto pari a quello teorico
 3)Spiega nel file latex di teoria come si fa l'estrapolazione di richardson con ordine empirico
