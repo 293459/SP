@@ -46,7 +46,8 @@ do i = 1, nele_interni
     norm2_residuals(:) = norm2_residuals(:) + ele(i)%d_dt**2 * ele(i)%area 
     ! in sostanza norm2_residuals(:) è la somma dei quadrati dei residui, pesata per l'area degli elementi, 
     ! quindi alla fine del loop avremo la somma dei quadrati dei residui per tutta la mesh, pesata per l'area totale della mesh
-    areatot = areatot + ele(i)%area
+    areatot = areatot + ele(i)%area ! dato che costruisco in modo iterativo la soluzione parto da un'area nulla poichè non ho ancora celle
+                                    ! e poi l'area aumenta man mano che aggiungo celle alla mesh.
 end do
 
 norm2_residuals(:) = sqrt(norm2_residuals(:) / areatot) ! normalizzo la norma L2 dei residui dividendo per l'area totale della mesh e prendendo la radice quadrata,
@@ -78,6 +79,8 @@ end do
 
 norm2_entropy = sqrt(norm2_entropy / areatot)
 write(*,*) 'Norm2_entropy = ', norm2_entropy
+
+
 
 ! [MODIFICA 2026-05-06] norms.txt e' scritto nella cartella della singola
 ! simulazione, cosi' piu' processi paralleli non condividono lo stesso file.
