@@ -1,3 +1,4 @@
+\chapter{Mesh}
 
 \section{Generazione della Mesh con \texttt{gmsh}}
 \label{sec:gmsh}
@@ -20,7 +21,7 @@ rapidamente (grandi gradienti di velocità, pressione o temperatura), mantenendo
 nelle zone dove il campo è quasi uniforme. Questa logica è alla base degli strumenti di
 raffinamento adattivo disponibili in \textit{gmsh}.
 
-\subsection{Logica di Raffinamento e Algoritmi di Generazione}
+\section{Logica di Raffinamento e Algoritmi di Generazione}
 
 La strategia ottimale per la generazione di una griglia computazionale consiste nell'infittire la mesh esclusivamente in quelle regioni in cui i gradienti delle variabili conservative (o fisiche) sono più elevati. Non avrebbe senso, infatti, raffinare la griglia laddove le grandezze si mantengono pressoché costanti (ad esempio nel campo potenziale indisturbato lontano dai corpi): ciò comporterebbe solo un inutile spreco di risorse e potenza computazionale. 
 
@@ -29,7 +30,7 @@ Le zone di forte gradiente coincidono tipicamente con strati limite, onde d'urto
 Nel software \texttt{gmsh}, la generazione della mesh non strutturata si affida a diversi algoritmi matematici. Uno dei più utilizzati (spesso impostato di default per le mesh 2D) è la \textbf{Triangolazione di Delaunay}. Questo algoritmo collega un insieme di punti nello spazio in modo tale che nessun punto si trovi all'interno della circonferenza circoscritta a un qualsiasi triangolo della mesh. Il vantaggio principale di Delaunay è che tende a massimizzare l'angolo minimo dei triangoli, evitando elementi troppo "schiacciati" (con \textit{aspect ratio} elevato) che potrebbero degradare il condizionamento numerico e l'accuratezza della soluzione.
 
 % ------------------------------------------------------------
-\subsection{Il Software \texttt{gmsh}}
+\section{Il Software \texttt{gmsh}}
 
 \texttt{gmsh} è un generatore di mesh open-source a tre dimensioni con un preprocessore CAD
 integrato, un generatore di griglia e un post-processore. I suoi punti di forza nell'ambito di
@@ -46,7 +47,7 @@ questo corso sono:
 \end{itemize}
 
 % ------------------------------------------------------------
-\subsection{Griglie Strutturate e Non Strutturate}
+\section{Griglie Strutturate e Non Strutturate}
 \label{sec:tipi_griglia}
 
 \subsubsection{Griglie Strutturate}
@@ -125,7 +126,7 @@ Gli \textbf{svantaggi} sono:
     linea di punti attraverso tutto il dominio, aumentando il costo computazionale globale.
 \end{itemize}
 
-\subsubsection{Griglie Non Strutturate}
+\subsection{Griglie Non Strutturate}
 
 Nelle griglie non strutturate i nodi non seguono linee coordinate: la loro disposizione nello
 spazio è arbitraria e la connettività tra celle deve essere memorizzata esplicitamente in una
@@ -295,7 +296,7 @@ Background Field = 2;
 È possibile definire più attrattori e più campi Threshold, combinandoli con un campo
 \texttt{Min} per prendere il minimo tra diverse regole di raffinamento.
 
-\subsection{Struttura del File \texttt{.msh}: Gli Elementi}
+\section{Struttura del File \texttt{.msh}: Gli Elementi}
 
 Mentre il file \texttt{.geo} contiene le istruzioni procedurali, il risultato della discretizzazione viene esportato nel formato \texttt{.msh}. Questo file contiene l'elenco dei nodi (coordinate spaziali) e la definizione topologica degli \emph{elementi}. 
 
