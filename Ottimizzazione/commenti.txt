@@ -1,0 +1,34 @@
+STRUTTURA REPORT
+1)Introduzione a ModeFrontier (metti tutte le sezioni necessarie a spiegarne il funzionamento)
+2)Richiami teorici di ottimizzazione (spiega ad esempio le varie analisi tipo sensitivity, statistica, robusta, multivariata, la questione dei range di simulazione)
+3)Introduzione alle rappresentaziuoni dei vari grafici e della loro logica (tipo scatter matrix, spazio delle soluzioni, pareto front, parallel coordinate charts filtrato e non)
+4)Case study ugello (spiega tutto ciò hce riguarda il problema fisico dell'ugello e la descrizioone più fisica, oltre che come è fatto il custom mode essendo che ciò ha uno specifico significato fisico)
+5)Commento dettagliato del workflow (perché uso un nodo input, dos, project file, exit etx...). Deve essere chiaro cosa fa ciasscun blococ e quale sia il suo contributo al progetto, perché sia stato inserito e conme si collega agli altri)
+6)Risultati nel caso specifico dell'ugello(commento di tutti i grafici tipo scatter matrix, spazio delle soluzioni, pareto front, parallel coordinate charts filtrato e non)
+
+
+1)spiega i tipi di analisi che mode fronteir supporta ovvero sensitivity, statistica, robusta, multivariata
+2)spiega la differnza tra pipeline (linee continue) e direzione dei dati (linee tratteggiate)
+3)spiega la struttura del programma (workflow, planner, run, design space)
+4)spiega dell'ugello che alcuni parametri sono fissati (tipo il rapporto tra le aree e e che la gola sia una arco di circonferenza), che i parametri di design sono theta (angolo di inclinazione all'inizio della parte divergente) e lunghezza dell'ugello
+5)spiega che cosa è un nodo su node frontier, perché si chiama così e quale è la logica dietro 
+6)spiega che su node frontier ci sono nodi di tantissimi tipi (logici, dati, processing, file, application e custom generatbili dall'utente tipo come abbiamo fatto nell'esercitazione). Fai una tabella riassuntiva di quelli che ti ho citato e di altri se lo ritieni opportuno
+7)spiega che a livello basilare modefrontier si lega a ciascun software tramite delle API e così riconosce tutti i parametri in gioco.
+8)Mi pare che mode frontier apllichi di defaulkt un lower and upper boundary rispettivamente di +-5 % del valoe nominale... SPiega qual è il motiuvo per cui va scelto un range non tropèpo grande o troppo piccolo
+9)spiega la questione dello step ovvero del fatto che si possono condurre sia analisi continue che discrete. Vorrie però capire le continue come fa nel concreto perché mi chiedo come faccia e non richoiedere troppo costo computazionale
+10)Spiega che oproject file serve a caricare il file nella directory di esecuzione e ha il vantaggio di rendere il progetto indipendebnte (non devo collegarmi ad un path locale che magari può cambiare mandando il progetto ed aprendolo su un altro pc)
+11)Spiega che dos permette di integrare un terminale tipo batch, shell etc.. e quanot può essere utile nel workflow
+12)Spiega che spiega come aggiungere un nodo custom andando su option --> mynodes --> install e prché è molto utile
+13)Spiega perchè aziende come ansys che hanno WORKBENCH e un sacco di software decidono di usare modefrontier anzichè il loro ottimizzatore interno
+14)spiega che file sono contenuti nella cartella del docente (Files_attendees) e a cosa serve ciascuno di esso così da comprendere la struttura gebnerale 
+15)spiega la differrenza tra single run, design of analisys e altre simulazioni possibilki nella parte doi planning 
+16) sopiega che anche se c'è un parametro nel workflow questo non implica necessariamente che venga studiato il suo effetto ma bisogna invece promuoverla a avriabile
+17) è important3e gestire la policy di salvataggio e gestione dei file (se ho 1000 run e ciascuna ha 100 file devo capire come, quali e dove salvarli)
+18) con run options posso definire diversi plan a diversi livelli di fedeltà, dettaglio e softare utilizzati
+19)Design of experiments --> devo capire come scegliere gli esperimenti, analisi e run. Idealmente voglio uno spazio ben coperto (considero tutte le possibili casistiche) ma con una densità dello spazio minore (meno simulazioni per caso)
+20) ULH = Uniform Latin Hypercube divide l'intervallo di variazione in sottointervalli e sceglie in modo non randomico le simulazioni. 
+21)un modello surrogato è un modello matematico che approssima la relazione input-output in una certa regione dello spazio di analisi. Per farlo mi servono dei dati "reali" o high fidelity di cui fidarmi
+22)le superfici di risposta sono proprio le curve mateamtiche che interpolano i dati ad alta fedeltà
+23)In base alla logica dell'esprimento può essere che convenga fare uno sapzio denso in una regione piuttosto che un'altra, magari dopo aver fatto un'analisi generale più rada (capisco che regione è più promettente e mi focalizzo su quella)
+24)qual è l'idea dietro ULH e perché dovrebbe essere (e quando ) meglio del montecarlo. Di solito il montecarlo è utile per calcolare valori attesi, varianza etc... mentre ULH conviene per distribuire le risorse in modo sensato 
+ 
