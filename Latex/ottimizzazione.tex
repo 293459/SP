@@ -437,9 +437,40 @@ I \textbf{parametri di design} dell'ottimizzazione sono invece:
     dell'ingombro e del peso del sistema.
 \end{itemize}
 
-Gli obiettivi dell'ottimizzazione sono tipicamente il massimo della
-spinta (o equivalentemente della portata effettiva) e il minimo della
-lunghezza (o del peso), risultando in un problema bi-obiettivo.
+
+Le analisi condotte nel presente lavoro sono state realizzate con due
+distinte funzioni obiettivo: la prima ottimizzazione mira alla
+\textbf{massimizzazione della spinta}, mentre la seconda ricerca la
+\textbf{minimizzazione dell'area di uscita}. Questa seconda condizione,
+equivalente a ridurre le dimensioni trasversali dell'ugello, permette di
+valutare soluzioni caratterizzate da ingombri ridotti.
+
+La tabella che segue riassume i parametri e le caratteristiche delle due
+analisi di ottimizzazione:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Categoria} & \textbf{Parametro/Variabile} & \textbf{Valore/Descrizione} \\
+    \hline
+    \multirow{2}{*}{\textbf{Parametri fissati}} & Rapporto aree $A_e/A^*$ & Definito dalle specifiche \\
+    & Geometria gola & Arco di circonferenza \\
+    \hline
+    \multirow{2}{*}{\textbf{Parametri di design}} & $\theta$ & Angolo divergente (variabile) \\
+    & $L$ & Lunghezza totale (variabile) \\
+    \hline
+    \multirow{2}{*}{\textbf{Output}} & Geometria discretizzata & File CFD \\
+    & Campi di flusso & Pressione, velocità, numero di Mach \\
+    \hline
+    \multirow{2}{*}{\textbf{Funzioni obiettivo}} & Analisi 1 & Massimizzazione spinta $F$ \\
+    & Analisi 2 & Minimizzazione area uscita $A_e$ \\
+    \hline
+    \end{tabular}
+    \caption{Riassunto dei parametri, output e funzioni obiettivo per le
+    analisi di ottimizzazione dell'ugello supersonico.}
+    \label{tab:opt_summary}
+\end{table}
 
 \subsection{Il nodo custom per la geometria dell'ugello}
 
@@ -483,8 +514,92 @@ tramite i nodi standard.
     \label{fig:opt_workflow}
 \end{figure}
 
+
 Il workflow (figura~\ref{fig:opt_workflow}) è la rappresentazione
 grafica dell'intero processo di ottimizzazione.
+
+\subsection{Catena di calcolo: strumenti utilizzati e metodo di valutazione}
+
+\paragraph{Assenza di CFD: valutazione analitica delle prestazioni.}
+Contrariamente a quanto si potrebbe supporre, nell'esercitazione \textbf{non è
+stata eseguita alcuna simulazione CFD} per calcolare le prestazioni dell'ugello.
+Le due variabili di output -- la superficie bagnata $S$ e la spinta $T$ -- sono
+calcolate in modo \textbf{analitico} ad ogni iterazione tramite l'eseguibile
+\texttt{write\_points.exe}, che implementa le relazioni isentropiche per
+ugelli convergenti-divergenti.
+Questo approccio è del tutto coerente con la fisica del problema: in condizioni
+di progetto (flusso adattato, senza onde d'urto all'interno dell'ugello) le
+prestazioni di un ugello supersonico si ricavano direttamente dalla geometria
+tramite le leggi di conservazione per flusso isentropico, senza dover risolvere
+le equazioni di Eulero o Navier--Stokes su una griglia di calcolo.
+Il vantaggio pratico è un costo computazionale per singola valutazione
+dell'ordine del millisecondo, che ha reso possibile eseguire l'intera campagna
+di 300 simulazioni in tempi molto ridotti.
+
+\paragraph{Il ruolo di \texttt{write\_points.exe}.}
+L'eseguibile \texttt{write\_points.exe} (contenuto nella cartella
+\texttt{SP/Ottimizzazione/EXE/}) è il nucleo computazionale del workflow.
+Riceve in ingresso i due parametri di design ($L$ e $\theta$), calcola il
+profilo geometrico dell'ugello secondo il metodo di costruzione adottato
+(gola ad arco di circonferenza, sezione divergente con angolo iniziale
+$\theta$), e produce in uscita i valori di $S$ (proxy del peso e dell'ingombro)
+e $T$ (spinta, calcolata tramite le relazioni isentropiche e la quantità di
+moto all'uscita).
+Questi valori vengono intercettati da modeFRONTIER come variabili di risposta
+e associati agli obiettivi dell'ottimizzazione.
+
+\paragraph{Il ruolo di Gmsh.}
+Il secondo eseguibile presente nella cartella \texttt{EXE/} è \texttt{gmsh}
+(versione 2022, 84 KB).
+In questo contesto Gmsh non viene utilizzato per generare una mesh di calcolo
+destinata a un solutore CFD, ma come strumento di discretizzazione geometrica:
+dato il profilo dell'ugello prodotto da \texttt{write\_points.exe}, Gmsh
+costruisce la rappresentazione a elementi finiti della geometria, utile per
+la visualizzazione e per eventuali analisi di post-processing.
+
+\paragraph{Algoritmo di ottimizzazione: pilOPT.}
+Dal file di database \texttt{nozzleOPT.des} (file testuale in formato
+modeFRONTIER) è possibile leggere direttamente il tag \texttt{Algorithm}
+associato a ciascun design: tutte le 300 configurazioni valutate appartengono
+all'algoritmo \textbf{pilOPT}, l'ottimizzatore proprietario di ESTECO.
+pilOPT è un algoritmo di tipo \textit{meta-heuristic} che combina una fase
+di esplorazione globale (stile evolutivo) con un raffinamento locale
+intelligente: a differenza di un puro algoritmo genetico, pilOPT decide
+autonomamente quando passare dall'esplorazione al raffinamento senza
+richiedere la configurazione manuale degli iperparametri.
+Il campo \texttt{Phase} registra la fase \textit{Evolution} per tutti i design,
+confermando che l'ottimizzatore ha operato in modalità evolutiva per l'intera
+campagna.
+
+\paragraph{Struttura della campagna: DoE + raffinamento.}
+Un'analisi dei dati nel file \texttt{.des} rivela due fasi distinte.
+Le prime 66 configurazioni (ID 00000--00065) presentano valori di $L$ e
+$\theta$ su una griglia strutturata a valori interi o multipli di $0.5$,
+caratteristica di un Design of Experiments iniziale (campionamento ULH) con
+cui pilOPT costruisce la mappa dello spazio di progetto.
+Dalla configurazione 66 in poi i valori di $\theta$ diventano non interi
+(ad esempio $\theta = 24.833\ldots$, $\theta = 27.363\ldots$), segnale
+inequivocabile che l'ottimizzatore ha attivato la fase di raffinamento locale,
+esplorando con granularità sempre più fine le regioni promettenti identificate
+nel DoE preliminare.
+Questo comportamento adattivo è la ragione per cui pilOPT risulta più efficiente
+di un DoE puro: concentra le valutazioni dove il gradiente degli obiettivi è
+più elevato, riducendo il numero totale di simulazioni necessarie per
+caratterizzare il fronte di Pareto.
+
+\paragraph{Spazio di progetto e variabili.}
+Dai dati si ricavano i range effettivi esplorati:
+\begin{equation}
+    L \in [10,\; 17]\;\text{[unità di lunghezza]},
+    \qquad
+    \theta \in [20^{\circ},\; 40^{\circ}]
+\end{equation}
+Gli obiettivi sono la massimizzazione della spinta $T$ (registrata come
+\texttt{max\_thrust}) e la minimizzazione della superficie $S$
+(\texttt{min\_surface}), in un problema bi-obiettivo che genera il fronte
+di Pareto commentato nella sezione~\ref{sec:risultati_ugello}.
+
+
 Di seguito si descrive il ruolo di ciascun blocco.
 
 \subsection{Nodo Input}
