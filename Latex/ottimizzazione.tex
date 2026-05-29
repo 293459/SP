@@ -1,3 +1,685 @@
-\chapter{Ottimizzazione}
-\label{cap:progetto4}
+% ============================================================
+%  Capitolo: Ottimizzazione con modeFRONTIER
+%  File   : ottimizzazione.tex
+%  Posizione nel repository: SP/latex/ottimizzazione.tex
+%  Immagini: ../Images/<nome>.png   (cartella SP/Images/)
+% ============================================================
 
+\chapter{Ottimizzazione con modeFRONTIER}
+\label{cap:ottimizzazione}
+
+Questo capitolo introduce l'utilizzo del software \textbf{modeFRONTIER}
+per l'ottimizzazione multi-obiettivo di sistemi aerodinamici, con
+riferimento al caso studio dell'ugello supersonico.
+Dopo una presentazione dell'ambiente software e dei richiami teorici di
+ottimizzazione, si descrive la struttura del workflow impiegato e si
+commentano i risultati ottenuti.
+
+% ============================================================
+\section{Introduzione a modeFRONTIER}
+% ============================================================
+
+\subsection{Cos'è modeFRONTIER e perché utilizzarlo}
+
+\textbf{modeFRONTIER} è un software commerciale sviluppato da ESTECO,
+concepito come piattaforma di integrazione e ottimizzazione per processi
+ingegneristici complessi.
+La sua caratteristica fondamentale è la \textit{neutralità tecnologica}:
+a differenza degli ottimizzatori interni ai grandi pacchetti CAE (come
+Ansys optiSLang integrato nell'ecosistema Ansys), modeFRONTIER non impone
+nessun software specifico nella catena di progettazione.
+Nelle aziende reali il processo di sviluppo è tipicamente eterogeneo:
+si possono usare CATIA per la geometria, Ansys per la struttura,
+OpenFOAM per la CFD e script MATLAB o Python per il post-processing.
+modeFRONTIER si interfaccia con qualsiasi di questi strumenti tramite
+\textbf{API} dedicate, riconoscendo in automatico -- tramite la modalità
+\textit{introspection} -- tutte le variabili di input e output senza
+richiedere all'utente di scrivere codice di interfaccia.
+
+\paragraph{Confronto con Ansys optiSLang.}
+Ansys ha sviluppato il proprio ottimizzatore (optiSLang) e l'ambiente
+Workbench per orchestrare i flussi interni alla suite Ansys.
+Tuttavia, optiSLang risulta ottimale solo quando l'intera catena di
+calcolo risiede all'interno dell'ecosistema Ansys.
+Non appena si introducono software di terze parti o script personalizzati,
+la neutralità di modeFRONTIER diventa un vantaggio determinante.
+
+\paragraph{Gestione delle licenze dei software collegati.}
+modeFRONTIER non aggira le licenze dei software che orchestral: se il
+workflow lancia un calcolo Ansys, viene richiesta una licenza Ansys
+standard di tipo Solver/Batch.
+In contesti con molte simulazioni parallele modeFRONTIER può interfacciarsi
+con i server di licenza (es.\ FlexLM) per accodare le richieste ed evitare
+che il ciclo di ottimizzazione si blocchi per mancanza di licenze.
+
+\paragraph{Stima del tempo di calcolo.}
+modeFRONTIER non può prevedere a priori il tempo di convergenza di un
+solutore esterno, poiché non conosce la complessità della mesh né la
+stabilità del metodo numerico.
+La stima avviene in due fasi: prima si lancia un ristretto Design of
+Experiments per misurare il tempo medio per simulazione, poi si proietta
+quel dato sul numero totale di run previsto.
+Se il costo risulta proibitivo si ricorre ai \textit{metamodelli} (vedi
+sezione~\ref{sec:surrogate}): poche simulazioni ad alta fedeltà
+addestrando un modello predittivo su cui si può esplorare lo spazio di
+progetto con costo computazionale trascurabile.
+È infine possibile impostare \textit{timeout} protettivi per terminare
+automaticamente le simulazioni che non convergono entro un limite di tempo.
+
+% ============================================================
+\subsection{Struttura del programma}
+
+L'interfaccia di modeFRONTIER è organizzata in quattro ambienti principali:
+
+\begin{description}
+    \item[\textbf{Workflow}] Ambiente grafico in cui si costruisce il
+    processo di ottimizzazione collegando nodi che rappresentano software,
+    file, operazioni logiche e parametri.
+    \item[\textbf{Planner}] Ambiente in cui si definisce il tipo di
+    analisi (singola run, Design of Experiments, ottimizzazione),
+    si configurano gli algoritmi e si gestiscono i \textit{run options}
+    per controllare fedeltà, parallelismo e politica di salvataggio dei file.
+    \item[\textbf{Run}] Pannello di monitoraggio in tempo reale
+    dell'avanzamento dell'ottimizzazione: visualizza lo stato di ogni
+    simulazione, i residui di convergenza e il fronte di Pareto in
+    costruzione.
+    \item[\textbf{Design Space}] Ambiente di analisi post-processing in cui
+    si esplorano i risultati tramite scatter plot, grafici a parallel
+    coordinates, fronte di Pareto e analisi statistiche.
+\end{description}
+
+\subsection{Il concetto di nodo}
+
+In modeFRONTIER ogni elemento del processo è rappresentato da un
+\textbf{nodo}. La metafora è quella di una rete di oggetti autonomi
+che comunicano tra loro scambiando dati: ciascun nodo ha porte di
+ingresso e uscita, e il collegamento di questi nodi mediante
+\textit{archi} definisce sia il flusso di esecuzione sia la direzione
+del trasferimento dei dati.
+
+Nel workflow compaiono due tipi distinti di connessioni:
+le \textbf{linee continue} (pipeline) indicano l'ordine di esecuzione
+dei nodi, mentre le \textbf{linee tratteggiate} indicano la direzione
+del flusso di dati tra le porte dei nodi.
+Questa distinzione è importante perché non è detto che il flusso dati
+segua lo stesso percorso del flusso di controllo.
+
+La tabella~\ref{tab:nodi_modefrontier} riassume le principali categorie
+di nodi disponibili in modeFRONTIER.
+
+\begin{table}[H]
+    \centering
+    \caption{Principali categorie di nodi in modeFRONTIER.}
+    \label{tab:nodi_modefrontier}
+    \begin{tabular}{lp{9cm}}
+        \hline
+        \textbf{Categoria} & \textbf{Descrizione ed esempi} \\
+        \hline
+        Logici & Controllano il flusso di esecuzione: \textit{Scheduler},
+                 \textit{If/Else}, \textit{Loop}, \textit{Exit}. \\
+        Dati & Gestiscono variabili e parametri: nodi
+               \textit{Input Variable}, \textit{Output Variable},
+               \textit{Objective}, \textit{Constraint}. \\
+        Processing & Eseguono operazioni sui dati: \textit{Expression},
+                     \textit{Filter}, \textit{Math}. \\
+        File & Gestiscono il trasferimento e la modifica di file:
+               \textit{Input File} (template), \textit{Output File},
+               \textit{Project File}, \textit{Transfer File}. \\
+        Application & Lanciano software esterni: \textit{Generic Application},
+                      \textit{Excel}, \textit{MATLAB}, \textit{Ansys},
+                      \textit{Script} (DOS/Shell). \\
+        Custom & Nodi creati dall'utente tramite \textit{Options}
+                 $\to$ \textit{MyNodes} $\to$ \textit{Install};
+                 incapsulano logica applicativa proprietaria. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\paragraph{Promozione a variabile.}
+La semplice presenza di un parametro nel workflow non implica che esso
+venga studiato nell'analisi: il parametro deve essere esplicitamente
+\textbf{promosso a variabile di design o obiettivo} attraverso il
+pannello di configurazione del nodo corrispondente.
+Questa distinzione consente di mantenere nel workflow parametri fissi
+(come condizioni al contorno costanti) senza che vengano inclusi nello
+spazio di ricerca dell'ottimizzatore.
+
+\subsection{Integrazione tramite API e input template}
+
+A livello basilare modeFRONTIER si lega a ciascun software tramite
+\textbf{API} dedicate che permettono al software di riconoscere
+automaticamente tutti i parametri coinvolti.
+Per i software che non dispongono di un'API nativa il meccanismo
+standard è il seguente: si parte da un file di configurazione del
+solutore (ad esempio un file \texttt{.cas} di Fluent o un file di
+input di un codice Fortran), si trasforma in un \textbf{input template}
+marcando le variabili con segnaposto, e si assegna al nodo
+\textit{Input File} il compito di sostituire i segnaposto con i valori
+numerici generati dall'ottimizzatore ad ogni iterazione.
+Il driver del nodo applicativo si occupa quindi di lanciare il solutore
+e di raccogliere l'output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{../Images/ottimizzazione_input_parameters}
+    \caption{Pannello di configurazione dei parametri di input in
+    modeFRONTIER. I parametri devono essere promossi a variabile di
+    design specificando nome, tipo, valore nominale, lower bound e
+    upper bound.}
+    \label{fig:opt_input_parameters}
+\end{figure}
+
+% ============================================================
+\section{Richiami teorici di ottimizzazione}
+\label{sec:opt_theory}
+% ============================================================
+
+\subsection{Tipologie di analisi supportate}
+
+modeFRONTIER supporta quattro principali tipologie di analisi
+post-processing applicabili ai risultati di un Design of Experiments
+o di una campagna di ottimizzazione.
+
+\paragraph{Analisi di sensitività.}
+Quantifica quanto ciascuna variabile di input influenza le variabili
+di output.
+Permette di identificare quali parametri di progetto hanno effetto
+rilevante sulle prestazioni e quali sono ininfluenti, consentendo di
+ridurre la dimensionalità dello spazio di ricerca nelle fasi successive.
+
+\paragraph{Analisi statistica.}
+Calcola le distribuzioni statistiche (media, varianza, distribuzione
+di frequenza) delle variabili di output su tutto il campione di
+simulazioni eseguite.
+È utile per capire la distribuzione dei risultati nello spazio di
+progetto e per identificare tendenze globali.
+
+\paragraph{Analisi robusta.}
+Studia la sensibilità della soluzione ottimale alle incertezze sui
+parametri di input.
+Una soluzione è robusta se le sue prestazioni degradano poco al
+variare dei parametri entro le loro tolleranze di produzione o
+operative.
+L'analisi robusta è fondamentale in contesti industriali dove le
+tolleranze di fabbricazione sono non trascurabili.
+
+\paragraph{Analisi multivariata.}
+Esplora le correlazioni tra più variabili contemporaneamente tramite
+strumenti come la \textit{principal component analysis} (PCA) o la
+\textit{self-organizing map} (SOM).
+Permette di identificare cluster di soluzioni con caratteristiche simili
+e di comprendere le relazioni strutturali tra le variabili.
+
+\subsection{Range di simulazione: lower bound, upper bound e step}
+\label{sec:ranges}
+
+Per ciascuna variabile di design è necessario definire un intervallo
+di variazione $[x_{\min},\, x_{\max}]$.
+modeFRONTIER applica di default un range di $\pm 5\%$ rispetto al
+valore nominale, ma questo valore deve essere scelto con cura.
+
+Un range troppo \textbf{piccolo} rischia di non coprire lo spazio di
+progetto in modo significativo: l'ottimizzatore opera in una regione
+ristretta e l'ottimo trovato potrebbe essere solo locale.
+Un range troppo \textbf{grande} aumenta il costo computazionale (servono
+più punti per campionare adeguatamente lo spazio) e può introdurre
+configurazioni fisicamente non realizzabili o numericamente instabili
+che fanno fallire le simulazioni.
+La scelta ottimale è quindi un compromesso che richiede conoscenza del
+problema fisico: si parte tipicamente da un range ristretto basato
+sull'esperienza del progettista, si esplora con un primo DoE, e si
+raffina eventualmente il range nelle zone più promettenti.
+
+Lo \textbf{step} definisce la granularità della variabile: se impostato,
+la variabile assume solo valori discreti (multipli dello step).
+È possibile omettere lo step e trattare la variabile come continua:
+in quel caso l'ottimizzatore può proporre qualsiasi valore reale
+nell'intervallo.
+Per un'analisi continua, il software non calcola tutte le combinazioni
+possibili (cosa impossibile per variabili reali) ma genera i candidati
+tramite algoritmi di campionamento (ad esempio ULH, descritto di
+seguito) o tramite gli operatori dell'algoritmo di ottimizzazione
+selezionato (crossover e mutazione negli algoritmi genetici).
+
+\subsection{Design of Experiments}
+
+Il \textbf{Design of Experiments} (DoE) è la fase in cui si determina
+quale insieme di configurazioni (``esperimenti'') simulare per
+caratterizzare lo spazio di progetto.
+L'obiettivo è duplice: coprire bene l'intero spazio con un numero
+limitato di punti (\textit{space-filling}) e distribuire i punti in
+modo da estrarre il massimo dell'informazione statistica.
+
+\paragraph{Uniform Latin Hypercube (ULH).}
+L'\textbf{Uniform Latin Hypercube} è il metodo di campionamento più
+comunemente utilizzato in modeFRONTIER.
+L'idea è semplice: l'intervallo di variazione di ciascuna variabile
+viene suddiviso in $n$ sottointervalli di uguale ampiezza.
+L'ULH garantisce che in ciascun sottointervallo cada esattamente un
+punto, e che la distribuzione sia uniforme anche nelle proiezioni su
+ogni coppia di variabili (proprietà dello \textit{hypercube}).
+Questo meccanismo è non randomico: a differenza del campionamento
+Monte Carlo, l'ULH non produce cluster né zone vuote.
+
+Il vantaggio rispetto al \textbf{Monte Carlo} è sostanziale: il Monte
+Carlo campiona in modo casuale e, con un numero limitato di punti, può
+lasciare regioni dello spazio non coperte.
+L'ULH garantisce invece una distribuzione uniforme con molti meno punti.
+Il Monte Carlo rimane preferibile per la stima di valori attesi e
+varianze in contesti stocastici; l'ULH è la scelta corretta quando
+si vuole mappare lo spazio di progetto con un budget computazionale
+limitato.
+
+\paragraph{Raffinamento adattivo.}
+Una strategia efficace è condurre prima un DoE con densità rada sull'intero
+spazio (per identificare le regioni più promettenti) e successivamente
+raffinare il campionamento in quelle zone, eventualmente con un livello
+di fedeltà più elevato (diversi livelli di fedeltà sono configurabili
+tramite \textit{Run Options}).
+
+\subsection{Modelli surrogati e superfici di risposta}
+\label{sec:surrogate}
+
+Un \textbf{modello surrogato} (o \textit{metamodello}) è un modello
+matematico che approssima la relazione input-output di una simulazione
+computazionalmente costosa in una certa regione dello spazio di analisi.
+Per costruire un modello surrogato sono necessari dati ad alta fedeltà
+(simulazioni reali) su cui addestrare il modello.
+
+Le \textbf{superfici di risposta} (\textit{Response Surfaces}) sono le
+funzioni matematiche che interpolano o approssimano i dati ad alta
+fedeltà.
+Una volta costruite, è possibile valutarle milioni di volte in pochi
+secondi, riducendo drasticamente il costo dell'ottimizzazione.
+I tipi più comuni di superfici di risposta includono polinomi di
+secondo ordine, radial basis functions e reti neurali.
+
+\subsection{Algoritmi di ottimizzazione}
+
+Gli algoritmi di ottimizzazione disponibili in modeFRONTIER si
+suddividono in tre macro-categorie.
+
+\paragraph{Metodi gradient-based.}
+Sfruttano le derivate della funzione obiettivo rispetto alle variabili
+di design per orientare la ricerca.
+Sono molto efficienti in termini di numero di valutazioni necessarie,
+ma convergono verso l'ottimo locale più vicino al punto di partenza.
+Non sono quindi adatti a problemi con molteplici ottimi locali senza
+un'accurata inizializzazione.
+
+\paragraph{Metodi global search.}
+Esplorano l'intero spazio di progetto senza fare affidamento sul
+gradiente, mantenendo una certa randomness per evitare di restare
+intrappolati in ottimi locali.
+Tra questi rientrano gli algoritmi genetici (NSGA-II, MOGA) e il
+metodo Simplex.
+Sono più robusti ma richiedono generalmente un maggior numero di
+valutazioni della funzione obiettivo.
+
+\paragraph{Metodi combinati.}
+Combinano un'esplorazione globale iniziale (per identificare le regioni
+promettenti) con un raffinamento locale tramite metodi del gradiente.
+Sono la scelta ottimale per problemi industriali dove si vuole bilanciare
+robustezza ed efficienza computazionale.
+
+\paragraph{Robustezza vs accuratezza.}
+È importante distinguere tra \textbf{robustezza} e \textbf{accuratezza}
+di un algoritmo.
+Un algoritmo robusto è in grado di trovare l'\textit{ottimo globale}
+indipendentemente dal punto di partenza; un algoritmo accurato converge
+con precisione all'\textit{ottimo} (locale o globale), ma non garantisce
+di averlo trovato il migliore in assoluto.
+Gli algoritmi genetici sono robusti ma moderatamente accurati; i metodi
+del gradiente sono precisi ma non robusti.
+L'algoritmo Simplex (mono-obiettivo) è un esempio di metodo che media
+tra le due proprietà tramite la sequenza riflessione--espansione--contrazione
+con restart.
+
+\paragraph{Algoritmi genetici.}
+Negli algoritmi genetici la popolazione di soluzioni evolve attraverso
+generazioni successive.
+Le soluzioni più performanti si ``riproducono'' tramite \textbf{crossover}
+(scambio di porzioni del vettore di design tra due genitori), producendo
+nuovi candidati che combinano le caratteristiche migliori di entrambi.
+L'\textbf{operatore di mutazione} introduce perturbazioni casuali per
+mantenere la diversità della popolazione ed evitare la convergenza
+prematura a ottimi locali.
+
+\subsection{Dominanza di Pareto e fronte ottimale}
+
+Nel caso multi-obiettivo non esiste un'unica soluzione ottimale ma un
+insieme di soluzioni \textbf{non dominate}.
+Una soluzione $A$ \textbf{domina} una soluzione $B$ se $A$ è migliore
+di $B$ su almeno un obiettivo e non peggiore su nessun altro.
+Le soluzioni dominate non sono mai candidate all'ottimo progettuale
+(ne esistono altre migliori su tutti i fronti).
+Le soluzioni non dominate formano il \textbf{fronte di Pareto}: esse
+sono ``parimenti buone'' nel senso che nessuna migliora un obiettivo
+senza peggiorarne un altro.
+La scelta del punto specifico sul fronte di Pareto è una decisione
+ingegneristica che dipende dalle priorità del progetto
+(ad esempio: privilegiare la spinta a scapito del peso o viceversa).
+
+% ============================================================
+\section{Rappresentazioni grafiche}
+\label{sec:grafici}
+% ============================================================
+
+modeFRONTIER fornisce diversi strumenti di visualizzazione per
+esplorare lo spazio dei risultati.
+
+\subsection{Spazio delle soluzioni (scatter plot)}
+
+Gli \textbf{scatter plot} rappresentano le soluzioni come punti in un
+piano avente come assi due variabili scelte dall'utente (tipicamente
+due obiettivi o un obiettivo e una variabile di design).
+Permettono di visualizzare tendenze, correlazioni e la distribuzione
+del fronte di Pareto.
+
+\subsection{Fronte di Pareto (scatter output)}
+
+Un caso particolare di scatter plot in cui i due assi sono le due
+funzioni obiettivo evidenzia graficamente il \textbf{fronte di Pareto}:
+le soluzioni non dominate formano una curva (in 2D) o una superficie
+(in 3D) che rappresenta il confine ottimale dello spazio di progetto.
+Tutti i punti sul fronte sono equamente validi; la selezione del punto
+di design è guidata dalle specifiche del progetto.
+
+\subsection{Parallel coordinates}
+
+Il \textbf{grafico a coordinate parallele} consente di rappresentare
+simultaneamente un elevato numero di variabili (sia di input che di
+output) su un unico grafico.
+Ogni asse verticale corrisponde a una variabile; ogni linea spezzata
+che connette gli assi da sinistra a destra rappresenta una specifica
+configurazione simulata, con il valore della variabile letto
+sull'ordinata corrispondente.
+Procedendo da sinistra a destra è possibile leggere l'intera
+configurazione di una soluzione.
+
+L'aspetto cruciale è la possibilità di \textbf{filtrare} il grafico:
+si può restringere l'intervallo ammissibile su uno o più assi
+(tipicamente su variabili di output), scartando automaticamente tutte
+le configurazioni che non soddisfano il filtro.
+Questo permette di identificare in modo visivo quali combinazioni di
+variabili di input producono i risultati desiderati.
+
+% ============================================================
+\section{Case study: ottimizzazione di un ugello supersonico}
+\label{sec:ugello}
+% ============================================================
+
+\subsection{Descrizione fisica del problema}
+
+L'ugello supersonico convergente-divergente è il sistema di accelerazione
+del gas propellente impiegato nei motori a razzo e nei propulsori
+aerospaziali.
+Il fluido entra nella sezione convergente con condizioni subsoniche,
+raggiunge $M = 1$ alla gola (sezione di area minima) e si espande nella
+sezione divergente fino a raggiungere condizioni supersoniche in uscita.
+
+Ai fini dell'ottimizzazione, alcuni parametri geometrici dell'ugello sono
+\textbf{fissati}:
+\begin{itemize}
+    \item il \textbf{rapporto tra le aree} (area di uscita su area di
+    gola, $A_e/A^*$), che fissa il numero di Mach di uscita per mezzo
+    della relazione isentropica;
+    \item la \textbf{gola}, che è modellata come un arco di
+    circonferenza per garantire continuità della curvatura e limitare
+    le perdite per onde d'urto in quella regione.
+\end{itemize}
+
+I \textbf{parametri di design} dell'ottimizzazione sono invece:
+\begin{itemize}
+    \item $\boldsymbol{\theta}$: angolo di inclinazione all'inizio
+    della parte divergente (controlla la rapidità dell'espansione);
+    \item $\boldsymbol{L}$: lunghezza totale dell'ugello, indicativa
+    dell'ingombro e del peso del sistema.
+\end{itemize}
+
+Gli obiettivi dell'ottimizzazione sono tipicamente il massimo della
+spinta (o equivalentemente della portata effettiva) e il minimo della
+lunghezza (o del peso), risultando in un problema bi-obiettivo.
+
+\subsection{Il nodo custom per la geometria dell'ugello}
+
+La generazione della geometria dell'ugello a partire dai parametri di
+design $\theta$ e $L$ non è una funzionalità nativa di modeFRONTIER,
+ma richiede un calcolo specifico basato sulle relazioni della
+aerodinamica degli ugelli.
+Per questo motivo è stato sviluppato un \textbf{nodo custom} che
+incapsula la logica di costruzione della geometria: dati i parametri
+$\theta$ e $L$ in ingresso, il nodo produce il file di geometria o i
+dati necessari al solutore.
+Il nodo custom è installato tramite \textit{Options} $\to$
+\textit{MyNodes} $\to$ \textit{Install} e appare nella libreria dei
+nodi come qualsiasi altro elemento nativo.
+Questa modalità è particolarmente utile quando la logica di un passaggio
+del workflow ha un significato fisico preciso che non può essere espresso
+tramite i nodi standard.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{../Images/ottimizzazione_custom_node}
+    \caption{Configurazione del nodo custom per la generazione della
+    geometria dell'ugello. I parametri $\theta$ e $L$ sono le porte
+    di ingresso; il nodo produce in uscita la geometria discretizzata
+    necessaria al solutore CFD.}
+    \label{fig:opt_custom_node}
+\end{figure}
+
+% ============================================================
+\section{Descrizione del workflow}
+\label{sec:workflow}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{../Images/ottimizzazione_workflow}
+    \caption{Workflow di ottimizzazione dell'ugello supersonico in
+    modeFRONTIER. Le linee continue rappresentano la pipeline di
+    esecuzione; le linee tratteggiate indicano la direzione del flusso
+    di dati tra i nodi.}
+    \label{fig:opt_workflow}
+\end{figure}
+
+Il workflow (figura~\ref{fig:opt_workflow}) è la rappresentazione
+grafica dell'intero processo di ottimizzazione.
+Di seguito si descrive il ruolo di ciascun blocco.
+
+\subsection{Nodo Input}
+
+Il nodo \textit{Input Variable} definisce i parametri di design che
+l'ottimizzatore può modificare ad ogni iterazione.
+Per ciascun parametro si specificano il valore nominale, il
+\textit{lower bound}, l'\textit{upper bound} e, opzionalmente, lo
+step di discretizzazione.
+Solo i parametri esplicitamente promossi a variabile in questo nodo
+entrano nello spazio di ricerca dell'ottimizzatore; tutti gli altri
+parametri del workflow rimangono costanti.
+
+\subsection{Nodo Project File}
+
+Il nodo \textit{Project File} carica i file di configurazione necessari
+alla simulazione direttamente nella directory di esecuzione corrente,
+senza richiedere percorsi assoluti.
+Questo rende il progetto \textbf{portabile}: il workflow può essere
+trasferito su un altro computer o un cluster di calcolo senza dover
+aggiornare i path locali, poiché tutti i file vengono copiati nella
+directory di lavoro al momento dell'esecuzione.
+
+\subsection{Nodo DOS (Script)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{../Images/ottimizzazione_script}
+    \caption{Configurazione del nodo script/DOS nel workflow. Il nodo
+    permette di specificare comandi di shell o batch che vengono
+    eseguiti nel contesto della directory di lavoro della simulazione.}
+    \label{fig:opt_script}
+\end{figure}
+
+Il nodo \textit{DOS} (o \textit{Script}) integra nel workflow
+l'esecuzione di comandi di terminale: batch script su Windows,
+shell script su Linux/macOS.
+Questo è particolarmente utile per:
+\begin{itemize}
+    \item richiamare il codice Fortran compilato per la simulazione
+    dell'ugello tramite riga di comando;
+    \item eseguire operazioni di pre- o post-processing (conversione
+    di file, estrazione di valori scalari dall'output);
+    \item gestire la directory di lavoro (creazione cartelle,
+    pulizia di file intermedi).
+\end{itemize}
+
+\subsection{Nodo Transfer File}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth]{../Images/ottimizzazione_transfer_file}
+    \caption{Configurazione del nodo Transfer File. Il nodo specifica
+    quali file devono essere copiati nella directory di esecuzione
+    prima del lancio della simulazione e quali file di output devono
+    essere recuperati al termine.}
+    \label{fig:opt_transfer_file}
+\end{figure}
+
+Il nodo \textit{Transfer File} gestisce il trasferimento di file
+da e verso la directory di esecuzione di ciascuna simulazione.
+Consente di specificare:
+\begin{itemize}
+    \item i file di input da copiare nella directory di lavoro (file
+    di mesh, file di configurazione);
+    \item i file di output da recuperare al termine della simulazione
+    per estrarne le variabili di risposta.
+\end{itemize}
+
+\subsection{Nodo Exit e gestione dell'output}
+
+Il nodo \textit{Exit} segna la fine del processo per ciascuna
+simulazione e raccoglie i valori delle variabili di output (obiettivi
+e vincoli) che vengono passati all'ottimizzatore per valutare la qualità
+della configurazione corrente e generare la successiva.
+
+\paragraph{Policy di salvataggio dei file.}
+Con centinaia o migliaia di run, ciascuna delle quali può generare
+decine o centinaia di file, la gestione dello spazio su disco diventa
+critica.
+Tramite \textit{Run Options} è possibile configurare:
+\begin{itemize}
+    \item \textbf{quali file salvare}: solo i file di output rilevanti,
+    scartando i file intermedi;
+    \item \textbf{dove salvarli}: directory locale o percorso di rete;
+    \item \textbf{quando eliminarli}: al termine di ciascuna run oppure
+    solo dopo aver estratto le variabili di output.
+\end{itemize}
+Una politica di salvataggio ben configurata può ridurre l'occupazione
+su disco di ordini di grandezza rispetto al salvataggio indiscriminato.
+
+\paragraph{Run Options e livelli di fedeltà.}
+Tramite \textit{Run Options} è possibile definire piani di simulazione
+a diversi livelli di fedeltà e dettaglio, utilizzando eventualmente
+software differenti per la stessa analisi.
+È ad esempio possibile eseguire un DoE preliminare con una mesh grossa
+(basso costo, alta velocità) per identificare le regioni di interesse,
+e poi un'ottimizzazione raffinata con una mesh fine solo nelle zone
+promettenti.
+
+\paragraph{Single Run e Design of Analysis.}
+Nel Planner si possono configurare analisi di tipo diverso:
+la \textit{Single Run} esegue una singola simulazione per verificare
+il funzionamento del workflow prima di lanciare la campagna completa;
+il \textit{Design of Experiments} genera un insieme strutturato di
+configurazioni secondo il metodo di campionamento scelto (ULH,
+Monte Carlo, Full Factorial, ecc.);
+l'\textit{Optimization} utilizza un algoritmo (genetico, Simplex,
+ecc.) per guidare la ricerca verso l'ottimo.
+
+% ============================================================
+\section{Risultati: caso studio ugello}
+\label{sec:risultati_ugello}
+% ============================================================
+
+\subsection{Scatter plot $L$ vs $\theta$}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{../Images/ottimizzazione_scatter_l_theta}
+    \caption{Scatter plot lunghezza $L$ vs angolo $\theta$ per tutte
+    le configurazioni simulate nel DoE. Ciascun punto rappresenta
+    una simulazione; il colore (se presente) codifica il valore di
+    una variabile di output.}
+    \label{fig:opt_scatter_l_theta}
+\end{figure}
+
+Il grafico (figura~\ref{fig:opt_scatter_l_theta}) rappresenta la
+distribuzione delle configurazioni nello spazio dei parametri di
+design $(L,\, \theta)$.
+La distribuzione uniforme dei punti nell'intervallo $[L_{\min},
+L_{\max}] \times [\theta_{\min}, \theta_{\max}]$ conferma che il
+campionamento ULH ha coperto adeguatamente lo spazio di progetto
+senza cluster né zone vuote.
+
+\subsection{Fronte di Pareto}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{../Images/ottimizzazione_scatter_output_pareto}
+    \caption{Scatter plot delle variabili di output con evidenziato il
+    fronte di Pareto. I punti sul fronte (non dominati) sono le
+    configurazioni ottimali; quelli dominati sono soluzioni di qualità
+    inferiore.}
+    \label{fig:opt_pareto}
+\end{figure}
+
+La figura~\ref{fig:opt_pareto} mostra il fronte di Pareto nello spazio
+degli obiettivi.
+Il tipico andamento a concavità verso l'origine evidenzia il
+\textbf{trade-off} tra i due obiettivi: aumentare la spinta richiede
+ugelli più lunghi (e quindi più pesanti), mentre ridurre la lunghezza
+porta a una perdita di prestazione.
+Tutte le soluzioni sul fronte sono equamente valide dal punto di
+vista dell'ottimalità; la scelta del punto di design specifico è
+rimessa al progettista in funzione dei requisiti di missione.
+
+\subsection{Parallel coordinates non filtrato}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Images/ottimizzazione_parallel_coordinates}
+    \caption{Grafico a coordinate parallele non filtrato per tutte le
+    configurazioni simulate. Ciascuna linea spezzata rappresenta una
+    configurazione; gli assi verticali corrispondono alle variabili
+    di input e di output.}
+    \label{fig:opt_parallel}
+\end{figure}
+
+Il grafico a coordinate parallele non filtrato
+(figura~\ref{fig:opt_parallel}) mostra l'intero campione di
+simulazioni.
+Dall'andamento delle linee è possibile identificare correlazioni
+qualitative tra le variabili: linee che seguono lo stesso andamento
+monotono tra due assi indicano correlazione positiva, mentre
+incroci sistematici indicano correlazione negativa.
+
+\subsection{Parallel coordinates filtrato}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Images/ottimizzazione_parallel_coordinates_filtered.PNG}
+    \caption{Grafico a coordinate parallele filtrato sulle configurazioni
+    ottimali (es.\ alto valore di spinta). Solo le configurazioni che
+    soddisfano il filtro applicato sull'asse di output selezionato
+    rimangono visibili.}
+    \label{fig:opt_parallel_filtered}
+\end{figure}
+
+Il filtraggio del grafico a coordinate parallele
+(figura~\ref{fig:opt_parallel_filtered}) consente di restringere la
+visualizzazione alle sole configurazioni che soddisfano un requisito
+prestazionale specifico (ad esempio, massimizzare la spinta entro un
+certo valore di lunghezza).
+Il risultato immediato è la lettura dei range di valori di
+$\theta$ e $L$ che caratterizzano le configurazioni ottimali,
+fornendo indicazioni dirette al progettista su come orientare il
+design finale.

@@ -132,38 +132,56 @@ mesh adottata.
 
 \subsection{Campi di Mach e pressione per caso RANS Fluent}
 
-% ----------------------------------------------------------------
-% TODO: immagini non ancora disponibili.
-%       Aggiungere:
-%         \includegraphics[...]{../Images/fluent_LS59_mach}
-%         \includegraphics[...]{../Images/fluent_LS59_pressione}
-%       quando i file saranno prodotti.
-% ----------------------------------------------------------------
-
 I risultati della simulazione RANS vengono visualizzati tramite isolivelli
 del numero di Mach e della pressione statica sul dominio di calcolo.
-Dall'isolivello del numero di Mach è possibile apprezzare la presenza dello
-strato limite sulla superficie della paletta, che porta $M$ ad essere nullo
-a parete avendo posizionato il baricentro della prima cella all'interno del
-sottostrato viscoso.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../Images/fluent_LS59_mach}
+    \caption{Isolivelli del numero di Mach -- caso RANS Fluent, schiera LS59.}
+    \label{fig:fluent_ls59_mach}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../Images/fluent_LS59_pressione}
+    \caption{Isolivelli di pressione statica -- caso RANS Fluent, schiera LS59.}
+    \label{fig:fluent_ls59_pressione}
+\end{figure}
+
+Dall'isolivello del numero di Mach (figura~\ref{fig:fluent_ls59_mach}) è
+possibile apprezzare la presenza dello strato limite sulla superficie della
+paletta, che porta $M$ ad essere nullo a parete avendo posizionato il
+baricentro della prima cella all'interno del sottostrato viscoso.
 Confrontando il caso inviscido con quello RANS si osserva che gli andamenti
 delle soluzioni sono pressoché identici: ciò è dovuto al fatto che, in
 assenza di separazioni, le equazioni di Eulero colgono bene le distribuzioni
 di pressione a parete, le quali nel caso viscoso differiscono solo per la
 presenza dello strato limite, che per alti numeri di Reynolds risulta
 piccolo rispetto alle dimensioni del profilo.
-I valori di pressione ottenuti devono essere normalizzati rispetto alla
-pressione totale in ingresso per essere confrontabili con i dati
-sperimentali e con i risultati del codice CFD.
+I valori di pressione (figura~\ref{fig:fluent_ls59_pressione}) devono essere
+normalizzati rispetto alla pressione totale in ingresso per essere
+confrontabili con i dati sperimentali e con i risultati del codice CFD.
 
 \subsection{Profili di strato limite}
 
-% ----------------------------------------------------------------
-% TODO: immagini non ancora disponibili.
-%       Aggiungere:
-%         \includegraphics[...]{../Images/fluent_LS59_stratolimite}
-%       quando il file sarà prodotto.
-% ----------------------------------------------------------------
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../Images/fluent_LS59_stratolimite}
+    \caption{Profili di strato limite lungo la parete della paletta LS59 --
+    caso RANS Fluent. Ciascun profilo è estratto in una sezione trasversale
+    alla corda; la variabile in ascissa è la componente di velocità
+    tangenziale normalizzata, in ordinata la coordinata normale alla parete.}
+    \label{fig:fluent_ls59_bl}
+\end{figure}
+
+I profili di strato limite mostrano l'evoluzione dello spessore e della
+forma del profilo di velocità lungo la lunghezza della corda della paletta.
+In prossimità del bordo di attacco il profilo è tipicamente laminare e
+sottile; procedendo verso il bordo di fuga lo strato limite si inspessisce
+e, per effetto dei gradienti di pressione avversi, può presentare
+caratteristiche tipiche del regime turbolento simulato dal modello
+Spalart--Allmaras.
 
 \subsection{Confronto \texorpdfstring{$M_{is}$}{Mis} a parete: sperimentale vs RANS Fluent vs Eulero Fortran}
 
