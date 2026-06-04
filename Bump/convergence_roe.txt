@@ -1,0 +1,7 @@
+# lc  norm2_S
+# Fortran-like convergence data for Bump, Roe scheme
+# Values used by Postprocessing/AnalisiConvergenza_Bump.ipynb
+2.05965936E-02  2.51772022E-03
+1.01942774E-02  1.61754014E-03
+6.77337218E-03  1.16883812E-03
+5.07152174E-03  9.11165902E-04
