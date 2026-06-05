@@ -450,6 +450,20 @@ discontinuità.
 \section{Confronto con Dati Sperimentali}
 \label{sec:presa_exp}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/confronto_pressione_doppia_rampa}
+  \caption{Distribuzione di pressione adimensionale $P_w/P^\circ$ sulla parete inferiore
+           della presa a doppia rampa: confronto tra i dati sperimentali, la soluzione Euler
+           con schema di Roe (codice sviluppato), la soluzione Euler--CFD (ANSYS Fluent
+           inviscido) e il modello RANS Spalart--Allmaras (ANSYS Fluent viscoso).
+           I modelli inviscidi sottostimano la distribuzione di pressione a valle degli urti
+           per la mancata modellazione dell'interazione urto--strato limite (SBLI), mentre
+           il modello RANS con Spalart--Allmaras cattura parzialmente la separazione
+           indotta dagli urti, avvicinandosi ai dati sperimentali nella regione downstream.}
+  \label{fig:confronto_pressione_doppia_rampa}
+\end{figure}
+
 I dati sperimentali disponibili forniscono la distribuzione di pressione sulla parete
 inferiore del condotto in funzione della coordinata assiale $x$. Per il confronto si estrae
 numericamente la pressione nelle celle di bordo con tag 99 (parete solida), si filtra
