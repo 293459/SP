@@ -6,8 +6,11 @@ Per questo progetto è stata effettuata una migrazione dall'IDE tradizionale Cod
 La configurazione del workspace ha seguito i seguenti step fondamentali:
 \begin{itemize}
     \item \textbf{Integrazione Toolchain:} Identificazione del compilatore \texttt{gfortran} e del debugger \texttt{gdb} all'interno della distribuzione \textit{Strawberry Perl}.
-    \item \textbf{Automazione Build (tasks.json):} Creazione di un task per la compilazione modulare che unisce i file sorgente (\texttt{main.f90}, \texttt{calcolo\_area.f90}, \texttt{calcolo\_baricentro.f90}) generando l'eseguibile nella directory \texttt{bin/Debug}.
-    \item \textbf{Setup Debugging (launch.json):} Collegamento del motore di debug di VS Code all'eseguibile \texttt{gdb.exe} tramite il percorso assoluto \texttt{C:/Strawberry/c/bin/gdb.exe}.
+    \item \textbf{Automazione Build (\texttt{tasks.json}):} Creazione di un task per la compilazione modulare che unisce i file sorgente
+          (\texttt{main.f90}, \texttt{calcolo\_area.f90}, \texttt{calcolo\_baricentro.f90})
+          generando l'eseguibile nella directory \texttt{bin/Debug}.
+    \item \textbf{Setup Debugging (\texttt{launch.json}):} Collegamento del motore di debug di VS Code all'eseguibile \texttt{gdb.exe}
+          tramite il percorso \texttt{C:/Strawberry/c/bin/gdb.exe}.
     \item \textbf{Supporto Linguistico:} Configurazione del \textit{Language Server} \texttt{fortls} (via Python) per abilitare l'autocompletamento e il \textit{linting} in tempo reale.
 \end{itemize}
 

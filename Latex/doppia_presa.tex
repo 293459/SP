@@ -391,6 +391,19 @@ Il campo di Mach mostra chiaramente le strutture attese:
   \item Eventuale urto normale all'ingresso del canale o urto riflesso sul bordo superiore.
 \end{enumerate}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/fluent_doppiarampa_mach}
+  \caption{Campo di numero di Mach nella presa a doppia rampa ($M_{\rm in} = 3$), ottenuto
+           con ANSYS Fluent (schema di Roe, secondo ordine upwind, solutore density-based).
+           Sono chiaramente visibili i due urti obliqui attaccati rispettivamente al piede
+           della prima rampa e al ginocchio tra prima e seconda rampa. La struttura a ventaglio
+           delle isobare conferma la compressione progressiva del flusso supersonico,
+           con il numero di Mach che scende da $M \approx 3$ a monte a valori intorno a
+           $M \approx 1.5$ nella sezione del canale di cattura.}
+  \label{fig:campo_mach_doppia_rampa}
+\end{figure}
+
 Al raffinamento della griglia, gli urti diventano progressivamente più netti
 (la zona di smearing si riduce), e il metodo di Roe cattura meglio le discontinuità
 rispetto a Lax--Friedrichs.
@@ -455,40 +468,20 @@ I risultati mostrano che:
     ai dati sperimentali nella regione downstream.
 \end{itemize}
 
-\section{Analisi con ANSYS Fluent}
-\label{sec:presa_fluent}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/confronto_pressione_doppia_rampa}
+  \caption{Distribuzione di pressione adimensionale $P_w/P^\circ$ sulla parete inferiore
+           della presa a doppia rampa: confronto tra i dati sperimentali, la soluzione Euler
+           con schema di Roe (codice sviluppato), la soluzione Euler--CFD (ANSYS Fluent
+           inviscido) e il modello RANS Spalart--Allmaras (ANSYS Fluent viscoso).
+           I modelli inviscidi sottostimano la distribuzione di pressione a valle degli urti
+           per la mancata modellazione dell'interazione urto--strato limite (SBLI), mentre
+           il modello RANS con Spalart--Allmaras cattura parzialmente la separazione
+           indotta dagli urti, avvicinandosi ai dati sperimentali nella regione downstream.}
+  \label{fig:confronto_pressione_doppia_rampa}
+\end{figure}
 
-\subsection{Geometria e Mesh in ANSYS}
-
-La geometria è stata importata in ANSYS DesignModeler a partire dal file \texttt{.step}
-esportato da \texttt{gmsh} (con il comando \texttt{SetFactory("OpenCASCADE")}), applicando
-un fattore di scala di 1000 per convertire le unità da millimetri a metri.
-
-La mesh ANSYS è non strutturata con elementi quadrangolari, con le seguenti specifiche:
-\begin{itemize}
-  \item \texttt{Element size}: 0.008~m
-  \item \texttt{Inflation layers} (strati di inflazione sulla parete): massimo 15 strati
-  \item \texttt{Inflation Growth rate}: 1.2
-\end{itemize}
-
-\subsection{Impostazioni Fluent}
-
-\begin{itemize}
-  \item Solutore: \textit{density-based}, implicito, $P_{\rm ref} = 0$~Pa
-  \item Discretizzazione spaziale: secondo ordine upwind, schema di Roe
-  \item Numero di Courant: 5
-  \item Condizioni al contorno Inlet: $P^\circ = 100\,000$~Pa,
-    $P_{\rm static} = 2722.37$~Pa (corrispondente a $M = 3$), $T^\circ = 300$~K
-  \item Viscosità (caso RANS): $\mu = 1.4946 \times 10^{-5}$~N$\cdot$s/m$^2$,
-    ottenuta da:
-    \begin{equation}
-      \mu = \frac{\rho u L}{Re} = \frac{\rho u L}{1.3 \times 10^6}
-    \end{equation}
-\end{itemize}
-
-\paragraph{Analisi del $y^+$.}
-Il profilo di $y^+$ sulla parete inferiore mostra valori superiori alla soglia di $y^+ \le 5$
-nella maggior parte del dominio, indicando che lo strato limite non è completamente risolto.
-Sarebbe necessario aumentare il numero di strati di inflazione o ridurre l'altezza del primo
-strato per soddisfare il requisito $y^+ \le 5$ richiesto dal modello Spalart--Allmaras
-(che non prevede funzioni di parete e necessita di risolvere il sottostrato viscoso).
+% L'analisi ANSYS Fluent completa (mesh, y+, campi Mach/pressione, strato limite,
+% bolla di ricircolo e confronto con dati sperimentali) è trattata nel
+% Capitolo~\ref{cap:fluent} dedicato, al fine di evitare duplicazione.

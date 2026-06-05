@@ -1,6 +1,22 @@
 \chapter{LS59}
 \label{cap:progetto3}
 
+\section{Descrizione del Caso Studio}
+\label{sec:paletta_descrizione}
+
+Il terzo caso studio riguarda una \textbf{paletta di turbina con profilo LS59}, un profilo
+transsonico tipico degli stadi di alta pressione dei turboventilatori. Il dominio
+computazionale rappresenta un \emph{canale di cascata} (o \emph{cascade tunnel}): una
+configurazione periodica in cui si simula il comportamento di una singola paletta
+all'interno di una schiera infinita di profili identici, sfruttando la periodicità del
+campo di moto per ridurre il dominio alla sola intercella.
+
+La geometria è definita dal profilo LS59 che occupa la sezione centrale del canale, con
+le condizioni di ingresso imposte con angolo di attacco $\alpha = 30°$ rispetto all'asse
+orizzontale e numero di Mach $M_{\rm in} = 0.5$ (regime transonico basso). La pressione
+statica di uscita $p_{\rm out} = 0.4124$ è ricavata dalle relazioni isentropiche per le
+condizioni operative della paletta.
+
 \section{Condizioni di Inlet e Outlet}
 
 \begin{table}[h!]
@@ -17,3 +33,76 @@
 \caption{Condizioni di Inlet e Outlet - LS59}
 \label{tab:ls59_conditions}
 \end{table}
+
+\section{Angolo di Attacco e Deflessione -- Considerazioni Teoriche}
+\label{sec:paletta_angoli}
+
+Un aspetto fondamentale nella simulazione di pale di turbina riguarda la corretta
+interpretazione dell'angolo di attacco e della deflessione del flusso, grandezze che
+influenzano direttamente le perdite di profilo e l'efficienza dello stadio.
+
+\paragraph{Angolo di attacco.}
+L'angolo di attacco $\alpha = 30°$ rappresenta l'angolo tra il vettore velocità in ingresso
+e l'asse di riferimento del canale (asse $x$ orizzontale). Nelle cascate di turbina, a
+differenza dei profili alari isolati, l'angolo di attacco è definito rispetto alla direzione
+nominale di ingresso della schiera, non alla corda del profilo. Pertanto, piccole variazioni
+di $\alpha$ rispetto al valore di progetto producono effetti di incidenza che si manifestano
+principalmente sulla distribuzione di pressione intorno al bordo di attacco e sulla posizione
+del punto di ristagno.
+
+\paragraph{Deflessione del flusso.}
+La deflessione $\Delta\beta = \beta_{\rm in} - \beta_{\rm out}$ (differenza tra angolo di
+ingresso e angolo di uscita misurati rispetto all'asse tangenziale) è la grandezza che
+quantifica il lavoro estratto dalla paletta. Per il profilo LS59, la deflessione di progetto
+è tale da garantire un campo di pressione uniforme sull'intradosso e un'accelerazione
+controllata sull'estradosso, minimizzando le perdite per separazione dello strato limite.
+
+\paragraph{Effetto dell'angolo di attacco sulle prestazioni.}
+Nella paletta di turbina LS59, variazioni dell'angolo di attacco rispetto al valore nominale
+($\alpha = 30°$) hanno i seguenti effetti:
+\begin{itemize}
+  \item \textbf{Incidenza positiva} ($\alpha > 30°$): carico aerodinamico maggiore sul
+    bordo di attacco, rischio di separazione precoce sull'intradosso e aumento delle perdite
+    di profilo.
+  \item \textbf{Incidenza negativa} ($\alpha < 30°$): sottocarico del bordo di attacco,
+    possibile separazione sull'estradosso con conseguente riduzione della deflessione
+    effettiva e calo dell'efficienza di palettatura.
+  \item \textbf{Valore di progetto} ($\alpha = 30°$): distribuzione di carico ottimale,
+    minime perdite di profilo e comportamento isentropico prossimo a quello teorico.
+\end{itemize}
+In un modello di Eulero (flusso non viscoso), tali effetti di separazione non sono
+direttamente simulabili; tuttavia, il campo di pressione risultante fornisce informazioni
+preziose sul \emph{carico del profilo} (integrale della differenza di pressione tra
+intradosso ed estradosso) e sulla distribuzione di velocità, che possono essere confrontate
+con i dati sperimentali per validare il codice numerico e identificare zone critiche dove
+gli effetti viscosi diventano rilevanti.
+
+\section{Confronto con Dati Sperimentali e Analisi con ANSYS Fluent}
+\label{sec:paletta_confronto}
+
+La distribuzione di pressione (o equivalentemente il coefficiente di pressione $C_p$)
+attorno al profilo LS59 costituisce il principale termine di confronto tra il codice
+numerico, ANSYS Fluent e i dati sperimentali di letteratura per questo tipo di paletta.
+
+Per il confronto si estrae la pressione statica adimensionale $P_w/P^\circ$ nelle celle
+di bordo che definiscono il profilo (tag di parete solida), separando l'intradosso
+dall'estradosso tramite la coordinata $y$ delle celle, e si confronta con i dati
+sperimentali disponibili.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/confronto_Mis_LS59}
+  \caption{Distribuzione di pressione adimensionale $P_w/P^\circ$ attorno al profilo LS59:
+           confronto tra i dati sperimentali, la soluzione Euler con schema di Roe (codice
+           sviluppato), la soluzione Euler--CFD (ANSYS Fluent inviscido) e il modello RANS
+           Spalart--Allmaras (ANSYS Fluent viscoso).
+           I modelli inviscidi concordano bene con i dati sperimentali sull'intradosso,
+           dove il flusso rimane attaccato; le discrepanze sull'estradosso, in prossimità
+           del bordo di uscita, sono attribuibili agli effetti viscosi e alla separazione
+           dello strato limite non modellata dalle equazioni di Eulero.}
+  \label{fig:confronto_Mis_LS59}
+\end{figure}
+
+% L'analisi ANSYS Fluent completa (mesh, y+, campi Mach/pressione, profili di
+% strato limite e confronto con dati sperimentali) è trattata nel
+% Capitolo~\ref{cap:fluent} dedicato, al fine di evitare duplicazione.

@@ -1,5 +1,9 @@
 % --- Grafica, figure e resa tipografica ---
-\usepackage{microtype}
+% NOTA: expansion=false necessario con fontenc T1 per evitare il fatal error
+%   "auto expansion is only possible with scalable fonts" di pdfTeX/microtype.
+%   La protrusion (margini ottici) rimane attiva; solo l'espansione del font
+%   (che richiede font scalabili Type1/OTF) è disabilitata.
+\usepackage[protrusion=true, expansion=false]{microtype}
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{float}
@@ -10,7 +14,9 @@
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
 
 \graphicspath{{../Images/}{../Rampa/}{../Paletta/}}
-\emergencystretch=3em
+% emergencystretch: allarga la spaziatura inter-parola come ultima risorsa
+% prima di produrre un overfull/underfull hbox. Riduce i warning di badness.
+\emergencystretch=4em
 
 % --- Codice sorgente ---
 \usepackage{listings}

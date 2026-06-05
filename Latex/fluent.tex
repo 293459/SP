@@ -6,6 +6,7 @@
 % ============================================================
 
 \chapter{Analisi con ANSYS Fluent}
+\label{cap:fluent}
 
 Si propone di ripetere le analisi svolte precedentemente attraverso il software
 commerciale ANSYS Fluent, ripercorrendo gli stessi casi studiati con il codice
@@ -185,16 +186,28 @@ Spalart--Allmaras.
 
 \subsection{Confronto \texorpdfstring{$M_{is}$}{Mis} a parete: sperimentale vs RANS Fluent vs Eulero Fortran}
 
-% ----------------------------------------------------------------
-% TODO: grafico di confronto non ancora disponibile.
-%       Sarà fornito dal docente (nota: ``lo daremo dal Penna'').
-% ----------------------------------------------------------------
-
 Il grafico di confronto mette in relazione l'andamento del numero di Mach
 isentropico a parete $M_{is}$ ricavato sperimentalmente con i risultati
 ottenuti dalla simulazione RANS in Fluent e dal codice Eulero sviluppato
 in Fortran.
-Come discusso in precedenza, tutti i modelli si comportano all'incirca allo
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../Images/confronto_Mis_LS59}
+    \caption{Confronto del numero di Mach isentropico a parete $M_{is}$ lungo
+    il profilo LS59: dati sperimentali, codice Eulero Fortran (schema di Roe)
+    e simulazione RANS Fluent (Spalart--Allmaras).
+    Sull'intradosso e nella zona centrale dell'estradosso i tre approcci
+    concordano bene; le discrepanze si concentrano in prossimità del bordo
+    di fuga, dove la presenza di gradienti avversi di pressione e l'effetto
+    del bordo di uscita a cuneo producono effetti viscosi non catturabili
+    dal modello Eulero inviscido. Il modello RANS si avvicina maggiormente
+    ai dati sperimentali in questa regione grazie alla modellazione della
+    turbolenza con Spalart--Allmaras.}
+    \label{fig:confronto_Mis_LS59}
+\end{figure}
+
+Come si osserva nel grafico, tutti i modelli si comportano all'incirca allo
 stesso modo nel cogliere i dati sperimentali; le differenze si localizzano
 principalmente nel tratto finale del profilo, in prossimità del bordo di
 fuga, dove la presenza di spigoli e la generazione di entropia numerica
@@ -358,16 +371,28 @@ per definizione non risolve gli effetti viscosi.
 
 \subsection{Confronto \texorpdfstring{$p_w/p^{\circ}$}{pw/p0} sperimentale vs RANS Fluent vs Eulero Fortran}
 
-% ----------------------------------------------------------------
-% TODO: grafico di confronto non ancora disponibile.
-% ----------------------------------------------------------------
-
 Il grafico di confronto mette a confronto il profilo di pressione a parete
 normalizzata $p_w/p^{\circ}$ ricavato sperimentalmente con i risultati
 ottenuti dal codice Eulero Fortran e dalla simulazione RANS in Fluent.
 I valori di pressione ottenuti da Fluent devono essere normalizzati
 rispetto alla pressione totale in ingresso $p^{\circ} = 100\,000$~Pa
 per essere confrontabili con i dati sperimentali e con i risultati CFD.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../Images/confronto_pressione_doppia_rampa}
+    \caption{Confronto della distribuzione di pressione adimensionale $p_w/p^{\circ}$
+    sulla parete inferiore della presa a doppia rampa: dati sperimentali, codice
+    Eulero Fortran (schema di Roe), simulazione Eulero Fluent (inviscido) e
+    simulazione RANS Fluent (Spalart--Allmaras).
+    I modelli inviscidi concordano bene tra loro e con i dati sperimentali nella
+    zona delle rampe ($x < 0.5$); le discrepanze a valle degli urti ($x > 0.5$)
+    sono attribuibili all'interazione urto--strato limite (SBLI), un fenomeno
+    puramente viscoso non modellato dalle equazioni di Eulero. Il modello RANS
+    Spalart--Allmaras cattura parzialmente questa separazione, avvicinandosi ai
+    dati sperimentali nella regione downstream della presa.}
+    \label{fig:confronto_pressione_doppia_rampa}
+\end{figure}
 
 Come si osserva nel grafico, i casi inviscidi (codice Eulero Fortran e
 Fluent inviscido) trovano riscontro diretto l'uno con l'altro, mentre

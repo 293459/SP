@@ -388,6 +388,28 @@ Jacobiana, applicando la dissipazione corretta per ogni onda caratteristica. Il 
 un'interfaccia numerica più netta, con meno smearing delle strutture fisiche. Il costo
 computazionale aggiuntivo di Roe è moderato (decomposizione in autovettori a ogni interfaccia)
 e ampiamente compensato dall'accuratezza guadagnata.
+\section{Confronto con Misure Sperimentali sulla Parete}
+\label{sec:bump_exp}
+
+La distribuzione di pressione sulla parete inferiore (bump) costituisce un termine di
+confronto diretto tra la soluzione numerica e le misure sperimentali. Si estrae la pressione
+statica adimensionale $P_w/P^\circ$ nelle celle di bordo con tag 99 (parete solida) e la si
+traccia in funzione della coordinata assiale $x$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/Mis_parete_bump.png}
+  \caption{Distribuzione di pressione sulla parete inferiore del condotto con bump:
+           confronto tra la soluzione numerica (Euler, schema di Roe), la soluzione di
+           riferimento Euler--CFD e i dati sperimentali disponibili.
+           L'accordo complessivo è buono nella zona di accelerazione ($x < 0.5$,
+           tratto convergente); piccole discrepanze nel tratto divergente ($x > 0.5$)
+           sono attribuibili agli effetti viscosi non modellati dalle equazioni di Eulero,
+           in particolare allo strato limite che altera il profilo di pressione in prossimità
+           della parete.}
+  \label{fig:Mis_parete_bump}
+\end{figure}
+
 \section{Dati di Riferimento e Valutazione Grafica dell'Ordine}
 
 \subsection{Tabella della Soluzione Esatta Fornita}
@@ -422,6 +444,27 @@ In questo grafico:
     \item \textbf{Retta tratteggiata (Ideal 1st order slope)}: rappresenta la pendenza teorica ideale che il metodo dovrebbe avere ($p=1$). 
 \end{itemize}
 La rappresentazione in scala log-log è fondamentale perché trasforma la relazione polinomiale dell'errore $E = k \cdot h^p$ in un'equazione lineare $\log E = p \log h + \log k$. La pendenza geometrica delle curve tracciate è quindi esattamente pari all'ordine di convergenza $p$. Al diminuire di $h$ (verso sinistra), le curve dei metodi numerici devono tendere a disporsi parallelamente alla retta ideale, a dimostrazione che il codice è entrato nel regime asintotico teorico.
+
+% NOTA: i punti sperimentali/numerici riportati nel grafico non sono ordinati rispetto ad h.
+% Esistono due strategie di visualizzazione:
+%   a) Plottarli come scatter (pallini isolati, senza linee di connessione) -- consigliato
+%      quando non si vuole suggerire una continuità tra valori non ordinati.
+%   b) Connetterli con linee, previa ordinazione crescente di h -- necessario se si vuole
+%      confrontare visivamente la pendenza con la retta ideale, ma richiede un ordinamento
+%      esplicito dei dati (es. numpy argsort) per evitare linee che si incrociano.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/convergenza_griglia_bump}
+  \caption{Analisi di convergenza di griglia per il caso bump: norma $L_2$ dell'entropia
+           $\|\bar{S}\|_2$ in funzione della lunghezza caratteristica $h$ (scala log-log).
+           Le curve di Roe e Lax--Friedrichs sono confrontate con la pendenza teorica
+           del primo ordine (retta tratteggiata) e con i dati di riferimento forniti.
+           Lo schema di Roe presenta errori sistematicamente inferiori a parità di griglia,
+           confermando la minore dissipazione numerica del metodo upwind rispetto a
+           Lax--Friedrichs.}
+  \label{fig:convergenza_griglia_bump}
+\end{figure}
 
 % ============================================================
 \section{Studio della Stabilità al Variare della CFL}
@@ -466,4 +509,19 @@ subroutine salva_storia_convergenza(k)
 end subroutine
 \end{lstlisting}
 
-Per lo studio della stabilità, fissando la mesh e il metodo numerico, si fa girare il codice con valori crescenti di CFL (es. 0.3, 0.6, 0.9, e uno oltre il limite teorico come 1.2). I dati prodotti nel file `history.txt` permetteranno di graficare direttamente le curve richieste, visualizzando come un valore di CFL elevato porti all'esplosione dei residui (instabilità) anziché all'asintoto.
+Per lo studio della stabilità, fissando la mesh e il metodo numerico, si fa girare il codice con valori crescenti di CFL (es. 0.3, 0.6, 0.9, e uno oltre il limite teorico come 1.2). I dati prodotti nel file \texttt{history.txt} permetteranno di graficare direttamente le curve richieste, visualizzando come un valore di CFL elevato porti all'esplosione dei residui (instabilità) anziché all'asintoto.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../Images/stabilita_CFL_bump}
+  \caption{Effetto del numero CFL sulla stabilità numerica per il caso bump: andamento
+           della norma del residuo (sinistra) e della norma $L_2$ dell'entropia (destra)
+           in funzione del numero di iterazioni, per diversi valori di CFL.
+           Valori di CFL contenuti (es.\ $\mathrm{CFL} \le 0.9$) producono una convergenza
+           monotona verso lo stazionario; valori superiori al limite teorico (es.\
+           $\mathrm{CFL} = 1.2$) provocano la crescita esponenziale dei residui (instabilità
+           numerica). La norma dell'entropia fornisce una metrica di accuratezza indipendente
+           dal residuo, confermando che il regime asintotico stabile coincide con il minimo
+           della dissipazione numerica.}
+  \label{fig:stabilita_CFL_bump}
+\end{figure}
