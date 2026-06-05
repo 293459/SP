@@ -1,0 +1,8 @@
+# Escludi file di calcolo pesanti e binari
+*.myn
+gmsh-4.15.2-Windows64/
+*.exe
+
+# Escludi ambienti virtuali di Python
+.venv/
+__pycache__/
