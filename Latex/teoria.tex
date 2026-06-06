@@ -45,6 +45,7 @@ Il sistema è chiuso dall'equazione di stato dei gas perfetti:
 
 % ============================================================
 \section{Adimensionalizzazione}
+\label{sec:adim}
 % ============================================================
 
 Le equazioni vengono risolte in forma adimensionale.
@@ -100,6 +101,7 @@ dell'interfaccia.
 
 % ============================================================
 \section{Calcolo dei Flussi Numerici}
+\label{sec:flussi}
 % ============================================================
 
 \subsection{Schema di Lax--Friedrichs Locale}
@@ -200,12 +202,21 @@ Qualsiasi deviazione da questo valore misurata nella soluzione numerica rapprese
 
 Assumendo che l'errore segua un andamento asintotico del tipo $E = k \cdot h^p$, dove $h$ è la dimensione caratteristica della griglia e $p$ è l'ordine di convergenza effettivo, ci si aspetta che $\|\bar{S}\|_2 \to 0$ per $h \to 0$. Calcolando $\|\bar{S}\|_2$ su griglie via via più fitte, la pendenza della curva in un grafico log-log fornisce il valore dell'ordine di convergenza spaziale $p$.
 
+\paragraph{Ambito di validità.}
+È importante sottolineare che questo approccio alla valutazione dell'ordine di convergenza, basato sulla \emph{conoscenza analitica} della soluzione esatta ($S_{\rm esatto}=0$), è applicabile \textbf{esclusivamente al caso del bump}. Esso richiede infatti che siano simultaneamente verificate tre condizioni: il flusso deve essere \textbf{subsonico e privo di onde d'urto} (così che l'entropia si conservi e sia ovunque nulla), e il solutore deve essere \textbf{inviscido} (le equazioni di Eulero non includono perdite di strato limite o effetti viscosi che genererebbero entropia fisica). Solo in questo scenario qualsiasi deviazione di $\bar{S}$ da zero è imputabile unicamente all'errore numerico, rendendo la norma $L_2$ dell'entropia un misuratore diretto dell'errore di discretizzazione. Nei casi con urti (ad esempio la presa a doppia rampa) l'entropia esatta \emph{non} è più nulla — viene prodotta fisicamente attraverso gli urti — e questa tecnica non è utilizzabile: in tali casi si ricorre all'estrapolazione di Richardson (Sez.~\ref{subsec:richardson}).
+
 \subsection{Estrapolazione di Richardson}
+\label{subsec:richardson}
 
 L'estrapolazione di Richardson è una tecnica che permette di stimare il valore esatto di una grandezza (o un errore residuo) combinando i risultati ottenuti su griglie con livelli di raffinamento diversi. Può essere applicata in due modalità.
 
 \paragraph{1. Ordine assunto pari a quello teorico.}
-Se si ha forte confidenza che il metodo numerico stia operando nella regione asintotica, si può ipotizzare che l'ordine effettivo $p$ sia pari all'ordine formale teorico dello schema (ad esempio, $p=1$ per Lax-Friedrichs o Roe al primo ordine). Eseguendo due simulazioni con lunghezze caratteristiche $h_1$ e $h_2 = r h_1$ (con $r > 1$ rapporto di diradamento), l'errore si esprime come:
+Se si ha forte confidenza che il metodo numerico stia operando nella regione asintotica, si può ipotizzare che l'ordine effettivo $p$ sia pari all'ordine formale teorico dello schema (ad esempio, $p=1$ per Lax-Friedrichs o Roe al primo ordine). Eseguendo due simulazioni con lunghezze caratteristiche $h_1$ e $h_2 = r h_1$ (con $r > 1$ \emph{rapporto di diradamento}), l'errore si esprime come:
+\begin{equation}
+  r = \frac{h_2}{h_1} > 1
+  \label{eq:rapporto_diradamento}
+\end{equation}
+Il rapporto di diradamento quantifica di quanto una griglia è più grossolana dell'altra: essendo $r>1$ si ha $h_2 > h_1$, ovvero la griglia con passo $h_2$ è \textbf{più rada} (celle più grandi) rispetto a quella con passo $h_1$, che è la \textbf{più fitta}. Il valore tipicamente adottato è $r=2$, corrispondente al dimezzamento del numero di nodi per direzione fra un livello e il successivo.
 \begin{equation}
   \begin{cases}
     E_1 = u_{h_1} - u_{\rm esatto} = k \cdot h_1^p \\
@@ -226,6 +237,47 @@ Una volta trovato $p$, lo si sostituisce nella formula dell'estrapolazione per r
 \begin{equation}
   u_{\rm esatto} \approx u_h + \frac{u_{2h}-u_h}{2^p - 1}
 \end{equation}
+
+\paragraph{Quando usare l'ordine teorico.} L'ipotesi $p = p_{\rm teorico}$ è lecita
+\emph{solo} se si ha confidenza di operare nella \textbf{regione asintotica}, ossia con griglie
+sufficientemente fitte da rendere il termine dominante $k\,h^p$ molto maggiore dei termini di
+ordine superiore nello sviluppo dell'errore. Su griglie grossolane ciò non accade: l'ordine
+\emph{osservato} differisce da quello formale (tipicamente risulta \textbf{inferiore} per la
+dissipazione numerica e gli effetti di bordo, ma può apparire anche superiore, come nel caso
+della presa a doppia rampa con Roe, dove $p_{\rm eff}\approx1.46$). La Figura~\ref{fig:ordine_convergenza}
+illustra qualitativamente l'andamento dell'ordine osservato in funzione del raffinamento: lontano
+dalla regione asintotica l'ordine è distante dal valore teorico, e solo infittendo la griglia vi
+si avvicina. Lo schema di Roe (upwind, meno dissipativo) converge al valore formale più
+rapidamente di Lax--Friedrichs.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=12cm, height=6.8cm,
+        xlabel={raffinamento $\rightarrow$ ($h$ decrescente)},
+        ylabel={ordine osservato $p$},
+        xmin=0, xmax=4, ymin=0, ymax=1.4,
+        xtick={0,1,2,3,4},
+        xticklabels={$4h$,$2h$,$h$,$h/2$,$h/4$},
+        legend pos=south east, grid=both, thick]
+      \addplot[black, dashed, domain=0:4] {1.0};
+      \addlegendentry{ordine teorico $p=1$}
+      \addplot[blue, mark=*] coordinates {(0,0.35)(1,0.55)(2,0.75)(3,0.88)(4,0.96)};
+      \addlegendentry{Roe (upwind)}
+      \addplot[red, mark=square*] coordinates {(0,0.22)(1,0.35)(2,0.50)(3,0.63)(4,0.78)};
+      \addlegendentry{Lax--Friedrichs}
+      \draw[gray, <->] (axis cs:3,1.22) -- (axis cs:4,1.22)
+        node[midway, above, font=\footnotesize]{regione asintotica};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Andamento qualitativo dell'ordine di convergenza osservato in funzione del livello di
+           raffinamento. Per griglie grossolane l'ordine effettivo è inferiore a quello teorico
+           ($p=1$, tratteggiato); solo entrando nella regione asintotica l'ordine tende al valore
+           formale. Lo schema di Roe vi si avvicina più rapidamente di Lax--Friedrichs, coerentemente
+           con la sua minore dissipazione numerica.}
+  \label{fig:ordine_convergenza}
+\end{figure}
 
 Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa dell'incertezza numerica associata alla discretizzazione:
 \begin{equation}

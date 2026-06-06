@@ -27,26 +27,39 @@
 \definecolor{backcolour}{rgb}{0.97,0.97,0.97}
 \definecolor{keyblue}{rgb}{0.0,0.35,0.75}
 
-\lstdefinestyle{gmsh}{
+% Parametri comuni a tutti gli stili di codice: garantiscono che il riquadro sia
+% staccato dai margini della pagina (xleftmargin/xrightmargin) e che il testo non
+% tocchi la cornice (framesep), migliorando la leggibilita' del codice ovunque.
+\lstdefinestyle{base}{
     backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen}\itshape,
     keywordstyle=\color{keyblue}\bfseries,
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=true,
+    breakatwhitespace=false,
     breaklines=true,
+    postbreak=\mbox{\textcolor{codegray}{$\hookrightarrow$}\space},
     captionpos=b,
     columns=fullflexible,
     keepspaces=true,
     numbers=left,
-    numbersep=5pt,
+    numbersep=8pt,
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
     tabsize=2,
     frame=single,
+    framesep=6pt,
+    xleftmargin=1.8em,
+    xrightmargin=1.2em,
+    aboveskip=1.2em,
+    belowskip=1.2em,
     rulecolor=\color{gray!40},
+}
+
+\lstdefinestyle{gmsh}{
+    style=base,
     morekeywords={Point, Line, Spline, Line Loop, Plane Surface, Physical Surface,
                   Physical Line, Transfinite Line, Transfinite Surface,
                   Recombine, Field, Background, Using, Progression, Bump,
@@ -56,18 +69,12 @@
 }
 
 \lstdefinestyle{fortran}{
-    backgroundcolor=\color{backcolour},
-    commentstyle=\color{codegreen}\itshape,
-    keywordstyle=\color{keyblue}\bfseries,
-    numberstyle=\tiny\color{codegray},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=true,
-    breaklines=true,
-    captionpos=b,
-    columns=fullflexible,
-    numbers=left,
-    numbersep=5pt,
-    frame=single,
-    rulecolor=\color{gray!40},
+    style=base,
     language=[90]Fortran,
+}
+
+% Stile generico per eventuali blocchi di codice non Gmsh/Fortran (es. testo,
+% pseudo-codice, output a terminale): usa lo stesso aspetto coerente con gli altri.
+\lstdefinestyle{plain}{
+    style=base,
 }

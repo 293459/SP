@@ -40,6 +40,37 @@ spaziale al secondo ordine upwind (\textit{Solution} $\to$ \textit{Methods}
 $\to$ \textit{Second Order Upwind}).
 
 % ============================================================
+\section{Workflow di Simulazione}
+\label{sec:fluent_workflow}
+% ============================================================
+
+Per coerenza, l'intera procedura di impostazione delle simulazioni Fluent (comune ai due
+casi LS59 e presa a doppia rampa) è raccolta in questo capitolo dedicato, evitando di
+disperdere i dettagli operativi nei capitoli delle singole esercitazioni. Il flusso di
+lavoro seguito è riassunto schematicamente in Figura~\ref{fig:fluent_workflow}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[>=Stealth, node distance=0.55cm,
+      box/.style={rectangle, rounded corners, draw=blue!55!black, fill=blue!5,
+                  text width=10.5cm, align=center, font=\footnotesize, inner sep=5pt}]
+    \node[box] (geo)   {\textbf{Import geometria}: file \texttt{.step} esportato da Gmsh};
+    \node[box, below=of geo]   (scale) {\textbf{Scalatura} $\times 1000$ (\textit{Body Transformation} $\to$ \textit{Scale})};
+    \node[box, below=of scale] (mesh)  {\textbf{Mesh} non strutturata \textit{Quad Dominant} + \textit{inflation layers} a parete};
+    \node[box, below=of mesh]  (setup) {\textbf{Setup solver}: \textit{density-based}, $p_{\rm ref}=0$, energia ON, gas ideale, modello Spalart--Allmaras};
+    \node[box, below=of setup] (bc)    {\textbf{Condizioni al contorno} (inlet/outlet secondo il regime) e viscosità $\mu$ ricavata da $Re$};
+    \node[box, below=of bc]    (solve) {\textbf{Soluzione}: schema di Roe, 2° ordine \textit{upwind}, formulazione implicita};
+    \node[box, below=of solve] (post)  {\textbf{Post-processing}: contour di $M$ e $p$, $y^+$, profili di strato limite, confronti};
+    \foreach \a/\b in {geo/scale, scale/mesh, mesh/setup, setup/bc, bc/solve, solve/post}
+      \draw[->, very thick, blue!55!black] (\a) -- (\b);
+  \end{tikzpicture}
+  \caption{Diagramma di flusso del processo di simulazione in ANSYS Fluent, comune ai casi
+           LS59 e presa a doppia rampa. La versione Mermaid editabile è disponibile nel file
+           \texttt{Mermaid/07\_fluent\_workflow.mmd}.}
+  \label{fig:fluent_workflow}
+\end{figure}
+
+% ============================================================
 \section{LS59}
 % ============================================================
 
@@ -204,7 +235,7 @@ in Fortran.
     dal modello Eulero inviscido. Il modello RANS si avvicina maggiormente
     ai dati sperimentali in questa regione grazie alla modellazione della
     turbolenza con Spalart--Allmaras.}
-    \label{fig:confronto_Mis_LS59}
+    \label{fig:fluent_confronto_Mis_LS59}
 \end{figure}
 
 Come si osserva nel grafico, tutti i modelli si comportano all'incirca allo
@@ -391,7 +422,7 @@ per essere confrontabili con i dati sperimentali e con i risultati CFD.
     puramente viscoso non modellato dalle equazioni di Eulero. Il modello RANS
     Spalart--Allmaras cattura parzialmente questa separazione, avvicinandosi ai
     dati sperimentali nella regione downstream della presa.}
-    \label{fig:confronto_pressione_doppia_rampa}
+    \label{fig:fluent_confronto_pressione_doppia_rampa}
 \end{figure}
 
 Come si osserva nel grafico, i casi inviscidi (codice Eulero Fortran e

@@ -39,7 +39,7 @@ Contiene il numero di nodi, il tipo di elemento nel formato Gmsh
 (es.\ triangolo, quadrilatero), l'array dei tag dei nodi associati e il
 tag di entity.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 type tipo_elemento
     integer :: nnodi, tipo_ele   ! tipo_ele: tag gmsh dell'elemento
     integer, dimension(:), pointer :: nodi
@@ -54,7 +54,7 @@ le informazioni di connettività topologica.
 \texttt{nghbr} contiene i tag dei nodi vicini; \texttt{ele} contiene i tag
 degli elementi che condividono quel nodo.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 type tipo_nodo
     real(4), dimension(2) :: x       ! coordinate (x, y)
     integer :: nnghbrs, neles
@@ -70,7 +70,7 @@ e un bordo) ed è il luogo dove vengono calcolati i flussi numerici.
 La convenzione è che \texttt{e1} è l'elemento di riferimento per la
 normale uscente.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 type tipo_interfaccia
     integer :: e1, e2              ! celle ai lati dell'interfaccia
     integer :: edge_e1, edge_e2    ! indici dei lati corrispondenti
@@ -91,7 +91,7 @@ Contiene sia le proprietà geometriche (area, baricentro, connettività)
 sia le variabili fisiche (conservative e primitive) e le derivate
 temporali.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 type tipo_elemento_solido
     integer :: nnodi, tipo_ele, nlati
     integer, dimension(:), allocatable :: nodi
@@ -150,7 +150,7 @@ importa i tipi da \texttt{strutture.f90} e dichiara tutte le variabili
 allocabili che vengono condivise tra le varie subroutine tramite la
 clausola \texttt{use Variabili}.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 Module Variabili
     use strutture
     implicit none
@@ -203,7 +203,7 @@ Il programma principale orchestra il ciclo di soluzione richiamando le
 subroutine nell'ordine corretto: lettura dati, costruzione della mesh,
 inizializzazione del campo, ciclo temporale.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 Program test2d
     use Variabili
     implicit none
@@ -374,7 +374,7 @@ da \texttt{compute\_fluxes}:
   \mathtt{ucons}_i^{k+1} = \mathtt{ucons}_i^k + \Delta t \cdot \mathtt{d\_dt}_i^k
 \]
 
-\begin{lstlisting}
+\begin{lstlisting}[style=fortran]
 subroutine integ_time
     use variabili
     implicit none

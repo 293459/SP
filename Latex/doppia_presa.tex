@@ -19,7 +19,7 @@ urto, con perdite di pressione totale minori.
 
 Le condizioni operative sono:
 \begin{itemize}
-  \item Numero di Mach di ingresso: $M_{\rm in} = 3$ (regime ipersonico basso)
+  \item Numero di Mach di ingresso: $M_{\rm in} = 3$ (regime supersonico)
   \item Angolo di attacco: $\alpha = 0°$ (flusso parallelo all'asse $x$)
   \item Il flusso in uscita è supersonico, pertanto la condizione di pressione statica
     all'outlet non è applicata (la corrente non ha caratteristiche entranti dal bordo destro).
@@ -27,43 +27,55 @@ Le condizioni operative sono:
 
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[scale=4.0, >=Stealth]
-    % Dominio esterno
+  \begin{tikzpicture}[scale=4.2, >=Stealth]
+    % --- Dominio (riempimento) ---
     \fill[blue!5] (-0.5,0) -- (-0.5,0.8) -- (0.832,0.8) -- (0.832,0.426)
       -- (0.617,0.280) -- (0.797,0.310) -- (1,0.310) -- (1,0.204)
       -- (0.720,0.207) -- (0.353,0.0623) -- (0,0) -- (-0.45,0) -- (-0.5,0) -- cycle;
-    % Rampe
-    \draw[very thick, gray!80] (-0.5,0) -- (-0.45,0) -- (0,0);
-    \draw[very thick, gray!80] (0,0) -- (0.353,0.0623); % Prima rampa
-    \draw[very thick, gray!80] (0.353,0.0623) -- (0.720,0.207); % Seconda rampa
-    \draw[very thick, gray!80] (0.720,0.207) -- (1,0.204); % Fondo canale
-    % Bordo superiore esterno
-    \draw[very thick, gray!80] (-0.5,0.8) -- (0.832,0.8);
-    \draw[very thick, gray!80] (0.832,0.8) -- (0.832,0.426) -- (0.617,0.280);
-    % Canale interno
-    \draw[very thick, gray!80] (0.797,0.310) -- (1,0.310);
-    \draw[very thick, gray!80] (1,0.310) -- (1,0.204);
-    \draw[very thick, gray!80] (0.617,0.280) -- (0.797,0.310);
-    % Inlet
-    \draw[very thick, green!60!black] (-0.5,0) -- (-0.5,0.8) node[midway,left,font=\tiny]{Inlet};
-    % Outlet
-    \draw[very thick, red!60!black] (1,0.204) -- (1,0.310) node[midway,right,font=\tiny]{Outlet};
-    % Urti obliqui (schematici)
-    \draw[dashed, orange!80!black, thick] (0,0) -- (0.55,0.8);
-    \draw[dashed, orange!80!black, thick] (0.353,0.0623) -- (0.75,0.8);
-    % Frecce flusso
+    % --- Pareti solide (Wall): rampe, fondo canale e labbro ---
+    \draw[very thick, gray!75] (-0.5,0) -- (0,0);
+    \draw[very thick, gray!75] (0,0) -- (0.353,0.0623);          % 1a rampa
+    \draw[very thick, gray!75] (0.353,0.0623) -- (0.720,0.207);  % 2a rampa
+    \draw[very thick, gray!75] (0.720,0.207) -- (1,0.204);       % fondo canale
+    \draw[very thick, gray!75] (0.832,0.8) -- (0.832,0.426) -- (0.617,0.280); % bordo esterno labbro
+    \draw[very thick, gray!75] (0.617,0.280) -- (0.797,0.310) -- (1,0.310);   % labbro interno
+    % --- Simmetria / far-field (bordo superiore) ---
+    \draw[very thick, blue!45!black, dash dot] (-0.5,0.8) -- (0.832,0.8);
+    % --- Inlet (sinistra) ---
+    \draw[very thick, green!55!black] (-0.5,0) -- (-0.5,0.8);
+    % --- Outlet (destra) ---
+    \draw[very thick, red!65!black] (1,0.204) -- (1,0.310);
+    % --- Urti obliqui: convergono verso il labbro (spigolo all'imbocco del canale).
+    %     L'inclinazione mostrata vale per M=3: a Mach piu' alti gli urti si "sdraiano". ---
+    \coordinate (lip) at (0.617,0.280);
+    \draw[dashed, orange!85!black, thick] (0,0) -- (lip);          % urto 1 (1a rampa)
+    \draw[dashed, red!70!black, thick]    (0.353,0.0623) -- (lip); % urto 2 (piu' inclinato)
+    % --- Frecce del flusso a monte ---
     \foreach \y in {0.2, 0.4, 0.6}
-      \draw[->, blue!60, thick] (-0.57,\y) -- (-0.5,\y);
-    \node[left, blue!60, font=\tiny] at (-0.57,0.4) {$M=3$};
-    % Label rampe
-    \node[below, font=\tiny] at (0.18,0.02) {1\textordfeminine~rampa};
-    \node[below, font=\tiny] at (0.54,0.12) {2\textordfeminine~rampa};
-    % Label urti
-    \node[right, orange!80!black, font=\tiny] at (0.55,0.75) {Urto 1};
-    \node[right, orange!80!black, font=\tiny] at (0.75,0.72) {Urto 2};
+      \draw[->, blue!55, thick] (-0.64,\y) -- (-0.5,\y);
+    \node[left, blue!55, font=\footnotesize] at (-0.64,0.4) {$M_\infty = 3$};
+    % --- Etichette dei contorni (leggibili) ---
+    \node[above, green!55!black, font=\footnotesize] at (-0.5,0.8) {Inlet};
+    \node[below right, red!65!black, font=\footnotesize] at (1,0.31) {Outlet};
+    \node[above, blue!45!black, font=\footnotesize] at (0.16,0.8) {Simmetria / far-field};
+    \node[below, gray!45!black, font=\footnotesize] at (-0.25,0.0) {Wall};
+    \node[right, gray!45!black, font=\footnotesize] at (0.84,0.45) {Wall (labbro)};
+    % --- Etichette rampe ---
+    \node[below, font=\tiny] at (0.18,0.02) {1\textordfeminine{} rampa};
+    \node[below, font=\tiny] at (0.55,0.135) {2\textordfeminine{} rampa};
+    % --- Etichette urti (allineate alle linee) ---
+    \node[orange!85!black, font=\tiny, rotate=25, anchor=south] at (0.18,0.084) {urto 1};
+    \node[red!70!black, font=\tiny, rotate=40, anchor=south] at (0.45,0.142) {urto 2};
+    \node[font=\tiny, anchor=west] at (0.63,0.265) {labbro};
   \end{tikzpicture}
   \caption{Schema del dominio computazionale per la presa a doppia rampa (non in scala).
-           Le linee arancioni tratteggiare indicano gli urti obliqui attesi.}
+           Le linee tratteggiate indicano gli urti obliqui attesi, che si originano dal piede
+           della prima rampa e dal ginocchio della seconda e \textbf{convergono verso il labbro}
+           all'imbocco del canale di uscita. L'inclinazione mostrata è quella relativa a
+           $M_\infty = 3$: poiché l'angolo dell'onda d'urto dipende dal numero di Mach, a Mach
+           più elevati gli urti si "sdraiano" (angolo minore) e il punto di intersezione si
+           sposta. Sono indicati i bordi di \textbf{Inlet}, \textbf{Outlet}, \textbf{Wall}
+           (pareti solide) e \textbf{Simmetria/far-field} (bordo superiore).}
   \label{fig:dominio_presa}
 \end{figure}
 
@@ -117,8 +129,10 @@ Sono stati prodotti due file \texttt{.geo} distinti:
     del dominio e raffinamento mesh ottimizzato per le simulazioni CFD.
 \end{itemize}
 
-\subsection{Geometria Reale -- File \texttt{doppia\_presa\_reale.geo}}
+\subsection{Geometria Reale}
 \label{sec:presa_reale}
+
+Geometria completa, file \texttt{doppia\_presa\_reale.geo}.
 
 \begin{lstlisting}[style=gmsh, caption={File \texttt{doppia\_presa\_reale.geo} -- geometria completa.}, label={lst:presa_reale}]
 Mesh.MshFileVersion = 2.2;
@@ -182,7 +196,7 @@ canale interno e la zona di uscita. I punti chiave sono:
     del dominio computazionale.
 \end{itemize}
 
-\subsection{Geometria Semplificata -- File \texttt{doppia\_presa\_semplificata.geo}}
+\subsection{Geometria Semplificata}
 \label{sec:presa_semplificata}
 
 La versione semplificata riduce il numero di punti da 12 a 11, eliminando il punto 10
@@ -289,6 +303,14 @@ Le linee selezionate come attrattori corrispondono alle zone fisicamente più cr
 Il rapporto $\texttt{LcMax}/\texttt{LcMin} = 2$ garantisce una transizione graduale nella
 dimensione delle celle, evitando elementi distorti o con rapporti di aspetto elevati.
 
+% ============================================================
+% SEZIONE COMMENTATA (errore noto #5):
+% Il processo iterativo di raffinamento della mesh (Mesh v1 -> v2) viene omesso
+% perche' le simulazioni vengono condotte direttamente sulla mesh a convergenza.
+% Spiegare come si e' arrivati a tale mesh non e' necessario ai fini dei risultati.
+% Per ripristinare la sezione, sostituire \iffalse con \iftrue.
+% ============================================================
+\iffalse
 \section{Raffinamento Mesh}
 
 \subsection{Mesh v1 -- Raffinamento Iniziale}
@@ -323,8 +345,12 @@ Una prima versione della mesh è stata generata con i parametri di raffinamento 
 \paragraph{Osservazioni critiche sulla mesh v1.}
 Sebbene il raffinamento sia presente nelle regioni di interesse (rampe e labbro della presa),
 i parametri \texttt{DistMin} risulta eccessivamente ampio andando ad infittire anche zone che non lo necessiterebbero. 
-Si decide quindi di abbassare \texttt{DistMin} da 0.25 a 0.15. 
+Si decide quindi di abbassare \texttt{DistMin} da 0.25 a 0.15.
 Tuttavia questo non sarà sufficiente poiché occorrerà preoccuparsi di desrcivere adeguatamente la zona di interazione tra gli urti obliqui, che si trova a valle del punto 9 (labbro) e non è coperta da nessuna delle linee attrattori. %Evidentemente, non è possibile inserire un attrattore su una linea che non esiste (non c'è nessuna linea che attraversa la zona di interazione), pertanto si decide di inserire un secondo campo di tipo \texttt{Box} centrato sulla zona di interazione, con \texttt{LcMin} più piccolo rispetto al primo campo Attractor.
+\fi
+% ============================================================
+% Fine sezione commentata (errore noto #5)
+% ============================================================
 
 
 
@@ -482,19 +508,10 @@ I risultati mostrano che:
     ai dati sperimentali nella regione downstream.
 \end{itemize}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{../Images/confronto_pressione_doppia_rampa}
-  \caption{Distribuzione di pressione adimensionale $P_w/P^\circ$ sulla parete inferiore
-           della presa a doppia rampa: confronto tra i dati sperimentali, la soluzione Euler
-           con schema di Roe (codice sviluppato), la soluzione Euler--CFD (ANSYS Fluent
-           inviscido) e il modello RANS Spalart--Allmaras (ANSYS Fluent viscoso).
-           I modelli inviscidi sottostimano la distribuzione di pressione a valle degli urti
-           per la mancata modellazione dell'interazione urto--strato limite (SBLI), mentre
-           il modello RANS con Spalart--Allmaras cattura parzialmente la separazione
-           indotta dagli urti, avvicinandosi ai dati sperimentali nella regione downstream.}
-  \label{fig:confronto_pressione_doppia_rampa}
-\end{figure}
+% Figura di confronto rimossa perche' duplicata (errore noto #6): la stessa
+% immagine confronto_pressione_doppia_rampa con identico \label era inserita due
+% volte nella stessa sezione, generando un warning di label multipla. Resta la
+% prima occorrenza all'inizio della sezione.
 
 % L'analisi ANSYS Fluent completa (mesh, y+, campi Mach/pressione, strato limite,
 % bolla di ricircolo e confronto con dati sperimentali) è trattata nel

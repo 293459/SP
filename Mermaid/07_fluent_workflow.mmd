@@ -1,0 +1,12 @@
+%% Workflow di simulazione in ANSYS Fluent (casi LS59 e presa a doppia rampa)
+%% Versione Mermaid del diagramma di flusso presente nel capitolo Fluent del report.
+flowchart TD
+    A["Import geometria<br/>file .step da Gmsh"] --> B["Scalatura x1000<br/>Body Transformation > Scale"]
+    B --> C["Mesh non strutturata<br/>Quad Dominant + inflation layers a parete"]
+    C --> D["Setup solver<br/>density-based, p_ref=0, energia ON,<br/>gas ideale, Spalart-Allmaras"]
+    D --> E["Condizioni al contorno<br/>inlet/outlet secondo regime + mu da Re"]
+    E --> F["Soluzione<br/>Roe, 2 ordine upwind, implicito"]
+    F --> G["Post-processing<br/>contour M e p, y+, profili, confronti"]
+
+    style A fill:#e3f2fd,stroke:#1565c0
+    style G fill:#e8f5e9,stroke:#2e7d32
