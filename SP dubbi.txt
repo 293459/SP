@@ -66,7 +66,7 @@ OUPUT
 5)codice markdown delle simulazione d'esame da incolllre su notion 
 
 PIPELINE
-1)leggi il .claudeignore per capire che file leggere e comprendere.
+1)leggi il .claudeignore per capire che file leggere e comprendere (così da avere un'attenzione selettiva e evitare di leggere file grandie  inutili e sprecare token). In generale leggi la skill che spiega come risparmiare token
 2)crea le mappe mentali partendo dalla più generale a quelle dei singoli argomenti (se riesci aggiungi il codice mermaid direttamente nel file latex e compilalo in qualche mdoo altrimenti genera un file di testo a se stante che poi richiami nel file latex). Crea magari una cartella con i soli file di testo dei grafici mermaid
 3)rispondi a tutte le domande sotto forma di codice markdown (che metti in una cartella apposita chiamata "markdown") e di simulazione d'esame (quindi domanda che u notion verrà convertita in un toggle list e risposta discorsiva con parole chive evidenziate). Segui le logiche della skill claude sulla simulazione d'esame
 4)modifica tutti i file latex che costruiscono il report al fine di avere tutti i contenuti aggiuntivi (correzione di errori noti, aggiunta di discussioni e riflessioni teoriche e commenti sul report id varia natura)
