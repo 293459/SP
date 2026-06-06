@@ -1,21 +1,12 @@
-# Reacting Flows — Teoria & Simulazione d'esame
-
-> Risposte alle domande di teoria 1–6 (capitolo **Flussi reagenti**) in formato simulazione
-> d'esame. Ogni domanda è un blocco collassabile (toggle Notion): clicca per espandere la
-> risposta. Le **parole chiave** sono evidenziate in grassetto.
-> Questo file funge anche da contenuto per la pagina Notion *Reacting Flows* (attualmente vuota).
-
----
-
 ## Parte teorica (riassunto)
 
 I **flussi reagenti** descrivono fluidi in cui avvengono **reazioni chimiche** (tipicamente
-combustione) che rilasciano calore e modificano la composizione. Rispetto a un flusso inerte si
-aggiungono: (i) **equazioni di trasporto delle specie**, (ii) un **termine sorgente chimico**
-fortemente non lineare, (iii) l'accoppiamento con l'**energia** tramite il calore di reazione.
-La difficoltà centrale è la **enorme separazione di scale temporali** tra la chimica (velocissima)
-e il trasporto/mescolamento (lento), che rende il problema **stiff** e introduce il concetto di
-**collo di bottiglia** (tempo limitante).
+combustione) che rilasciano calore e modificano la composizione. Rispetto a un flusso inerte si aggiungono: 
+(i) **equazioni di trasporto delle specie**, 
+(ii) un **termine sorgente chimico**
+fortemente non lineare, 
+(iii) l'accoppiamento con l'**energia** tramite il calore di reazione.
+La difficoltà centrale è la **enorme separazione di scale temporali** tra la chimica (velocissima) e il trasporto/mescolamento (lento), che rende il problema **stiff** e introduce il concetto di **collo di bottiglia** (tempo limitante).
 
 ---
 

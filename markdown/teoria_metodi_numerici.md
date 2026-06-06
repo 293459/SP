@@ -1,11 +1,3 @@
-# Metodi Numerici — Teoria & Simulazione d'esame
-
-> Risposte alle domande di teoria 7–9. Le domande 7 e 8 sono **domande di organizzazione**:
-> chiedono dove collocare alcuni argomenti nella suddivisione del Notion. La 9 è concettuale.
-> Formato toggle Notion; **parole chiave** in grassetto.
-
----
-
 ## Premessa — la suddivisione attuale del Notion
 
 | Pagina Notion | Cosa contiene (natura) |
