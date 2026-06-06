@@ -91,3 +91,7 @@ Desktop.ini
 
 # --- VisIt software ---
 LLNL/ # ignora i file della cartella ddi VisIt software
+
+# --- Claude Code runtime (stato di sessione locale, non versionare) ---
+.claude/
+*.lock
