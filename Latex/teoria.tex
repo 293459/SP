@@ -145,8 +145,35 @@ di Roe, costruita con le medie di Roe tra gli stati $L$ e $R$:
 
 Lo schema di Roe è più accurato di Lax--Friedrichs perché è meno dissipativo e
 cattura meglio le discontinuità (onde d'urto) e le strutture fini del campo.
-Include la \textit{entropy fix} di Harten per correggere le singolarità in
-corrispondenza dei punti sonici.
+
+\paragraph{Perché serve l'\emph{entropy fix}.}
+La dissipazione numerica dello schema di Roe per la $k$-esima onda è proporzionale a
+$|\hat{\lambda}_k|$: l'autovalore agisce da coefficiente di dissipazione. Il problema nasce in
+corrispondenza dei \textbf{punti sonici} (\emph{sonic points}), dove un autovalore
+\textbf{cambia segno} e si annulla ($\hat{\lambda}_k \to 0$), ad esempio quando $u - a$ passa da
+negativo a positivo attraversando una transizione sonica ($M=1$). In quel punto la dissipazione
+$|\hat{\lambda}_k| \to 0$ \textbf{svanisce}: lo schema, costruito risolvendo \emph{esattamente} un
+problema di Riemann linearizzato, non distingue più tra una compressione (urto, fisicamente
+ammesso) e una \textbf{espansione}; può così ammettere un'\textbf{espansione discontinua}
+(\emph{expansion shock}), soluzione matematicamente valida ma \textbf{non fisica} perché
+viola la condizione di entropia. È questa la causa delle cosiddette \emph{stagnation-point} e
+\emph{sonic-point anomalies}.
+
+\paragraph{Correzione di Harten.}
+La \textit{entropy fix} di Harten elimina il problema imponendo una \textbf{dissipazione minima}
+anche dove l'autovalore si annulla: si sostituisce $|\hat{\lambda}_k|$ con una funzione
+$\Psi(\hat{\lambda}_k)$ regolarizzata che non scende mai sotto una piccola soglia $\delta$:
+\begin{equation}
+  \Psi(\hat{\lambda}_k) =
+  \begin{cases}
+    |\hat{\lambda}_k| & \text{se } |\hat{\lambda}_k| \ge \delta \\[4pt]
+    \dfrac{\hat{\lambda}_k^2 + \delta^2}{2\,\delta} & \text{se } |\hat{\lambda}_k| < \delta
+  \end{cases}
+\end{equation}
+dove $\delta$ è una piccola frazione della velocità caratteristica locale (tipicamente
+$\delta = \epsilon(|\hat u| + \hat a)$ con $\epsilon \sim 0.1$). In pratica si "arrotonda" il
+valore assoluto vicino allo zero, garantendo una dissipazione residua che \textbf{impedisce le
+espansioni non fisiche} senza degradare l'accuratezza lontano dai punti sonici.
 
 % ============================================================
 \section{Integrazione Temporale}

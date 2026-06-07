@@ -41,14 +41,64 @@ Un aspetto fondamentale nella simulazione di pale di turbina riguarda la corrett
 interpretazione dell'angolo di attacco e della deflessione del flusso, grandezze che
 influenzano direttamente le perdite di profilo e l'efficienza dello stadio.
 
-\paragraph{Angolo di attacco.}
+\paragraph{Angolo di attacco e convenzione di segno.}
 L'angolo di attacco $\alpha = 30°$ rappresenta l'angolo tra il vettore velocità in ingresso
-e l'asse di riferimento del canale (asse $x$ orizzontale). Nelle cascate di turbina, a
+e l'asse assiale di riferimento del canale (asse $x$ orizzontale). Nelle cascate di turbina, a
 differenza dei profili alari isolati, l'angolo di attacco è definito rispetto alla direzione
-nominale di ingresso della schiera, non alla corda del profilo. Pertanto, piccole variazioni
-di $\alpha$ rispetto al valore di progetto producono effetti di incidenza che si manifestano
-principalmente sulla distribuzione di pressione intorno al bordo di attacco e sulla posizione
-del punto di ristagno.
+nominale di ingresso della schiera, non alla corda del profilo. Si definisce
+\textbf{incidenza} lo scarto rispetto al valore di progetto:
+\begin{equation}
+  i = \alpha - \alpha_{\rm progetto}, \qquad \alpha_{\rm progetto} = 30°
+\end{equation}
+Con la convenzione adottata (Figura~\ref{fig:incidenza_ls59}), $\alpha$ è misurato dall'asse
+assiale e cresce ruotando il vettore velocità verso il \textbf{dorso} (estradosso). Per
+chiarezza terminologica: l'\textbf{estradosso} (o dorso) è la superficie \emph{convessa} dove
+il flusso accelera e la pressione cala; l'\textbf{intradosso} (o ventre) è la superficie
+\emph{concava} dove la pressione resta elevata. Al valore di progetto il punto di ristagno cade
+esattamente sul naso del bordo di attacco; un'incidenza non nulla lo sposta su una delle due
+superfici, costringendo il flusso a contornare il naso con un \emph{picco di sovravelocità}
+sulla superficie opposta.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.0, >=Stealth]
+    % --- Profilo paletta schematico (cambered) ---
+    % estradosso (dorso, convesso) sopra, intradosso (ventre, concavo) sotto
+    \draw[very thick, fill=gray!12]
+      (0,0) .. controls (1.2,1.4) and (3.2,1.7) .. (4.6,1.0) % dorso (estradosso)
+            .. controls (3.6,0.7) and (1.6,0.2) .. (0,0);      % ventre (intradosso)
+    \node at (2.4,1.15) {\footnotesize estradosso (dorso)};
+    \node at (2.4,0.32) {\footnotesize intradosso (ventre)};
+    % --- Bordo di attacco (naso) e bordo di fuga ---
+    \fill[black] (0,0) circle (1.3pt);
+    \node[left, font=\scriptsize] at (-0.05,-0.05) {BA};
+    \node[right, font=\scriptsize] at (4.62,1.0) {BF};
+    % --- Asse assiale ---
+    \draw[densely dashed, gray] (-1.8,0) -- (-0.2,0);
+    \node[below, font=\scriptsize, gray] at (-1.0,0) {asse assiale $x$};
+    % --- Vettore di progetto (alpha=30) ---
+    \draw[->, very thick, blue!60!black] (-1.6,-0.9) -- (-0.15,-0.06)
+      node[midway, below right, font=\scriptsize, blue!60!black] {$\alpha=30°$ (progetto)};
+    % --- Incidenza positiva (alpha>30): ruotato verso il dorso ---
+    \draw[->, thick, red!70!black] (-1.55,-0.4) -- (-0.15,0.05)
+      node[midway, above left, font=\scriptsize, red!70!black] {$\alpha>30°$ ($i>0$)};
+    % --- Incidenza negativa (alpha<30): ruotato verso il ventre ---
+    \draw[->, thick, green!45!black] (-1.5,-1.45) -- (-0.15,-0.12)
+      node[midway, below, font=\scriptsize, green!45!black] {$\alpha<30°$ ($i<0$)};
+    % --- Indicazione spostamento punto di ristagno ---
+    \draw[->, red!70!black, thick] (0.05,-0.18) to[bend right] (0.45,-0.30);
+    \node[font=\scriptsize, red!70!black, right] at (0.5,-0.33) {ristagno $\to$ intradosso ($i>0$)};
+    \draw[->, green!45!black, thick] (0.05,0.2) to[bend left] (0.5,0.42);
+    \node[font=\scriptsize, green!45!black, right] at (0.55,0.45) {ristagno $\to$ estradosso ($i<0$)};
+  \end{tikzpicture}
+  \caption{Schema dell'angolo di attacco e dell'incidenza per la paletta LS59.
+           Il vettore blu è la condizione di progetto ($\alpha = 30°$, ristagno sul naso);
+           in rosso l'incidenza positiva ($\alpha > 30°$, ristagno spostato verso l'intradosso
+           e picco di sovravelocità sull'estradosso); in verde l'incidenza negativa
+           ($\alpha < 30°$, ristagno verso l'estradosso). Estradosso = dorso convesso (alta
+           velocità, bassa pressione); intradosso = ventre concavo (bassa velocità, alta pressione).}
+  \label{fig:incidenza_ls59}
+\end{figure}
 
 \paragraph{Deflessione del flusso.}
 La deflessione $\Delta\beta = \beta_{\rm in} - \beta_{\rm out}$ (differenza tra angolo di
@@ -57,25 +107,61 @@ quantifica il lavoro estratto dalla paletta. Per il profilo LS59, la deflessione
 è tale da garantire un campo di pressione uniforme sull'intradosso e un'accelerazione
 controllata sull'estradosso, minimizzando le perdite per separazione dello strato limite.
 
-\paragraph{Effetto dell'angolo di attacco sulle prestazioni.}
-Nella paletta di turbina LS59, variazioni dell'angolo di attacco rispetto al valore nominale
-($\alpha = 30°$) hanno i seguenti effetti:
-\begin{itemize}
-  \item \textbf{Incidenza positiva} ($\alpha > 30°$): carico aerodinamico maggiore sul
-    bordo di attacco, rischio di separazione precoce sull'intradosso e aumento delle perdite
-    di profilo.
-  \item \textbf{Incidenza negativa} ($\alpha < 30°$): sottocarico del bordo di attacco,
-    possibile separazione sull'estradosso con conseguente riduzione della deflessione
-    effettiva e calo dell'efficienza di palettatura.
-  \item \textbf{Valore di progetto} ($\alpha = 30°$): distribuzione di carico ottimale,
-    minime perdite di profilo e comportamento isentropico prossimo a quello teorico.
-\end{itemize}
-In un modello di Eulero (flusso non viscoso), tali effetti di separazione non sono
-direttamente simulabili; tuttavia, il campo di pressione risultante fornisce informazioni
+\paragraph{Effetto dell'incidenza sulle prestazioni.}
+Variazioni dell'angolo di attacco rispetto al valore nominale spostano il punto di ristagno e
+ridistribuiscono il carico. La Tabella~\ref{tab:incidenza_ls59} riassume i tre regimi.
+
+\begin{table}[H]
+  \centering
+  \caption{Effetto dell'incidenza sulla paletta LS59 (convenzione di Figura~\ref{fig:incidenza_ls59}).}
+  \label{tab:incidenza_ls59}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{p{2.4cm} p{1.6cm} p{3.0cm} p{4.6cm}}
+    \toprule
+    \textbf{Incidenza} & \textbf{Angolo} & \textbf{Punto di ristagno} & \textbf{Conseguenza} \\
+    \midrule
+    Positiva ($i>0$) & $\alpha > 30°$ & si sposta verso l'\textbf{intradosso} (ventre) &
+      picco di sovravelocità sull'estradosso, sovraccarico del bordo d'attacco, rischio di
+      separazione e \textbf{aumento delle perdite} di profilo \\
+    Nominale & $\alpha = 30°$ & sul \textbf{naso} (BA) &
+      carico ottimale, perdite minime, comportamento prossimo all'isentropico \\
+    Negativa ($i<0$) & $\alpha < 30°$ & si sposta verso l'\textbf{estradosso} (dorso) &
+      sottocarico del bordo d'attacco, \textbf{riduzione della deflessione effettiva} e calo
+      dell'efficienza di palettatura \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+In un modello di Eulero (flusso non viscoso) tali effetti di separazione non sono
+direttamente simulabili; tuttavia il campo di pressione risultante fornisce informazioni
 preziose sul \emph{carico del profilo} (integrale della differenza di pressione tra
-intradosso ed estradosso) e sulla distribuzione di velocità, che possono essere confrontate
-con i dati sperimentali per validare il codice numerico e identificare zone critiche dove
-gli effetti viscosi diventano rilevanti.
+intradosso ed estradosso) e sulla distribuzione di velocità, confrontabili con i dati
+sperimentali per validare il codice e individuare le zone dove gli effetti viscosi diventano
+rilevanti.
+
+\paragraph{Nota critica: regime transonico e perdite.}
+Il campo di Mach (Sez.~\ref{sec:paletta_mach}) mostra che il flusso \textbf{supera $M=1$} in
+una regione sul dorso, verso la parte posteriore della paletta. Questo \textbf{non} contraddice
+il buon funzionamento della palettatura: la LS59 è un profilo \textbf{transonico}, progettato
+proprio per espandere il flusso fino a un'uscita supersonica (qui $M_{\rm out}$ di progetto
+$\approx 1.2$). La presenza di un cuscinetto supersonico implica in generale un \textbf{debole
+urto} (urto di chiusura sul dorso o urto al bordo di fuga), ma le \textbf{perdite associate
+sono modeste} perché:
+\begin{itemize}
+  \item l'urto è \textbf{debole} (numero di Mach normale di poco superiore a 1) e la perdita di
+    pressione totale attraverso un urto scala come $\Delta P^\circ \propto (M_n^2 - 1)^3$:
+    per $M_n \approx 1.1$ la perdita è dell'ordine di frazioni di percento;
+  \item il profilo è sagomato per ottenere un'\textbf{accelerazione controllata}, evitando un
+    forte urto normale e contenendo l'interazione urto--strato limite.
+\end{itemize}
+Si potrebbe in linea di principio limitare l'accelerazione a un valore \textbf{appena sonico}
+($M \approx 1$) per annullare le perdite d'urto; tuttavia ciò comporterebbe un
+\textbf{rapporto di espansione inferiore} e quindi un minore salto entalpico elaborato dallo
+stadio: la palettatura lavorerebbe \emph{lontano} dal suo punto di progetto, con minore lavoro
+specifico e portata. La scelta transonica è dunque un \textbf{compromesso voluto}: si accettano
+piccole perdite d'urto in cambio dell'espansione necessaria a fornire le prestazioni di
+progetto. Nel modello Euler, inoltre, non esistono perdite viscose: l'unica entropia prodotta
+è quella (in parte fisica, in parte numerica) concentrata negli urti e al bordo di fuga.
 
 \section{Mesh di Calcolo}
 \label{sec:paletta_mesh}
@@ -158,11 +244,19 @@ isentropiche, il che costituisce di per sé una prima validazione del codice.
 \end{figure}
 
 \paragraph{Uniformità a monte.}
-Come atteso, a monte del profilo il campo di pressione è \textbf{uniforme}: la corrente non ha
-ancora "sentito" la presenza della paletta. Il valore numerico letto dal grafico in questa
-regione (circa $0.84$) coincide con la \textbf{pressione statica di freestream} associata al
-Mach di ingresso, come verificato di seguito. A valle, la pressione si porta sul valore di
-scarico imposto ($P_{\rm out} = 0.4124$), coerente con la fascia ciano della scala.
+Come atteso, a monte del profilo il campo di pressione è \textbf{uniforme}. È importante
+chiarire \emph{perché}: il flusso in ingresso è \textbf{subsonico} ($M_{\rm in} = 0.5$; solo più
+a valle, nel canale, accelera fino a divenire supersonico). In regime subsonico le
+\textbf{linee caratteristiche risalenti} ($u-a < 0$) \emph{sono} in grado di propagare il
+segnale verso monte: l'informazione sulla presenza della paletta \textbf{può} dunque
+risalire la corrente. L'uniformità a monte \textbf{non} è quindi dovuta all'impossibilità del
+segnale di risalire, bensì al fatto che la sezione di ingresso è posta
+\textbf{sufficientemente lontana} dal profilo da risentirne solo debolmente, e che lì il campo
+deve comunque \textbf{rispettare le condizioni al contorno imposte} (pressione e temperatura
+totali, angolo e Mach di ingresso). Il valore numerico letto in questa regione (circa $0.84$)
+coincide con la \textbf{pressione statica di freestream} associata al Mach di ingresso, come
+verificato di seguito. A valle, la pressione si porta sul valore di scarico imposto
+($P_{\rm out} = 0.4124$), coerente con la fascia ciano della scala.
 
 \paragraph{Pressione attesa al punto di ristagno.}
 Il dubbio sul perché la differenza tra ristagno e monte appaia "piccola" si chiarisce con il
@@ -176,6 +270,17 @@ relazione isentropica:
   = (1.05)^{-3.5} \approx 0.843
   \label{eq:p_statica_monte}
 \end{equation}
+
+\noindent\emph{Verifica delle condizioni al contorno (check standard).} Il confronto tra questo
+valore analitico ($0.843$) e la pressione uniforme letta a monte nel campo è una
+\textbf{procedura di controllo standard} che va effettuata \emph{prima} di interpretare
+l'intero campo: serve a verificare che le \textbf{condizioni al contorno siano state imposte
+correttamente}. Se, ad esempio, a monte si leggesse una pressione statica molto diversa
+(es.\ $0.3$ anziché $\approx 0.84$), ciò sarebbe il chiaro sintomo di un errore nell'impostazione
+del problema (riferimento di adimensionalizzazione errato, Mach o pressione totale sbagliati,
+condizione di inlet mal posta). Solo dopo aver superato questo controllo di consistenza ha senso
+analizzare il resto del campo.
+
 Al \textbf{punto di ristagno} la corrente si arresta ($M = 0$): per definizione tutta l'energia
 cinetica si converte in pressione, quindi la pressione statica eguaglia quella totale. Poiché il
 flusso è isentropico (Euler subsonico, privo di urti) la pressione totale si \emph{conserva} ed è
@@ -219,15 +324,25 @@ costante). La sua interpretazione discende dall'equilibrio dei gradienti di pres
 \textbf{curvo}: in direzione normale alle linee di corrente vale
 \begin{equation}
   \frac{\partial P}{\partial n} = \rho\,\frac{V^2}{R}
+  \label{eq:gradiente_normale}
 \end{equation}
-ovvero la pressione cresce allontanandosi dalla parete convessa (raggio di curvatura $R$). Vicino
-alla superficie del dorso la pressione è minima e \textbf{aumenta spostandosi verso il cuore del
-canale}; quando le linee di corrente tornano \emph{rettilinee} (zona centrale del canale
-inter-pala) il gradiente normale si annulla e la pressione diventa \textbf{uniforme}. L'isobara
-gialla segna proprio il \textbf{confine} tra la regione a flusso curvo (adiacente al profilo, dove
-$P$ varia rapidamente) e il nucleo a flusso quasi rettilineo (dove $P$ è costante): poiché segue
-la curvatura del dorso, assume la caratteristica forma \textbf{ad arco}. Lo stesso fenomeno è
-visibile, più debolmente, in altre zone curve del campo.
+dove $R$ è il \textbf{raggio di curvatura} della linea di corrente. Questa relazione chiarisce il
+ruolo della geometria attraverso i due casi limite:
+\begin{itemize}
+  \item per una \textbf{superficie piana} (o un flusso rettilineo) il raggio di curvatura è
+    \textbf{infinito}, $R \to \infty$, quindi $\partial P/\partial n \to 0$: la pressione
+    \textbf{non varia} in direzione normale (campo uniforme nel nucleo del canale);
+  \item per uno \textbf{spigolo} il raggio di curvatura tende a \textbf{zero}, $R \to 0$, quindi
+    $\partial P/\partial n \to \infty$: gradienti di pressione molto intensi e localizzati
+    (è il motivo per cui i bordi aguzzi --- come il bordo di fuga --- sono zone critiche).
+\end{itemize}
+Vicino alla superficie convessa del dorso ($R$ finito e piccolo) la pressione è minima e
+\textbf{aumenta spostandosi verso il cuore del canale}; quando le linee di corrente tornano
+\emph{rettilinee} ($R \to \infty$) il gradiente normale si annulla e la pressione diventa
+\textbf{uniforme}. L'isobara gialla segna proprio il \textbf{confine} tra la regione a flusso curvo
+(adiacente al profilo, dove $P$ varia rapidamente) e il nucleo a flusso quasi rettilineo (dove $P$
+è costante): poiché segue la curvatura del dorso, assume la caratteristica forma \textbf{ad arco}.
+Lo stesso fenomeno è visibile, più debolmente, in altre zone curve del campo.
 
 \paragraph{C'è separazione, scia o turbolenza?}
 È un punto importante: il modello è di \textbf{Eulero}, cioè \textbf{non viscoso}. Di conseguenza
@@ -324,17 +439,41 @@ regolare e diffusa, senza il picco puntuale.
 \label{sec:paletta_roe}
 
 Diversi dettagli dei campi sono riconducibili al comportamento dello \textbf{schema di Roe}, molto
-poco dissipativo e quindi accurato ma soggetto ad alcune anomalie note in punti critici:
+poco dissipativo e quindi accurato ma soggetto ad alcune anomalie note in punti critici.
+
+\paragraph{Origine numerica dell'overshoot.}
+Che si tratti di un overshoot è certo (altrimenti non si spiegherebbero valori adimensionali di
+pressione e temperatura maggiori di $1$). La sua origine si legge direttamente nella struttura del
+flusso di Roe (richiamato dalla Sez.~\ref{sec:flussi}):
+\begin{equation}
+  \Fvec_{ij} = \underbrace{\tfrac{1}{2}\left[F^L + F^R\right]}_{\text{parte centrata}}
+               - \underbrace{\tfrac{1}{2} \sum_{k=1}^{4} |\hat{\lambda}_k|\,\hat{\alpha}_k\,\hat{r}_k}_{\text{dissipazione}}
+  \label{eq:roe_overshoot}
+\end{equation}
+Il termine \textbf{centrato} $\tfrac{1}{2}(F^L+F^R)$, da solo, è \emph{instabile} (analogo a uno
+schema a differenze centrate su un'equazione iperbolica): è il secondo termine, la
+\textbf{dissipazione}, a stabilizzare lo schema. Tale dissipazione è però \textbf{pesata
+sull'autovalore} $|\hat{\lambda}_k|$, cioè ogni onda viene smorzata proporzionalmente alla propria
+velocità caratteristica. Gli autovalori delle equazioni di Eulero sono $\hat u$ (doppio, onde di
+entropia e di vorticità) e $\hat u \pm \hat a$ (onde acustiche). \textbf{Al punto di ristagno}
+$\hat u \to 0$: la dissipazione associata all'onda di entropia, $|\hat u|$, \textbf{si annulla}.
+Su quel campo --- che trasporta proprio le fluttuazioni di densità e temperatura --- lo schema
+resta quindi \emph{quasi privo di dissipazione} e \textbf{non smorza} le piccole oscillazioni
+numeriche locali, che possono così superare i limiti fisici ($P, T > P^\circ, T^\circ$). È il
+medesimo meccanismo del \emph{sonic-point} (dove ad annullarsi è $\hat u \pm \hat a$): un
+autovalore che svanisce $\Rightarrow$ dissipazione che collassa $\Rightarrow$ possibile
+soluzione non fisica. L'\emph{entropy fix} di Harten (Sez.~\ref{sec:flussi}) corregge proprio
+questo, imponendo una dissipazione minima anche dove $\hat{\lambda}_k \to 0$.
+
 \begin{itemize}
-  \item \textbf{Overshoot al ristagno}: il valore $P_{\max} = 1.003 > 1.0$ (e analogamente
-    $T_{\max} = 1.040 > 1.0$) è un piccolo sovra-tiro non fisico tipico dei punti di ristagno,
-    dove la bassa dissipazione di Roe non smorza del tutto le oscillazioni locali.
-  \item \textbf{Anomalie ai bordi di attacco e di fuga}: gli spike di Mach e temperatura descritti
-    sopra sono coerenti con le \emph{stagnation-point anomalies} dello schema di Roe, accentuate
-    nelle zone di forte curvatura e nelle singolarità inviscide (trailing edge).
-  \item \textbf{Punti sonici}: nell'attraversamento $M = 1$ sul dorso lo schema di Roe richiede una
-    \emph{entropy fix} (di Harten, già adottata nel codice) per evitare espansioni non fisiche; sue
-    eventuali tracce sarebbero localizzate proprio nella zona transonica del dorso.
+  \item \textbf{Overshoot al ristagno}: $P_{\max} = 1.003 > 1.0$ e $T_{\max} = 1.040 > 1.0$, per
+    il meccanismo appena descritto (dissipazione nulla sull'onda di entropia a $\hat u = 0$).
+  \item \textbf{Anomalie ai bordi di attacco e di fuga}: gli spike di Mach e temperatura sono
+    coerenti con le \emph{stagnation-point anomalies} dello schema di Roe, accentuate nelle zone
+    di forte curvatura e nelle singolarità inviscide (trailing edge).
+  \item \textbf{Punti sonici}: nell'attraversamento $M = 1$ sul dorso interviene l'\emph{entropy
+    fix} di Harten (descritta nella Sez.~\ref{sec:flussi}, già adottata nel codice) per evitare
+    espansioni non fisiche.
 \end{itemize}
 Tali artefatti sono \textbf{locali e di entità contenuta} e non inficiano la qualità complessiva
 della soluzione, ma è corretto segnalarli per una lettura critica dei campi.
