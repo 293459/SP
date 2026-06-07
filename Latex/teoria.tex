@@ -310,3 +310,35 @@ Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa 
 \begin{equation}
   \text{GCI} = F_s \cdot |u_h - u_{\rm esatto}|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
 \end{equation}
+
+\paragraph{Scelta del set di griglie.}
+Per l'analisi del bump sono disponibili quattro livelli di griglia con lunghezza caratteristica
+$l_c = \{0.02,\,0.01,\,0.005,\,0.0025\}$ (ciascuno la metà del precedente, $r=2$). Poiché
+l'estrapolazione con \textbf{ordine teorico} richiede \emph{due} griglie e quella con
+\textbf{ordine empirico} ne richiede \emph{tre}, si pongono due domande: il set di griglie è
+arbitrario? serve una griglia già "a convergenza"?
+\begin{itemize}
+  \item \textbf{Rapporto di diradamento costante.} La formula dell'ordine empirico (Eq.~con
+    $p=\ln[(u_{4h}-u_{2h})/(u_{2h}-u_h)]/\ln r$) presuppone un \textbf{rapporto $r$ costante} tra i
+    tre livelli. Con $l_c$ che si dimezza ogni volta, qualsiasi terna di griglie
+    \emph{consecutive} ($0.02$--$0.01$--$0.005$ oppure $0.01$--$0.005$--$0.0025$) ha $r=2$ ed è
+    quindi ammissibile; una terna non consecutiva (es.\ $0.02$--$0.01$--$0.0025$) avrebbe $r$
+    \emph{non} costante e renderebbe la formula non direttamente applicabile.
+  \item \textbf{Necessità del regime asintotico.} La scelta \emph{non} è del tutto indifferente:
+    affinché l'estrapolazione sia attendibile le griglie devono trovarsi nella \textbf{regione
+    asintotica} (Fig.~\ref{fig:ordine_convergenza}). Per questo conviene impiegare le coppie/terne
+    \textbf{più fini} disponibili ($h$ piccolo), dove l'ordine osservato è prossimo a quello
+    formale; le griglie più grossolane risentono ancora del "transitorio" iniziale dell'ordine di
+    convergenza.
+  \item \textbf{Effetto sui due metodi.} Il transitorio iniziale penalizza soprattutto il
+    \textbf{calcolo dell'ordine empirico}, che \emph{misura} $p$: su griglie grossolane fornisce un
+    $p$ lontano da quello teorico e quindi un'estrapolazione poco affidabile. Il metodo a
+    \textbf{ordine teorico} non misura $p$ ma lo \emph{assume}: usare griglie troppo rade non
+    produce un valore "strano" di $p$, ma introduce \textbf{silenziosamente} un errore di
+    estrapolazione (perché l'ipotesi di regime asintotico è violata). In entrambi i casi, dunque,
+    è preferibile basarsi sulle griglie più fitte.
+\end{itemize}
+In sintesi: il set non è completamente arbitrario. Combinazioni diverse (1--2, 2--3, 3--4,~\dots)
+sono tutte lecite ma forniscono stime leggermente diverse; la \textbf{più affidabile è quella
+costruita con le griglie più fini}, perché più vicina al regime asintotico in cui l'ipotesi
+$E = k\,h^p$ è valida.

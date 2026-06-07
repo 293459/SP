@@ -303,6 +303,26 @@ Le linee selezionate come attrattori corrispondono alle zone fisicamente più cr
 Il rapporto $\texttt{LcMax}/\texttt{LcMin} = 2$ garantisce una transizione graduale nella
 dimensione delle celle, evitando elementi distorti o con rapporti di aspetto elevati.
 
+\paragraph{Effetto della lunghezza caratteristica sui risultati.}
+La scelta della lunghezza caratteristica $l_c$ (e quindi di $\texttt{LcMin}$ nelle zone di urto)
+ha un effetto preciso e va motivata. La $l_c$ controlla la \textbf{risoluzione delle
+discontinuità}: poiché uno schema ai volumi finiti \emph{spalma} l'urto su alcune celle, una
+$l_c$ più piccola produce urti più \textbf{netti} (minore \emph{smearing} numerico) e una
+migliore cattura dei gradienti, al prezzo di un numero di celle e di un costo computazionale
+maggiori. È importante distinguere due aspetti:
+\begin{itemize}
+  \item la \textbf{posizione} degli urti obliqui è fissata dalla fisica (relazioni
+    $\theta$--$\beta$--$M$) ed è quindi \textbf{sostanzialmente indipendente} da $l_c$: griglie
+    diverse collocano gli urti quasi nello stesso punto;
+  \item lo \textbf{spessore apparente} dell'urto e l'accuratezza delle grandezze di parete
+    (pressione, picchi) \textbf{dipendono} invece da $l_c$: una griglia troppo rada arrotonda i
+    salti e sottostima i picchi.
+\end{itemize}
+Adottare una $l_c$ diversa è quindi legittimo purché la griglia sia \textbf{abbastanza fine da
+trovarsi nel regime di convergenza}: in tal caso le grandezze integrali e di parete risultano
+indipendenti dalla griglia, mentre l'unica differenza visibile tra una $l_c$ e l'altra è la
+maggiore o minore nitidezza con cui vengono risolti gli urti.
+
 % ============================================================
 % SEZIONE COMMENTATA (errore noto #5):
 % Il processo iterativo di raffinamento della mesh (Mesh v1 -> v2) viene omesso
