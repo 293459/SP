@@ -95,3 +95,7 @@ LLNL/ # ignora i file della cartella ddi VisIt software
 # --- Claude Code runtime (stato di sessione locale, non versionare) ---
 .claude/
 *.lock
+
+# --- Cartella di lavoro temporanea per le run di convergenza (artefatti pesanti) ---
+_conv/
+_run_debug1/
