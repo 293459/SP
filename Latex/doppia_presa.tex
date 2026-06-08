@@ -493,6 +493,95 @@ Per Lax--Friedrichs l'ordine effettivo è molto basso ($p \approx 0.23$), riflet
 maggiore dissipazione numerica e la scarsa capacità di catturare correttamente le
 discontinuità.
 
+\section{Campi di Mach, Pressione e Temperatura (Solutore Euler)}
+\label{sec:presa_campi}
+
+Si presentano i campi ottenuti con il \textbf{codice di Eulero sviluppato}, utilizzando lo
+\textbf{schema di Roe} come richiesto dalla traccia. Le grandezze sono adimensionali, riferite
+alle condizioni totali di ingresso ($P^\circ_{\rm in}=1$, $T^\circ_{\rm in}=1$). Tutti i campi
+sono mostrati a convergenza raggiunta (residui $\sim10^{-6}$).
+
+\paragraph{Verifica delle condizioni di ingresso.}
+Prima di interpretare i campi si controlla la consistenza del flusso indisturbato di monte con le
+relazioni isentropiche per $M_\infty = 3$:
+\begin{equation}
+  \frac{T_\infty}{T^\circ} = \left(1+\tfrac{\gamma-1}{2}M_\infty^2\right)^{-1} = \frac{1}{2.8} = 0.357,
+  \qquad
+  \frac{P_\infty}{P^\circ} = \left(1+\tfrac{\gamma-1}{2}M_\infty^2\right)^{-\frac{\gamma}{\gamma-1}} = 0.0272.
+\end{equation}
+I minimi letti nei campi ($T/T^\circ = 0.357$ e $P/P^\circ = 0.0272$ nella zona di monte) coincidono
+\textbf{esattamente} con questi valori: le condizioni al contorno sono imposte correttamente e il
+codice è consistente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../Images/Eulero_rampa_mach.png}
+  \caption{Campo del numero di Mach nella presa a doppia rampa (codice Euler, schema di Roe).
+           A monte $M=3$ uniforme; i due urti obliqui staccati dalle rampe decelerano
+           progressivamente la corrente fino a $M\approx1.5$, mantenendola ovunque
+           \textbf{supersonica}.}
+  \label{fig:eulero_rampa_mach}
+\end{figure}
+
+\paragraph{Campo di Mach.}
+Il campo riproduce la fisica attesa della presa a compressione esterna:
+\begin{itemize}
+  \item a monte la corrente è \textbf{uniforme a $M=3$} (regione rossa);
+  \item dal piede della prima rampa parte il \textbf{primo urto obliquo}, che deflette e comprime
+    il flusso riducendo il Mach; dal ginocchio della seconda rampa parte il \textbf{secondo urto
+    obliquo}, più inclinato, che lo riduce ulteriormente;
+  \item attraverso la doppia compressione il numero di Mach scende da $3$ a circa $1.5$
+    (minimo $M\approx1.53$), \textbf{restando supersonico} su tutto il dominio: è esattamente la
+    condizione che la geometria semplificata vuole garantire (natura iperbolica delle equazioni,
+    nessuna caratteristica entrante dall'outlet);
+  \item la \textbf{compressione a due urti deboli} è più efficiente di un singolo urto forte,
+    perché la perdita di pressione totale attraverso un urto cresce rapidamente con l'intensità
+    ($\Delta P^\circ \propto (M_n^2-1)^3$): due urti deboli dissipano meno di un urto normale unico.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../Images/Eulero_rampa_pressione.png}
+  \caption{Campo di pressione adimensionale $P/P^\circ$ (codice Euler, schema di Roe).
+           Pressione bassa e uniforme a monte ($0.0272$), che cresce a gradini attraverso i due
+           urti obliqui fino al picco ($\approx0.21$) nella zona di focalizzazione degli urti
+           in prossimità del labbro/imbocco del canale.}
+  \label{fig:eulero_rampa_pressione}
+\end{figure}
+
+\paragraph{Campo di pressione.}
+La pressione statica parte dal valore di monte $0.0272$ e \textbf{cresce a gradini} attraverso i
+due urti (ogni urto è una compressione), raggiungendo il \textbf{massimo} ($\approx0.21$, ossia
+quasi otto volte la pressione di monte) nella regione dove i due urti obliqui \textbf{convergono e
+si focalizzano} in prossimità del labbro, all'imbocco del canale di cattura. È qui che la presa
+realizza il suo scopo: \emph{recuperare pressione} comprimendo la corrente supersonica. A valle, nel
+canale, la pressione si ridistribuisce per effetto delle riflessioni d'onda sulle pareti.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../Images/Eulero_rampa_temperatura.png}
+  \caption{Campo di temperatura adimensionale $T/T^\circ$ (codice Euler, schema di Roe).
+           È l'immagine "speculare" del Mach: minima a monte ($0.357$, flusso veloce) e crescente
+           attraverso la compressione fino a $\approx0.68$ nel canale.}
+  \label{fig:eulero_rampa_temperatura}
+\end{figure}
+
+\paragraph{Campo di temperatura.}
+Coerentemente con la relazione isentropica $T/T^\circ=(1+\tfrac{\gamma-1}{2}M^2)^{-1}$, la
+temperatura è il \textbf{negativo} del campo di Mach: minima dove il flusso è più veloce (a monte,
+$T/T^\circ=0.357$) e crescente attraverso gli urti man mano che la corrente rallenta e si comprime,
+fino a $T/T^\circ\approx0.68$ nel canale. La coerenza incrociata fra i tre campi ($M$, $P$, $T$
+legati dalle relazioni isentropiche fuori dagli urti) costituisce un'ulteriore validazione del
+solutore.
+
+\paragraph{Note sulla risoluzione e sullo schema.}
+I campi sono calcolati sulla griglia impiegata per l'analisi di convergenza (la più rada,
+$\sim1150$ nodi): gli urti appaiono perciò \textbf{spalmati} su alcune celle (\emph{smearing}
+numerico). Lo schema di \textbf{Roe}, meno dissipativo, li rende comunque più netti di quanto
+farebbe Lax--Friedrichs. Trattandosi di un modello \textbf{inviscido}, non sono presenti strato
+limite né separazioni: la bolla di ricircolo e l'interazione urto--strato limite osservabili nel
+caso viscoso (Cap.~\ref{cap:fluent}) non compaiono qui.
+
 \section{Confronto con Dati Sperimentali}
 \label{sec:presa_exp}
 

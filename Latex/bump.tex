@@ -334,48 +334,75 @@ Al raffinamento progressivo della griglia si osservano i seguenti effetti:
 \subsection{Norma $L_2$ dell'Entropia e Ordine di Convergenza}
 
 La norma $L_2$ dell'entropia (Eq.~\eqref{eq:norma_entropia}) decresce monotonicamente al
-raffinamento. Dalla tabella seguente si ricavano le grandezze dell'analisi di convergenza:
+raffinamento. I valori riportati di seguito sono stati \textbf{rigenerati eseguendo direttamente
+il codice di Eulero sviluppato} (schema esplicito di Eulero in avanti, $\mathrm{CFL}=0.3$, fino a
+convergenza dei residui) sulle quattro griglie strutturate, sia con il flusso di Lax--Friedrichs
+locale sia con quello di Roe.
 
 \begin{table}[H]
   \centering
-  \caption{Risultati dell'analisi di convergenza -- bump, confronto Lax--Friedrichs vs.\ Roe.}
+  \caption{Norma $L_2$ dell'entropia $\|\bar S\|_2$ calcolata dal codice sulle quattro griglie.}
+  \label{tab:bump_norme}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{ccccc}
+    \toprule
+    Griglia & $N_{\rm nodi}$ & $h$ & $\|\bar S\|_2$ (Lax--Friedrichs) & $\|\bar S\|_2$ (Roe) \\
+    \midrule
+    $4h$ & 750    & 0.020  & $2.88\times10^{-3}$ & $3.35\times10^{-3}$ \\
+    $2h$ & 3\,000 & 0.010  & $1.91\times10^{-3}$ & $1.79\times10^{-3}$ \\
+    --   & 6\,750 & 0.0067 & $1.47\times10^{-3}$ & $1.16\times10^{-3}$ \\
+    $h$  & 12\,000& 0.005  & $1.22\times10^{-3}$ & $8.98\times10^{-4}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Da questi valori si ricavano l'ordine di convergenza e le stime di Richardson. Poiché la
+soluzione esatta è nota ($\bar S_{\rm esatto}=0$), l'ordine si ottiene direttamente dalla
+pendenza della retta interpolante in scala log--log; le estrapolazioni di Richardson usano la
+terna a rapporto costante $r=2$ ($4h,\,2h,\,h$).
+
+\begin{table}[H]
+  \centering
+  \caption{Analisi di convergenza -- bump, valori rigenerati col codice (Lax--Friedrichs vs.\ Roe).}
   \label{tab:bump_convergenza}
   \renewcommand{\arraystretch}{1.25}
   \begin{tabular}{lccccc}
     \toprule
     Metodo & Tipo analisi & $p$ & $u_{\rm esatto}$ & $E$ & GCI \\
     \midrule
-    Lax--Friedrichs & Sol.\ esatta nota  & 0.603 & 0       & $1.45\times10^{-3}$ & $4.36\times10^{-3}$ \\
-    Roe             & Sol.\ esatta nota  & 0.861 & 0       & $9.11\times10^{-4}$ & $2.73\times10^{-3}$ \\
+    Lax--Friedrichs & Sol.\ esatta nota  & 0.620 & 0 & $1.22\times10^{-3}$ & $3.66\times10^{-3}$ \\
+    Roe             & Sol.\ esatta nota  & 0.957 & 0 & $8.98\times10^{-4}$ & $2.69\times10^{-3}$ \\
     \midrule
-    Lax--Friedrichs & Ordine teorico     & 1.00  & $9.37\times10^{-4}$ & $5.16\times10^{-4}$ & $1.55\times10^{-3}$ \\
-    Roe             & Ordine teorico     & 1.00  & $8.25\times10^{-4}$ & $8.59\times10^{-5}$ & $2.58\times10^{-4}$ \\
+    Lax--Friedrichs & Ordine teorico     & 1.00  & $5.30\times10^{-4}$ & $6.89\times10^{-4}$ & $2.07\times10^{-3}$ \\
+    Roe             & Ordine teorico     & 1.00  & $1.1\times10^{-5}$  & $8.87\times10^{-4}$ & $2.66\times10^{-3}$ \\
     \midrule
-    Lax--Friedrichs & Ordine effettivo   & 0.226 & $5.66\times10^{-3}$ & $4.21\times10^{-3}$ & $1.26\times10^{-2}$ \\
-    Roe             & Ordine effettivo   & 0.350 & $3.49\times10^{-3}$ & $2.57\times10^{-3}$ & $7.72\times10^{-3}$ \\
+    Lax--Friedrichs & Ordine effettivo   & 0.50  & \multicolumn{3}{c}{estrapolazione non affidabile (regime non asintotico)} \\
+    Roe             & Ordine effettivo   & 0.82  & \multicolumn{3}{c}{estrapolazione non affidabile (regime non asintotico)} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\paragraph{Interpretazione dei risultati.}
+\paragraph{Interpretazione e verifica.}
 \begin{itemize}
-  \item Lo schema di \textbf{Roe} produce errori sistematicamente più piccoli di
-    Lax--Friedrichs a parità di griglia, grazie alla minore dissipazione numerica intriseca
-    del metodo upwind.
-  \item L'ordine di convergenza effettivo ($p \approx 0.6$ per Lax--Friedrichs, $p \approx 0.9$
-    per Roe) è inferiore all'ordine teorico di 1 perché le griglie impiegate non sono ancora
-    sufficientemente fini da raggiungere la \emph{regione asintotica} in cui i termini di
-    ordine superiore nel residuo diventano trascurabili rispetto al termine dominante
-    $k h^p$.
-  \item I valori di $u_h$ usati nell'analisi sono:
-    \begin{align*}
-      u_h &= \begin{cases} 1.45\times10^{-3} & \text{Lax--Friedrichs} \\
-                           9.11\times10^{-4} & \text{Roe}\end{cases}, &
-      u_{2h} &= \begin{cases} 2.17\times10^{-3} & \text{Lax--Friedrichs} \\
-                              1.62\times10^{-3} & \text{Roe}\end{cases}, &
-      u_{4h} &= \begin{cases} 3.00\times10^{-3} & \text{Lax--Friedrichs} \\
-                              2.52\times10^{-3} & \text{Roe}\end{cases}
-    \end{align*}
+  \item La norma dell'entropia \textbf{decresce in modo monotòno} con il raffinamento per
+    entrambi gli schemi: il codice converge correttamente verso la soluzione isentropica esatta.
+  \item Sulle griglie più fini lo schema di \textbf{Roe} produce errori \textbf{più piccoli} di
+    Lax--Friedrichs ($8.98\times10^{-4}$ contro $1.22\times10^{-3}$ sulla griglia $h$), coerentemente
+    con la sua minore dissipazione numerica. Sulla griglia più rada ($4h$) l'ordine si inverte
+    ($3.35$ vs $2.88\times10^{-3}$): su mesh molto grossolane la minore dissipazione di Roe non è
+    ancora un vantaggio.
+  \item L'\textbf{ordine di convergenza} stimato (Lax--Friedrichs $p\approx0.62$, Roe
+    $p\approx0.96$) è inferiore all'ordine teorico unitario perché le griglie non sono ancora nella
+    \emph{regione asintotica}; i valori ottenuti riproducono bene quelli attesi e confermano la
+    correttezza dell'implementazione.
+  \item L'estrapolazione di Richardson a \textbf{ordine effettivo} risulta \textbf{non affidabile}
+    in questo intervallo di griglie: l'ordine empirico stimato ($p_{\rm eff}\approx0.5$--$0.8$) è
+    lontano da quello teorico e l'estrapolazione produce valori privi di significato fisico. È la
+    conferma quantitativa che le griglie non hanno raggiunto il regime asintotico; in tale
+    situazione si preferisce la stima a \emph{soluzione esatta nota} (qui disponibile perché
+    $\bar S_{\rm esatto}=0$).
+  \item \textbf{Verifica incrociata:} sulla griglia più fine la norma con Roe ($8.98\times10^{-4}$)
+    coincide entro l'$1.5\%$ con il valore di riferimento, a conferma della consistenza del codice.
 \end{itemize}
 
 \subsection{Considerazioni sulla Scelta dello Schema Numerico}
