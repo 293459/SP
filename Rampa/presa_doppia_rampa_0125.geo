@@ -1,5 +1,5 @@
 Mesh.MshFileVersion=2.2;
-lc = 0.3;
+lc = 0.125;
 
 Point(1) = {-0.5, 0., 0, lc};
 Point(2) = {-0.45, 0., 0, lc};
