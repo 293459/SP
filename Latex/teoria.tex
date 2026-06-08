@@ -823,4 +823,59 @@ Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa
 dell'incertezza numerica associata alla discretizzazione:
 \begin{equation}
   \text{GCI} = F_s \cdot |u_h - u_{\rm esatto}|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
+  \label{eq:gci}
 \end{equation}
+
+\subsection{Lunghezza caratteristica nominale ed effettiva}
+\label{subsec:lc_eff}
+
+Un punto che merita chiarimento riguarda il significato della lunghezza caratteristica $h$ (o
+$l_c$) usata nell'analisi di convergenza. Verrebbe naturale identificarla con il parametro
+\texttt{lc} scritto nel file di geometria \texttt{.geo}; in realtà ciò è corretto \emph{solo}
+per le mesh \textbf{non strutturate}.
+
+\paragraph{Mesh non strutturate.} Qui \texttt{lc} (eventualmente modulato da campi
+\texttt{Threshold}/\texttt{Attractor}) è il parametro \emph{operativo}: Gmsh genera gli elementi
+imponendo localmente una dimensione pari a \texttt{lc}. La lunghezza caratteristica della griglia
+coincide quindi, a meno di variazioni locali, con il valore impostato.
+
+\paragraph{Mesh strutturate (transfinite).} In una mesh strutturata generata con i comandi
+\texttt{Transfinite Line}, il numero di celle è imposto \textbf{direttamente} dal numero di nodi
+per lato (es.\ \texttt{Transfinite Line\{2\} = N}); il parametro \texttt{lc} del file viene
+\textbf{ignorato} (resta solo la dimensione di default per l'eventuale parte non strutturata). La
+dimensione reale della cella non è quindi \texttt{lc}, ma deriva \emph{a posteriori} dal numero di
+elementi:
+\begin{equation}
+  h_{\rm eff} \approx \frac{L}{N_{\rm lato}} \qquad\text{(oppure } h_{\rm eff} \approx \sqrt{A/N_{\rm celle}} \text{ in 2D)}.
+  \label{eq:lc_eff}
+\end{equation}
+È questa la ragione per cui, per le griglie strutturate, nelle tabelle compare un \textbf{valore
+``stimato''} di $l_c$: non è un numero arbitrario, ma la \emph{dimensione caratteristica effettiva}
+ricavata dal conteggio degli elementi. Se in un file \texttt{.geo} strutturato si raddoppia il
+moltiplicatore del numero di nodi, $h_{\rm eff}$ si dimezza pur restando \texttt{lc} invariato:
+è il moltiplicatore, non \texttt{lc}, a controllare il raffinamento.
+
+\subsection{Validità per griglie strutturate e non strutturate}
+\label{subsec:richardson_strutt}
+
+L'estrapolazione di Richardson \textbf{non è limitata alle griglie strutturate}: si applica anche
+a quelle non strutturate, ma con alcune precisazioni, perché la sua derivazione assume che
+l'errore segua la legge di potenza $E = k\,h^p$ con un $h$ ben definito e un raffinamento
+\emph{globalmente uniforme} di rapporto costante $r$.
+
+\paragraph{Griglie strutturate.} La lunghezza caratteristica $h$ è ben definita e uniforme, e il
+raffinamento (raddoppio dei nodi per lato) realizza in modo esatto un rapporto $r$ costante
+(tipicamente $r=2$). Le ipotesi di Richardson sono soddisfatte ``alla lettera'' e l'ordine
+osservato è pulito.
+
+\paragraph{Griglie non strutturate.} Le celle hanno dimensioni variabili: non esiste un singolo
+$h$, ma se ne usa uno \textbf{rappresentativo} (Eq.~\ref{eq:lc_eff}, $h_{\rm eff}\approx\sqrt{A/N}$).
+Il rapporto di diradamento si ricava dal conteggio delle celle, $r = (N_{\rm fine}/N_{\rm rada})^{1/d}$
+($d$ = dimensione spaziale). L'estrapolazione resta valida \textbf{a condizione che} il raffinamento
+sia \emph{self-simile}, cioè che tutte le griglie vengano infittite \textbf{globalmente e con la
+stessa logica} (stessa distribuzione relativa di densità). Ciò che cambia rispetto al caso
+strutturato è che: (i) $h$ è una media e non un valore esatto; (ii) la qualità non uniforme degli
+elementi introduce ``rumore'' nell'andamento, per cui l'ordine osservato è in genere \textbf{meno
+regolare}. Va invece evitato il raffinamento \textbf{locale/adattivo} non uniforme (es.\ infittire
+solo una zona): in tal caso $h$ ed $r$ non sono ben definiti e la legge di potenza, e con essa
+Richardson, perde validità.
