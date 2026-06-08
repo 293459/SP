@@ -1,13 +1,3 @@
-# Modelli numerici per Turbomacchine — Interfacciamento Statore–Rotore
-
-> Teoria + simulazione d'esame sul **macroargomento 1** della lezione 06-04: come si gestisce
-> numericamente l'**interfaccia tra una schiera fissa (statore) e una rotante (rotore)** quando le
-> due hanno **passo (pitch) diverso** e moto relativo. Formato toggle Notion; **parole chiave** in
-> grassetto; formule LaTeX (`$...$`, `$$...$$`).
-> Risponde alle domande **1–5** del file di dubbi.
-
----
-
 ## Parte I — Teoria
 
 ### 1. Il problema di base
@@ -16,7 +6,15 @@ In una turbomacchina reale **statore e rotore hanno un numero di pale diverso** 
 sono in **moto relativo**. Una simulazione CFD non può quasi mai contenere l'**intero anello (full
 annulus)**: sarebbe corretta ma proibitiva. Si cerca allora di simulare **un solo canale (o pochi
 canali) per schiera** e di raccordare le due zone con una **condizione di interfaccia**. Il modo in
-cui si tratta quell'interfaccia definisce la **fedeltà** della simulazione e il suo **costo**:
+cui si tratta quell'interfaccia definisce la **fedeltà** della simulazione e il suo **costo**.
+
+> **La domanda centrale di tutta la lezione è una sola: come catturare — o quanto si è disposti a
+> perdere de — l'*interazione instazionaria* tra statore e rotore.** Le scie e i campi di potenziale
+> delle pale di una schiera investono **periodicamente** la schiera opposta in moto relativo: tutti i
+> metodi che seguono si distinguono proprio per **quanta** di questa interazione conservano e a
+> **quale costo**.
+
+I metodi principali sono:
 
 | Metodo | Stazionario/Instazionario | Fedeltà | Costo | Gestione del passo diverso |
 |---|---|---|---|---|
@@ -39,14 +37,7 @@ distruggono.
 **pre-progetto**. L'idea: all'interfaccia si fa una **media in direzione circonferenziale** delle
 grandezze di flusso e si passa al rotore solo il **profilo radiale mediato**.
 
-```
-   STATORE                 |  MIXING PLANE  |              ROTORE
-   (passo p1)              media circonf.                 (passo p2)
-   ----\        scia ~~~~> | ============== |  profilo radiale mediato (uniforme in θ)
-        \____               |   NO interaz.  |  ----\
-   ----\        scia ~~~~> |   instazionaria |       \____
-        \____               | ============== |  ----\
-```
+![Schema del mixing plane: media circonferenziale all'interfaccia statore-rotore](mixing_plane.jpg)
 
 - **Perché si media in direzione circonferenziale (θ):** è la direzione lungo cui statore e rotore
   hanno **periodicità diversa** (passi diversi). Mediando in θ si ottiene un profilo che dipende
@@ -70,6 +61,49 @@ grandezze di flusso e si passa al rotore solo il **profilo radiale mediato**.
   è un **piano di scambio** dove si calcolano i flussi mediati e si impongono come condizioni al
   contorno reciproche. Non serve corrispondenza tra le celle delle due zone.
 
+**Il vantaggio cruciale: qualunque passo va bene.** Proprio perché si media in θ, il mixing plane
+**accetta un rapporto di pale qualsiasi** ($Z_1/Z_2$ arbitrario, anche irrazionale). È questo —
+oltre al basso costo dello stazionario — il vantaggio decisivo del metodo: non serve alcun divisore
+comune tra i numeri di pala (a differenza dello sliding mesh, §3).
+
+**Ma allora i dati dell'interfaccia non combaciante "si perdono"?** No, non nel senso di celle
+inutilizzate: nella media circonferenziale **tutti i valori contribuiscono** all'integrale (media
+mass-/area-weighted). Nessun dato resta "scartato"; ciò che si perde è l'**informazione sulla
+distribuzione** in θ (la forma della scia), non singole celle. Anche se le due mesh non combaciano
+faccia-a-faccia, ogni faccia entra nella media con il suo peso: il mixing plane **non perde dati,
+perde struttura circonferenziale**.
+
+**Cosa resta dopo la media: una sola "pala media".** Prima del mixing plane statore e rotore hanno
+in generale un **numero di pale diverso**; ma dopo aver mediato lungo θ il risultato dipende **solo
+dal raggio** $r$. È come se restasse **una sola pala media** (un profilo radiale), e il problema "quante
+pale?" **scompare**: ne rimane una sola, quella mediata. Di fatto si osserva come variano le grandezze
+(es. la vorticità) **lungo $r$**, cioè muovendosi dal **tip all'hub** (o viceversa), e non più lungo θ.
+
+**Cosa significa "troncamento della scia" (livello matematico).** Sviluppiamo la grandezza
+all'interfaccia in **serie di Fourier circonferenziale**:
+$$U(r,\theta) = \sum_{n=-\infty}^{+\infty} \hat{U}_n(r)\,e^{\,i n \theta}.$$
+La media circonferenziale **conserva solo l'armonica $n=0$** (il valor medio) e **azzera tutte le
+armoniche $n\neq 0$**:
+$$\bar{U}(r) = \frac{1}{\Delta\theta}\int_{\theta_1}^{\theta_2} U(r,\theta)\,d\theta = \hat{U}_0(r),
+\qquad \hat{U}_n(r)\xrightarrow{\;\text{mixing plane}\;} 0 \;\; (n\neq 0).$$
+"Troncamento" significa proprio questo: si **tronca la serie di Fourier al solo modo $n=0$**. I valori
+troncati sono le **armoniche superiori** $\hat U_n$ ($n\neq 0$), che sono esattamente quelle che
+descrivono la **scia** e le **non-uniformità circonferenziali**. Buttarle via equivale a un
+miscelamento istantaneo e genera le **perdite di mixing numeriche**.
+
+---
+
+### Frozen rotor (cenno)
+
+Citato nella tabella ma assente dagli appunti, per completezza: il **frozen rotor** è un metodo
+**stazionario** in cui statore e rotore vengono "**congelati**" in una **posizione relativa fissa** e
+risolti insieme **senza mediare** in θ. A differenza del mixing plane **conserva la non-uniformità
+circonferenziale** (la scia *si vede*), ma solo per **una** posizione relativa arbitraria: l'interazione
+**non è quella reale instazionaria**, è una "fotografia" a posizione bloccata. Va quindi inteso come un
+compromesso tra mixing plane (media, niente scia) e sliding mesh (instazionario completo): **più
+informazione del mixing plane, ma risultato dipendente dalla posizione scelta** e quindi non
+fisicamente rigoroso.
+
 ---
 
 ### 3. Sliding mesh (mesh scorrevole)
@@ -77,27 +111,47 @@ grandezze di flusso e si passa al rotore solo il **profilo radiale mediato**.
 È il metodo **instazionario ad alta fedeltà**: la mesh del rotore **scorre** rispetto a quella dello
 statore e all'interfaccia si **interpola** il flusso ad ogni passo temporale. Conserva la scia e
 tutta l'**interazione instazionaria**.
+![Sliding mesh: ripartizione conservativa dei flussi all'interfaccia tra celle sovrapposte](sliding_mesh_ripartizione_flussi.jpg)
 
 - **La matrice di connettività varia nel tempo:** ci si riferisce alla **zona di interfaccia**, non
   alle mesh di statore e rotore (che restano rigide). Mentre il rotore scorre, **ogni faccia
   d'interfaccia del rotore si affaccia ad ogni passo a celle diverse dello statore**: l'elenco di
   "chi confina con chi" (la connectivity) **cambia istante per istante**.
-- **Euleriano o lagrangiano?** Le mesh sono **euleriane** (rigide, non seguono il fluido); ciò che si
-  muove è la **griglia del rotore in blocco** (moto rigido imposto, *moving/sliding mesh*), non le
-  particelle. L'interfaccia è quindi un **accoppiamento euleriano con interpolazione geometrica**, non
-  un metodo lagrangiano.
+- **Euleriano, non lagrangiano (attenzione a non confondere).** Le mesh sono **euleriane**: definiscono
+  una **regione di spazio fissa** su cui si scrivono le equazioni, e **non seguono le particelle di
+  fluido**. Il fatto che la griglia del rotore **si muova in blocco** (moto rigido imposto,
+  *moving/sliding mesh*) **non la rende lagrangiana**: un approccio **lagrangiano** significherebbe
+  **seguire le particelle** lungo le loro traiettorie, cosa che qui **non si fa**. Stiamo sempre
+  analizzando un **volume di controllo** (la mesh); che poi quel volume trasli rigidamente è un
+  discorso a parte e si gestisce con la **velocità di griglia** nei flussi (formulazione ALE,
+  *Arbitrary Lagrangian–Eulerian*, che resta sostanzialmente euleriana). In sintesi: **griglia in moto
+  ≠ approccio lagrangiano**.
 - **"In alcuni casi non c'è nemmeno corrispondenza 1-a-1 tra le celle":** le facce affacciate possono
   avere dimensioni/posizioni diverse, quindi una faccia del rotore si sovrappone **parzialmente a più
   celle** dello statore. Non serve (e non si pretende) una relazione **1-a-1**: si calcolano i flussi
   con **pesi proporzionali alle aree di sovrapposizione** (interpolazione conservativa).
-- **Perché i passi dovrebbero essere (quasi) uguali:** per avere una **periodicità circonferenziale
-  semplice** quando si simula solo un sottoinsieme di canali, i settori di statore e rotore devono
-  coprire lo **stesso angolo**. Questo richiede $n_1 \cdot p_1 = n_2 \cdot p_2$, cioè un **divisore
-  comune** tra i numeri di pala.
-- **Se non c'è un divisore comune:** servirebbe il **full annulus** (tutte le pale), molto costoso.
-  In pratica si **modifica leggermente il numero di pale** per ottenere un rapporto semplice: es. da
-  **50 e 61** pale si passa a **50 e 60** (fingendo 60), introducendo un piccolo errore geometrico ma
-  rendendo la simulazione **drasticamente più economica**.
+- **Ripartizione dei flussi (conferma).** Sì: se la cella 1 dello statore è affacciata **in parti
+  uguali** a due celle del rotore, il flusso all'interfaccia viene **diviso a metà** (50%–50%) tra le
+  due. In generale ogni flusso si **ripartisce in proporzione all'area di sovrapposizione**: con tre
+  celle sovrapposte al 30/50/20% il flusso si divide 0.30/0.50/0.20. È questa ripartizione pesata che
+  garantisce la **conservatività** dell'interfaccia.
+- **Perché i passi dovrebbero essere (quasi) uguali → serve il Massimo Comun Divisore.** Per simulare
+  solo un sottoinsieme di canali, i settori di statore e rotore devono coprire **lo stesso angolo**.
+  Non basta *un* divisore comune: si cerca il **Massimo Comun Divisore (MCD)** dei numeri di pala, così
+  da ottenere il **settore periodico più piccolo possibile** (costo computazionale minimo). Vale:
+  $$\text{settore} = \frac{360°}{\mathrm{MCD}(Z_1,Z_2)}, \qquad
+    \text{canali per settore} = \frac{Z_1}{\mathrm{MCD}},\;\frac{Z_2}{\mathrm{MCD}}.$$
+  *Calcoletto:* a $360°$ con **60 pale** ogni canale occupa $360/60 = 6°$; con **30 pale** ogni canale
+  occupa $360/30 = 12°$ (il doppio). Con $\mathrm{MCD}(60,30)=30$ il settore minimo è
+  $360/30 = 12°$, contenente **2 canali** del rotore a 60 pale e **1 canale** della schiera a 30 pale:
+  i due settori hanno **estensione angolare identica** ($12°$). È proprio questo che evita che parte
+  del flusso di una schiera **si perda** e non arrivi all'altra — cosa tollerabile nel mixing plane
+  (che media), **non** nello sliding mesh (che vuole far combaciare le interfacce).
+- **Se l'MCD è troppo piccolo (es. 1):** servirebbe il **full annulus** (tutte le pale), molto costoso.
+  In pratica si **modifica leggermente il numero di pale** per ottenere un MCD favorevole: es. da
+  **50 e 61** pale si passa a **50 e 60** (fingendo 60, $\mathrm{MCD}=10$, settore $36°$ con 5 canali :
+  6 canali), introducendo un piccolo errore geometrico ma rendendo la simulazione **drasticamente più
+  economica**.
 
 ```
         REALE (50 e 61)                  SIMULATO (50 e 60)
@@ -117,6 +171,14 @@ perché due canali adiacenti **non sono nella stessa fase** rispetto alla schier
 è una **periodicità sfasata nel tempo**: il bordo di un canale è uguale al bordo del canale adiacente,
 ma **valutato a un istante diverso**.
 
+> **Attenzione a cosa "sfasa" il metodo.** "Sfasamento temporale tra i canali" **non** significa
+> aspettare che un canale **combaci geometricamente** con l'altro: canali di passo diverso hanno
+> dimensioni diverse e **non combaceranno mai**. Ciò che si sfasa è il **tempo a cui si legge il
+> campo**: il bordo del canale che sto simulando, a un certo istante $t$, è **identico** a quello del
+> canale adiacente **a un altro istante** $t+\delta_t$. Si sfrutta cioè la **periodicità nel tempo** del
+> fenomeno (le scie passano a intervalli regolari), non un'impossibile coincidenza geometrica dei
+> canali.
+
 - **Periodicità spaziale (passi uguali):**
 $$U(x,r,\theta,t) = U\!\left(x,r,\theta - \tfrac{2\pi}{Z_2},\, t\right)$$
 - **Periodicità sfasata / corocronica (passi diversi):**
@@ -130,14 +192,25 @@ $$\delta_t = \frac{\left|\dfrac{2\pi}{Z_1} - \dfrac{2\pi}{Z_2}\right|}{\left|\Om
   $|\Omega_1-\Omega_2|$. Quando $Z_1 = Z_2$ la differenza di passo è **nulla** e $\delta_t = 0$: si
   ricade nella periodicità spaziale semplice. Il segno (turbina vs compressore) dipende dal verso
   relativo del moto.
+- **Una delle due velocità è sempre nulla.** Sia in un **compressore** sia in una **turbina** la
+  configurazione è **statore–rotore** (o rotore–statore): **una delle due schiere è ferma**, quindi ha
+  velocità **zero**. Di conseguenza la velocità relativa si riduce alla sola velocità del rotore:
+  $|\Omega_1-\Omega_2| = \Omega_{\text{rotore}}$ (con $\Omega_{\text{statore}}=0$). La formula del lag
+  si semplifica perciò in $\delta_t = \left|\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right| / \Omega_{\text{rotore}}$.
 - **Perché tanti nomi diversi (phase-lag, corocroniche, chorochronic):** descrivono la **stessa
   idea** da angolazioni diverse. *Phase-lag* sottolinea lo **sfasamento di fase** (= rotazione di un
   passo) tra canali adiacenti; *corocroniche/chorochronic* sottolinea che la **periodicità è
   spazio-temporale** (greco *choros* = spazio, *chronos* = tempo): ciò che è periodico è la
   combinazione **(spazio θ) + (tempo t)**, non lo spazio da solo.
-- **Costo in memoria:** per imporre la BC al tempo $t+\delta_t$ bisogna **conservare la storia
-  temporale** della soluzione al bordo su un intero periodo. Questo è il prezzo del metodo:
-  **più memoria** in cambio di una simulazione su **un solo canale** invece che sull'intero anello.
+- **Full annulus vs phase-lag — memoria al posto dei canali.** Il **full annulus** richiederebbe di
+  simulare **tutti i canali** contemporaneamente (costo in **numero di celle/domini**). Il phase-lag
+  evita questo simulando **un solo canale**, ma in cambio deve **memorizzare la storia temporale** al
+  bordo (es. del rotore): così, **in base all'istante di tempo**, sa **quale condizione al contorno**
+  imporre alla schiera opposta (lo statore). Lo scambio è quindi **memoria temporale ⇄ numero di
+  canali**.
+- **Implica un metodo instazionario.** Proprio perché la BC dipende dall'**istante** $t$ (tramite
+  $\delta_t$) e richiede la storia temporale, il phase-lag è **necessariamente instazionario** (periodico
+  nel tempo): non avrebbe senso in un calcolo stazionario, dove non esiste una "storia" da memorizzare.
 
 ```
    Canale 1 al tempo t          ==  Canale 2 al tempo  t + δt
@@ -241,14 +314,6 @@ mediare.
 **piano di scambio** su cui si calcolano i profili radiali mediati e li si impone reciprocamente. Non
 serve corrispondenza cella-a-cella tra le due zone.
 
-**Sketch del mixing plane (basato sullo schema del docente):**
-```
-   STATORE             | MIXING PLANE |          ROTORE
-   ----\    scia ~~~~> | ===media===> |  profilo radiale uniforme in θ
-        \____           |  NO interaz. |  ----\
-   ----\    scia ~~~~> |  instazion.  |       \____
-   (passo p1)                                  (passo p2)
-```
 
 </details>
 
