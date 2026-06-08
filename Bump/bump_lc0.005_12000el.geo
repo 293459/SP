@@ -3,8 +3,8 @@ Mesh.MshFileVersion = 2.2;
 // Definizione lunghezze caratteristiche 
 L=1; // lungheza del domionio
 h = 0.3; //altezza del dominio
-lc = 0.05; // lunghezza caratteristica della mesh
-n = 4; // è un moltiplicatore che permette di infittire la mesh
+lc = 0.05; // NB: per mesh strutturata (Transfinite) lc NON e' usato: la densita' e' imposta da 50*n x 15*n elementi
+n = 4; // moltiplicatore: lc_eff = 0.02/n -> qui lc_eff = 0.0050
 
 // Definizione Rettangolo
 Point(1) = {0,0,0,lc}; // volendo posso addensare la mesh in un punto specifico
