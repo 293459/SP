@@ -323,54 +323,59 @@ trovarsi nel regime di convergenza}: in tal caso le grandezze integrali e di par
 indipendenti dalla griglia, mentre l'unica differenza visibile tra una $l_c$ e l'altra è la
 maggiore o minore nitidezza con cui vengono risolti gli urti.
 
-% ============================================================
-% SEZIONE COMMENTATA (errore noto #5):
-% Il processo iterativo di raffinamento della mesh (Mesh v1 -> v2) viene omesso
-% perche' le simulazioni vengono condotte direttamente sulla mesh a convergenza.
-% Spiegare come si e' arrivati a tale mesh non e' necessario ai fini dei risultati.
-% Per ripristinare la sezione, sostituire \iffalse con \iftrue.
-% ============================================================
-\iffalse
-\section{Raffinamento Mesh}
+\section{Mesh per l'Analisi di Convergenza}
+\label{sec:presa_mesh_conv}
 
-\subsection{Mesh v1 -- Raffinamento Iniziale}
-\label{sec:presa_mesh_v1}
-
-Una prima versione della mesh è stata generata con i parametri di raffinamento riportati in \autoref{tab:presa_mesh_v1}.
+L'analisi di convergenza richiede tre griglie progressivamente più fitte. A differenza del bump
+(mesh strutturata), per la presa a doppia rampa si impiega una \textbf{mesh non strutturata} a
+triangoli, con raffinamento controllato da un campo che infittisce in prossimità delle rampe,
+della parete inferiore e del labbro --- cioè dove si formano gli urti e i gradienti maggiori. Le
+tre griglie si ottengono \textbf{scalando globalmente} la lunghezza caratteristica $l_c$
+($l_c = 1,\ 0.5,\ 0.25$), mantenendo identico lo schema di raffinamento: il raffinamento è
+quindi \emph{self-simile}, requisito necessario per l'applicabilità di Richardson alle griglie non
+strutturate (cfr.\ Sez.~\ref{subsec:richardson_strutt}).
 
 \begin{table}[H]
   \centering
-  \caption{Parametri di raffinamento mesh -- versione v1.}
-  \label{tab:presa_mesh_v1}
-  \begin{tabular}{ll}
+  \caption{Le tre griglie non strutturate per la convergenza della presa a doppia rampa. L'unico
+           parametro che cambia è la lunghezza caratteristica globale $l_c$; il rapporto di
+           diradamento sui nodi è $r=(N_{\rm fine}/N_{\rm rada})^{1/2}\approx 2$.}
+  \label{tab:presa_mesh}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{cccc}
     \toprule
-    Parametro & Valore \\
+    Griglia & $l_c$ & $N_{\rm nodi}$ & $h_{\rm eff}\approx\sqrt{A/N}$ \\
     \midrule
-    \texttt{Field[2].LcMin} & $lc \times 0.01 = 0.01$ \\
-    \texttt{Field[2].LcMax} & $lc \times 0.10 = 0.10$ \\
-    \texttt{Field[2].DistMin} & $lc / 4 = 0.25$ \\
-    \texttt{Field[2].DistMax} & $lc / 2 = 0.50$ \\
+    M1 (rada)  & $1.00$ & 4\,320  & $\sim 0.0136$ \\
+    M2 (media) & $0.50$ & 16\,564 & $\sim 0.0070$ \\
+    M3 (fine)  & $0.25$ & 65\,130 & $\sim 0.0035$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.8\textwidth]{SP/2-Rampa/mesh_v1.png}
-%   \caption{Mesh v1 con raffinamento iniziale. Si osserva un infittimento in prossimità
-%            delle rampe e del canale, tuttavia le zone di transizione tra la regione fitta e diradata della mesh è troppo distanti dalle pareti fisiche.}
-%   \label{fig:mesh_v1}
-% \end{figure}
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{0.9\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_rampa_1.png}\\[-2pt]
+    {\footnotesize (a) M1 -- $l_c=1$ -- 4320 nodi}
+  \end{minipage}
 
-\paragraph{Osservazioni critiche sulla mesh v1.}
-Sebbene il raffinamento sia presente nelle regioni di interesse (rampe e labbro della presa),
-i parametri \texttt{DistMin} risulta eccessivamente ampio andando ad infittire anche zone che non lo necessiterebbero. 
-Si decide quindi di abbassare \texttt{DistMin} da 0.25 a 0.15.
-Tuttavia questo non sarà sufficiente poiché occorrerà preoccuparsi di desrcivere adeguatamente la zona di interazione tra gli urti obliqui, che si trova a valle del punto 9 (labbro) e non è coperta da nessuna delle linee attrattori. %Evidentemente, non è possibile inserire un attrattore su una linea che non esiste (non c'è nessuna linea che attraversa la zona di interazione), pertanto si decide di inserire un secondo campo di tipo \texttt{Box} centrato sulla zona di interazione, con \texttt{LcMin} più piccolo rispetto al primo campo Attractor.
-\fi
-% ============================================================
-% Fine sezione commentata (errore noto #5)
-% ============================================================
+  \vspace{3pt}
+  \begin{minipage}{0.9\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_rampa_05.png}\\[-2pt]
+    {\footnotesize (b) M2 -- $l_c=0.5$ -- 16564 nodi}
+  \end{minipage}
+
+  \vspace{3pt}
+  \begin{minipage}{0.9\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_rampa_025.png}\\[-2pt]
+    {\footnotesize (c) M3 -- $l_c=0.25$ -- 65130 nodi}
+  \end{minipage}
+  \caption{Le tre griglie non strutturate a raffinamento crescente per la presa a doppia rampa.
+           Si nota l'infittimento concentrato lungo le rampe, la parete inferiore e il labbro,
+           dove si sviluppano gli urti obliqui; la zona di monte (flusso indisturbato) resta rada.}
+  \label{fig:presa_mesh3}
+\end{figure}
 
 
 
