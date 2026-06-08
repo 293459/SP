@@ -16,10 +16,33 @@ fino agli strumenti di verifica della convergenza.
 \section{Equazioni di Governo: Eulero 2D}
 % ============================================================
 
-Il codice risolve le \textbf{equazioni di Eulero 2D}, che descrivono il moto di un
-fluido comprimibile non viscoso.
-Nella forma conservativa differenziale:
+Il codice risolve le \textbf{equazioni di Eulero}, che descrivono il moto di un
+fluido comprimibile \textbf{non viscoso} e \textbf{non conduttivo}: rappresentano
+cioè il limite delle equazioni di Navier--Stokes quando si trascurano gli sforzi
+viscosi e il flusso di calore.
 
+\subsection{Forma vettoriale generale}
+
+In forma conservativa e in notazione vettoriale compatta, valida in un numero
+qualsiasi di dimensioni, le equazioni si scrivono come una legge di conservazione:
+\begin{equation}
+  \parziale{\uvec}{t} + \nabla \cdot \mathcal{F}(\uvec) = \bm{0}
+  \label{eq:eulero_vettoriale}
+\end{equation}
+dove $\uvec$ è il vettore delle \textbf{variabili conservative} e
+$\mathcal{F}(\uvec)$ è il \textbf{tensore dei flussi} (una matrice le cui colonne
+sono i vettori di flusso lungo ciascuna direzione spaziale).
+La struttura~\eqref{eq:eulero_vettoriale} esprime il concetto fisico fondamentale:
+la variazione nel tempo della grandezza conservata in un volume è pari al bilancio
+netto dei flussi che ne attraversano la frontiera.
+
+\subsection{Specializzazione al caso 2D}
+
+Nel caso bidimensionale il termine di divergenza si esplicita nelle derivate rispetto
+alle due coordinate cartesiane $x$ e $y$.
+Indicando con $\fvec$ e $\gvec$ le due colonne del tensore dei flussi
+($\mathcal{F} = [\,\fvec \;\; \gvec\,]$), l'equazione~\eqref{eq:eulero_vettoriale}
+diventa:
 \begin{equation}
   \parziale{\uvec}{t}
   + \parziale{\fvec}{x}
@@ -37,32 +60,156 @@ dove il vettore delle variabili conservative e i vettori dei flussi sono:
 
 con $\rho$ densità, $u,\,v$ componenti di velocità, $P$ pressione, $E$ energia totale
 specifica.
-Il sistema è chiuso dall'equazione di stato dei gas perfetti:
 
+\subsection{Scelta e ordine delle variabili conservative}
+
+Le variabili trasportate non sono le grandezze \emph{primitive} $(\rho, u, v, P)$ ma
+le \textbf{variabili conservative}, cioè le grandezze per cui vale realmente una legge
+di conservazione fisica: \textbf{energia totale} $\rho E$, \textbf{massa} $\rho$ e le
+due componenti della \textbf{quantità di moto} $\rho u,\ \rho v$.
+La ragione è metodologica: lo schema a volumi finiti garantisce la conservazione
+\emph{discreta} solo delle quantità effettivamente integrate, ed è proprio la
+conservazione di massa, quantità di moto ed energia a permettere di catturare
+correttamente la posizione e l'intensità delle onde d'urto (condizioni di
+Rankine--Hugoniot).
+I corrispondenti flussi $\fvec,\gvec$ sono i flussi fisici di queste stesse
+grandezze: trasporto convettivo per la massa, trasporto convettivo più pressione per
+la quantità di moto, e trasporto dell'entalpia totale $\rho H = \rho E + P$ per
+l'energia.
+
+\paragraph{Perché $\rho E$ compare per primo.}
+L'ordinamento $(\rho E,\ \rho,\ \rho u,\ \rho v)$ non è casuale ma riflette
+\textbf{esattamente l'ordine con cui le componenti sono memorizzate nel codice}.
+Nel solutore il vettore \texttt{ucons} è indicizzato come
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+indice & \texttt{ucons(1)} & \texttt{ucons(2)} & \texttt{ucons(3)} & \texttt{ucons(4)} \\
+\midrule
+grandezza & $\rho E$ & $\rho$ & $\rho u$ & $\rho v$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+e tutte le subroutine (calcolo dei flussi, condizioni al contorno) accedono alle
+componenti con questa convenzione (ad esempio la velocità in $x$ è ricostruita come
+\texttt{ucons(3)/ucons(2)} $=\rho u/\rho$).
+Riportare nel report lo stesso ordine usato nell'implementazione evita ambiguità nel
+confronto fra teoria e codice; collocare $\rho E$ in testa è inoltre coerente con il
+fatto che l'energia, attraverso l'equazione di stato, è la variabile che \emph{chiude}
+il sistema fornendo la pressione.
+
+\subsection{Equazione di stato e chiusura del sistema}
+
+Le quattro equazioni~\eqref{eq:eulero_diff} contengono \textbf{cinque} grandezze
+incognite: $\rho,\ u,\ v,\ E,\ P$.
+Il sistema è quindi \emph{sottodeterminato} e va \textbf{chiuso} con una relazione
+algebrica aggiuntiva che leghi la pressione alle altre variabili: l'\textbf{equazione
+di stato dei gas perfetti}.
+
+\paragraph{Non si tratta della forma $PV = nRT$.}
+La forma elementare $PV = nRT$ è una relazione \emph{estensiva} (dipende dal volume $V$
+e dalle moli $n$), poco utile in un contesto di campo dove servono grandezze
+\emph{intensive} puntuali. Dividendo per il volume e introducendo la densità si ottiene
+la forma intensiva $P = \rho R T$. Esprimendo poi la temperatura tramite l'energia
+interna specifica $e = c_v T$ e l'energia totale $E = e + \tfrac{1}{2}(u^2+v^2)$, e
+usando $R = c_p - c_v$ e $\gamma = c_p/c_v$, si arriva alla forma effettivamente
+implementata, che fornisce $P$ direttamente dalle variabili conservative:
 \begin{equation}
   P = (\gamma - 1)\left(\rho E - \tfrac{1}{2}\rho(u^2+v^2)\right), \qquad \gamma = 1.4
+  \label{eq:stato}
 \end{equation}
+Il significato fisico è trasparente: la pressione è proporzionale all'\textbf{energia
+interna} $\rho e = \rho E - \tfrac12\rho(u^2+v^2)$, cioè all'energia totale al netto di
+quella cinetica.
+
+\paragraph{Bilancio equazioni--incognite.}
+La tabella seguente mostra perché serve \emph{esattamente} una equazione di chiusura.
+
+\begin{table}[H]
+\centering
+\caption{Conteggio di equazioni e incognite per la chiusura del sistema di Eulero 2D.}
+\begin{tabular}{lc}
+\toprule
+\textbf{Incognite} & \textbf{Numero} \\
+\midrule
+$\rho$ (massa) & 1 \\
+$u,\ v$ (quantità di moto) & 2 \\
+$E$ (energia totale) & 1 \\
+$P$ (pressione) & 1 \\
+\midrule
+\textbf{Totale incognite} & \textbf{5} \\
+\midrule\midrule
+\textbf{Equazioni} & \textbf{Numero} \\
+\midrule
+Conservazione massa & 1 \\
+Conservazione q.\ di moto ($x,y$) & 2 \\
+Conservazione energia & 1 \\
+\midrule
+\textbf{Equazioni di trasporto} & \textbf{4} \\
+Equazione di stato~\eqref{eq:stato} & \textbf{+1} \\
+\midrule
+\textbf{Totale} & \textbf{5 = 5} \;\checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Le equazioni di trasporto sono quattro, le incognite cinque: l'unica equazione
+mancante è quella di stato. Con essa il numero di equazioni eguaglia quello delle
+incognite e il problema è ben posto.
 
 % ============================================================
 \section{Adimensionalizzazione}
-\label{sec:adim}
 % ============================================================
 
-Le equazioni vengono risolte in forma adimensionale.
-Scelti $P_{\rm ref} = P^\circ_{\rm in}$ e $T_{\rm ref} = T^\circ_{\rm in}$ come
-grandezze di riferimento, le scale caratteristiche derivate sono:
+\subsection{Perché risolvere in forma adimensionale}
+
+Le equazioni vengono risolte in \textbf{forma adimensionale}.
+La motivazione non è fisica ma \textbf{numerica}: lavorando con grandezze dimensionali
+le variabili assumono ordini di grandezza molto diversi tra loro (ad esempio
+$P \sim 10^5$~Pa, $\rho \sim 1$~kg/m$^3$, $T \sim 300$~K), il che peggiora il
+\emph{condizionamento} del sistema e introduce errori di arrotondamento in aritmetica
+finita. Riscalando ogni variabile con un'opportuna grandezza di riferimento, tutte le
+quantità diventano di ordine $O(1)$ e i confronti numerici (residui, tolleranze)
+diventano indipendenti dalle unità di misura.
+
+\begin{table}[H]
+\centering
+\caption{Confronto tra risoluzione in forma dimensionale e adimensionale.}
+\begin{tabular}{p{0.27\linewidth} p{0.33\linewidth} p{0.33\linewidth}}
+\toprule
+ & \textbf{Forma dimensionale} & \textbf{Forma adimensionale} \\
+\midrule
+\textbf{Pro} &
+Interpretazione fisica immediata; nessuna conversione in uscita. &
+Variabili $O(1)$, miglior condizionamento; risultati generali e riusabili a parità di
+numeri caratteristici; tolleranze indipendenti dalle unità. \\[2pt]
+\textbf{Contro} &
+Ordini di grandezza molto diversi $\Rightarrow$ peggior condizionamento ed errori di
+round-off; risultati legati alle unità scelte. &
+Necessità di ridimensionalizzare in post-processing; scelta delle scale di
+riferimento da documentare con cura. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scelta delle grandezze di riferimento}
+
+Si fissano come riferimenti indipendenti la \textbf{pressione} e la
+\textbf{temperatura totali di ingresso}, $P_{\rm ref} = P^\circ_{\rm in}$ e
+$T_{\rm ref} = T^\circ_{\rm in}$; le altre scale sono \emph{derivate}:
 \begin{align*}
-  \rho_{\rm ref} &= \frac{P_{\rm ref}}{R T_{\rm ref}}, &
-  u_{\rm ref}    &= \sqrt{R T_{\rm ref}}, &
+  \rho_{\rm ref} &= \frac{P_{\rm ref}}{R\,T_{\rm ref}}, &
+  u_{\rm ref}    &= \sqrt{R\,T_{\rm ref}}, &
   t_{\rm ref}    &= \frac{L_{\rm ref}}{u_{\rm ref}}
 \end{align*}
-
-Una proprietà fondamentale dell'adimensionalizzazione è che le equazioni di Eulero
-mantengono la stessa forma: i fattori di scala si elidono, e il codice lavora quindi
-con le stesse espressioni indipendentemente dall'adimensionalizzazione scelta.
-In pratica, fissando $P^\circ_{\rm in} = 1$ e $T^\circ_{\rm in} = 1$, le condizioni
-al contorno e le variabili di campo assumono valori $O(1)$, migliorando il
-condizionamento numerico del sistema.
+La logica è quella anticipata: la \textbf{densità di riferimento} discende
+dall'\textbf{equazione di stato dei gas perfetti} applicata ai valori di riferimento;
+la \textbf{velocità di riferimento} ha la struttura di una \textbf{velocità del suono}
+($a = \sqrt{\gamma R T}$, qui presa senza il fattore $\gamma$, cioè proporzionale alla
+velocità termica $\sqrt{RT}$); il \textbf{tempo di riferimento} segue da una semplice
+\textbf{considerazione dimensionale}, come rapporto tra una lunghezza caratteristica
+$L_{\rm ref}$ e la velocità di riferimento. L'impostazione proposta nel quesito è
+dunque corretta.
 
 Le variabili adimensionalizzate rilevanti sono:
 \begin{align}
@@ -74,6 +221,54 @@ Le variabili adimensionalizzate rilevanti sono:
   \bar{S} &= \gamma \ln \bar{T} - (\gamma-1)\ln \bar{P}
 \end{align}
 
+\subsection{Invarianza di forma delle equazioni}
+
+Si osserva che le equazioni di Eulero \textbf{mantengono la stessa forma} nella
+versione adimensionale.
+
+\paragraph{È una regola generale?}
+\textbf{No.} L'invarianza di forma \emph{non} è automatica per un sistema di equazioni
+qualsiasi: in generale l'adimensionalizzazione fa comparire dei \textbf{gruppi
+adimensionali} (numeri di Reynolds, Mach, Froude\dots) come coefficienti davanti ad
+alcuni termini, cambiando la struttura formale. Le equazioni di Eulero sono un caso
+\emph{particolare e favorevole}: essendo prive dei termini diffusivi (viscosità,
+conducibilità) che introdurrebbero il numero di Reynolds e di Prandtl, e adottando una
+scelta \emph{coerente} delle scale di riferimento, tutti i fattori di scala si elidono
+e nessun gruppo adimensionale residuo compare nei coefficienti.
+
+\paragraph{Dimostrazione dell'equivalenza.}
+Si sostituiscano $\uvec = \uvec_{\rm ref}\,\bar{\uvec}$, $\fvec = f_{\rm ref}\,\bar\fvec$,
+$x = L_{\rm ref}\,\bar{x}$, $t = t_{\rm ref}\,\bar{t}$ nella~\eqref{eq:eulero_diff}.
+Considerando per chiarezza una singola componente:
+\begin{equation*}
+  \frac{u_{\rm ref}}{t_{\rm ref}}\parziale{\bar{u}}{\bar t}
+  + \frac{f_{\rm ref}}{L_{\rm ref}}\parziale{\bar f}{\bar x}
+  + \frac{f_{\rm ref}}{L_{\rm ref}}\parziale{\bar g}{\bar y} = 0 .
+\end{equation*}
+Moltiplicando per $t_{\rm ref}/u_{\rm ref}$ e usando $t_{\rm ref} = L_{\rm ref}/u_{\rm ref}$
+si ottiene il coefficiente comune
+\[
+  \frac{f_{\rm ref}\,t_{\rm ref}}{u_{\rm ref}\,L_{\rm ref}}
+  = \frac{f_{\rm ref}}{u_{\rm ref}^2}.
+\]
+Poiché le scale dei flussi sono costruite in modo coerente con quelle delle variabili
+($f_{\rm ref} = u_{\rm ref}^2\,\rho_{\rm ref}/\rho_{\rm ref}$, cioè
+$f_{\rm ref}/u_{\rm ref}^2 = 1$ per ciascuna componente), tale coefficiente vale $1$ e
+l'equazione adimensionale
+\[
+  \parziale{\bar{\uvec}}{\bar t}
+  + \parziale{\bar\fvec}{\bar x}
+  + \parziale{\bar\gvec}{\bar y} = \bm{0}
+\]
+è \textbf{formalmente identica} a quella dimensionale. $\qquad\blacksquare$
+
+\paragraph{È questo il motivo per cui si adimensionalizza?}
+Solo in parte. L'invarianza di forma è una \emph{comodità implementativa} molto
+gradita --- il codice usa le stesse espressioni in entrambi i casi, senza riscalature
+sparse --- ma \textbf{la ragione principale dell'adimensionalizzazione resta il
+miglior condizionamento numerico} discusso sopra. L'invarianza è quindi una
+conseguenza fortunata, non il fine.
+
 L'entropia adimensionale $\bar{S}$ è particolarmente utile per la validazione: in un
 campo di Eulero privo di onde d'urto $\bar{S}$ è conservata lungo le linee di flusso,
 quindi ogni deviazione da zero è imputabile all'errore numerico di discretizzazione.
@@ -82,263 +277,550 @@ quindi ogni deviazione da zero è imputabile all'errore numerico di discretizzaz
 \section{Discretizzazione a Volumi Finiti}
 % ============================================================
 
-Integrando l'equazione~\eqref{eq:eulero_diff} sul volume della cella $\Omega_i$:
+\subsection{Dalla forma integrale alla forma semidiscreta}
+
+Il metodo dei volumi finiti parte dalla \textbf{forma integrale} della legge di
+conservazione~\eqref{eq:eulero_vettoriale} su un volume di controllo (la cella
+$\Omega_i$). Applicando il \textbf{teorema della divergenza} l'integrale di volume del
+termine di divergenza si trasforma in un integrale di flusso sulla frontiera:
 \begin{equation}
   \parziale{}{t} \int_{\Omega_i} \uvec \, d\Omega
-  + \oint_{\partial\Omega_i} \left(\fvec n_x + \gvec n_y\right) dS = \bm{0}
+  + \oint_{\partial\Omega_i} \mathcal{F}(\uvec)\cdot\nhat \, dS = \bm{0}
 \end{equation}
+che nel caso 2D, esplicitando le due componenti del flusso, diventa
+$\oint_{\partial\Omega_i}\left(\fvec\,n_x + \gvec\,n_y\right) dS = \bm{0}$.
 
-Approssimando con il valore medio sulla cella e la somma dei flussi sui lati:
+Si introduce ora il \textbf{valore medio di cella}
+\begin{equation}
+  \uvec_i \;=\; \frac{1}{|\Omega_i|}\int_{\Omega_i}\uvec\,d\Omega ,
+\end{equation}
+cioè la media integrale delle variabili conservative sulla cella: è l'\textbf{unica
+incognita} che il metodo dei volumi finiti effettivamente trasporta e che si pensa
+``concentrata'' nel baricentro dell'elemento. Approssimando l'integrale di bordo con
+una somma sui lati della cella si ottiene la forma \emph{semidiscreta}:
 \begin{equation}
   \parziale{\uvec_i}{t} = -\frac{1}{|\Omega_i|}
   \sum_{j \in \mathcal{N}(i)} \Fvec_{ij} \cdot \nhat_{ij} \, l_{ij}
   \label{eq:volumi_finiti}
 \end{equation}
 
-dove $\Fvec_{ij}$ è il flusso numerico all'interfaccia tra la cella $i$ e il suo
-vicino $j$, $\nhat_{ij}$ la normale uscente da $i$, e $l_{ij}$ la lunghezza
-dell'interfaccia.
+\subsection{Significato dei termini}
+
+\begin{itemize}
+  \item $\Fvec_{ij}$ è il \textbf{flusso numerico} all'interfaccia tra la cella $i$ e
+    il vicino $j$: è la quantità che approssima il flusso fisico esatto e la cui scelta
+    (Lax--Friedrichs, Roe, \dots) determina accuratezza e dissipazione dello schema.
+  \item $\nhat_{ij}$ è la \textbf{normale unitaria uscente} dalla cella $i$ attraverso
+    il lato condiviso con $j$. Il \textbf{doppio pedice} indica orientamento e verso:
+    $\nhat_{ij}$ ``esce da $i$ ed entra in $j$''. La normale vista dalla cella vicina è
+    quella opposta,
+    \begin{equation}
+      \nhat_{ji} = -\,\nhat_{ij},
+    \end{equation}
+    e questa antisimmetria è ciò che garantisce la \textbf{conservazione discreta}: il
+    flusso che esce da $i$ verso $j$ è esattamente l'opposto di quello che esce da $j$
+    verso $i$, dunque ciò che una cella perde l'altra lo acquista.
+  \item $l_{ij}$ è la \textbf{lunghezza dell'interfaccia} (in 2D; in 3D sarebbe l'area
+    della faccia).
+  \item $|\Omega_i|$ a denominatore è il \textbf{modulo} del volume (3D) o area (2D)
+    della cella. Compare perché stiamo passando dall'integrale sul volume al
+    \emph{valore medio}: dividere per $|\Omega_i|$ ``spalma'' il bilancio netto dei
+    flussi di bordo sull'intera cella, restituendo la velocità di variazione della
+    media $\uvec_i$. Si usa il modulo perché un'area/volume deve essere positiva:
+    eventuali segni nell'orientazione sono già contenuti nelle normali.
+\end{itemize}
 
 % ============================================================
 \section{Calcolo dei Flussi Numerici}
-\label{sec:flussi}
 % ============================================================
 
 \subsection{Schema di Lax--Friedrichs Locale}
 
-Lo schema di Lax--Friedrichs è uno schema \emph{centrato} con dissipazione numerica
+Lo schema di Lax--Friedrichs è uno schema \textbf{centrato} con dissipazione numerica
 proporzionale al massimo valore proprio locale:
 \begin{equation}
-  \Fvec_{ij} = \frac{1}{2}\left[F^L + F^R\right]
+  \Fvec_{ij} = \frac{1}{2}\left[\Fvec(\uvec^L) + \Fvec(\uvec^R)\right]
                - \frac{\lambda_{\max}}{2}\left(\uvec^R - \uvec^L\right)
+  \label{eq:lax}
 \end{equation}
-dove $\lambda_{\max} = \max(|\tilde{u}^L|+a^L,\,|\tilde{u}^R|+a^R)$ è la velocità
-massima di propagazione e $\tilde{u} = \bm{q}\cdot\nhat$ è la velocità normale
-all'interfaccia.
 
-I flussi vengono calcolati nel sistema di riferimento \emph{ruotato} locale
-all'interfaccia, sfruttando la matrice di rotazione:
+\paragraph{Di quale grandezza è il flusso.}
+$\Fvec$ è il \textbf{flusso del vettore delle variabili conservative} nel suo
+complesso: non di una singola grandezza, ma simultaneamente di massa, quantità di moto
+ed energia. La~\eqref{eq:lax} è infatti un'identità \emph{vettoriale} (a quattro
+componenti) e nel codice viene valutata componente per componente sull'intero vettore
+$\uvec$. Il primo termine $\tfrac12(\Fvec^L+\Fvec^R)$ è la media centrata dei flussi
+fisici; il secondo è la \textbf{dissipazione numerica}.
+
+\paragraph{Su $\tilde u$ ($u$ è davvero la velocità?).}
+Nel coefficiente di dissipazione
+\begin{equation*}
+  \lambda_{\max} = \max\!\big(|\tilde{u}^L|+a^L,\; |\tilde{u}^R|+a^R\big),
+\end{equation*}
+$\tilde u = \bm{q}\cdot\nhat$ è effettivamente la \textbf{velocità normale
+all'interfaccia} (una grandezza scalare, non l'intero vettore conservativo): essa
+fissa la \emph{velocità di propagazione} delle perturbazioni attraverso il lato. La
+distinzione è importante: il \emph{flusso} $\Fvec$ agisce su tutte le variabili
+conservative, mentre $\tilde u$ è solo la velocità che entra nella stima della
+massima velocità d'onda $\lambda_{\max}=|\tilde u|+a$.
+
+\paragraph{Schema centrato: stencil e sistema ruotato.}
+Lax--Friedrichs è \emph{centrato} perché il flusso all'interfaccia usa in modo
+\textbf{simmetrico} i due stati adiacenti $\uvec^L$ (sinistra) e $\uvec^R$ (destra),
+senza privilegiare la direzione di provenienza dell'informazione. Lo stencil è quindi
+minimo: \textbf{due celle}, quella a sinistra e quella a destra dell'interfaccia.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth, scale=1.0]
+  % due celle
+  \draw[thick] (-3,-0.9) rectangle (0,0.9);
+  \draw[thick] (0,-0.9) rectangle (3,0.9);
+  % interfaccia
+  \draw[red, very thick] (0,-0.9) -- (0,0.9);
+  \node[red] at (0,1.25) {\small interfaccia $ij$};
+  % baricentri
+  \fill (-1.5,0) circle (2pt) node[below=3pt] {$\uvec^L$ (cella $i$)};
+  \fill (1.5,0) circle (2pt) node[below=3pt] {$\uvec^R$ (cella $j$)};
+  \node at (-1.5,0.55) {\small sinistra};
+  \node at (1.5,0.55) {\small destra};
+  % normale uscente da i
+  \draw[->, blue, very thick] (0,0) -- (1.1,0) node[above, blue] {$\nhat_{ij}$};
+  % velocita normale
+  \draw[->, teal, thick] (-1.5,-0.45) -- (-0.6,-0.45);
+  \node[teal] at (-1.05,-0.72) {\small $\tilde u$};
+\end{tikzpicture}
+\caption{Stencil dello schema centrato di Lax--Friedrichs: due sole celle adiacenti
+($i$ a sinistra, $j$ a destra) condividono l'interfaccia (in rosso). La normale
+$\nhat_{ij}$ esce da $i$; nel sistema ruotato l'asse $\tilde x$ è allineato ad essa.}
+\end{figure}
+
+I flussi vengono calcolati in un \textbf{sistema di riferimento ruotato} locale, con un
+asse allineato alla normale $\nhat$ dell'interfaccia, tramite la matrice di rotazione:
 \begin{equation}
   \begin{pmatrix} \tilde{u} \\ \tilde{v} \end{pmatrix} =
   \begin{pmatrix} n_x & n_y \\ -n_y & n_x \end{pmatrix}
   \begin{pmatrix} u \\ v \end{pmatrix}
 \end{equation}
-I flussi di quantità di moto vengono poi riportati nel sistema globale tramite
-la trasposta della stessa matrice (ortogonale: $R^{-1} = R^T$).
+La ragione è che il problema di Riemann all'interfaccia è \textbf{essenzialmente
+mono\-dimensionale} lungo la normale: ruotando il sistema, il flusso 2D si riduce a un
+flusso 1D nella direzione $\tilde x$ (normale), per cui la velocità tangenziale
+$\tilde v$ è semplicemente trasportata. Questo permette di riusare la formulazione 1D
+su griglie non strutturate con normali orientate in modo arbitrario. I flussi di
+quantità di moto vengono poi riportati nel sistema globale tramite la trasposta della
+stessa matrice (ortogonale: $R^{-1} = R^T$).
+
+\paragraph{Perché il massimo e non un'altra operazione.}
+Nel coefficiente $\lambda_{\max}$ si prende il \textbf{massimo} fra le velocità d'onda
+dello stato sinistro e destro perché la dissipazione deve essere \emph{sufficiente a
+stabilizzare la più veloce} delle perturbazioni che possono attraversare
+l'interfaccia. Una media (o il minimo) potrebbe sottostimare la velocità di
+propagazione effettiva su uno dei due lati, lasciando lo schema \textbf{instabile};
+sovrastimare leggermente con il massimo è invece sempre sicuro (al più si aggiunge un
+po' di dissipazione in eccesso). È lo stesso principio per cui la condizione CFL
+(Sez.~\ref{sec:integrazione_temporale}) si basa sulla velocità d'onda più grande.
 
 \subsection{Schema di Roe (Upwind)}
 
-Lo schema di Roe è un metodo \emph{upwind} che tiene conto della propagazione
-direzionale delle onde caratteristiche. Il flusso è:
+Lo schema di Roe è un metodo \textbf{upwind} che, a differenza dello schema centrato,
+tiene conto della \textbf{direzione di propagazione} delle singole onde
+caratteristiche. Il flusso è:
 \begin{equation}
-  \Fvec_{ij} = \frac{1}{2}\left[F^L + F^R\right]
-               - \frac{1}{2} \sum_{k=1}^{4} |\hat{\lambda}_k| \hat{\alpha}_k \hat{r}_k
+  \Fvec_{ij} = \frac{1}{2}\left[\Fvec^L + \Fvec^R\right]
+               - \frac{1}{2} \sum_{k=1}^{4} |\hat{\lambda}_k|\, \hat{\alpha}_k\, \hat{r}_k
+  \label{eq:roe}
 \end{equation}
-dove $\hat{\lambda}_k$, $\hat{r}_k$, $\hat{\alpha}_k$ sono rispettivamente i valori
-propri, i vettori propri destri e le \emph{wave strengths} della matrice Jacobiana
-di Roe, costruita con le medie di Roe tra gli stati $L$ e $R$:
+
+\paragraph{Matrice Jacobiana di Roe e sue quantità spettrali.}
+La \textbf{matrice Jacobiana} del flusso è $A = \partial \Fvec/\partial \uvec$ e governa
+la propagazione delle perturbazioni. Per uno stato uniforme essa è diagonalizzabile e
+le equazioni di Eulero si comportano come quattro equazioni di trasporto disaccoppiate
+(le onde caratteristiche). La \textbf{matrice Jacobiana di Roe} $\hat A$ è una
+particolare media tra gli stati $L$ e $R$ (costruita con le \emph{medie di Roe}) scelta
+in modo da soddisfare \emph{esattamente} la relazione di salto
+$\Fvec^R - \Fvec^L = \hat A\,(\uvec^R - \uvec^L)$, garantendo così la cattura corretta
+delle discontinuità. Le sue quantità spettrali sono:
+\begin{itemize}
+  \item \textbf{valori propri} $\hat\lambda_k$: le \emph{velocità} delle quattro onde
+    ($\tilde u - a,\ \tilde u,\ \tilde u,\ \tilde u + a$);
+  \item \textbf{vettori propri (destri)} $\hat r_k$: la ``forma'' di ciascuna onda
+    nello spazio delle variabili conservative;
+  \item \textbf{wave strengths} $\hat\alpha_k$: le \emph{ampiezze} con cui il salto
+    $\uvec^R - \uvec^L$ si decompone sulla base dei vettori propri, cioè
+    $\uvec^R - \uvec^L = \sum_k \hat\alpha_k\,\hat r_k$.
+\end{itemize}
+Le medie di Roe per gli stati $L$ e $R$ sono:
 \begin{align}
   \sqrt{\hat{\rho}} &= \sqrt{\rho^L\rho^R}, &
   \hat{u} &= \frac{\sqrt{\rho^L}\,u^L + \sqrt{\rho^R}\,u^R}{\sqrt{\rho^L}+\sqrt{\rho^R}}, &
   \hat{H} &= \frac{\sqrt{\rho^L}\,H^L + \sqrt{\rho^R}\,H^R}{\sqrt{\rho^L}+\sqrt{\rho^R}}
 \end{align}
 
-Lo schema di Roe è più accurato di Lax--Friedrichs perché è meno dissipativo e
-cattura meglio le discontinuità (onde d'urto) e le strutture fini del campo.
+\paragraph{Chiarimento sull'aggettivo ``destri''.}
+L'aggettivo \emph{destro} si riferisce \textbf{esclusivamente ai vettori propri}
+$\hat r_k$ (in contrapposizione ai vettori propri \emph{sinistri} $\hat\ell_k$, che
+sono le righe della matrice inversa di trasformazione). I \textbf{valori propri}
+$\hat\lambda_k$ \emph{non} sono né destri né sinistri: sono semplici scalari (le
+velocità d'onda), identici qualunque sia la base usata. Parlare di ``valori propri
+destri'' sarebbe quindi privo di significato; nel testo l'aggettivo va inteso riferito
+ai soli vettori propri.
 
-\paragraph{Perché serve l'\emph{entropy fix}.}
-La dissipazione numerica dello schema di Roe per la $k$-esima onda è proporzionale a
-$|\hat{\lambda}_k|$: l'autovalore agisce da coefficiente di dissipazione. Il problema nasce in
-corrispondenza dei \textbf{punti sonici} (\emph{sonic points}), dove un autovalore
-\textbf{cambia segno} e si annulla ($\hat{\lambda}_k \to 0$), ad esempio quando $u - a$ passa da
-negativo a positivo attraversando una transizione sonica ($M=1$). In quel punto la dissipazione
-$|\hat{\lambda}_k| \to 0$ \textbf{svanisce}: lo schema, costruito risolvendo \emph{esattamente} un
-problema di Riemann linearizzato, non distingue più tra una compressione (urto, fisicamente
-ammesso) e una \textbf{espansione}; può così ammettere un'\textbf{espansione discontinua}
-(\emph{expansion shock}), soluzione matematicamente valida ma \textbf{non fisica} perché
-viola la condizione di entropia. È questa la causa delle cosiddette \emph{stagnation-point} e
-\emph{sonic-point anomalies}.
+\subsection{Confronto Lax--Friedrichs vs Roe}
 
-\paragraph{Correzione di Harten.}
-La \textit{entropy fix} di Harten elimina il problema imponendo una \textbf{dissipazione minima}
-anche dove l'autovalore si annulla: si sostituisce $|\hat{\lambda}_k|$ con una funzione
-$\Psi(\hat{\lambda}_k)$ regolarizzata che non scende mai sotto una piccola soglia $\delta$:
+\begin{table}[H]
+\centering
+\caption{Confronto sintetico tra lo schema di Lax--Friedrichs e lo schema di Roe.}
+\begin{tabular}{p{0.24\linewidth} p{0.34\linewidth} p{0.34\linewidth}}
+\toprule
+ & \textbf{Lax--Friedrichs} & \textbf{Roe} \\
+\midrule
+Tipo & Centrato & Upwind (caratteristico) \\
+Dissipazione & Scalare, su \emph{tutte} le onde con $\lambda_{\max}$ & Selettiva, $|\hat\lambda_k|$ onda per onda \\
+Accuratezza & Minore (più diffusivo) & Maggiore (cattura meglio gli urti) \\
+Costo per interfaccia & Basso & Maggiore (decomposizione spettrale) \\
+Robustezza & Molto robusto & Richiede \emph{entropy fix} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{(a) Perché Roe è più accurato.}
+Perché \emph{adatta} la dissipazione alla fisica: invece di smorzare tutte le variabili
+con un'unica velocità $\lambda_{\max}$ (la più grande), Roe smorza ciascuna delle
+quattro onde con la \emph{propria} velocità $|\hat\lambda_k|$. Le onde lente vengono
+così dissipate poco, preservando le strutture fini e i contatti del campo.
+
+\paragraph{(b) Perché Roe è meno dissipativo (dal termine di destra).}
+I due schemi hanno \textbf{identico} il primo termine (la media centrata
+$\tfrac12(\Fvec^L+\Fvec^R)$); differiscono solo nel \textbf{termine dissipativo}.
+Confrontando:
+\[
+  \underbrace{\tfrac{\lambda_{\max}}{2}(\uvec^R-\uvec^L)}_{\text{Lax--Friedrichs}}
+  \qquad\text{vs}\qquad
+  \underbrace{\tfrac12\sum_k |\hat\lambda_k|\,\hat\alpha_k\,\hat r_k}_{\text{Roe}} .
+\]
+Poiché $\uvec^R-\uvec^L = \sum_k \hat\alpha_k\hat r_k$, il termine di Lax--Friedrichs
+equivale a $\tfrac12\sum_k \lambda_{\max}\,\hat\alpha_k\hat r_k$: \textbf{stessa
+decomposizione}, ma con il \emph{coefficiente costante} $\lambda_{\max}$ al posto del
+$|\hat\lambda_k|$ specifico di ciascuna onda. Dato che $|\hat\lambda_k|\le\lambda_{\max}$
+per ogni $k$, la dissipazione di Roe è \textbf{termine a termine non superiore} a quella
+di Lax--Friedrichs, ed è ciò che si intende quando si dice che Roe è ``meno
+dissipativo''.
+
+\paragraph{(c) Dove agisce l'\emph{entropy fix} di Harten.}
+L'entropy fix \textbf{non} si vede nella formula~\eqref{eq:roe} così com'è scritta: è una
+\textbf{correzione implementata nel codice} sui valori propri. Il problema è che quando
+un valore proprio si annulla ($\hat\lambda_k \to 0$, condizione \emph{sonica}) la
+dissipazione di quella componente svanisce, e lo schema di Roe può convergere a una
+soluzione non fisica (urto di rarefazione che viola la condizione di entropia).
+L'entropy fix di Harten \textbf{sostituisce} $|\hat\lambda_k|$ in prossimità dello zero
+con una funzione regolarizzata che impone una soglia minima $\delta$:
 \begin{equation}
-  \Psi(\hat{\lambda}_k) =
-  \begin{cases}
-    |\hat{\lambda}_k| & \text{se } |\hat{\lambda}_k| \ge \delta \\[4pt]
-    \dfrac{\hat{\lambda}_k^2 + \delta^2}{2\,\delta} & \text{se } |\hat{\lambda}_k| < \delta
-  \end{cases}
+  |\hat\lambda_k| \;\longrightarrow\;
+  \begin{dcases}
+    |\hat\lambda_k| & |\hat\lambda_k| \ge \delta \\[2pt]
+    \dfrac{\hat\lambda_k^2 + \delta^2}{2\,\delta} & |\hat\lambda_k| < \delta
+  \end{dcases}
 \end{equation}
-dove $\delta$ è una piccola frazione della velocità caratteristica locale (tipicamente
-$\delta = \epsilon(|\hat u| + \hat a)$ con $\epsilon \sim 0.1$). In pratica si "arrotonda" il
-valore assoluto vicino allo zero, garantendo una dissipazione residua che \textbf{impedisce le
-espansioni non fisiche} senza degradare l'accuratezza lontano dai punti sonici.
+In pratica \emph{aggiunge un minimo di dissipazione} dove altrimenti sarebbe nulla,
+evitando le soluzioni non entropiche senza degradare l'accuratezza altrove.
 
 % ============================================================
 \section{Integrazione Temporale}
+\label{sec:integrazione_temporale}
 % ============================================================
 
-L'integrazione nel tempo è esplicita con schema di Eulero in avanti:
+L'integrazione nel tempo è esplicita con schema di \textbf{Eulero in avanti}, applicato
+a \emph{ciascuna cella} della mesh:
 \begin{equation}
   \uvec_i^{k+1} = \uvec_i^k + \dt \parziale{\uvec_i}{t}^k
 \end{equation}
+dove i due pedici/apici hanno significati distinti: \textbf{$k$ è l'indice del passo
+temporale} (l'iterazione: $k\to k+1$ avanza la soluzione nel tempo), mentre
+\textbf{$i$ è l'indice della cella} della mesh, dato che lo schema di Eulero esplicito
+va applicato separatamente al valore medio $\uvec_i$ di ogni cella.
+
+\subsection{Condizione CFL e scelta del passo}
 
 Il passo temporale $\dt$ è calcolato ad ogni iterazione imponendo la condizione CFL:
 \begin{equation}
   \dt = \text{CFL} \cdot \min_i \frac{\sqrt{|\Omega_i|}}{\lambda_{\max,i}}
   \label{eq:cfl}
 \end{equation}
+dove $\lambda_{\max,i} = |\bm{q}_i| + a_i$ è la velocità di propagazione massima nella
+cella $i$, $|\Omega_i|$ è il \textbf{volume (3D) o l'area (2D)} della cella, e
+$\sqrt{|\Omega_i|}$ ne approssima la dimensione caratteristica in 2D
+($h \propto \sqrt{A}$, analogamente a $h \propto \sqrt[3]{V}$ in 3D).
 
-dove $\lambda_{\max,i} = |\bm{q}_i| + a_i$ è la velocità di propagazione massima
-nella cella $i$.
-Il fattore $\sqrt{|\Omega_i|}$ approssima la dimensione caratteristica della cella
-in 2D ($h \propto \sqrt{A}$, analogamente a $h \propto \sqrt[3]{V}$ in 3D).
+\paragraph{Perché non si può prendere $\dt$ grande a piacere.}
+Si vorrebbe un $\dt$ il \textbf{più grande possibile} per raggiungere prima la
+convergenza (meno iterazioni per arrivare allo stato stazionario). Ciò però non è
+consentito dalla \textbf{stabilità} dello schema esplicito: in un passo temporale
+l'informazione non deve propagarsi oltre la cella adiacente. Se $\dt$ è troppo grande,
+il \emph{segnale} (l'onda che viaggia a velocità $\lambda_{\max}$) percorrerebbe in un
+solo passo una distanza maggiore della dimensione della cella, ``saltandola'': lo
+schema esplicito non riuscirebbe più a seguire fisicamente la propagazione e
+\textbf{diverge}.
+
+\paragraph{Influenza dei parametri e ruolo dell'operatore di minimo.}
+\begin{itemize}
+  \item \textbf{Numero di CFL.} Aumentando CFL aumenta $\dt$ (convergenza più rapida),
+    cosa desiderabile. Esiste però un limite: per lo schema esplicito \textbf{CFL $>1$
+    rende il metodo instabile}, perché corrisponde proprio a far percorrere al segnale
+    più di una cella per passo. Si sceglie quindi CFL appena sotto $1$ (con un margine
+    di sicurezza).
+  \item \textbf{Operatore $\min_i$.} L'analisi di stabilità va fatta su \emph{tutte} le
+    celle, ognuna con il proprio limite locale
+    $\dt_i = \text{CFL}\cdot\sqrt{|\Omega_i|}/\lambda_{\max,i}$. Poiché si usa un
+    \textbf{unico passo globale}, esso deve rispettare \emph{simultaneamente} il
+    vincolo di ogni cella: basta una cella che ``esploda'' per far divergere l'intera
+    simulazione. Si prende dunque il \textbf{minimo}, cioè il passo della cella
+    \emph{più stringente}.
+  \item \textbf{Cella più stringente.} È quella con $\dt_i$ minimo, ovvero la cella
+    \textbf{più piccola} (numeratore $\sqrt{|\Omega_i|}$ piccolo) e/o con
+    \textbf{velocità d'onda più alta} (denominatore $\lambda_{\max,i}$ grande). In
+    entrambi i casi è la cella in cui la linea caratteristica rischia di propagare il
+    segnale fuori dalla cella nel minor tempo: scegliendo il $\dt$ minimo si evita che
+    ciò accada \emph{ovunque}. L'intuizione del quesito è corretta.
+\end{itemize}
 
 % ============================================================
 \section{Condizioni al Contorno}
 % ============================================================
 
-Le condizioni al contorno dipendono dalla direzione del flusso e dal regime locale:
+\subsection{Logica di fondo: la teoria delle caratteristiche}
+
+La scelta di quali grandezze imporre al bordo \textbf{non è arbitraria} ma è dettata
+dalla \textbf{teoria delle caratteristiche}. Lungo la normale al contorno il sistema di
+Eulero possiede quattro onde caratteristiche, con velocità (normali)
+\[
+  \tilde u - a, \qquad \tilde u, \qquad \tilde u, \qquad \tilde u + a .
+\]
+Ogni onda trasporta informazione in una direzione precisa. La regola fondamentale è:
+\begin{quote}
+\textbf{Si impongono dall'esterno tante condizioni quante sono le caratteristiche
+\emph{entranti} nel dominio; le grandezze associate alle caratteristiche \emph{uscenti}
+vanno invece estrapolate dall'interno}, perché trasportano informazione prodotta dal
+campo interno.
+\end{quote}
+È questo il motivo per cui ``a volte si impongono più caratteristiche e a volte meno'':
+il numero dipende dal \textbf{segno di $\tilde u$} e dal confronto $|\tilde u|$ con $a$,
+cioè dal \textbf{regime} (subsonico/supersonico) e dal \textbf{verso} (ingresso/uscita)
+del flusso al bordo.
+
+\paragraph{Conteggio delle caratteristiche entranti.}
 \begin{itemize}
-  \item \textbf{Inlet subsonico}: si impongono $T^\circ_{\rm in}$, $P^\circ_{\rm in}$,
-    $\alpha_{\rm in}$; il numero di Mach è estrapolato dall'interno.
-  \item \textbf{Inlet supersonico}: si impongono tutte e quattro le variabili
-    conservative (flusso completamente entrante, nessuna caratteristica uscente).
-  \item \textbf{Outlet subsonico}: si impone la pressione statica $P_{\rm exit}$;
-    le altre tre variabili sono estrapolate dall'interno.
-  \item \textbf{Outlet supersonico}: tutte le variabili sono estrapolate
-    (nessuna caratteristica entrante).
-  \item \textbf{Parete solida}: condizione di impermeabilità ($\bm{q}\cdot\nhat = 0$),
-    implementata con una cella specchio che annulla la componente normale della velocità.
+  \item \textbf{Inlet supersonico} ($\tilde u > a$, entrante): tutte e quattro le onde
+    entrano $\Rightarrow$ si impongono \textbf{4} condizioni (tutto dall'esterno).
+  \item \textbf{Inlet subsonico} ($0<\tilde u<a$): entrano $\tilde u,\ \tilde u,\
+    \tilde u+a$ (\textbf{3} entranti), esce $\tilde u-a<0$ $\Rightarrow$ si impongono
+    \textbf{3} condizioni, \textbf{1} estrapolata.
+  \item \textbf{Outlet subsonico}: escono $\tilde u,\ \tilde u,\ \tilde u+a$, entra solo
+    $\tilde u-a$ (\textbf{1} entrante) $\Rightarrow$ si impone \textbf{1} condizione,
+    \textbf{3} estrapolate.
+  \item \textbf{Outlet supersonico}: tutte le onde escono $\Rightarrow$ si impone
+    \textbf{0}, tutto estrapolato.
 \end{itemize}
+
+\subsection{Discussione dei quattro casi}
+
+\paragraph{Inlet supersonico --- perché il Mach è ``quello interno''?}
+Se il flusso entra in regime \textbf{supersonico}, nessuna onda risale: la corrente a
+monte \emph{non riceve} alcuna informazione dal dominio. Di conseguenza tutte e quattro
+le variabili sono imposte dall'esterno (grandezze totali e direzione assegnate). Va
+però chiarito un punto: poiché la corrente a monte \textbf{non comunica} con
+l'interno, non è detto che il Mach assegnato a monte coincida con quello effettivo
+all'imbocco; per questo, in pratica, ciò che si fissa sono le \textbf{grandezze totali}
+($P^\circ,\ T^\circ$) e la direzione, mentre il Mach risulta determinato dallo stato
+imposto. Imporre rigidamente ``il Mach di monte'' non avrebbe senso fisico proprio
+perché monte e ingresso non dialogano: l'osservazione del quesito è corretta.
+
+\paragraph{Inlet subsonico --- si può imporre il Mach dall'esterno?}
+In regime \textbf{subsonico} l'onda $\tilde u - a$ risale: esiste un \textbf{dialogo}
+tra interno e monte. Tuttavia entrano solo \emph{3} caratteristiche, quindi si possono
+imporre solo \textbf{3} condizioni: tipicamente $P^\circ_{\rm in},\ T^\circ_{\rm in}$ e
+la direzione $\alpha_{\rm in}$. La quarta grandezza (qui il \textbf{numero di Mach}, o
+equivalentemente l'invariante di Riemann uscente) \textbf{deve} essere estrapolata
+dall'interno: imporre \emph{anche} il Mach dall'esterno significherebbe assegnare 4
+condizioni a fronte di 3 caratteristiche entranti, \textbf{sovra-determinando} il
+problema. Per questo il report estrapola il Mach dall'interno: è la scelta corretta, e
+non in contraddizione con il fatto che ci sia ``dialogo'' --- il dialogo riguarda
+proprio l'unica caratteristica uscente che porta fuori l'informazione interna.
+
+\paragraph{Outlet subsonico --- perché estrapolare e non usare i valori esterni?}
+All'uscita subsonica entra una sola caratteristica ($\tilde u - a$), che porta dentro
+l'informazione sulla \textbf{pressione ambiente}: si impone quindi la sola
+$P_{\rm exit}$. Le altre tre grandezze sono trasportate \emph{fuori} dalle
+caratteristiche uscenti e vanno perciò \textbf{estrapolate dall'interno}: usare per
+esse dei valori esterni significherebbe imporre informazione su onde che in realtà
+\emph{escono}, introducendo riflessioni spurie. Questo è anche il senso dell'analogia
+acustica delle dispense allegate (la \emph{corda vincolata al muro}): fissare
+rigidamente una grandezza al bordo dove l'onda è uscente genera un'\textbf{onda
+acustica fittizia} che si riflette nel dominio e falsa la soluzione. Estrapolare le tre
+grandezze uscenti, imponendo solo la pressione, minimizza questa riflessione.
+
+\paragraph{Parete solida.}
+Per una parete impermeabile si impone l'annullamento della velocità normale
+($\bm{q}\cdot\nhat = 0$): nel codice ciò è realizzato con una \textbf{cella specchio}
+che inverte la componente normale della velocità lasciando invariate pressione,
+densità e componente tangenziale.
+
+\subsection{Quadro riepilogativo}
+
+\begin{table}[H]
+\centering
+\caption{Condizioni al contorno: grandezze imposte dall'esterno ed estrapolate
+dall'interno per i quattro casi di ingresso/uscita, con la giustificazione
+caratteristica.}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{0.16\linewidth} p{0.10\linewidth} p{0.27\linewidth} p{0.30\linewidth}}
+\toprule
+\textbf{Contorno} & \textbf{Caratt.\ entranti} & \textbf{Imposto dall'esterno} & \textbf{Estrapolato dall'interno (perché)} \\
+\midrule
+Inlet supersonico & 4 & Tutte e 4 le variabili ($P^\circ,T^\circ,\alpha$ \emph{e} Mach) & --- nessuna onda risale \\
+Inlet subsonico & 3 & $P^\circ_{\rm in},\ T^\circ_{\rm in},\ \alpha_{\rm in}$ & Mach (1 caratt.\ uscente $\tilde u-a$) \\
+Outlet subsonico & 1 & $P_{\rm exit}$ (pressione statica) & $\rho,\ u,\ v$ (3 caratt.\ uscenti) \\
+Outlet supersonico & 0 & --- (nessuna onda entra) & Tutte e 4 le variabili \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Analisi di Convergenza della Griglia}
 
 \subsection{Valutazione dell'Ordine di Convergenza con la Norma $L_2$ dell'Entropia}
+\label{sec:conv_entropia}
 
-Per quantificare l'errore numerico di discretizzazione si utilizza la norma $L_2$ (valore quadratico medio) dell'entropia adimensionale $\bar{S}$. In un campo di moto Euleriano privo di onde d'urto (flusso puramente subsonico), l'entropia deve conservarsi costante lungo le linee di corrente. Assumendo un ingresso isentropico, il valore analitico esatto dell'entropia nel dominio è ovunque nullo ($S_{\rm esatto} = 0$). 
+Per quantificare l'errore numerico di discretizzazione si utilizza la \textbf{norma
+$L_2$} (valore quadratico medio) dell'entropia adimensionale $\bar{S}$.
 
-Qualsiasi deviazione da questo valore misurata nella soluzione numerica rappresenta puramente l'errore di troncamento dovuto alla discretizzazione spaziale. La norma $L_2$ valuta questo errore integralmente su tutto il dominio:
+\paragraph{Significato di ``ingresso isentropico'' e di $S=0$.}
+L'ipotesi di \textbf{ingresso isentropico} significa che la corrente entra \emph{senza}
+incremento di entropia, cosa pienamente coerente con le ipotesi del solutore: il flusso
+è \textbf{subsonico} (quindi privo di onde d'urto, che sono l'unico meccanismo di
+produzione di entropia in un campo di Eulero) ed è \textbf{inviscido} (le equazioni di
+Eulero non contengono attrito né strato limite, dunque non vi è produzione viscosa di
+entropia). Per un campo di Eulero subsonico l'entropia si conserva quindi lungo ogni
+linea di corrente.
+
+È più corretto parlare di \textbf{$\Delta S = 0$}: l'entropia \emph{non varia} rispetto
+al valore di ingresso. Si \emph{sceglie} allora di porre il valore di riferimento
+dell'entropia pari a zero ($S_{\rm rif}=0$), così che $\Delta S = S - S_{\rm rif} = S$ e
+la condizione $\Delta S = 0$ ovunque diventa semplicemente $S_{\rm esatto}=0$ ovunque.
+Questa è una pura convenzione sullo zero (l'entropia è definita a meno di una costante);
+con essa qualunque deviazione misurata $\bar S_i \ne 0$ rappresenta \emph{direttamente}
+l'errore di troncamento.
+
+\paragraph{Definizione della norma e perché la $L_2$.}
+La norma $L_2$ valuta l'errore \emph{integralmente} su tutto il dominio:
 \begin{equation}
   \|\bar{S}\|_2 = \sqrt{\frac{\displaystyle\sum_i \bar{S}_i^2 \cdot |\Omega_i|}
                               {\displaystyle\sum_i |\Omega_i|}}
   \label{eq:norma_entropia}
 \end{equation}
+Si sceglie la $L_2$ (e non, ad esempio, la $L_\infty$ o la $L_1$) perché fornisce una
+\textbf{misura globale e pesata sul volume} dell'errore: elevando al quadrato penalizza
+gli scostamenti grandi ma, mediando su tutte le celle, non è dominata da un singolo
+\emph{outlier} locale come sarebbe la norma del massimo $L_\infty$. La pesatura con
+$|\Omega_i|$ rende inoltre la misura \textbf{indipendente dalla non uniformità della
+mesh}, requisito essenziale per confrontare griglie diverse in uno studio di
+convergenza.
 
-Assumendo che l'errore segua un andamento asintotico del tipo $E = k \cdot h^p$, dove $h$ è la dimensione caratteristica della griglia e $p$ è l'ordine di convergenza effettivo, ci si aspetta che $\|\bar{S}\|_2 \to 0$ per $h \to 0$. Calcolando $\|\bar{S}\|_2$ su griglie via via più fitte, la pendenza della curva in un grafico log-log fornisce il valore dell'ordine di convergenza spaziale $p$.
-
-\paragraph{Ambito di validità.}
-È importante sottolineare che questo approccio alla valutazione dell'ordine di convergenza, basato sulla \emph{conoscenza analitica} della soluzione esatta ($S_{\rm esatto}=0$), è applicabile \textbf{esclusivamente al caso del bump}. Esso richiede infatti che siano simultaneamente verificate tre condizioni: il flusso deve essere \textbf{subsonico e privo di onde d'urto} (così che l'entropia si conservi e sia ovunque nulla), e il solutore deve essere \textbf{inviscido} (le equazioni di Eulero non includono perdite di strato limite o effetti viscosi che genererebbero entropia fisica). Solo in questo scenario qualsiasi deviazione di $\bar{S}$ da zero è imputabile unicamente all'errore numerico, rendendo la norma $L_2$ dell'entropia un misuratore diretto dell'errore di discretizzazione. Nei casi con urti (ad esempio la presa a doppia rampa) l'entropia esatta \emph{non} è più nulla — viene prodotta fisicamente attraverso gli urti — e questa tecnica non è utilizzabile: in tali casi si ricorre all'estrapolazione di Richardson (Sez.~\ref{subsec:richardson}).
+\paragraph{Ordine di convergenza dal grafico log--log.}
+Assumendo che l'errore segua un andamento asintotico a \emph{legge di potenza}
+$E = k \cdot h^p$, dove $h$ è la dimensione caratteristica della griglia e $p$ l'ordine
+di convergenza effettivo, ci si aspetta $\|\bar{S}\|_2 \to 0$ per $h \to 0$. Prendendo
+il logaritmo di entrambi i membri:
+\begin{equation}
+  \log E = \log k + p \,\log h ,
+\end{equation}
+la relazione, esponenziale (a potenza) nelle variabili originali, diventa
+\textbf{lineare} nelle variabili logaritmiche. Per questo in un grafico \textbf{log--log}
+i dati si dispongono lungo una retta la cui \textbf{pendenza} è esattamente l'ordine di
+convergenza $p$: la considerazione del quesito è corretta.
+Si sottolinea infine che questa valutazione è \textbf{significativa solo per il caso del
+bump} (flusso subsonico, privo di urti e quindi isentropico nel solutore inviscido);
+\textbf{non} si applica ai casi con onde d'urto (rampa, presa), dove l'entropia
+\emph{deve} crescere attraverso gli urti per ragioni fisiche e non solo numeriche, come
+già discusso nei rispettivi capitoli.
 
 \subsection{Estrapolazione di Richardson}
-\label{subsec:richardson}
 
-L'estrapolazione di Richardson è una tecnica che permette di stimare il valore esatto di una grandezza (o un errore residuo) combinando i risultati ottenuti su griglie con livelli di raffinamento diversi. Può essere applicata in due modalità.
+L'estrapolazione di Richardson è una tecnica che permette di stimare il valore esatto di
+una grandezza (o un errore residuo) combinando i risultati ottenuti su griglie con
+livelli di raffinamento diversi. Può essere applicata in due modalità.
 
 \paragraph{1. Ordine assunto pari a quello teorico.}
-Se si ha forte confidenza che il metodo numerico stia operando nella regione asintotica, si può ipotizzare che l'ordine effettivo $p$ sia pari all'ordine formale teorico dello schema (ad esempio, $p=1$ per Lax-Friedrichs o Roe al primo ordine). Eseguendo due simulazioni con lunghezze caratteristiche $h_1$ e $h_2 = r h_1$ (con $r > 1$ \emph{rapporto di diradamento}), l'errore si esprime come:
-\begin{equation}
-  r = \frac{h_2}{h_1} > 1
-  \label{eq:rapporto_diradamento}
-\end{equation}
-Il rapporto di diradamento quantifica di quanto una griglia è più grossolana dell'altra: essendo $r>1$ si ha $h_2 > h_1$, ovvero la griglia con passo $h_2$ è \textbf{più rada} (celle più grandi) rispetto a quella con passo $h_1$, che è la \textbf{più fitta}. Il valore tipicamente adottato è $r=2$, corrispondente al dimezzamento del numero di nodi per direzione fra un livello e il successivo.
+Se si ha forte confidenza che il metodo numerico stia operando nella \textbf{regione
+asintotica}, si può ipotizzare che l'ordine effettivo $p$ sia pari all'ordine formale
+teorico dello schema (ad esempio, $p=1$ per Lax--Friedrichs o Roe al primo ordine).
+Eseguendo due simulazioni con lunghezze caratteristiche $h_1$ e $h_2 = r h_1$ (con
+$r > 1$ rapporto di diradamento), l'errore si esprime come:
 \begin{equation}
   \begin{cases}
     E_1 = u_{h_1} - u_{\rm esatto} = k \cdot h_1^p \\
     E_2 = u_{h_2} - u_{\rm esatto} = k \cdot (r h_1)^p
   \end{cases}
 \end{equation}
-Risolvendo il sistema per l'incognita $u_{\rm esatto}$, si ottiene la formula di estrapolazione:
+Risolvendo il sistema per l'incognita $u_{\rm esatto}$, si ottiene la formula di
+estrapolazione:
 \begin{equation}
   u_{\rm esatto} \approx \frac{r^p u_{h_1} - u_{h_2}}{r^p - 1}
 \end{equation}
 
+\paragraph{Attenzione all'ipotesi di regione asintotica.}
+L'ipotesi che $p$ coincida con l'ordine teorico ha senso \textbf{solo se la mesh è già
+sufficientemente fitta}, cioè se si è effettivamente entrati nel regime asintotico dello
+schema. In fase di \textbf{avanprogetto}, con mesh ancora molto larghe, questa ipotesi
+\textbf{non è giustificata}: i termini di ordine superiore non sono trascurabili e
+l'ordine osservato può differire sensibilmente da quello teorico (di norma è
+\emph{inferiore}). In tali condizioni è più prudente \textbf{non} assumere l'ordine
+teorico e ricorrere invece alla seconda modalità, ricavando l'\textbf{ordine effettivo}
+dai dati stessi.
+
 \paragraph{2. Ordine empirico (effettivo).}
-Se non si conosce a priori l'ordine reale del metodo sulla specifica griglia (ad esempio a causa di effetti di bordo o mesh non sufficientemente fitta), l'ordine $p$ diventa un'incognita. È necessario introdurre una terza simulazione per chiudere il sistema. Date tre griglie con passo $h$, $2h$ e $4h$ (rapporto costante $r=2$), si valuta prima l'ordine effettivo $p$:
+Se non si conosce a priori l'ordine reale del metodo sulla specifica griglia (ad esempio
+a causa di effetti di bordo o mesh non sufficientemente fitta), l'ordine $p$ diventa
+un'\textbf{incognita}. È necessario introdurre una \textbf{terza} simulazione per chiudere
+il sistema. Date tre griglie con passo $h$, $2h$ e $4h$ (rapporto costante $r=2$), si
+valuta prima l'ordine effettivo $p$:
 \begin{equation}
   p = \frac{\ln\!\left(\dfrac{u_{4h}-u_{2h}}{u_{2h}-u_h}\right)}{\ln 2}
 \end{equation}
-Una volta trovato $p$, lo si sostituisce nella formula dell'estrapolazione per ricavare la stima accurata della soluzione esatta:
+Una volta trovato $p$, lo si sostituisce nella formula dell'estrapolazione per ricavare
+la stima accurata della soluzione esatta:
 \begin{equation}
   u_{\rm esatto} \approx u_h + \frac{u_{2h}-u_h}{2^p - 1}
 \end{equation}
 
-\paragraph{Quando usare l'ordine teorico.} L'ipotesi $p = p_{\rm teorico}$ è lecita
-\emph{solo} se si ha confidenza di operare nella \textbf{regione asintotica}, ossia con griglie
-sufficientemente fitte da rendere il termine dominante $k\,h^p$ molto maggiore dei termini di
-ordine superiore nello sviluppo dell'errore. Su griglie grossolane ciò non accade: l'ordine
-\emph{osservato} differisce da quello formale (tipicamente risulta \textbf{inferiore} per la
-dissipazione numerica e gli effetti di bordo, ma può apparire anche superiore, come nel caso
-della presa a doppia rampa con Roe, dove $p_{\rm eff}\approx1.46$). La Figura~\ref{fig:ordine_convergenza}
-illustra qualitativamente l'andamento dell'ordine osservato in funzione del raffinamento: lontano
-dalla regione asintotica l'ordine è distante dal valore teorico, e solo infittendo la griglia vi
-si avvicina. Lo schema di Roe (upwind, meno dissipativo) converge al valore formale più
-rapidamente di Lax--Friedrichs.
+\subsection{Ordine teorico ed effettivo: stesso impianto, incognite diverse}
 
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-        width=12cm, height=6.8cm,
-        xlabel={raffinamento $\rightarrow$ ($h$ decrescente)},
-        ylabel={ordine osservato $p$},
-        xmin=0, xmax=4, ymin=0, ymax=1.4,
-        xtick={0,1,2,3,4},
-        xticklabels={$4h$,$2h$,$h$,$h/2$,$h/4$},
-        legend pos=south east, grid=both, thick]
-      \addplot[black, dashed, domain=0:4] {1.0};
-      \addlegendentry{ordine teorico $p=1$}
-      \addplot[blue, mark=*] coordinates {(0,0.35)(1,0.55)(2,0.75)(3,0.88)(4,0.96)};
-      \addlegendentry{Roe (upwind)}
-      \addplot[red, mark=square*] coordinates {(0,0.22)(1,0.35)(2,0.50)(3,0.63)(4,0.78)};
-      \addlegendentry{Lax--Friedrichs}
-      \draw[gray, <->] (axis cs:3,1.22) -- (axis cs:4,1.22)
-        node[midway, above, font=\footnotesize]{regione asintotica};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Andamento qualitativo dell'ordine di convergenza osservato in funzione del livello di
-           raffinamento. Per griglie grossolane l'ordine effettivo è inferiore a quello teorico
-           ($p=1$, tratteggiato); solo entrando nella regione asintotica l'ordine tende al valore
-           formale. Lo schema di Roe vi si avvicina più rapidamente di Lax--Friedrichs, coerentemente
-           con la sua minore dissipazione numerica.}
-  \label{fig:ordine_convergenza}
-\end{figure}
+È importante sottolineare che l'analisi con ordine \textbf{teorico} e quella con ordine
+\textbf{effettivo} \emph{non} sono concettualmente distanti: si fondano sulle
+\textbf{stesse equazioni} (la legge di potenza dell'errore e la formula di
+estrapolazione). Cambia unicamente \textbf{chi è dato e chi è incognito}. Nel caso
+teorico si \emph{assume} noto $p$ e bastano due griglie; nel caso effettivo, venendo
+meno tale assunzione, anche $p$ va trattato come incognita e serve una terza griglia per
+chiudere il sistema.
 
-Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa dell'incertezza numerica associata alla discretizzazione:
+\begin{table}[H]
+\centering
+\caption{Confronto tra estrapolazione di Richardson con ordine teorico ed effettivo.}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{0.18\linewidth} p{0.30\linewidth} p{0.36\linewidth}}
+\toprule
+ & \textbf{Ordine teorico} & \textbf{Ordine effettivo (empirico)} \\
+\midrule
+Tipologia & A priori & A posteriori \\
+Ipotesi & Regione asintotica raggiunta; $p$ = ordine formale dello schema & Nessuna ipotesi su $p$; valido anche fuori dal regime asintotico \\
+Dati noti & $u_{h_1},\ u_{h_2}$, $p$, $r$ & $u_h,\ u_{2h},\ u_{4h}$, $r$ \\
+Incognite & $u_{\rm esatto}$ & $p$ \emph{e} $u_{\rm esatto}$ \\
+Griglie necessarie & 2 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Il \textbf{Grid Convergence Index} (GCI) fornisce infine una stima conservativa
+dell'incertezza numerica associata alla discretizzazione:
 \begin{equation}
   \text{GCI} = F_s \cdot |u_h - u_{\rm esatto}|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
 \end{equation}
-
-\paragraph{Scelta del set di griglie.}
-Per l'analisi del bump sono disponibili quattro livelli di griglia con lunghezza caratteristica
-$l_c = \{0.02,\,0.01,\,0.005,\,0.0025\}$ (ciascuno la metà del precedente, $r=2$). Poiché
-l'estrapolazione con \textbf{ordine teorico} richiede \emph{due} griglie e quella con
-\textbf{ordine empirico} ne richiede \emph{tre}, si pongono due domande: il set di griglie è
-arbitrario? serve una griglia già "a convergenza"?
-\begin{itemize}
-  \item \textbf{Rapporto di diradamento costante.} La formula dell'ordine empirico (Eq.~con
-    $p=\ln[(u_{4h}-u_{2h})/(u_{2h}-u_h)]/\ln r$) presuppone un \textbf{rapporto $r$ costante} tra i
-    tre livelli. Con $l_c$ che si dimezza ogni volta, qualsiasi terna di griglie
-    \emph{consecutive} ($0.02$--$0.01$--$0.005$ oppure $0.01$--$0.005$--$0.0025$) ha $r=2$ ed è
-    quindi ammissibile; una terna non consecutiva (es.\ $0.02$--$0.01$--$0.0025$) avrebbe $r$
-    \emph{non} costante e renderebbe la formula non direttamente applicabile.
-  \item \textbf{Necessità del regime asintotico.} La scelta \emph{non} è del tutto indifferente:
-    affinché l'estrapolazione sia attendibile le griglie devono trovarsi nella \textbf{regione
-    asintotica} (Fig.~\ref{fig:ordine_convergenza}). Per questo conviene impiegare le coppie/terne
-    \textbf{più fini} disponibili ($h$ piccolo), dove l'ordine osservato è prossimo a quello
-    formale; le griglie più grossolane risentono ancora del "transitorio" iniziale dell'ordine di
-    convergenza.
-  \item \textbf{Effetto sui due metodi.} Il transitorio iniziale penalizza soprattutto il
-    \textbf{calcolo dell'ordine empirico}, che \emph{misura} $p$: su griglie grossolane fornisce un
-    $p$ lontano da quello teorico e quindi un'estrapolazione poco affidabile. Il metodo a
-    \textbf{ordine teorico} non misura $p$ ma lo \emph{assume}: usare griglie troppo rade non
-    produce un valore "strano" di $p$, ma introduce \textbf{silenziosamente} un errore di
-    estrapolazione (perché l'ipotesi di regime asintotico è violata). In entrambi i casi, dunque,
-    è preferibile basarsi sulle griglie più fitte.
-\end{itemize}
-In sintesi: il set non è completamente arbitrario. Combinazioni diverse (1--2, 2--3, 3--4,~\dots)
-sono tutte lecite ma forniscono stime leggermente diverse; la \textbf{più affidabile è quella
-costruita con le griglie più fini}, perché più vicina al regime asintotico in cui l'ipotesi
-$E = k\,h^p$ è valida.
