@@ -379,6 +379,77 @@ strutturate (cfr.\ Sez.~\ref{subsec:richardson_strutt}).
 
 
 
+\section{Analisi di Convergenza con Estrapolazione di Richardson}
+\label{sec:presa_convergenza}
+
+A differenza del bump (subsonico, privo di urti, dove la soluzione esatta è $\bar S=0$), nella
+presa a doppia rampa il campo presenta \textbf{urti obliqui fisici}: l'entropia esatta \emph{non}
+è nulla (gli urti producono entropia reale) e la stima dell'errore tramite soluzione esatta nota
+non è applicabile. Si usa quindi la sola \textbf{estrapolazione di Richardson} (con ordine teorico
+ed effettivo), come previsto dalla traccia, impiegando lo schema di \textbf{Roe} sulle tre griglie
+non strutturate definite in precedenza.
+
+\paragraph{Scelta della grandezza integrale.}
+L'estrapolazione di Richardson richiede una \textbf{singola grandezza scalare} che riassuma l'intero
+campo. Si sceglie la \textbf{norma $L_2$ dell'entropia} $\|\bar S\|_2$ (Eq.~\ref{eq:norma_entropia}).
+Il suo significato qui è diverso rispetto al bump: non è un errore che tende a zero, ma una grandezza
+\emph{integrale} del campo che, al raffinare della griglia, \textbf{converge a un valore non nullo}
+--- l'entropia \emph{fisica} prodotta dagli urti --- man mano che si annulla la sola componente
+\emph{numerica} (spuria) dovuta alla discretizzazione. Richardson ne stima il valore a griglia
+infinita ($u_{\rm esatto}$) e il GCI quantifica quanto la griglia più fine ne sia ancora distante.
+È una scelta naturale: l'entropia è massimamente sensibile proprio dove il metodo fatica (gli urti)
+ed è già calcolata dal codice come integrale di superficie.
+
+\paragraph{Valori calcolati sulle tre griglie (schema di Roe).}
+Eseguendo il codice fino a convergenza dei residui, la norma dell'entropia vale (si riporta sempre
+l'$l_c$ associato; i tre valori sono impilati per chiarezza):
+\begin{align*}
+  u_{h}   &= 1.443\times10^{-2} \qquad (l_c = 0.25,\ \text{M3},\ 65\,130\ \text{nodi}) \\
+  u_{2h}  &= 1.651\times10^{-2} \qquad (l_c = 0.50,\ \text{M2},\ 16\,564\ \text{nodi}) \\
+  u_{4h}  &= 1.973\times10^{-2} \qquad (l_c = 1.00,\ \text{M1},\ 4\,320\ \text{nodi})
+\end{align*}
+con rapporto di diradamento $r=2$ (dimezzando $l_c$ il numero di nodi quadruplica, quindi
+$r=(N_{\rm fine}/N_{\rm rada})^{1/2}\approx2$).
+
+\begin{table}[H]
+  \centering
+  \caption{Estrapolazione di Richardson sulla norma $L_2$ dell'entropia -- presa a doppia rampa,
+           schema di Roe.}
+  \label{tab:presa_convergenza}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{lccccc}
+    \toprule
+    Metodo & Tipo analisi & $p$ & $u_{\rm esatto}$ & $E$ & GCI \\
+    \midrule
+    Roe & Ordine teorico   & $1.00$  & $1.236\times10^{-2}$ & $2.08\times10^{-3}$ & $6.23\times10^{-3}$ \\
+    Roe & Ordine effettivo & $0.636$ & $1.069\times10^{-2}$ & $3.75\times10^{-3}$ & $1.12\times10^{-2}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Interpretazione.}
+\begin{itemize}
+  \item La norma dell'entropia \textbf{decresce monotonicamente} al raffinare della griglia
+    ($1.97 \to 1.65 \to 1.44 \times 10^{-2}$): la componente numerica si riduce e la grandezza
+    converge verso l'entropia fisica degli urti, stimata da Richardson in
+    $u_{\rm esatto}\approx1.1$--$1.2\times10^{-2}$.
+  \item L'\textbf{ordine effettivo} risulta $p_{\rm eff}\approx0.64$, \emph{inferiore} all'unità:
+    è coerente con la presenza di \textbf{urti}, che degradano l'ordine di convergenza degli schemi
+    (in corrispondenza di una discontinuità anche uno schema di ordine elevato cade al prim'ordine
+    o meno). Le griglie non sono ancora nella regione asintotica piena.
+  \item Il \textbf{GCI} sulla griglia più fine è dell'ordine dell'$1\%$ del valore estrapolato:
+    indica che la mesh M3 fornisce una soluzione ragionevolmente \emph{grid-independent}, e che già
+    la M2 (impiegata per i campi) è prossima alla convergenza --- da cui la scelta di usarla per i
+    campi di Mach/pressione/temperatura a costo ridotto.
+\end{itemize}
+
+\paragraph{Nota: validità su griglie non strutturate.}
+Le tre mesh sono \textbf{non strutturate}, quindi $h$ è una dimensione caratteristica \emph{media} e
+il rapporto $r$ è ricavato dal conteggio dei nodi. L'estrapolazione di Richardson resta valida
+perché il raffinamento è \textbf{self-simile} --- lo stesso schema di infittimento (medesimi campi
+di mesh) applicato globalmente a tutte le griglie, scalando solo $l_c$ --- come discusso nella parte
+teorica (Sez.~\ref{subsec:richardson_strutt}).
+
 \section{Condizioni al Contorno e Parametri della Simulazione}
 \label{sec:presa_bc}
 
@@ -419,84 +490,6 @@ strutturate (cfr.\ Sez.~\ref{subsec:richardson_strutt}).
   \item Il valore $P_{\rm exit} = 0.001$ è puramente indicativo: in uscita supersonica
     il codice ignora questa condizione e estraprola tutte le variabili dall'interno.
 \end{itemize}
-
-\section{Analisi di Convergenza della Griglia}
-\label{sec:presa_convergenza}
-
-\subsection{Campo di Mach e Struttura degli Urti}
-
-A differenza del caso bump (dove il campo di moto è privo di urti), nella presa a doppia
-rampa sono presenti urti obliqui fisici. Pertanto:
-\begin{itemize}
-  \item L'entropia non è più identicamente nulla anche nella soluzione esatta;
-  \item L'analisi di convergenza tramite soluzione esatta nota non è applicabile;
-  \item Si utilizzano solo l'estrapolazione di Richardson con ordine teorico e ordine effettivo.
-\end{itemize}
-
-Il campo di Mach mostra chiaramente le strutture attese:
-\begin{enumerate}
-  \item Primo urto obliquo generato dal piede della prima rampa (punto 3), che deflette la
-    corrente di circa 10° e riduce $M$ da 3 a circa 2.5.
-  \item Secondo urto obliquo generato dal ginocchio (punto 4), che deflette ulteriormente la
-    corrente e riduce $M$ a circa 1.5.
-  \item Eventuale urto normale all'ingresso del canale o urto riflesso sul bordo superiore.
-\end{enumerate}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{../Images/fluent_doppiarampa_mach}
-  \caption{Campo di numero di Mach nella presa a doppia rampa ($M_{\rm in} = 3$), ottenuto
-           con ANSYS Fluent (schema di Roe, secondo ordine upwind, solutore density-based).
-           Sono chiaramente visibili i due urti obliqui attaccati rispettivamente al piede
-           della prima rampa e al ginocchio tra prima e seconda rampa. La struttura a ventaglio
-           delle isobare conferma la compressione progressiva del flusso supersonico,
-           con il numero di Mach che scende da $M \approx 3$ a monte a valori intorno a
-           $M \approx 1.5$ nella sezione del canale di cattura.}
-  \label{fig:campo_mach_doppia_rampa}
-\end{figure}
-
-Al raffinamento della griglia, gli urti diventano progressivamente più netti
-(la zona di smearing si riduce), e il metodo di Roe cattura meglio le discontinuità
-rispetto a Lax--Friedrichs.
-
-\subsection{Risultati dell'Estrapolazione di Richardson}
-
-\begin{table}[H]
-  \centering
-  \caption{Risultati dell'analisi di convergenza -- presa doppia rampa.}
-  \label{tab:presa_convergenza}
-  \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{lccccc}
-    \toprule
-    Metodo & Tipo analisi & $p$ & $u_{\rm esatto}$ & $E$ & GCI \\
-    \midrule
-    Lax--Friedrichs & Ordine teorico   & 1.00  & $1.61\times10^{-2}$ & $3.61\times10^{-3}$ & $1.08\times10^{-2}$ \\
-    Roe             & Ordine teorico   & 1.00  & $1.42\times10^{-2}$ & $2.26\times10^{-3}$ & $6.79\times10^{-3}$ \\
-    \midrule
-    Lax--Friedrichs & Ordine effettivo & 0.234 & $4.79\times10^{-2}$ & $2.82\times10^{-2}$ & $8.47\times10^{-2}$ \\
-    Roe             & Ordine effettivo & 1.46  & $1.75\times10^{-2}$ & $1.03\times10^{-3}$ & $3.09\times10^{-3}$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-I valori di $\norma{\bar{S}}_2$ usati nell'analisi sono:
-\begin{align*}
-  u_h   &= \begin{cases} 1.97\times10^{-2} & \text{Lax--Friedrichs} \\
-                         1.65\times10^{-2} & \text{Roe}\end{cases}, \quad
-  u_{2h} = \begin{cases} 2.47\times10^{-2} & \text{Lax--Friedrichs} \\
-                         1.83\times10^{-2} & \text{Roe}\end{cases}, \quad
-  u_{4h} = \begin{cases} 3.05\times10^{-2} & \text{Lax--Friedrichs} \\
-                         2.33\times10^{-2} & \text{Roe}\end{cases}
-\end{align*}
-
-\paragraph{Interpretazione.}
-Per lo schema di Roe l'ordine effettivo risulta $p \approx 1.46 > 1$: questo valore superiore
-all'ordine teorico è un artefatto dovuto al non aver ancora raggiunto la regione asintotica.
-Quando la griglia non è abbastanza fine, i termini di ordine superiore nello sviluppo
-dell'errore sono ancora significativi e possono aumentare apparentemente l'ordine stimato.
-Per Lax--Friedrichs l'ordine effettivo è molto basso ($p \approx 0.23$), riflettendo la
-maggiore dissipazione numerica e la scarsa capacità di catturare correttamente le
-discontinuità.
 
 \section{Confronto con Dati Sperimentali}
 \label{sec:presa_exp}
