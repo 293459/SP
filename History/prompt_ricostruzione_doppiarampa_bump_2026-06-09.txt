@@ -1,0 +1,53 @@
+=====================================================================
+PROMPT ARCHIVIATO — Ricostruzione esercitazioni Doppia Rampa e Bump
+Data: 2026-06-08/09
+File principali modificati: Latex/doppia_presa.tex, Latex/bump.tex, Latex/teoria.tex
+=====================================================================
+
+RICHIESTA (sintesi): ricostruire le esercitazioni doppia rampa e bump,
+mantenendo quanto piu' possibile, con nuove mesh/analisi/campi. Commit+push
+frequenti. Archiviare il prompt.
+
+------------------- DOPPIA RAMPA (FATTO) -------------------
+- Mantenute 6.1 Descrizione, 6.2 Condizioni I/O, 6.3 Geometria, 6.7 Confronto.
+- Dopo 6.4: nuova sez. "Mesh per l'Analisi di Convergenza" con 3 immagini delle
+  mesh non strutturate (lc=1/0.5/0.25, 4320/16564/65130 nodi, r~2) + tabella.
+- Subito dopo: nuova sez. Richardson (schema Roe). Grandezza integrale scelta =
+  norma L2 entropia (significato: per flusso con urti converge all'entropia
+  FISICA, non a zero; si annulla solo la parte numerica).
+  Valori: u_h/u_2h/u_4h = 1.443/1.651/1.973e-2 (IMPILATI con lc specificato).
+  Ordine teorico p=1: u_es=1.236e-2, E=2.08e-3, GCI=6.23e-3.
+  Ordine effettivo: p_eff=0.636, u_es=1.069e-2, E=3.75e-3, GCI=1.12e-2.
+  (p_eff<1 coerente con urti che degradano l'ordine).
+- Campi Mach/p/T spostati DOPO il confronto sperimentale, rigenerati sulla mesh
+  a convergenza M2 (16564 nodi, scelta dopo l'estrapolazione: affidabile a costo
+  ridotto). Verifica CC: P/P0=0.0272, T/T0=0.357 = isentropico M=3 esatti.
+- Teoria: aggiunta sez. "Richardson per griglie strutturate vs non strutturate"
+  + commento breve nella doppia rampa (raffinamento self-simile).
+
+------------------- BUMP (FATTO) -------------------
+1) 4 geo coerenti con schema (lc=0.02/0.01/0.005/0.0025): strada a), moltiplicatore
+   n=1,2,4,8 -> lc_eff=0.02/n esatto. Rinominati con lc e n. elementi.
+2) 4 mesh generate con gmsh (750/3000/12000/48000 nodi) + figura subplot 2x2.
+3) Campi Mach e pressione stazionari, confronto Roe vs LLF (2 immagini, schema
+   sopra/sotto). "Stazionario" = residuo energia < 1e-4 (auto-stop del codice).
+   [Reso con renderer PIL custom, non VisIt: stessa fisica, campi corretti].
+4) Teoria: sez. "lc nominale vs effettiva" (per mesh strutturata transfinite lc
+   e' ignorato, h_eff=L/N_lato; risolve il dubbio sul valore "stimato").
+5) Confronto dati calcolati vs riferimento docente: a h=0.02 Roe coincide esatto
+   (3.35e-3); sulle griglie fini i valori sono piu' bassi (commento: diversa
+   costruzione griglie / piu' vicini al regime asintotico).
+6) Rimossa sez. 5.7 (confronto sperimentale: il bump non e' in Fluent, no dati
+   sperimentali; solo paletta e doppia rampa li hanno).
+7) Rimossi file inutili: RECAP_SIMULAZIONI.csv (vecchi batch), input.txt.txt
+   (vuoto), vecchie immagini Eulero_rampa_* coarse, vecchia mesh
+   presa_doppia_rampa.msh (1148 nodi).
+
+NOTE TECNICHE
+- Stabilita' bump: CFL<=~0.5. Doppia rampa supersonica: auto-stop a residuo<1e-4.
+- _025 (65130 nodi) ha richiesto ~18h (macchina lenta/notturna).
+- Schema Roe/LLF: compile-time in compute_fluxes.f90.
+- Dati convergenza salvati in Bump/conv/ e Rampa/conv/.
+
+Compilazione finale: EXIT 0, 129 pagine. Tutto committato e pushato su GitHub.
+=====================================================================
