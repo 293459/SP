@@ -3,7 +3,8 @@
 > Teoria + simulazione d'esame sul **macroargomento 3** della lezione 06-04: i **flussi rarefatti**
 > (plume di ugello nel vuoto), il **numero di Knudsen** e il metodo **Monte Carlo / DSMC**. Formato
 > toggle Notion; **parole chiave** in grassetto; formule LaTeX (`$...$`, `$$...$$`).
-> Risponde alle domande **9–16** del file di dubbi.
+> Risponde alle domande **9–16** del file di dubbi e ai **chiarimenti aggiuntivi del 06-04**
+> (punti 10–14: $Kn$ come campo e $\lambda$ variabile, VHS e viscosità, $\Delta t<\tau_c$, $\Delta x\le\lambda$, vincolo CFL).
 
 ---
 
@@ -54,6 +55,17 @@ e regolare**, mentre il gradiente di velocità è **vettoriale/tensoriale** e si
 flusso è uniforme pur essendo rarefatto. La definizione locale rende $Kn$ un **campo**, non un numero
 unico, identificando *dove* il continuo cessa di valere.
 
+> **Cosa fa variare il campo di $Kn$ (chiarimento).** Variano **entrambi** i termini del rapporto, non
+> solo il denominatore. (i) La **lunghezza locale** $L=Q/|\nabla Q|$ cambia con i **gradienti** delle
+> grandezze (come sopra). (ii) **Anche il libero cammino medio $\lambda$ è un campo**: vale
+> $$\lambda = \frac{1}{\sqrt{2}\,n\,\sigma},$$
+> con $n$ **densità numerica** e $\sigma$ **sezione d'urto**. In un plume che si espande nel vuoto la
+> **densità $n$ crolla di ordini di grandezza** procedendo a valle ⟹ $\lambda$ **cresce enormemente**;
+> inoltre $\sigma$ dipende (debolmente) dalla **temperatura** nei modelli VHS/VSS. È **proprio questo
+> aumento di $\lambda$** (dovuto al collasso di densità) il motore principale che fa salire $Kn$ dal
+> regime continuo a quello molecolare libero lungo il getto. Quindi $Kn$ varia sia perché **$\lambda$
+> aumenta** (densità che cala) sia perché **$L$ cambia** (gradienti): nel plume domina il primo.
+
 ---
 
 ### 3. Il metodo Monte Carlo / DSMC
@@ -95,6 +107,27 @@ modelli collisionali sono tarati proprio per **correlare questa viscosità a que
 $\mu(T)$ (è il criterio di scelta tra HS/VHS/VSS). Nel rarefatto la **fenomenologia è diversa** dal
 continuo: la viscosità non è una proprietà imposta dal modello (come in Navier–Stokes) ma una
 **conseguenza statistica** del trasporto di quantità di moto tra collisioni discrete.
+
+> **Perché il VHS riproduce meglio la viscosità (chiarimento sui "diametri diversi").** Attenzione a
+> un equivoco: il diametro variabile del VHS **non** significa avere **specie diverse** o sfere di
+> taglie diverse mescolate. È che il **diametro efficace di una collisione dipende dalla velocità
+> relativa $g$ della coppia che collide**: $\sigma \propto g^{-2\nu}$. Fisicamente le molecole **non**
+> sono sfere rigide ma si respingono con un **potenziale "morbido"** (inverse-power-law): in una
+> collisione **veloce/energetica** le molecole **si compenetrano di più** prima di respingersi, quindi
+> "vedono" un **diametro efficace minore**. È **lo stesso gas** (es. aria): cambia solo il modo in cui
+> ogni urto viene pesato in funzione dell'energia.
+>
+> **Legame con la viscosità.** In teoria cinetica la viscosità è $\mu \propto \rho\,\bar c\,\lambda
+> \propto \sqrt{m k T}/\sigma$, e la sua **dipendenza dalla temperatura** $\mu \propto T^{\omega}$ è
+> governata **da come $\sigma$ dipende dall'energia di collisione**. L'**Hard Sphere** ha $\sigma$
+> **costante** ⟹ dà $\mu\propto\sqrt T$ ($\omega=1/2$), troppo ripida/sbagliata per i gas reali (aria
+> $\omega\approx0.74$). Il **VHS**, legando $\sigma$ a $g$, **aggiusta l'esponente $\omega$** al valore
+> reale ⟹ riproduce la $\mu(T)$ corretta. **E la viscosità in un gas puro?** Non servono più specie:
+> la viscosità è **diffusione di quantità di moto**: molecole **dello stesso gas** trasportano, urto
+> dopo urto, quantità di moto dagli strati veloci a quelli lenti. Le **due fenomenologie** (collisioni
+> microscopiche ↔ viscosità macroscopica) sono **la stessa cosa** vista a due scale: la viscosità *è*
+> l'effetto medio di quelle collisioni, e il modello collisionale (HS/VHS/VSS) decide **quanto bene**
+> quel trasporto riproduce la $\mu(T)$ del gas reale.
 
 ---
 
@@ -307,5 +340,41 @@ particelle DSMC.
 **piccolissimo**, quindi servirebbero celle $\Delta x\le\lambda$ molto fini, $\Delta t\le\tau_c$ molto
 piccoli e **moltissime particelle** (≥30–50 per cella su tantissime celle): il costo esplode. Lì il
 **continuo** è sia valido sia molto più economico.
+
+</details>
+
+<details>
+<summary><strong>Chiarimenti aggiuntivi (06-04) — $\Delta t<\tau_c$ rischia di "saltare" tutte le collisioni? Perché $\Delta x\le\lambda$? Perché una particella non deve attraversare più di una cella?</strong></summary>
+
+**$\Delta t \le \tau_c$ non azzera le collisioni.** Il vincolo dice che, **in media**, una particella
+fa **al più ~una** collisione per passo: **non** che ne faccia esattamente una né zero. Le collisioni
+**non** sono decise particella-per-particella in modo deterministico: in DSMC, **dentro ogni cella**,
+l'algoritmo (es. **NTC, No-Time-Counter**) calcola il **numero atteso di coppie collidenti** nel passo
+$\Delta t$ a partire da densità, sezione d'urto e velocità relative, e ne **estrae stocasticamente**
+quel numero. Quindi su una cella con $N$ particelle avvengono comunque **diverse** collisioni a ogni
+passo, anche se la **singola** particella ne fa in media meno di una. La **frequenza di collisione**
+risulta corretta **per costruzione** (numero di coppie $=$ tasso di collisione $\times N \times
+\Delta t$): non si "perdono" collisioni, le si **risolve finemente nel tempo**. Lo scopo del vincolo è
+tenere valido il **disaccoppiamento moto↔collisione**, non garantire un urto a testa.
+
+**$\Delta x \le \lambda$ (la tua lettura è corretta).** ✅ Esatto: se la cella fosse **molto più grande**
+del libero cammino medio, per come è imposto il modello collisionale (collidono solo particelle
+**della stessa cella**, trattate come "co-locate") delle particelle sarebbero costrette a **interagire
+con compagne fisicamente troppo lontane** (oltre un $\lambda$), cosa **priva di senso fisico**: le
+collisioni reali sono **locali** sulla scala $\lambda$. Quindi meglio una cella $\le\lambda$, che
+garantisce **compagni di collisione genuinamente vicini** e risolve la scala su cui avvengono gli urti.
+Il limite opposto è quello che noti tu: **celle troppo piccole** ⟹ poche particelle per cella ⟹
+**rumore statistico** + costo elevato. Il compromesso è $\Delta x\!\sim\!\lambda$ con $\ge$30–50
+particelle/cella.
+
+**Una particella non deve attraversare più di una cella per passo (il tuo ragionamento regge).** ✅
+L'idea è quella: con $\Delta t\le\Delta x/v_{max}$ la particella avanza **al più di una cella**, così
+collide con i **vicini immediati** prima di proseguire. Se "saltasse" una o più celle, **non
+campionerebbe l'ambiente collisionale** delle celle intermedie — celle in cui avrebbe dovuto avere la
+possibilità di collidere — e finirebbe per **interagire in una cella lontana** bypassando quelle in
+mezzo. Questo **viola la località delle collisioni** (solo le particelle co-localizzate nella stessa
+cella interagiscono) e **falsa il trasporto** di quantità di moto ed energia. Quindi la particella va
+fatta **avanzare cella per cella**, raccogliendo a ogni tappa le collisioni locali: è un vincolo di
+**coerenza fisica del trasporto**, non (come nel continuo) di pura stabilità numerica.
 
 </details>

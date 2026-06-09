@@ -3,7 +3,8 @@
 > Teoria + simulazione d'esame sul **macroargomento 2** della lezione 06-04: i **Reduced Order
 > Models** e in particolare la **Proper Orthogonal Decomposition (POD)**. Formato toggle Notion;
 > **parole chiave** in grassetto; formule LaTeX (`$...$`, `$$...$$`).
-> Risponde alle domande **6–7** del file di dubbi.
+> Risponde alle domande **6–7** del file di dubbi e ai **chiarimenti aggiuntivi del 06-04**
+> (punti 2–9: definizione di energia, modi calcolati vs imposti, vincolo di norma, spazio/parametri).
 
 ---
 
@@ -86,6 +87,18 @@ autovalori** (sulla matrice di correlazione degli snapshot):
 - gli **autovettori** → i coefficienti che combinano gli snapshot → i **modi** $\phi_i$;
 - gli **autovalori** $\lambda_i$ → la **importanza energetica** di ciascun modo.
 
+> **Cosa si intende per "energia" (definizione).** L'energia è definita **rispetto al prodotto
+> scalare scelto**: è la somma dei quadrati delle norme degli snapshot,
+> $$E_{tot} = \sum_{k=1}^{N_s}\|u_k\|_\Omega^2 = \mathrm{tr}(C) = \sum_{i=1}^{N_s}\lambda_i,$$
+> cioè la **traccia della matrice di correlazione** $C$. Ogni **autovalore** $\lambda_i$ è
+> **esattamente l'energia catturata dal modo** $i$-esimo, e il **RIC** è la **frazione cumulata** di
+> questa energia. Per un campo di velocità $\|u\|^2=\int_\Omega u^2\,d\Omega$ è proporzionale
+> all'**energia cinetica** (da cui il nome); in generale è la **varianza / contenuto $L^2$** del
+> database. Quindi **"energia", autovalori $\lambda_i$ e RIC sono la stessa quantità** vista da
+> angolazioni diverse: non è una parola "campata in aria" ma il valore del prodotto scalare $L^2$ sui
+> dati. Massimizzare $\sum_k\langle u_k,\phi_i\rangle^2$ significa letteralmente **catturare più
+> energia possibile** con quel modo.
+
 **Passo 6 — Troncamento con il RIC.** I modi sono potenzialmente **infiniti** (fino a $N_s$), ma ne
 bastano **pochi** (≈10) per rappresentare quasi tutta l'energia. Si tronca con il **Relative
 Information Content**:
@@ -104,6 +117,17 @@ ogni punto del database posso ricavare $\tilde u_i$ **proiettando** la soluzione
 I parametri $\mu_1,\mu_2,\dots$ definiscono uno **spazio di progetto discreto**: gli snapshot sono
 calcolati solo in **alcuni punti** (la "griglia" di campionamento). Per un design **nuovo** (un punto
 non calcolato) si **interpola** la mappa $\bar\mu \to \tilde u_i$.
+
+> **Perché lo spazio dei parametri è discreto (chiarimento).** Lo è perché possiamo permetterci solo
+> un **numero finito di simulazioni full-order**: si **campiona** lo spazio dei parametri in $N_s$
+> punti e quelli sono gli unici design "noti". È una **scelta pratica** (non potremmo calcolare la
+> soluzione per un *continuo* di parametri), non una proprietà intrinseca del problema. Di conseguenza
+> **non abbiamo la soluzione ovunque** nello spazio $\bar\mu$: per un punto non campionato si è
+> **costretti a interpolare**. ⚠️ Attenzione a non confonderlo con l'altra discretizzazione, di
+> **natura spaziale**, che compare nel prodotto scalare ($\int_\Omega\!\to\!\sum_\ell V_\ell$): quella
+> è la **quadratura sui volumi di cella** (volumi finiti) e riguarda lo spazio fisico $\bar x$, non lo
+> spazio dei parametri. Sono **due discretizzazioni diverse**: una sui **parametri** (campionamento
+> degli snapshot), una sullo **spazio fisico** (mesh FV).
 
 ```
    μ2 ↑
@@ -262,5 +286,51 @@ ricostruisce con pochi modi: servirebbero **molti** modi per "spostare" l'urto, 
 lentamente e la ricostruzione mostrerebbe **oscillazioni/urto spalmato**. Rimedi: **campionamento più
 fitto** vicino all'urto, oppure tecniche **non lineari** (registrazione/allineamento dell'urto,
 autoencoder, manifold learning) al posto della POD pura.
+
+</details>
+
+<details>
+<summary><strong>Chiarimenti aggiuntivi (06-04) — modi "calcolati" vs imposti, cosa si ottimizza, vincolo di norma, "spazio vs parametri", tempo vs parametri.</strong></summary>
+
+**Perché i modi si *calcolano* (e non si *impongono* a priori con senso fisico).** Si potrebbe in
+linea di principio fissare una base a priori (Fourier, polinomi, modi "fisici"), ma si perderebbe il
+vantaggio della POD: la base POD è quella **ottima per quel database**, perché è **estratta dai dati**
+risolvendo un **problema di ottimo** (massima energia catturata a parità di numero di modi). Una base
+imposta a priori sarebbe ottimale **solo** se avessimo **conoscenza assoluta** del problema (cosa che
+non abbiamo). Il **senso fisico non si perde**: emerge **a posteriori** — i primi modi POD coincidono
+spesso con strutture coerenti riconoscibili (campo medio, strutture dominanti). Quindi "calcolati"
+non vuol dire "arbitrari/numerici" ma **i migliori possibili rispetto ai dati**.
+
+**Cosa si ottimizza: i modi, non le soluzioni.** ✅ Confermato (correzione rispetto agli appunti di
+lezione). Le $u_k$ (gli **snapshot**) sono **dati noti e immutabili**: non ha senso "ottimizzarle".
+L'incognita del problema di ottimo sono i **modi** $\phi_i$ — un'estrazione **matematica** che possiamo
+scegliere — proprio quelli che **rappresentano al meglio** le soluzioni catturando più **energia** del
+database (vedi definizione di energia in §2, Passo 5). Gli appunti di Claude (questo file) sono
+corretti su questo punto.
+
+**Il vincolo di norma $\|\phi_i\|=1$.** La tua intuizione è giusta nello spirito, ma il motivo preciso
+è di **buona posizione** del problema: senza vincolo l'obiettivo $\max\sum_k\langle u_k,\phi_i\rangle^2$
+è **illimitato** (scalando $\phi_i$ di un fattore $c$ l'obiettivo scala di $c^2$), quindi **non esiste
+un massimo**. Normalizzando si confrontano i modi **a parità di taglia** e la "magnitudine" finisce
+tutta nel **coefficiente** $\tilde u_i$. Non è tanto un "imbroglio sull'energia" quanto il fatto che,
+senza normalizzazione, il problema **degenererebbe** (massimo all'infinito).
+
+**"La soluzione dipende solo dallo spazio, la soluzione ridotta da spazio e parametri": non è un
+errore.** È una distinzione corretta, purché si chiarisca **chi è cosa**. Un singolo **snapshot
+full-order** $u_J(\bar x)$ è calcolato a **un valore fissato** dei parametri $\bar\mu_J$: come dato, è
+quindi una funzione del **solo spazio** ($\bar\mu$ è un'etichetta fissa). Il **modello ridotto**
+$u(\bar x,\bar\mu)=\sum_i \tilde u_i(\bar\mu)\phi_i(\bar x)$ è invece un **surrogato parametrico**:
+dipende **esplicitamente da spazio e parametri** perché deve poter essere valutato a **qualunque**
+$\bar\mu$. Le due affermazioni sono coerenti: il **campo "vero"** dipende sì da entrambi, ma ogni
+**snapshot** ne è una "fetta" a $\bar\mu$ fissato (spazio), mentre il **ROM** ricostruisce la
+dipendenza continua dai parametri. Quindi: snapshot → spazio; ROM → spazio + parametri.
+
+**Tempo vs parametri (per non confondersi).** Nell'esempio **RANS stazionario** il **tempo non
+compare**: la dipendenza "extra" della soluzione è solo dai **parametri di design** $\bar\mu$
+(geometria, valori al contorno…), non dal tempo. La confusione nasce dal fatto che si cita la RANS
+(che *media* il tempo) e i fenomeni instazionari: ma nello schema POD presentato, le due "dimensioni"
+sono **spazio** $\bar x$ (catturato dai **modi**) e **parametri** $\bar\mu$ (catturati dai
+**coefficienti**). Il **tempo** entrerebbe **solo** in una POD instazionaria, come ulteriore variabile
+di campionamento (collezione di campi a istanti diversi), separata dai parametri di design.
 
 </details>

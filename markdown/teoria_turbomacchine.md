@@ -248,6 +248,14 @@ sistema di coordinate.
   **non è più un'evoluzione temporale ma un'evoluzione di vettori** lungo l'asse inclinato. Anche un
   semplice *plot a tempo fissato* diventa problematico, perché punti diversi del piano si riferiscono
   a tempi fisici diversi.
+- **Niente delay esplicito sulle condizioni al contorno.** A differenza del **phase-lag** — che impone
+  la BC al tempo $t+\delta_t$ andando a **recuperare la storia temporale** salvata — nel tempo
+  inclinato **non occorre applicare alcun ritardo esplicito** all'interfaccia statore–rotore. Per come
+  è costruito il **vettore dei dati** (i punti salvati allo stesso livello $n$ sono **già a istanti
+  fisici diversi** lungo θ), lo **sfasamento temporale è già incorporato nella griglia spazio-tempo
+  inclinata**: i dati che si impongono al contorno sono quindi **già sfasati per costruzione**, e la
+  periodicità corocronica si riduce a una **periodicità ordinaria** che non richiede di "ricordare" e
+  ri-applicare $\delta_t$. È esattamente il **vantaggio di memoria** del metodo rispetto al phase-lag.
 - **Pro:** evita di conservare la lunga storia temporale del phase-lag → **meno memoria** per certi
   casi; periodicità imposta in modo "esatto".
 - **Contro:** **complessità di implementazione** elevata, **post-processing** non intuitivo (i campi
@@ -401,6 +409,13 @@ e sliding mesh.
 Quindi $n\to n+1$ non rappresenta più un avanzamento nel tempo fisico ma il passaggio da un **vettore
 di stato a un altro** lungo l'asse spazio-temporale inclinato. Ne segue che persino un **plot a "tempo
 fissato"** diventa ambiguo, perché punti diversi del piano sono a tempi fisici differenti.
+
+**Non serve un delay esplicito sulle BC.** Proprio perché il vettore dei dati è costruito su una
+griglia spazio-tempo inclinata, i punti che si impongono al contorno statore–rotore sono **già
+sfasati nel tempo per costruzione**: non occorre — a differenza del phase-lag — andare a leggere la
+storia temporale e applicare il ritardo $\delta_t$. Lo sfasamento è **assorbito nella geometria del
+vettore di dati** e la periodicità corocronica diventa una **periodicità ordinaria**. È questo che
+rende il tempo inclinato **parsimonioso in memoria** rispetto al phase-lag.
 
 </details>
 
