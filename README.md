@@ -23,9 +23,8 @@ modeFRONTIER**, oltre al **report LaTeX** e al materiale teorico per lo studio.
 | `Fluent/` | Progetti e risultati ANSYS Fluent (LS59, doppia rampa) |
 | `Ottimizzazione/` | Ottimizzazione aerodinamica con modeFRONTIER |
 | `Images/` | Figure usate nel report |
-| `markdown/` | Sintesi teoriche in formato Q&A (toggle) pronte per Notion |
+| `teoria/` | Appunti teorici del corso + sintesi e simulazioni d'esame (immagini in `teoria/images/`) |
 | `Mermaid/` | Mappe mentali del corso (formato Mermaid) |
-| `Notion/` | Export degli appunti Notion del corso |
 | `Debug/` | Casi di riferimento per verificare il solutore |
 | `History/` | Archivio di prompt, dubbi e correzioni della fase di stesura |
 | `Skill/` | Skill/istruzioni usate per generare il materiale |
@@ -72,7 +71,8 @@ cp Euler2D/euler2d.exe Debug/Debug_1/ && cd Debug/Debug_1 && ./euler2d.exe
 
 - File pesanti (eseguibili, output `.plt`, mesh Gmsh, ambienti) sono esclusi via `.gitignore`
   e rigenerabili dai sorgenti.
-- Il materiale in `markdown/` è pensato per essere incollato in Notion (blocchi *toggle* e
-  formule LaTeX).
+- Il materiale in `teoria/` è pensato anche per essere incollato in Notion (blocchi *toggle* e
+  formule LaTeX); i chiarimenti/dubbi sono integrati nella teoria come note, mentre le sezioni di
+  *simulazione d'esame* restano separate.
 - La verifica del solutore (convergenza del bump rigenerata, campi della doppia rampa,
   consistenza con i casi di `Debug/`) è documentata in `History/` e in `Bump/conv/README.md`.

@@ -103,7 +103,7 @@
         
         ![Regioni di assoluta stabilità nel piano complesso hλ: Eulero esplicito vs implicito](images/regione_assoluta_stabilita_eulero_exp_imp.jpg)
         
-        [Regione di Assoluta Stabilità .pdf](Regione_di_Assoluta_Stabilita_.pdf)
+        *Regione di Assoluta Stabilità  (PDF allegato Notion, non incluso nell'export)*
         
         $$
         R_a = {hλ ∈ ℂ : |\mathcal{F}(h\lambda) | < 1}
@@ -392,28 +392,28 @@
 - **Esercizi**
     1. Sostituzione standard 
         
-        [Sostituzione Standard ODE.pdf](Sostituzione_Standard_ODE.pdf)
+        *Sostituzione Standard ODE (PDF allegato Notion, non incluso nell'export)*
         
     2. Regione di assoluta stabilità
         
-        [Regione di Assoluta Stabilit Calcoli_compressed 2.pdf](Regione_di_Assoluta_Stabilit_Calcoli_compressed_2.pdf)
+        *Regione di Assoluta Stabilit Calcoli_compressed 2 (PDF allegato Notion, non incluso nell'export)*
         
     3. Tableau di Butcher 
         
-        [Tableau di Butcher.pdf](Tableau_di_Butcher.pdf)
+        *Tableau di Butcher (PDF allegato Notion, non incluso nell'export)*
         
     4. Passi di Eulero Esplicito (equazione) 
         
-        [Eulero Esplicito.pdf](Eulero_Esplicito.pdf)
+        *Eulero Esplicito (PDF allegato Notion, non incluso nell'export)*
         
     5. Passi di Eulero Implicito (equazione)
     6. Sistema di equazioni differenziali
         
-        [Sistema di Equazioni differenziali .pdf](Sistema_di_Equazioni_differenziali_.pdf)
+        *Sistema di Equazioni differenziali  (PDF allegato Notion, non incluso nell'export)*
         
     7. Problemi Stiff 
         
-        [Problemi Stiff.pdf](Problemi_Stiff.pdf)
+        *Problemi Stiff (PDF allegato Notion, non incluso nell'export)*
         
 - **Approfondimenti teorici** (HPC e parallelismo, varianti Runge-Kutta, WENO, FV/FE/DG)
     
