@@ -1,0 +1,75 @@
+=====================================================================
+PROMPT ARCHIVIATO — LS59 (incidenza/perdite/Roe) + Doppia rampa + Bump
+Data: 2026-06-07
+File modificati: Latex/paletta.tex, Latex/teoria.tex, Latex/doppia_presa.tex
+=====================================================================
+
+RICHIESTA: completare sezioni del report (immagini+commenti+domande aperte),
+seguire schema_relazione, archiviare il prompt, modificare solo i file
+necessari, commit locale, tenere aggiornato.
+
+------------------------- LS59 (FATTO) -------------------------
+1) Perdite/urti transonici: aggiunta "Nota critica: regime transonico e
+   perdite". M>1 sul dorso e' by-design (cascata transonica, uscita M~1.2);
+   urto debole -> perdita ~ (Mn^2-1)^3 (piccola); fermarsi a M=1 ridurrebbe
+   l'espansione/lavoro (funzionamento non ottimale). In Euler niente perdite
+   viscose. -> paletta.tex
+2) Schema TikZ incidenza (intradosso/estradosso, alpha=30 progetto, alpha>30
+   e <30, spostamento punto di ristagno) + convenzione di segno (i=alpha-30)
+   + tabella riassuntiva 3 casi. -> paletta.tex (fig:incidenza_ls59,
+   tab:incidenza_ls59)
+3) Uniformita' di monte: chiarito che l'ingresso e' SUBSONICO, quindi le
+   linee caratteristiche risalenti POSSONO propagare il segnale; l'uniformita'
+   non e' dovuta al blocco del segnale ma alla distanza dal profilo + al
+   rispetto delle condizioni al contorno. -> paletta.tex
+4) Entropy fix spostato nella sezione teorica (teoria.tex, Schema di Roe):
+   perche' serve (autovalore che si annulla ai punti sonici -> dissipazione
+   nulla -> possibili espansioni non fisiche) + formula di Harten (Psi(lambda)
+   con soglia delta). Nel commento campi resta solo il rimando.
+5) Origine matematica dell'overshoot: richiamata la formula del flusso di Roe;
+   dissipazione ~ |lambda_k| che si ANNULLA sull'onda di entropia a u=0
+   (ristagno) -> oscillazioni di rho/T non smorzate -> p,T > 1. -> paletta.tex
+6) Enfasi sul check standard delle BC tramite p statica analitica (0.843):
+   procedura di controllo da fare PRIMA di interpretare il campo (se fosse
+   0.3 -> errore di impostazione). -> paletta.tex
+7) Isobara "ad archetto": aggiunti i casi limite del raggio di curvatura
+   (R->inf superficie piana -> dP/dn=0; R->0 spigolo -> gradiente enorme),
+   con la formula dP/dn = rho V^2/R. -> paletta.tex
+
+------------------- DOPPIA RAMPA -------------------
+1) (FATTO) Effetto della lunghezza caratteristica lc sui risultati: la
+   POSIZIONE degli urti e' fisica (~indip. da lc), lo SPESSORE apparente e i
+   picchi di parete dipendono da lc; con griglia in convergenza i risultati
+   sono grid-independent. -> doppia_presa.tex (senza citare report passati).
+2) (BLOCCATO) Equivalenza tra il codice MATLAB del collega e il Jupyter
+   notebook: RICHIEDE il codice MATLAB (non presente nella cartella SP,
+   l'utente doveva caricarlo in chat). DA FORNIRE.
+
+------------------------- BUMP -------------------------
+1) (FATTO) Scelta del set di griglie per la convergenza: rapporto di
+   diradamento costante richiesto (terne consecutive, r=2); serve regime
+   asintotico -> usare le griglie piu' fini; il transitorio iniziale penalizza
+   soprattutto l'ordine empirico (misurato) ma falsa silenziosamente anche
+   quello teorico (assunto). -> teoria.tex (sezione Richardson).
+2) (BLOCCATO) Attendibilita' del notebook vs codice MATLAB del collega:
+   RICHIEDE il codice MATLAB (mancante).
+3) (RISPOSTO) Generalita' del codice/notebook: il SOLUTORE Fortran e' gia'
+   generale (gira su bump e LS59/doppia rampa). Il NOTEBOOK e' gia' a funzioni
+   (carica_dati_convergenza, calcola_ordine_empirico, ...). Approccio
+   consigliato: notebook unico con funzioni, eseguendo TUTTI i blocchi per il
+   bump (Roe+Lax, norma entropia) e solo alcuni per la doppia rampa (solo Roe,
+   Richardson, niente soluzione esatta). NB: lo schema Roe/Lax si seleziona a
+   COMPILE-TIME in compute_fluxes.f90 (riga 20 LLF / riga 21 Roe), quindi per
+   l'analisi completa servono 2 build (una per schema).
+4) (VERIFICATO) Il codice Euler COMPILA e GIRA correttamente: test su
+   Debug_1 (bump, 750 nodi, LLF), 1000 iter, EXIT 0, residui in calo,
+   Norm2_entropy = 3.17e-3 (coerente con il riferimento di schema_relazione:
+   Err LLF h=0.02 = 0.00343, Roe = 0.00335). Output: RECAP_OUTPUT.csv,
+   SIM_OUTPUT_*, norms.txt, wall_data.txt.
+   RIMANE DA DECIDERE (con l'utente): se rieseguire l'INTERA analisi di
+   convergenza (4 griglie x 2 schemi = 8 run, con ricompilazione per schema)
+   e rigenerare la tabella del report (che gia' contiene valori coerenti).
+
+------------------- MATERIALE MANCANTE -------------------
+- Codice MATLAB del collega (per Bump Q2 e Doppia rampa Q2): non presente.
+=====================================================================

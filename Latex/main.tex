@@ -39,10 +39,15 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
+% Intestazione: solo il capitolo corrente a sinistra. Il titolo lungo del corso
+% e' stato spostato in piede di pagina per evitare la sovrapposizione con il
+% testo del capitolo (la scritta a destra era troppo lunga e si sovrapponeva
+% al \leftmark a sinistra).
 \fancyhead[L]{\small\nouppercase{\leftmark}}
-\fancyhead[R]{\small Fluidodinamica Computazionale dei Sistemi Propulsivi}
+\fancyfoot[L]{\scriptsize Fluidodinamica Computazionale dei Sistemi Propulsivi}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
 
 % --- Comandi personalizzati ---
 \newcommand{\lc}{\ell_c}

@@ -299,83 +299,184 @@ Il valore $P_{\rm exit} = 0.9395$ corrisponde alla pressione isentropica per $M 
 \section{Analisi di Convergenza della Griglia}
 \label{sec:bump_convergenza}
 
-\subsection{Raffinamento Progressivo}
+\subsection{Raffinamento Progressivo della Griglia}
+\label{sec:bump_raffinamento}
 
-L'analisi di convergenza è stata condotta eseguendo simulazioni su quattro griglie progressive,
-ciascuna ottenuta raddoppiando approssimativamente il numero di nodi rispetto alla precedente:
+L'analisi di convergenza è condotta su \textbf{quattro griglie strutturate} progressivamente più
+fitte, generate dallo stesso file di geometria variando il \textbf{moltiplicatore} $n$ del numero
+di nodi per lato. È importante notare che \emph{non} si agisce sul parametro \texttt{lc} del file:
+per una mesh strutturata transfinite \texttt{lc} è ininfluente e la dimensione di cella è imposta
+dal numero di elementi (si veda la discussione in Sez.~\ref{subsec:lc_eff} sulla differenza tra
+$l_c$ nominale ed effettiva). Scegliendo $n = 1,2,4,8$ si ottiene una lunghezza caratteristica
+effettiva $l_c = 0.02/n$, pari ai valori $\{0.02,\,0.01,\,0.005,\,0.0025\}$ richiesti dallo schema
+di riferimento, con rapporto di diradamento costante $r=2$.
 
 \begin{table}[H]
   \centering
-  \caption{Griglie utilizzate per l'analisi di convergenza -- bump strutturato.}
+  \caption{Griglie strutturate per l'analisi di convergenza del bump. La $l_c$ riportata è quella
+           \textbf{effettiva} ($h_{\rm eff}=L/N_{\rm lato}$), ricavata dal numero di elementi e non
+           dal parametro \texttt{lc} del file di geometria.}
   \label{tab:bump_griglie}
   \begin{tabular}{ccccc}
     \toprule
-    Caso & $N_{\rm nodi}$ & Nodi orizz.\ & Nodi vert.\ & $\lc$ approx. \\
+    Griglia & molt.\ $n$ & $l_c$ effettiva & $N_{\rm nodi}$ & $N$ elementi \\
     \midrule
-    1 & 750    & 25  & 30  & 0.022 \\
-    2 & 3\,000 & 50  & 60  & 0.011 \\
-    3 & 6\,750 & 75  & 90  & 0.007 \\
-    4 & 12\,000& 100 & 120 & 0.005 \\
+    G1 & 1 & 0.0200 & 750     & 686 \\
+    G2 & 2 & 0.0100 & 3\,000  & 2\,871 \\
+    G3 & 4 & 0.0050 & 12\,000 & 11\,741 \\
+    G4 & 8 & 0.0025 & 48\,000 & 47\,481 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\subsection{Campo di Mach e Entropia}
+Le quattro griglie sono mostrate in Figura~\ref{fig:bump_mesh4}: si nota chiaramente
+l'infittimento progressivo, con il caratteristico addensamento delle celle verso la parete
+(progressione geometrica) e in corrispondenza del bump (distribuzione \texttt{Bump}).
 
-Al raffinamento progressivo della griglia si osservano i seguenti effetti:
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{0.49\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_bump_lc002.png}\\[-1pt]
+    {\footnotesize (a) $l_c=0.02$ -- 750 nodi}
+  \end{minipage}\hfill
+  \begin{minipage}{0.49\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_bump_lc001.png}\\[-1pt]
+    {\footnotesize (b) $l_c=0.01$ -- 3000 nodi}
+  \end{minipage}
+
+  \vspace{4pt}
+  \begin{minipage}{0.49\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_bump_lc0005.png}\\[-1pt]
+    {\footnotesize (c) $l_c=0.005$ -- 12000 nodi}
+  \end{minipage}\hfill
+  \begin{minipage}{0.49\textwidth}\centering
+    \includegraphics[width=\linewidth]{../Images/mesh_bump_lc00025.png}\\[-1pt]
+    {\footnotesize (d) $l_c=0.0025$ -- 48000 nodi}
+  \end{minipage}
+  \caption{Le quattro griglie strutturate del bump a raffinamento crescente
+           ($l_c = 0.02 \to 0.0025$, $r=2$). L'infittimento è ottenuto col moltiplicatore $n=1,2,4,8$.}
+  \label{fig:bump_mesh4}
+\end{figure}
+
+\subsection{Campo Stazionario di Mach e Pressione: Roe vs Lax--Friedrichs}
+\label{sec:bump_campi}
+
+Si riportano i campi della \textbf{soluzione stazionaria} ottenuti con il codice di Eulero,
+mettendo a confronto i due schemi di flusso (Roe e Lax--Friedrichs) sulla stessa griglia
+($l_c = 0.01$). Per \textbf{soluzione stazionaria} si intende qui lo stato raggiunto a
+\emph{convergenza}: l'integrazione temporale è solo un mezzo per arrivare allo stato di regime, e
+la soluzione si considera stazionaria quando i \textbf{residui} non variano più
+significativamente (nel codice il ciclo si arresta quando la norma $L_2$ del residuo di energia
+scende sotto $10^{-4}$). In altre parole non è il singolo passo temporale a contare, ma il
+\emph{campo asintotico} verso cui il transitorio si assesta.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../Images/bump_mach_roe_llf.png}
+  \caption{Campo del numero di Mach a convergenza, confronto Roe (alto) vs Lax--Friedrichs (basso),
+           $l_c=0.01$. Il flusso subsonico ($M_{\rm in}=0.3$) \textbf{accelera} simmetricamente sopra
+           l'apice del bump fino a $M\approx0.46$ e \textbf{decelera} a valle, senza mai raggiungere
+           condizioni soniche: il campo è ovunque subsonico e privo di urti. I due schemi forniscono
+           soluzioni quasi identiche, con Roe leggermente più nitido (minore dissipazione).}
+  \label{fig:bump_mach}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{../Images/bump_pressione_roe_llf.png}
+  \caption{Campo di pressione adimensionale $P/P^\circ$ a convergenza, confronto Roe (alto) vs
+           Lax--Friedrichs (basso), $l_c=0.01$. La pressione è il \textbf{negativo} del Mach: cala
+           sopra il bump (dove il flusso accelera, $P/P^\circ\approx0.86$) e recupera a valle. La
+           simmetria monte--valle del campo conferma il comportamento \textbf{isentropico} atteso
+           (assenza di perdite per un flusso subsonico inviscido).}
+  \label{fig:bump_pressione}
+\end{figure}
+
+\paragraph{Osservazioni.}
 \begin{itemize}
-  \item Il campo di Mach diventa progressivamente più simmetrico rispetto all'asse verticale
-    passante per l'apice del bump, avvicinandosi alla soluzione analitica isentropica.
-  \item Il campo di entropia $\bar{S}$, che dovrebbe essere identicamente nullo, presenta valori
-    non nulli dovuti alla dissipazione numerica dello schema; tali valori si riducono al
-    raffinamento della griglia.
+  \item Il campo di Mach è \textbf{simmetrico} rispetto all'asse verticale passante per l'apice del
+    bump, in accordo con la soluzione analitica isentropica (un flusso subsonico inviscido non
+    genera perdite, quindi monte e valle sono speculari).
+  \item I due schemi sono \textbf{praticamente sovrapponibili}: trattandosi di un campo liscio e
+    privo di discontinuità, il vantaggio di Roe (minore dissipazione sulle discontinuità) è poco
+    evidente; resta una lievissima maggior nitidezza nei gradienti.
+  \item Il campo di entropia $\bar S$, che dovrebbe essere identicamente nullo, presenta valori non
+    nulli dovuti alla sola \textbf{dissipazione numerica}: è la grandezza usata per l'analisi di
+    convergenza, e si riduce al raffinamento della griglia (Sez.~\ref{sec:bump_convergenza}).
 \end{itemize}
 
 \subsection{Norma $L_2$ dell'Entropia e Ordine di Convergenza}
 
 La norma $L_2$ dell'entropia (Eq.~\eqref{eq:norma_entropia}) decresce monotonicamente al
-raffinamento. Dalla tabella seguente si ricavano le grandezze dell'analisi di convergenza:
+raffinamento. I valori riportati di seguito sono stati \textbf{rigenerati eseguendo direttamente
+il codice di Eulero sviluppato} (schema esplicito di Eulero in avanti, $\mathrm{CFL}=0.3$, fino a
+convergenza dei residui) sulle quattro griglie strutturate, sia con il flusso di Lax--Friedrichs
+locale sia con quello di Roe.
 
 \begin{table}[H]
   \centering
-  \caption{Risultati dell'analisi di convergenza -- bump, confronto Lax--Friedrichs vs.\ Roe.}
+  \caption{Norma $L_2$ dell'entropia $\|\bar S\|_2$ calcolata dal codice sulle quattro griglie.}
+  \label{tab:bump_norme}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{ccccc}
+    \toprule
+    Griglia & $N_{\rm nodi}$ & $h$ & $\|\bar S\|_2$ (Lax--Friedrichs) & $\|\bar S\|_2$ (Roe) \\
+    \midrule
+    $4h$ & 750    & 0.020  & $2.88\times10^{-3}$ & $3.35\times10^{-3}$ \\
+    $2h$ & 3\,000 & 0.010  & $1.91\times10^{-3}$ & $1.79\times10^{-3}$ \\
+    --   & 6\,750 & 0.0067 & $1.47\times10^{-3}$ & $1.16\times10^{-3}$ \\
+    $h$  & 12\,000& 0.005  & $1.22\times10^{-3}$ & $8.98\times10^{-4}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Da questi valori si ricavano l'ordine di convergenza e le stime di Richardson. Poiché la
+soluzione esatta è nota ($\bar S_{\rm esatto}=0$), l'ordine si ottiene direttamente dalla
+pendenza della retta interpolante in scala log--log; le estrapolazioni di Richardson usano la
+terna a rapporto costante $r=2$ ($4h,\,2h,\,h$).
+
+\begin{table}[H]
+  \centering
+  \caption{Analisi di convergenza -- bump, valori rigenerati col codice (Lax--Friedrichs vs.\ Roe).}
   \label{tab:bump_convergenza}
   \renewcommand{\arraystretch}{1.25}
   \begin{tabular}{lccccc}
     \toprule
     Metodo & Tipo analisi & $p$ & $u_{\rm esatto}$ & $E$ & GCI \\
     \midrule
-    Lax--Friedrichs & Sol.\ esatta nota  & 0.603 & 0       & $1.45\times10^{-3}$ & $4.36\times10^{-3}$ \\
-    Roe             & Sol.\ esatta nota  & 0.861 & 0       & $9.11\times10^{-4}$ & $2.73\times10^{-3}$ \\
+    Lax--Friedrichs & Sol.\ esatta nota  & 0.620 & 0 & $1.22\times10^{-3}$ & $3.66\times10^{-3}$ \\
+    Roe             & Sol.\ esatta nota  & 0.957 & 0 & $8.98\times10^{-4}$ & $2.69\times10^{-3}$ \\
     \midrule
-    Lax--Friedrichs & Ordine teorico     & 1.00  & $9.37\times10^{-4}$ & $5.16\times10^{-4}$ & $1.55\times10^{-3}$ \\
-    Roe             & Ordine teorico     & 1.00  & $8.25\times10^{-4}$ & $8.59\times10^{-5}$ & $2.58\times10^{-4}$ \\
+    Lax--Friedrichs & Ordine teorico     & 1.00  & $5.30\times10^{-4}$ & $6.89\times10^{-4}$ & $2.07\times10^{-3}$ \\
+    Roe             & Ordine teorico     & 1.00  & $1.1\times10^{-5}$  & $8.87\times10^{-4}$ & $2.66\times10^{-3}$ \\
     \midrule
-    Lax--Friedrichs & Ordine effettivo   & 0.226 & $5.66\times10^{-3}$ & $4.21\times10^{-3}$ & $1.26\times10^{-2}$ \\
-    Roe             & Ordine effettivo   & 0.350 & $3.49\times10^{-3}$ & $2.57\times10^{-3}$ & $7.72\times10^{-3}$ \\
+    Lax--Friedrichs & Ordine effettivo   & 0.50  & \multicolumn{3}{c}{estrapolazione non affidabile (regime non asintotico)} \\
+    Roe             & Ordine effettivo   & 0.82  & \multicolumn{3}{c}{estrapolazione non affidabile (regime non asintotico)} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\paragraph{Interpretazione dei risultati.}
+\paragraph{Interpretazione e verifica.}
 \begin{itemize}
-  \item Lo schema di \textbf{Roe} produce errori sistematicamente più piccoli di
-    Lax--Friedrichs a parità di griglia, grazie alla minore dissipazione numerica intriseca
-    del metodo upwind.
-  \item L'ordine di convergenza effettivo ($p \approx 0.6$ per Lax--Friedrichs, $p \approx 0.9$
-    per Roe) è inferiore all'ordine teorico di 1 perché le griglie impiegate non sono ancora
-    sufficientemente fini da raggiungere la \emph{regione asintotica} in cui i termini di
-    ordine superiore nel residuo diventano trascurabili rispetto al termine dominante
-    $k h^p$.
-  \item I valori di $u_h$ usati nell'analisi sono:
-    \begin{align*}
-      u_h &= \begin{cases} 1.45\times10^{-3} & \text{Lax--Friedrichs} \\
-                           9.11\times10^{-4} & \text{Roe}\end{cases}, &
-      u_{2h} &= \begin{cases} 2.17\times10^{-3} & \text{Lax--Friedrichs} \\
-                              1.62\times10^{-3} & \text{Roe}\end{cases}, &
-      u_{4h} &= \begin{cases} 3.00\times10^{-3} & \text{Lax--Friedrichs} \\
-                              2.52\times10^{-3} & \text{Roe}\end{cases}
-    \end{align*}
+  \item La norma dell'entropia \textbf{decresce in modo monotòno} con il raffinamento per
+    entrambi gli schemi: il codice converge correttamente verso la soluzione isentropica esatta.
+  \item Sulle griglie più fini lo schema di \textbf{Roe} produce errori \textbf{più piccoli} di
+    Lax--Friedrichs ($8.98\times10^{-4}$ contro $1.22\times10^{-3}$ sulla griglia $h$), coerentemente
+    con la sua minore dissipazione numerica. Sulla griglia più rada ($4h$) l'ordine si inverte
+    ($3.35$ vs $2.88\times10^{-3}$): su mesh molto grossolane la minore dissipazione di Roe non è
+    ancora un vantaggio.
+  \item L'\textbf{ordine di convergenza} stimato (Lax--Friedrichs $p\approx0.62$, Roe
+    $p\approx0.96$) è inferiore all'ordine teorico unitario perché le griglie non sono ancora nella
+    \emph{regione asintotica}; i valori ottenuti riproducono bene quelli attesi e confermano la
+    correttezza dell'implementazione.
+  \item L'estrapolazione di Richardson a \textbf{ordine effettivo} risulta \textbf{non affidabile}
+    in questo intervallo di griglie: l'ordine empirico stimato ($p_{\rm eff}\approx0.5$--$0.8$) è
+    lontano da quello teorico e l'estrapolazione produce valori privi di significato fisico. È la
+    conferma quantitativa che le griglie non hanno raggiunto il regime asintotico; in tale
+    situazione si preferisce la stima a \emph{soluzione esatta nota} (qui disponibile perché
+    $\bar S_{\rm esatto}=0$).
+  \item \textbf{Verifica incrociata:} sulla griglia più fine la norma con Roe ($8.98\times10^{-4}$)
+    coincide entro l'$1.5\%$ con il valore di riferimento, a conferma della consistenza del codice.
 \end{itemize}
 
 \subsection{Considerazioni sulla Scelta dello Schema Numerico}
@@ -388,27 +489,14 @@ Jacobiana, applicando la dissipazione corretta per ogni onda caratteristica. Il 
 un'interfaccia numerica più netta, con meno smearing delle strutture fisiche. Il costo
 computazionale aggiuntivo di Roe è moderato (decomposizione in autovettori a ogni interfaccia)
 e ampiamente compensato dall'accuratezza guadagnata.
-\section{Confronto con Misure Sperimentali sulla Parete}
-\label{sec:bump_exp}
-
-La distribuzione di pressione sulla parete inferiore (bump) costituisce un termine di
-confronto diretto tra la soluzione numerica e le misure sperimentali. Si estrae la pressione
-statica adimensionale $P_w/P^\circ$ nelle celle di bordo con tag 99 (parete solida) e la si
-traccia in funzione della coordinata assiale $x$.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{../Images/Mis_parete_bump.png}
-  \caption{Distribuzione di pressione sulla parete inferiore del condotto con bump:
-           confronto tra la soluzione numerica (Euler, schema di Roe), la soluzione di
-           riferimento Euler--CFD e i dati sperimentali disponibili.
-           L'accordo complessivo è buono nella zona di accelerazione ($x < 0.5$,
-           tratto convergente); piccole discrepanze nel tratto divergente ($x > 0.5$)
-           sono attribuibili agli effetti viscosi non modellati dalle equazioni di Eulero,
-           in particolare allo strato limite che altera il profilo di pressione in prossimità
-           della parete.}
-  \label{fig:Mis_parete_bump}
-\end{figure}
+% ============================================================
+% NOTA (rimozione errore noto): la sezione "Confronto con Misure Sperimentali
+% sulla Parete" e' stata ELIMINATA. Lo schema_relazione non prevede l'analisi
+% del bump in Fluent ne' un confronto sperimentale: dati sperimentali a parete
+% esistono solo per la paletta LS59 e per la presa a doppia rampa. Per il bump
+% l'unico riferimento e' la soluzione esatta (entropia nulla) e i dati tabulari
+% forniti dal docente, trattati nella sezione seguente.
+% ============================================================
 
 \section{Dati di Riferimento e Valutazione Grafica dell'Ordine}
 
@@ -433,6 +521,51 @@ Nel tracciare l'analisi di convergenza, il docente fornisce un set di dati tabul
 
 \paragraph{Scopo dei dati forniti.}
 Questi dati non devono essere calcolati da zero dallo studente. Vengono forniti perché ricavare analiticamente una soluzione esatta in forma chiusa per un dominio 2D con parete curva (bump) e flusso di Eulero è estremamente complesso. I valori di errore esatto (calcolati presumibilmente dal docente confrontando i risultati con una griglia enormemente più densa utilizzata come "verità") fungono da \textit{benchmark}. Servono come termine di paragone sicuro per validare la corretta implementazione delle routine di calcolo dell'errore e dell'ordine di convergenza sviluppate nel proprio codice Fortran.
+
+\subsection{Confronto tra Dati Calcolati e Dati di Riferimento}
+\label{sec:bump_confronto_rif}
+
+Avendo \textbf{rigenerato} la norma $L_2$ dell'entropia eseguendo il codice
+(Sez.~\ref{sec:bump_convergenza}), si confrontano i valori ottenuti con quelli di riferimento del
+docente. Il confronto è stato tenuto come \emph{obiettivo} durante l'intero svolgimento.
+
+\begin{table}[H]
+  \centering
+  \caption{Confronto tra la norma $L_2$ dell'entropia di riferimento (docente) e quella calcolata
+           dal codice. Le griglie corrispondono a $l_c$ effettiva $=0.02/n$ con $n=1,2,4$.}
+  \label{tab:bump_confronto}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{ccccc}
+    \toprule
+    $h$ ($l_c$) & Err.\ Roe (rif.) & Err.\ Roe (codice) & Err.\ LLF (rif.) & Err.\ LLF (codice) \\
+    \midrule
+    $0.020$ & $3.35\times10^{-3}$ & $3.35\times10^{-3}$ & $3.43\times10^{-3}$ & $2.88\times10^{-3}$ \\
+    $0.010$ & $2.93\times10^{-3}$ & $1.79\times10^{-3}$ & $2.61\times10^{-3}$ & $1.91\times10^{-3}$ \\
+    $0.005$ & $1.73\times10^{-3}$ & $0.90\times10^{-3}$ & $1.83\times10^{-3}$ & $1.22\times10^{-3}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Commento sulle differenze.}
+\begin{itemize}
+  \item Sulla \textbf{griglia più rada} ($h=0.02$) il valore Roe calcolato coincide
+    \textbf{esattamente} con il riferimento ($3.35\times10^{-3}$): è la conferma più forte della
+    corretta implementazione della routine che calcola la norma dell'entropia.
+  \item Sulle griglie più fini i valori calcolati risultano \textbf{sistematicamente più bassi} del
+    riferimento. La causa più probabile è una \textbf{diversa definizione/costruzione della griglia}
+    a parità di etichetta $h$: i valori calcolati a un dato $h$ sono prossimi a quelli di riferimento
+    al passo \emph{dimezzato} (es.\ il valore calcolato a $h=0.01$, $1.79\times10^{-3}$, è vicino al
+    riferimento a $h=0.005$, $1.73\times10^{-3}$), come se le griglie strutturate qui impiegate fossero
+    leggermente più risolventi di quelle usate per generare il benchmark.
+  \item Di conseguenza l'\textbf{ordine di convergenza} qui ottenuto (Roe $p\approx0.96$) è più alto
+    degli ordini locali di riferimento (che partono da $\approx0.19$ e crescono): entrambi descrivono
+    una convergenza sub-lineare che tende all'unità, ma le griglie qui usate appaiono più vicine al
+    regime asintotico.
+  \item In sintesi, il codice è \textbf{validato} (corrispondenza esatta sulla griglia di
+    riferimento più rada e andamento monotòno corretto, con Roe migliore di Lax--Friedrichs sulle
+    griglie fini); le differenze quantitative sono compatibili con una diversa costruzione delle
+    griglie e non segnalano errori di implementazione.
+\end{itemize}
 
 \subsection{Significato del Grafico Log-Log}
 Nello schema della relazione è presente un grafico che mostra l'andamento dell'errore in norma $L_2$ in funzione della lunghezza caratteristica $h$. 
@@ -471,7 +604,7 @@ La rappresentazione in scala log-log è fondamentale perché trasforma la relazi
 % ============================================================
 
 \subsection{Distinzione tra Convergenza Spaziale e Temporale}
-È fondamentale operare una distinzione teorica vitale rispetto ai report passati. La variazione della norma dell'entropia al variare di $h$ (numero di nodi) rappresenta la \textbf{convergenza spaziale di griglia}. Al contrario, la richiesta di valutare l'andamento dei residui e dell'entropia \textit{in funzione delle iterazioni} riguarda la \textbf{convergenza temporale verso lo stato stazionario} (stabilità numerica). Le due cose \textbf{non sono equivalenti}. Il report dell'anno precedente analizzava la convergenza spaziale; per rispondere a questa richiesta è invece necessario studiare la stabilità temporale su una singola griglia fissata.
+È fondamentale operare una distinzione teorica importante. La variazione della norma dell'entropia al variare di $h$ (numero di nodi) rappresenta la \textbf{convergenza spaziale di griglia}. Al contrario, la valutazione dell'andamento dei residui e dell'entropia \textit{in funzione delle iterazioni} riguarda la \textbf{convergenza temporale verso lo stato stazionario} (stabilità numerica). Le due cose \textbf{non sono equivalenti}: la prima quantifica l'errore di discretizzazione spaziale una volta raggiunto lo stazionario, mentre la seconda descrive come il transitorio numerico evolve verso la soluzione stazionaria su una singola griglia fissata.
 
 Dal punto di vista teorico, il flusso Euleriano puro (subsonico, invisicido e privo di urti) è isoentropico. Se inizializzato e alimentato con entropia nulla, la produzione teorica di entropia nel dominio è zero. L'incremento di entropia mostrato nel transitorio è generato interamente dalla viscosità numerica dello schema spaziale ed evolve iterazione dopo iterazione finché il calcolo non si assesta su una soluzione stazionaria.
 

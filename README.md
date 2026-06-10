@@ -1,338 +1,78 @@
-# SP — Esercitazioni di Fluidodinamica Computazionale dei Sistemi Propulsivi
+# Fluidodinamica Computazionale dei Sistemi Propulsivi
 
-> Sviluppo e analisi di un solutore CFD 2D per le equazioni di Eulero su griglia non strutturata, applicato a geometrie propulsive canoniche.
+Repository del progetto d'esame del corso **Fluidodinamica Computazionale dei Sistemi
+Propulsivi** (Politecnico di Torino, Ing. Aerospaziale).
+Contiene il **solutore Euler 2D** sviluppato a lezione, i **casi di studio** (bump, presa a
+doppia rampa, paletta LS59), le **analisi in ANSYS Fluent** e l'**ottimizzazione con
+modeFRONTIER**, oltre al **report LaTeX** e al materiale teorico per lo studio.
 
----
-
-## Indice
-
-- [Struttura del repository](#struttura-del-repository)
-- [Software richiesto](#software-richiesto)
-- [Estensioni VSCode raccomandate](#estensioni-vscode-raccomandate)
-- [Euler2D aggiornato](#euler2d-aggiornato)
-- [Quick Start](#quick-start)
-- [Test case](#test-case)
-- [Architettura del solutore](#architettura-del-solutore)
-- [Post-processing](#post-processing)
-- [Report LaTeX](#report-latex)
+**Autori:** Gabriel Cialdini · Fabiola D'Avino · Francesco Farella
 
 ---
 
-## Struttura del repository
+## Struttura della repository
 
-```
-SP/
-├── .gitignore
-├── .vscode/                          # Configurazione VSCode (tasks, settings, extensions)
-│   ├── extensions.json
-│   ├── settings.json
-│   └── tasks.json
-│
-├── 0-Reference/                      # Materiale di riferimento (paper, dispense)
-│
-├── Euler2D/                          # Solutore 2D Euler — Fortran
-│   ├── strutture.f90                 # Definizione dei tipi derivati (tipo_elemento, tipo_nodo,
-│   │                                 #   tipo_interfaccia, …)
-│   ├── Variabili.f90                 # Dichiarazione variabili globali
-│   ├── costanti.f90                  # Costanti fisiche e numeriche
-│   ├── main.f90                      # Programma principale — ciclo temporale
-│   ├── leggi_gmsh.f90                # Lettore mesh in formato Gmsh (.msh v4)
-│   ├── calcola_area.f90              # Calcolo aree degli elementi
-│   ├── calcola_baricentri.f90        # Calcolo baricentri degli elementi
-│   ├── vicini.f90                    # Costruzione della connettività tra elementi vicini
-│   ├── BCs.f90                       # Condizioni al contorno (parete, ingresso, uscita, …)
-│   ├── calcola_flussi.f90            # Flussi numerici (Roe / Rusanov)
-│   ├── calcola_derivate.f90          # Ricostruzione dei gradienti (Green-Gauss / LSQ)
-│   ├── calcola_passo_temporale.f90   # Passo temporale locale basato su CFL
-│   ├── output_tecplot.f90            # Scrittura output in formato Tecplot ASCII (.dat)
-│   └── Makefile                      # Build system — compilazione con gfortran
-│
-├── Bump/                             # Test case 1 — bump transonico
-│   ├── bump.geo                      # Script geometria Gmsh
-│   ├── bump.msh                      # Mesh generata (può essere rigenerata da bump.geo)
-│   └── post/                         # Script post-processing (Gnuplot, Python)
-│
-├── Rampa/                            # Test case 2 — urto obliquo su rampa
-│   ├── rampa.geo
-│   ├── rampa.msh
-│   └── post/
-│
-├── Paletta/                          # Test case 3 — paletta/profilo alare
-│   ├── paletta.geo
-│   ├── paletta.msh
-│   └── post/
-│
-└── Latex/                            # Report completo del progetto
-    ├── main.tex
-    ├── capitoli/
-    └── figure/
-```
-
-> **Nota:** Il binario di Gmsh non è incluso nel repository. Scaricarlo autonomamente come indicato nella sezione [Software richiesto](#software-richiesto).
-
----
-
-## Software richiesto
-
-| Software | Versione minima | Utilizzo | Link |
-|---|---|---|---|
-| **gfortran** (GCC) oppure **Intel oneAPI ifort/ifx** | GCC ≥ 10 | Compilazione del solutore Fortran | [gcc.gnu.org](https://gcc.gnu.org) / [intel.com/oneapi](https://www.intel.com/content/www/us/en/developer/tools/oneapi/overview.html) |
-| **GNU Make** | ≥ 4.3 | Build system | incluso in GCC toolchain |
-| **Gmsh** | ≥ 4.13 | Generazione e visualizzazione delle mesh | [gmsh.info](https://gmsh.info/) |
-| **Python** | ≥ 3.10 | Script di post-processing e analisi | [python.org](https://www.python.org/) |
-| **Gnuplot** | ≥ 5.4 | Plotting residui, soluzioni 1D | [gnuplot.info](http://www.gnuplot.info/) |
-| **Julia** | ≥ 1.9 | Script di analisi numerica aggiuntivi | [julialang.org](https://julialang.org/) |
-| **TeX Live** o **MiKTeX** | recente | Compilazione del report LaTeX | [tug.org/texlive](https://tug.org/texlive/) |
-| **ParaView** | ≥ 5.11 | Visualizzazione output Tecplot (reader nativo) | [paraview.org](https://www.paraview.org/) |
-
-### Installazione Gmsh
-
-```bash
-# Linux (apt)
-sudo apt install gmsh
-
-# macOS (Homebrew)
-brew install gmsh
-
-# Windows
-# Scaricare il binario da https://gmsh.info/#Download
-# Aggiungere la cartella gmsh/bin al PATH di sistema
-```
-
-### Dipendenze Python
-
-```bash
-pip install -r Euler2D/requirements.txt
-# oppure
-pip install numpy matplotlib scipy
-```
-
----
-
-## Estensioni VSCode raccomandate
-
-Le estensioni elencate in `.vscode/extensions.json` sono installabili automaticamente alla prima apertura del workspace.
-
-| Estensione | ID | Utilizzo |
-|---|---|---|
-| **Modern Fortran** | `fortran-lang.linter-gfortran` | Syntax highlighting, diagnostics, hover documentation per Fortran |
-| **LaTeX Workshop** | `James-Yu.latex-workshop` | Compilazione e preview in-editor del report LaTeX |
-| **Python** | `ms-python.python` | Supporto Python con IntelliSense e debugging |
-| **Julia** | `julialang.language-julia` | Supporto linguaggio Julia |
-| **Gnuplot** | `MarioSchwalbe.gnuplot` | Syntax highlighting per script `.gp` |
-| **GitLens** | `eamodio.gitlens` | Cronologia Git integrata nell'editor |
-
-> Per installare tutte le estensioni raccomandate: `Ctrl+Shift+P` → *Extensions: Show Recommended Extensions* → installa tutto.
-
----
-
-## Euler2D aggiornato
-
-Modifica 2026-05-06:
-
-- `Euler2D/Makefile` compila solo il solver Euler2D e il target `clean` funziona in PowerShell/MinGW senza dipendere da `rm`.
-- Il solver accetta `input_file` e `output_dir`: `euler2d.exe [input_file] [output_dir]`.
-- `Bump/run_all_meshes.ps1` non modifica piu' `Bump/input.txt`; genera un input dedicato per ogni mesh e scrive ogni run in `Bump/runs/batch_<timestamp>/<run_id>/`.
-- I file `wall_data.txt`, `norms.txt`, `RECAP_OUTPUT.csv`, `RECUP_SIMULAZIONE.txt` e `SIM_OUTPUT_<k>/` sono locali alla singola simulazione, quindi piu' processi possono girare in parallelo.
-- `RECUP_SIMULAZIONE.txt` include conteggi mesh, parametri di run, diagnostica elemento 10/interfaccia 100 e lista degli output Tecplot.
-
-Build Windows:
-
-```powershell
-cd Euler2D
-mingw32-make clean
-mingw32-make
-```
-
-Build debug:
-
-```powershell
-mingw32-make debug
-```
-
-Run singola:
-
-```powershell
-.\euler2d.exe ..\Bump\input.txt ..\Bump\runs\manual_test
-```
-
-Batch Bump sequenziale:
-
-```powershell
-cd ..\Bump
-powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1
-```
-
-Batch Bump parallelo:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1 -Parallel -ThrottleLimit 2
-```
-
-Prova breve:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\run_all_meshes.ps1 -KFinalOverride 1 -KInfOverride 1 -KOutOverride 1
-```
-
-Verifiche eseguite il 2026-05-06:
-
-- `mingw32-make clean`, `mingw32-make`, `mingw32-make debug`, `mingw32-make rebuild`: OK, senza warning di compilazione.
-- Batch breve su tutte le 6 mesh Bump con `KFINAL=1`: OK.
-- Run completa su `bump_unstr_n1.msh` con `KFINAL=1000`: OK.
-
-## Quick Start
-
-> Nota: per il flusso Euler2D/Bump attuale su Windows usare prima la sezione
-> [Euler2D aggiornato](#euler2d-aggiornato). Le note sotto restano come traccia
-> generale del repository e possono riferirsi a nomi storici.
-
-### 1. Clonare il repository
-
-```bash
-git clone https://github.com/293459/SP.git
-cd SP
-```
-
-### 2. Generare la mesh con Gmsh
-
-```bash
-# Esempio con il test case Bump
-gmsh Bump/bump.geo -2 -o Bump/bump.msh
-```
-
-Il flag `-2` forza la generazione di una mesh 2D. Il file `.msh` viene salvato nella cartella del test case.
-
-### 3. Compilare il solutore
-
-```bash
-cd Euler2D
-make
-```
-
-Il `Makefile` gestisce automaticamente le dipendenze tra moduli (l'ordine di compilazione è: `costanti` → `strutture` → `Variabili` → … → `main`). L'eseguibile prodotto è `euler2d`.
-
-Per compilare in modalità debug (con bound checking):
-
-```bash
-make debug
-```
-
-### 4. Eseguire il solutore
-
-```bash
-./euler2d ../Bump/bump.msh
-```
-
-L'output viene scritto nella directory del test case in formato Tecplot ASCII (`.dat`), leggibile direttamente da ParaView o VisIt con il reader Tecplot.
-
-### 5. Post-processing
-
-```bash
-# Residui — Gnuplot
-gnuplot Bump/post/residui.gp
-
-# Analisi soluzione — Python
-python Bump/post/analisi.py
-
-# Confronto con soluzione analitica — Julia (dove applicabile)
-julia Bump/post/confronto.jl
-```
-
----
-
-## Test case
-
-### Bump transonico (`Bump/`)
-
-Flusso transonico su un bump sinusoidale in un canale. Permette di verificare la corretta cattura dell'onda d'urto normale e la conservazione della massa. Confronto con la soluzione di riferimento AGARD.
-
-| Parametro | Valore |
+| Cartella | Contenuto |
 |---|---|
-| Mach ingresso | 0.8 |
-| Tipo urto | normale |
-| Validazione | soluzione AGARD |
-
-### Urto obliquo — Rampa (`Rampa/`)
-
-Flusso supersonico su una rampa che genera un urto obliquo. La soluzione analitica è disponibile tramite le relazioni di Rankine-Hugoniot per onda d'urto obliqua, permettendo un confronto esatto.
-
-| Parametro | Valore |
-|---|---|
-| Mach ingresso | 2.0 |
-| Angolo rampa | 15° |
-| Validazione | soluzione analitica R-H |
-
-### Paletta / Profilo alare (`Paletta/`)
-
-Flusso attorno a un profilo alare (o paletta di turbina). Test case più complesso: la mesh è a corpo immerso con condizioni al contorno di parete solida (slip wall). Nessuna soluzione analitica esatta — validazione tramite confronto con dati di letteratura.
-
----
-
-## Architettura del solutore
-
-Il solutore implementa un metodo ai volumi finiti esplicito al primo ordine (con estensione al secondo ordine tramite ricostruzione lineare a pezzi) per le equazioni di Eulero 2D in forma conservativa:
-
-$$\frac{\partial \mathbf{U}}{\partial t} + \nabla \cdot \mathbf{F}(\mathbf{U}) = 0$$
-
-Il vettore delle variabili conservative è:
-
-$$\mathbf{U} = (\rho E,\; \rho,\; \rho u,\; \rho v)^T$$
-
-### Pipeline di esecuzione
-
-```
-leggi_gmsh        →  Lettura mesh .msh (nodi, elementi, boundary tags)
-calcola_area      →  Aree degli elementi
-calcola_baricentri→  Baricentri per la ricostruzione
-vicini            →  Connettività elemento–elemento e elemento–bordo
-────────────────────────────────────────────────────────────────
-loop temporale (RK esplicito):
-  BCs             →  Imposizione condizioni al contorno
-  calcola_derivate→  Ricostruzione gradiente (Green-Gauss)
-  calcola_flussi  →  Flusso numerico agli spigoli (Roe/Rusanov)
-  calcola_passo_t →  Passo temporale locale (CFL)
-  aggiorna U      →  Aggiornamento soluzione
-────────────────────────────────────────────────────────────────
-output_tecplot    →  Scrittura soluzione su file .dat
-```
-
-### Tipi derivati principali (`strutture.f90`)
-
-| Tipo | Campi principali | Descrizione |
-|---|---|---|
-| `tipo_nodo` | coordinate, indice | Nodo della mesh |
-| `tipo_elemento` | nodi, area, baricentro, vicini, U | Cella del volume finito |
-| `tipo_interfaccia` | normale, lunghezza, elem\_L, elem\_R | Spigolo interno tra due celle |
-| `tipo_bordo` | tipo\_BC, elementi associati | Segmento di bordo con tag BC |
+| `Euler2D/` | Solutore CFD Euler 2D in Fortran (volumi finiti, schemi Lax–Friedrichs e Roe) |
+| `Latex/` | Sorgenti del report (`main.tex` + capitoli). PDF compilato: `Latex/main.pdf` |
+| `Bump/` | Caso condotto con bump: mesh, dati e analisi di convergenza (`Bump/conv/`) |
+| `Rampa/` | Caso presa a doppia rampa: geometrie `.geo`, mesh, input, dati sperimentali |
+| `Paletta/` | Caso paletta di turbina LS59 |
+| `Postprocessing/` | Notebook Jupyter per convergenza e confronti |
+| `Fluent/` | Progetti e risultati ANSYS Fluent (LS59, doppia rampa) |
+| `Ottimizzazione/` | Ottimizzazione aerodinamica con modeFRONTIER |
+| `Images/` | Figure usate nel report |
+| `markdown/` | Sintesi teoriche in formato Q&A (toggle) pronte per Notion |
+| `Mermaid/` | Mappe mentali del corso (formato Mermaid) |
+| `Notion/` | Export degli appunti Notion del corso |
+| `Debug/` | Casi di riferimento per verificare il solutore |
+| `History/` | Archivio di prompt, dubbi e correzioni della fase di stesura |
+| `Skill/` | Skill/istruzioni usate per generare il materiale |
+| `0-Reference/` | Materiale di riferimento (codice del docente, dispense) |
 
 ---
 
-## Post-processing
-
-| Tool | File | Output |
-|---|---|---|
-| **Gnuplot** | `post/residui.gp` | Convergenza della norma L2 dei residui |
-| **Gnuplot** | `post/mach.gp` | Campo di Mach lungo la parete/asse |
-| **Python** | `post/analisi.py` | Confronto pressione con soluzione di riferimento |
-| **Julia** | `post/confronto.jl` | Verifica conservazione entità fisiche (massa, energia) |
-| **ParaView** | — | Visualizzazione 2D del campo soluzione da file `.dat` |
-
----
-
-## Report LaTeX
-
-Il report completo del progetto si trova in `Latex/`. Per compilarlo:
+## Compilare il report
 
 ```bash
 cd Latex
-pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+latexmk -pdf main.tex      # produce main.pdf
 ```
 
-Oppure tramite LaTeX Workshop in VSCode (`Ctrl+Alt+B`).
+## Compilare ed eseguire il solutore Euler 2D
+
+```bash
+cd Euler2D
+mingw32-make rebuild       # compila euler2d.exe (richiede gfortran)
+```
+
+L'eseguibile legge `input.txt`, `inlet.txt`, `outlet.txt` dalla cartella di lavoro e una mesh
+Gmsh (`.msh`, versione 2.2). Esempio di prova nella cartella `Debug/Debug_1/` (bump):
+
+```bash
+cp Euler2D/euler2d.exe Debug/Debug_1/ && cd Debug/Debug_1 && ./euler2d.exe
+```
+
+- Lo **schema numerico** (Lax–Friedrichs / Roe) si seleziona in `Euler2D/compute_fluxes.f90`
+  (commentando/scommentando la chiamata corrispondente) e ricompilando.
+- Output: file Tecplot `.plt` in `SIM_OUTPUT_*`, norma dell'entropia e residui a schermo.
+
+## Casi di studio
+
+| Caso | Regime | Mach ingresso | Note |
+|---|---|---|---|
+| Bump | subsonico | 0.3 | analisi di convergenza (Roe vs Lax–Friedrichs, norma entropia) |
+| Presa a doppia rampa | supersonico | 3.0 | due urti obliqui, convergenza con Roe |
+| Paletta LS59 | transonico | 0.5 | cascata di turbina, uscita supersonica |
 
 ---
 
-## Nota sulla licenza
+## Note
 
-Repository accademico per uso interno al corso. Nessuna licenza open source associata.
+- File pesanti (eseguibili, output `.plt`, mesh Gmsh, ambienti) sono esclusi via `.gitignore`
+  e rigenerabili dai sorgenti.
+- Il materiale in `markdown/` è pensato per essere incollato in Notion (blocchi *toggle* e
+  formule LaTeX).
+- La verifica del solutore (convergenza del bump rigenerata, campi della doppia rampa,
+  consistenza con i casi di `Debug/`) è documentata in `History/` e in `Bump/conv/README.md`.

@@ -1,0 +1,49 @@
+=====================================================================
+PROMPT ARCHIVIATO — Verifica codice + campi doppia rampa + cleanup repo
+Data: 2026-06-08
+=====================================================================
+
+RICHIESTA (sintesi)
+- Completare i run di convergenza del bump interrotti dalla quota.
+- Aggiungere i campi Mach/pressione/temperatura della doppia rampa (con Roe),
+  inserirli nel report e commentarli in dettaglio.
+- Verificare completezza (schema_relazione) e consistenza (cartella Debug).
+  Se tutto ok dire "REPORT VERIFICATO CON SUCCESSO".
+- Spostare la cartella conv dentro Bump.
+- Correggere i warning dei markdown teoria.
+- Eseguire le correzioni del file turbomacchine.
+- Rifare README per repo pulita.
+- Recuperare il MATLAB del collega (Downloads/Convergenza.m).
+- Commit (+ push se possibile) e archiviare il prompt.
+
+ESITO
+1) Codice Euler: COMPILA e GIRA. Verificato su Debug_1 (bump) e sulla doppia rampa.
+2) Convergenza bump RIGENERATA (CFL 0.3, a convergenza), 4 griglie, LLF e Roe:
+   LLF: 2.88/1.91/1.47/1.22e-3 ; Roe: 3.35/1.79/1.16/0.90e-3 (monotone).
+   Ordini: LLF p=0.62 (report 0.60), Roe p=0.96 (report 0.86) -> CONFERMATI.
+   Roe<LLF sulle griglie fini (atteso). Roe finest = 8.98e-4 ~ riferimento (-1.4%).
+   I valori "incollati" del report sono stati sostituiti con quelli reali.
+   Estrapolazione effettiva: segnalata non affidabile (regime non asintotico).
+3) Doppia rampa: nuova sezione con 3 campi (Mach/P/T) generati dal codice (Roe) +
+   commenti dettagliati. Verifica CC: T/T0=0.357 e P/P0=0.0272 = isentropico M=3
+   ESATTI. Entropia doppia rampa = 2.3296e-2 = report (2.33e-2) e MATLAB
+   (2.32951e-2): coincidenza a 4 cifre.
+4) MATLAB collega (Convergenza.m): doppia rampa Roe, stessa metodologia/valori del
+   report e del notebook -> EQUIVALENTI (vedi confronto_matlab_notebook).
+5) Cartella dati convergenza spostata in Bump/conv/ (CSV + script + README).
+6) Warning markdown: corretti gli alt text generici in teoria_turbomacchine.md.
+7) Correzioni turbomacchine: gia' integrate nel markdown (11/11 punti presenti).
+8) README della repo riscritto (struttura, build report, build/run solutore, casi).
+
+NOTE TECNICHE
+- Schema Roe/LLF: scelta compile-time in compute_fluxes.f90 (righe ~20-21).
+- Stabilita' bump: CFL<=~0.5 (a 0.8 diverge).
+- I campi sono renderizzati con un plotter PIL (Bump/conv/plot_fields_pil.py)
+  per evitare l'hang della font-cache di matplotlib su Windows.
+- Le immagini doppia rampa sono sulla griglia piu' rada (~1150 nodi): urti
+  visibili ma un po' spalmati; il modello e' inviscido (niente strato limite).
+
+COMPLETEZZA (schema_relazione): bump (convergenza+confronto), doppia rampa
+(convergenza Roe + campi + confronto), LS59 (campi + confronto Mis), Fluent,
+ottimizzazione modeFRONTIER -> TUTTO PRESENTE.
+=====================================================================

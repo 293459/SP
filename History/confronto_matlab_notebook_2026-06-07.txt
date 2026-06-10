@@ -1,0 +1,49 @@
+=====================================================================
+CONFRONTO codice MATLAB del collega vs Jupyter notebook
+File MATLAB: Downloads/Convergenza.m (recuperato 2026-06-07)
+=====================================================================
+
+COSA FA IL MATLAB (Convergenza.m)
+- E' l'analisi di convergenza della PRESA A DOPPIA RAMPA (schema Roe).
+- Estrapolazione di Richardson con ORDINE TEORICO (p=1):
+    u_o = (r^p * u_h1 - u_h2)/(r^p - 1)
+    E_h = u_h1 - u_o ;  GCI = Fs * E_h   (Fs=3, r=2)
+- Estrapolazione con ORDINE EFFETTIVO (3 griglie):
+    p_eff = log((u2-u1)/(u1-u05))/log(2)
+    u_oeff = u05 + (u1-u05)/(2^p_eff - 1)
+    E_eff = |u05 - u_oeff| ;  GCI_eff = Fs * E_eff
+- Dati (norma 2 entropia, Roe):
+    u_h1 (h=0.005) = 1.65075790e-2
+    u_h2 (h=0.01)  = 1.83160976e-2
+    u_4h (h=0.02)  = 2.32951473e-2
+
+CONFRONTO CON IL REPORT (doppia_presa.tex)
+- I valori coincidono ESATTAMENTE: u_h=1.65e-2, u_2h=1.83e-2, u_4h=2.33e-2.
+- Le formule sono IDENTICHE a quelle del report e del notebook.
+
+------------------- DOPPIA RAMPA Q2 -------------------
+"Il codice MATLAB del collega e il mio Jupyter notebook sono equivalenti?"
+=> SI, sono EQUIVALENTI. Implementano la stessa identica metodologia
+   (Richardson ordine teorico + effettivo, GCI con Fs=3, r=2), con le stesse
+   formule e, sui medesimi dati, danno gli stessi risultati. Si tratta delle
+   formule standard di Richardson/GCI: non c'e' differenza di merito.
+
+------------------- BUMP Q2 -------------------
+"Il mio notebook e' piu' o meno attendibile del codice MATLAB del collega?"
+=> Sul piano MATEMATICO sono equivalenti (stesse formule, stessi risultati).
+   Differenze pratiche, a favore del NOTEBOOK:
+   - Il MATLAB ha i valori HARDCODED (incollati a mano): soggetto a errori di
+     trascrizione. Il notebook li LEGGE dai file di output del solutore
+     (carica_dati_convergenza), riducendo l'errore umano.
+   - Il notebook e' a FUNZIONI e gestisce sia Roe sia Lax-Friedrichs + grafici;
+     il MATLAB e' uno script specifico per un singolo caso (doppia rampa, Roe).
+   - Il MATLAB contiene righe inutilizzate (lc_rampa = linspace(...), commenti).
+   CONCLUSIONE (come da indicazione utente): si tiene il NOTEBOOK come
+   riferimento (almeno pari attendibilita', migliore automazione e generalita').
+   Il MATLAB e' comunque utile come CONTROPROVA indipendente: dato che usa gli
+   stessi valori del report per la doppia rampa, CONFERMA quei numeri.
+
+NOTA: il MATLAB riguarda la doppia rampa. Per il BUMP (Q4) i valori del report
+sono in corso di RIGENERAZIONE eseguendo il codice di Eulero (vedi
+prompt_LS59_doppiarampa_bump e i risultati in _conv/).
+=====================================================================

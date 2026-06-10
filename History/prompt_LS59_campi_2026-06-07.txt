@@ -1,0 +1,72 @@
+=====================================================================
+PROMPT ARCHIVIATO — Completamento sezione LS59 (campi Euler)
+Data: 2026-06-07
+File modificato: Latex/paletta.tex (solo)
+Immagini usate: Images/Eulero_LS59_{mesh,pressione,mach,temperatura}.jpg
+=====================================================================
+
+RICHIESTA DELL'UTENTE
+---------------------
+LS59
+Ho aggiunto una serie di immagini tutte chiamate eulero_LS59 seguite poi da un
+altro nome (tipo mesh, temperatura, mach o pressione). Vorrei che completassi la
+sezione dell'LS59 nel report aggiungendo le immagini e i commenti indicati. Tra i
+commenti ci sono anche domande/questioni poco chiare da completare. Per questo caso
+NON si fa l'analisi di convergenza (si seleziona già una mesh a convergenza).
+Seguire schema_relazione per ordine/sezioni. Archiviare questo prompt nella history.
+Modificare solo i file strettamente necessari (paletta.tex). Commit in locale.
+
+QUESITI (con sintesi della risposta data nel report)
+----------------------------------------------------
+1) Mesh: poco da dire, già a convergenza, lc = 0.01 (sufficientemente piccola).
+   -> Sezione "Mesh di Calcolo": niente analisi di convergenza (fatta sulla doppia
+      rampa), griglia non strutturata quad-dominante, lc=0.01.
+
+2) Campo di pressione: uniforme a monte; dubbio sulla differenza ristagno/monte.
+   Calcolo p_stat attesa al ristagno (p_tot=1 adim, M=0.5).
+   -> p_inf = (1.05)^-3.5 = 0.843 (statica a monte); p_rist = p_tot = 1.000;
+      Delta ~ 0.157 (16%, NON piccola). Max campo 1.003 conferma (+0.3% overshoot).
+      L'impressione di "poca differenza" e' effetto della scala cromatica (0.84-1.0
+      tutti toni caldi). Controprova con la temperatura (T_inf=0.952).
+
+3) Pressione scende sul dorso piu' che sul ventre: geometria o incidenza?
+   -> Causa primaria = geometria/deflessione (dorso convesso accelera -> bassa P);
+      incidenza (alpha=30) = modulatore secondario (posizione ristagno, picco LE).
+
+4) Linea gialla "ad archetto" sul dorso: isobara, perche' costante allontanandosi?
+   -> Equilibrio gradiente normale dP/dn = rho V^2/R in flusso curvo; P uniforme nel
+      nucleo a flusso rettilineo. L'isobara segna il confine curvo/rettilineo -> arco.
+
+5) Separazione / scia / turbolenza?
+   -> Modello Euler INVISCIDO: niente separazione/turbolenza. La forma strana e'
+      ricompressione/scia inviscida al TE (+ eventuale debole compressione transonica).
+      Separazione vera solo nelle RANS (Fluent).
+
+6) Campo di Mach: aspetti salienti + spike vicino LE e TE.
+   -> Ingresso M=0.5, ristagno LE (M->0), accelerazione dorso fino a supersonico
+      (cascata transonica), scia al TE. Spike LE = picco di sovravelocita' al naso
+      (fisico, amplificato da mesh/Roe); spike TE = singolarita' inviscida (Kutta non
+      imposta), prevalentemente numerico.
+
+7) Spike di temperatura in uscita dal TE, molto accentuata.
+   -> Artefatto numerico della singolarita' inviscida del TE. Prova: T_max=1.040 >
+      T_tot=1.0 e' impossibile (T_tot e' il limite superiore). Accentuata da:
+      singolarita' geometrica, ricongiungimento correnti, bassa densita', entropia
+      numerica concentrata al TE.
+
+8) Artefatti di Roe.
+   -> Overshoot al ristagno (P=1.003, T=1.040 > 1), anomalie LE/TE (stagnation-point
+      anomalies), necessita' di entropy fix di Harten ai punti sonici sul dorso.
+
+9) Altre informazioni rilevanti.
+   -> Coerenza isentropica incrociata p/M/T (validazione del solutore); regime
+      transonico; entropia numerica concentrata al TE come fonte di discrepanza col
+      confronto sperimentale.
+
+STRUTTURA RISULTANTE (paletta.tex), coerente con schema_relazione (caso 1.b: niente
+analisi di convergenza, solo punti 2 e 3 con Roe):
+  - Mesh di Calcolo (nuova)
+  - Confronto con Dati Sperimentali e Analisi Fluent (esistente, punto 2)
+  - Campi di Mach, Pressione e Temperatura (nuova, punto 3) con sottosezioni:
+      Pressione / Mach / Temperatura / Artefatti di Roe / Osservazioni conclusive
+=====================================================================
