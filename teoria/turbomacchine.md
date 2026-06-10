@@ -37,7 +37,7 @@ distruggono.
 **pre-progetto**. L'idea: all'interfaccia si fa una **media in direzione circonferenziale** delle
 grandezze di flusso e si passa al rotore solo il **profilo radiale mediato**.
 
-![Schema del mixing plane: media circonferenziale all'interfaccia statore-rotore](mixing_plane.jpg)
+![Schema del mixing plane: media circonferenziale all'interfaccia statore-rotore](images/mixing_plane.jpg)
 
 - **Perché si media in direzione circonferenziale (θ):** è la direzione lungo cui statore e rotore
   hanno **periodicità diversa** (passi diversi). Mediando in θ si ottiene un profilo che dipende
@@ -111,7 +111,7 @@ fisicamente rigoroso.
 È il metodo **instazionario ad alta fedeltà**: la mesh del rotore **scorre** rispetto a quella dello
 statore e all'interfaccia si **interpola** il flusso ad ogni passo temporale. Conserva la scia e
 tutta l'**interazione instazionaria**.
-![Sliding mesh: ripartizione conservativa dei flussi all'interfaccia tra celle sovrapposte](sliding_mesh_ripartizione_flussi.jpg)
+![Sliding mesh: ripartizione conservativa dei flussi all'interfaccia tra celle sovrapposte](images/sliding_mesh_ripartizione_flussi.jpg)
 
 - **La matrice di connettività varia nel tempo:** ci si riferisce alla **zona di interfaccia**, non
   alle mesh di statore e rotore (che restano rigide). Mentre il rotore scorre, **ogni faccia
