@@ -3,7 +3,11 @@
 - **Tipologie di errore**
     1. Nomenclatura 
         
-        ![IMG_0515.jpeg](IMG_0515.jpeg)
+        - $y_k$ — soluzione **numerica** nel nodo $t_k$, $\forall k$;
+        - $y(t_k)$ — soluzione **esatta** nel nodo $t_k$, $\forall k$;
+        - $\tilde y_{k+1}$ — soluzione numerica in $t_{k+1}$ **partendo dal dato esatto** $y(t_k)$:
+        
+        $$\tilde y_{k+1} = y(t_k) + h\,f(t_k, y(t_k))$$
         
     2. Errore di troncamento 
         
@@ -14,23 +18,29 @@
         
         </aside>
         
-        ![IMG_0501.jpeg](IMG_0501.jpeg)
+        **Errore locale di troncamento** $\tau(h)$ — l'errore commesso in **un passo**, partendo dalla soluzione esatta:
+        
+        $$\tau(h) = y(t_{k+1}) - \tilde y_{k+1} = y(t_{k+1}) - y(t_k) - h\,f(t_k, y(t_k))$$
         
         > Credo si chiami così perché alcuni metodi sono ottenuti dalle differenze finite con il troncamento di termini di grado più alto (che sono poi quelli che producono questo tipo di errore)
         > 
     3. Errore di discretizzazione 
         
-        ![IMG_0502.jpeg](IMG_0502.jpeg)
+        **Errore locale di discretizzazione** $d(h)$ — l'errore introdotto in un passo nella discretizzazione della derivata:
+        
+        $$d(h) = \frac{\tau(h)}{h}$$
         
         > Credo lo chiamino di discretizzazione poiché dipende da come ho discretizzazione l’intervallo
         > 
     4. Errore globale 
         
-        ![IMG_0503.jpeg](IMG_0503.jpeg)
+        **Errore globale** $e_{k+1}$ — l'errore complessivo commesso in $k$ passi di integrazione, scomponibile in troncamento (ultimo passo) + propagazione (passi precedenti):
+        
+        $$e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1}) - \tilde y_{k+1}\big)}_{\text{err. troncamento}} + \underbrace{\big(\tilde y_{k+1} - y_{k+1}\big)}_{\text{propagazione}}$$
         
     5. Interpretazione grafica degli errori
         
-        ![IMG_2483.jpeg](IMG_2483.jpeg)
+        ![Interpretazione grafica degli errori: contributo di propagazione vs troncamento](images/errori_interpretazione_grafica.jpg)
         
 - **Consistenza, 0-stabilitá, assoluta stabilità e convergenza**
     1. Consistenza e ordine di consistenza
@@ -42,9 +52,9 @@
         
         </aside>
         
-        ![IMG_2482.jpeg](IMG_2482.jpeg)
+        **Consistenza:** un metodo è consistente se $\lim_{h\to 0} d(h) = 0$.
         
-        ![IMG_0505.jpeg](IMG_0505.jpeg)
+        **Ordine (di consistenza):** un metodo è di ordine $p$ se $d(h) = \mathcal{O}(h^p)$ (es. Eulero $= \mathcal O(h)\Rightarrow p=1$).
         
         > La sola consistenza non `e suﬃciente per la convergenza, a causa del termine di propagazione degli errori. Aﬃnch`e un metodo numerico sia convergente occorre che sia consistente e che garantisca la non propagazione degli errori.
         > 
@@ -57,7 +67,9 @@
         
         </aside>
         
-        ![IMG_0507.jpeg](IMG_0507.jpeg)
+        **0-stabilità:** un metodo è 0-stabile se $\exists\,K>0,\ \bar h$ tali che, dati due valori iniziali $y_0,\hat y_0$, le soluzioni soddisfano (per $h\le\bar h$):
+        
+        $$|y_k - \hat y_k| \le K\,|y_0 - \hat y_0| \qquad \forall k \le \frac{b-a}{h}$$
         
         > Descritto in maniera differente K è molto simile all’essere un numero di condizionamento ed infatti il significato è sempre quello di verificare che il metodo sia stabile e non propaghi l’errore
         > 
@@ -89,7 +101,7 @@
         
         </aside>
         
-        ![IMG_0628.jpeg](IMG_0628.jpeg)
+        ![Regioni di assoluta stabilità nel piano complesso hλ: Eulero esplicito vs implicito](images/regione_assoluta_stabilita_eulero_exp_imp.jpg)
         
         [Regione di Assoluta Stabilità .pdf](Regione_di_Assoluta_Stabilita_.pdf)
         
@@ -113,7 +125,11 @@
         \\ 
         $$
         
-        ![IMG_0652.jpeg](IMG_0652.jpeg)
+        Se $A$ è diagonalizzabile, con autovalori $\lambda_i$ e autovettori $v_i$ ($i=1,\dots,m$):
+        
+        $$y(t) = c_1 e^{\lambda_1 (t-t_0)} v_1 + \dots + c_m e^{\lambda_m (t-t_0)} v_m$$
+        
+        Se $\mathrm{Re}\,\lambda_i < 0\ \forall i$ il problema è **asintoticamente stabile**.
         
     6. Convergenza (Lax-Richtmeyer)
         
@@ -124,7 +140,11 @@
         
         </aside>
         
-        ![IMG_0506.jpeg](IMG_0506.jpeg)
+        **Convergenza:** dato $t\in[a,b]$ e una suddivisione di $[a,t]$ in $N$ intervalli di ampiezza $h=\frac{t-a}{N}$, il metodo è convergente se
+        
+        $$\lim_{N\to\infty} y_N = y(t)$$
+        
+        ovvero se l'errore globale $e_N\to 0$. Il metodo è convergente in $[a,b]$ se lo è $\forall t\in[a,b]$.
         
 - **Passi, espliciti-impliciti, stadi e stencil**
     1. Metodi one-step e multi-step
@@ -187,7 +207,7 @@
         
         </aside>
         
-        ![IMG_0544.jpeg](IMG_0544.jpeg)
+        ![Esempio di stencil a 3 punti {ℓ-1, ℓ, ℓ+1}](images/stencil_3_punti.jpg)
         
 - Soluzione dei metodi impliciti
     
@@ -244,7 +264,7 @@
         > 
     2. Tableau di Butcher
         
-        ![IMG_0513.jpeg](IMG_0513.jpeg)
+        ![Struttura del tableau di Butcher: vettori b, c e aᵀ](images/butcher_tableau_struttura.jpg)
         
         <aside>
         💡
@@ -253,12 +273,14 @@
         
         </aside>
         
-        ![IMG_0514.jpeg](IMG_0514.jpeg)
+        Condizioni di consistenza sui coefficienti del tableau:
+        
+        $$\sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij}\quad \forall\, i=1,\dots,s$$
         
     3. Ordine 
 - Tipologie
     
-    ![IMG_0482.jpeg](IMG_0482.jpeg)
+    ![Tassonomia degli schemi di flusso: upwind (FDS/FVS) e centrati](images/schemi_flusso_tassonomia.jpg)
     
 - Problemi
     1. Stiffness
@@ -274,7 +296,7 @@
         condizione \space 1 \to Re(\lambda_i) L \space piccolo\\condizione \space 2 \to Re(\lambda_i) L << -1 \\ stiffness \space grade \to max_i |Re(\lambda_i)|L << -1\\soluzione \to y(t) = c_1 e^{\lambda_1 (t-t_0)} v_1 + ... + c_m e^{\lambda_m (t-t_0)} v_m
         $$
         
-        ![IMG_2489.jpeg](IMG_2489.jpeg)
+        ![Osservazione sulla stabilità per problemi non lineari/non assolutamente stabili; note su ode45 vs ode15s](images/stiff_ode45_vs_ode15s_osservazione.jpg)
         
     2. Diffusione numerica 
     3. Dispersione numerica
@@ -304,7 +326,7 @@
         
     2. Implementazione Eulero Implicito (equazione) 
         
-        ![IMG_2497.jpeg](IMG_2497.jpeg)
+        ![Quiz: Eulero implicito su problema di Cauchy, con derivazione manuale dell'iterazione](images/quiz_eulero_implicito_cauchy.jpg)
         
         ```matlab
         t0 = 0 ; y0 = pi; tf = 10; h = 0.1 ; N = (tf -t0)/h ;
@@ -317,7 +339,7 @@
         
     3. Implementazione Eulero Esplicito (sistema)
         
-        ![IMG_2513.jpeg](IMG_2513.jpeg)
+        ![Quiz: Eulero esplicito su sistema (Domanda 6), con impostazione](images/quiz_eulero_esplicito_sistema.jpg)
         
         ```matlab
         %% Quiz 2.6 (Eulero Esplicito ed Errore)
@@ -355,7 +377,7 @@
         ```
         
     
-    ![IMG_2496.jpeg](IMG_2496.jpeg)
+    ![Quiz: ODE45 su sistema del secondo ordine (Domanda 4), con impostazione](images/quiz_ode45_sistema.jpg)
     
     ```matlab
     z0 = [pi; log(2)];
@@ -393,11 +415,11 @@
         
         [Problemi Stiff.pdf](Problemi_Stiff.pdf)
         
-- **Domande/Approfondimenti**
+- **Approfondimenti teorici** (HPC e parallelismo, varianti Runge-Kutta, WENO, FV/FE/DG)
     
     HPC & Parallelismo
     
-    - Cosa sono gli InfiniBand nei nodi di un cluster di calcolo? Perché si chiamano così?
+    - InfiniBand nei nodi di un cluster di calcolo HPC
         
         ### Analogia Livello 1
         
@@ -429,7 +451,7 @@
         
         RDMA bypassa il kernel del sistema operativo: il trasferimento avviene direttamente tra le memorie RAM dei due nodi, senza coinvolgere le CPU. Questo riduce il *software overhead* e libera cicli CPU per il calcolo.
         
-    - Come sono legati tempo di calcolo e parallelizzazione per diverse dimensioni del problema?
+    - Tempo di calcolo e parallelizzazione al variare della dimensione del problema
         
         🟪 Intuizione
         
@@ -454,7 +476,7 @@
     
     Runge-Kutta: varianti e struttura
     
-    - Cosa sono i metodi RK-TVD? E quelli SSP (Strong Stability Preserving)? Sono la stessa cosa?
+    - Metodi RK-TVD e SSP (Strong Stability Preserving)
         
         ### Risposta rapida
         
@@ -480,7 +502,7 @@
         
         Questo è esattamente un RK-TVD a 3 stadi ed è SSP con coefficiente \(c=1\).
         
-    - Ci sono metodi Runge-Kutta impliciti? Cosa cambia? Perché sono meno famosi di quelli espliciti?
+    - Metodi Runge-Kutta impliciti (IRK e DIRK)
         
         ### Risposta Sì, esistono
         
@@ -500,7 +522,7 @@
         
         Una variante popolare è il metodo **DIRK (Diagonally Implicit RK)**: \(A\) è triangolare inferiore con diagonale non nulla. Ogni stadio richiede un solo solve lineare indipendente — costo intermedio tra esplicito e IRK completo.
         
-    - Il Tableau di Butcher è solo per i metodi Runge-Kutta, o si può usare in generale?
+    - Generalità del Tableau di Butcher
         
         🟪 Intuizione
         
@@ -531,7 +553,7 @@
     
     Espliciti vs Impliciti — Motivazioni pratiche
     
-    - Perché i metodi espliciti richiedono meno RAM e come influenza la scelta nei calcolatori industriali?
+    - Memoria (RAM) dei metodi espliciti e impatto sulle scelte industriali
         
         🟪 Intuizione
         
@@ -562,7 +584,7 @@
         
         Nei calcolatori industriali, il budget RAM per nodo è tipicamente 4–16 GB. Per grandi simulazioni 3D con metodi impliciti, si è rapidamente limitati dalla memoria, non dalla potenza di calcolo. I metodi espliciti permettono di scalare a mesh molto più fini con lo stesso hardware. Questo è il motivo per cui i codici industriali di aerodinamica (es. SU2, TAU, STAR-CCM+) offrono spesso entrambe le opzioni: esplicito per mesh grandi, implicito per convergenza rapida allo stato stazionario su mesh medie.
         
-    - Perché i metodi espliciti sono facilmente parallelizzabili?
+    - Parallelizzabilità dei metodi espliciti
         
         🟪 Intuizione
         
@@ -590,7 +612,7 @@
         
         Per i metodi impliciti, invece, il sistema lineare globale \(Ax = b\) non può essere decomposto localmente: i solver iterativi (GMRES, AMG) richiedono prodotti matrice-vettore globali, che implicano comunicazione all-to-all ad ogni iterazione. La scalabilità degradava con \(P\) molto più rapidamente.
         
-    - Perché se il problema è stiff i metodi impliciti sono ottimali?
+    - Problemi stiff e ottimalità dei metodi impliciti
         
         🟪 Intuizione
         
@@ -617,7 +639,7 @@
     
     Sistemi lineari: metodi iterativi
     
-    - Cosa sono i metodi a sottospazio di Krylov? Cosa è il metodo GMRES?
+    - Metodi a sottospazio di Krylov e GMRES
         
         🟪 Intuizione
         
@@ -646,7 +668,7 @@
         | LU diretto | Diretto | Soluzione esatta | Memoria \(\mathcal{O}(N^{3/2})\) in 2D, fill-in |
         | GMRES | Krylov | Solo mat-vec, parallelo | Convergenza dipende da condizionamento |
         | BiCGSTAB | Krylov | Memoria costante | Convergenza non monotona |
-    - In calcolo parallelo, come si suddividono i residui e come influenza il numero di iterazioni?
+    - Suddivisione dei residui in calcolo parallelo e impatto sul numero di iterazioni
         
         ### Suddivisione del residuo
         
@@ -661,7 +683,7 @@
     
     Metodi ad alta risoluzione: WENO
     
-    - Come i metodi WENO sono usati in ambiti di grafica e perché?
+    - Uso dei metodi WENO nella grafica
         
         🟪 Intuizione
         
@@ -681,7 +703,7 @@
         
         Il collegamento matematico è diretto: un bordo affilato in un'immagine o una superficie di acqua è una *discontinuità* nello spazio delle funzioni — esattamente il tipo di feature per cui WENO è stato progettato.
         
-    - Cosa sono undershoot e overshoot e perché WENO5 con 3 sottostencil li risolve?
+    - Undershoot e overshoot, e come WENO5 (3 sottostencil) li elimina
         
         ### Definizione
         
@@ -707,7 +729,7 @@
         
         Come annotato nelle note: *"i pesi sono una misura della regolarità della singola ricostruzione ovvero W è più grande se la soluzione è regolare mentre è piccolo se è oscillante"*.
         
-    - Come WENO5 raggiunge ordine 5 con sottostencil a 3 punti (parabolici, ordine 2)?
+    - Come WENO5 raggiunge l'ordine 5 con sottostencil parabolici a 3 punti
         
         🟪 Intuizione
         
@@ -764,7 +786,7 @@
         
         Su una mesh 2D con 10.000 triangoli, un solver DG di grado \(p=3\) ha \(10 \times 10^4 = 10^5\) DOF per variabile (10 funzioni di base per triangolo). Un FV sulla stessa mesh ha 10.000 DOF. DG richiede 10× più memoria ma raggiunge la stessa accuratezza con una mesh 5–10× più grossolana.
         
-    - Cos'è la matrice di massa e qual è il suo legame con le funzioni di forma?
+    - Matrice di massa e legame con le funzioni di forma
         
         🟪 Intuizione
         
