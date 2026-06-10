@@ -3,8 +3,9 @@
 > Teoria + simulazione d'esame sul **macroargomento 2** della lezione 06-04: i **Reduced Order
 > Models** e in particolare la **Proper Orthogonal Decomposition (POD)**. Formato toggle Notion;
 > **parole chiave** in grassetto; formule LaTeX (`$...$`, `$$...$$`).
-> Risponde alle domande **6–7** del file di dubbi e ai **chiarimenti aggiuntivi del 06-04**
-> (punti 2–9: definizione di energia, modi calcolati vs imposti, vincolo di norma, spazio/parametri).
+> I **chiarimenti** (definizione di energia, modi calcolati vs imposti, vincolo di norma, snapshot vs
+> ROM, spazio dei parametri vs mesh, tempo vs parametri) sono **integrati direttamente nella teoria**
+> come note `>`. La **Parte II** raccoglie le sole domande di **simulazione d'esame**.
 
 ---
 
@@ -52,9 +53,34 @@ spaziali elementari** ordinati per **contenuto energetico**.
 database e dei modi è immediata; nulla vieta di usare altri casi (instazionari → si campiona anche nel
 tempo), ma complicherebbero l'esposizione.
 
+> **Tempo vs parametri (per non confondersi).** Nell'esempio RANS stazionario il **tempo non compare**:
+> la dipendenza "extra" della soluzione è solo dai **parametri di design** $\bar\mu$ (geometria, valori
+> al contorno…), non dal tempo. Le due "dimensioni" del problema sono lo **spazio** $\bar x$ (catturato
+> dai **modi**) e i **parametri** $\bar\mu$ (catturati dai **coefficienti**); il **tempo** entrerebbe
+> solo in una POD *instazionaria*, come ulteriore variabile di campionamento (una collezione di campi a
+> istanti diversi), distinta dai parametri di design.
+
 **Passo 1 — Database di snapshot.** Si generano $N_s$ soluzioni full-order al variare di $n$ parametri
 $\mu_i$ ($1\le i\le n$):
 $$u_J(\bar{x}),\qquad 1\le J\le N_s \quad(\text{snapshot }J).$$
+
+> **Lo snapshot è una soluzione a parametri *fissati* (chiarimento).** Ogni snapshot $u_J(\bar x)$ è una
+> **soluzione fisica completa** (un esperimento o una simulazione CFD), ottenuta per **una specifica
+> scelta** dei parametri $\bar\mu_J$. Quindi lo snapshot **dipende sì** dalla parametrizzazione, ma
+> **in quel calcolo $\bar\mu_J$ è bloccato**: come *dato* è una funzione del **solo spazio** $\bar x$ —
+> il valore dei parametri è un'**etichetta** che identifica lo snapshot, non una variabile che facciamo
+> variare *dentro* quel campo. È in questo senso ("a $\bar\mu$ fissato") che si dice "lo snapshot
+> dipende solo dallo spazio".
+>
+> **Chi è il "campo vero"?** È la **funzione soluzione esatta** del problema parametrico,
+> $u(\bar x,\bar\mu)$: quella che, *al variare* di $\bar\mu$, restituisce il campo corrispondente.
+> Dipende **sia dallo spazio sia dai parametri**. Non c'è contraddizione con lo snapshot: ogni
+> **snapshot è una "fetta"** del campo vero a $\bar\mu$ fissato (perciò funzione del solo spazio),
+> mentre il **ROM** è il nostro **surrogato** che cerca di ricostruire *l'intera* dipendenza
+> $u(\bar x,\bar\mu)$ — ecco perché il ROM dipende esplicitamente anche dai parametri. In sintesi:
+> **campo vero e ROM** → spazio **+** parametri; **i singoli snapshot** (le loro fette) → solo spazio.
+> La frase degli appunti — *"la soluzione dipende solo dallo spazio, la ridotta da spazio e parametri"*
+> — **non è un errore**: per "soluzione" si intende lo **snapshot**, per "ridotta" il **modello**.
 
 **Passo 2 — Ipotesi di decomposizione modale.** Si assume che la soluzione si scriva come
 **combinazione lineare di $N$ modi** (con $N\le N_s$):
@@ -76,11 +102,32 @@ dove $V_\ell$ è il **volume della cella** $\ell$ (la discretizzazione FV trasfo
 una somma pesata sui volumi). Serve perché "il modo più rappresentativo" e "ortogonale" hanno senso
 **solo rispetto a un prodotto scalare**.
 
+> **Perché i modi si *calcolano* e non si *impongono* a priori.** Si potrebbe in linea di principio
+> fissare una base a priori (Fourier, polinomi, modi "fisici"), ma si perderebbe il vantaggio della
+> POD: la sua base è **ottima per quel database** perché **estratta dai dati** (massima energia a
+> parità di numero di modi). Una base imposta sarebbe ottimale **solo** con **conoscenza assoluta** del
+> problema. E il **senso fisico non si perde**: emerge **a posteriori** — i primi modi POD coincidono
+> spesso con strutture coerenti riconoscibili (campo medio, strutture dominanti). "Calcolati" non vuol
+> dire "arbitrari/numerici", ma **i migliori possibili rispetto ai dati**.
+
 **Passo 4 — Problema di ottimizzazione vincolato.** I modi POD sono quelli che **massimizzano la
 proiezione** degli snapshot sul modo, a parità di norma unitaria:
 $$\max_{\phi_i}\;\sum_{k=1}^{N_s}\langle u_k(\bar{x}),\phi_i(\bar{x})\rangle^2 \quad\text{con}\quad \|\phi_i(\bar{x})\|_{\Omega}^2 = 1.$$
 Cerco cioè i **modi più rappresentativi**, quelli che catturano la **maggior parte dell'energia** del
 database. Il vincolo $\|\phi_i\|=1$ evita la soluzione banale (modo infinitamente grande).
+
+> **Si ottimizzano i *modi*, non le soluzioni.** Le $u_k$ (gli snapshot) sono **dati noti e
+> immutabili**: non ha senso "ottimizzarle". L'incognita del problema di ottimo sono i **modi**
+> $\phi_i$ — un oggetto **matematico** che possiamo scegliere — proprio quelli che rappresentano al
+> meglio le soluzioni catturando più **energia** (vedi Passo 5). *(Appunti che parlano di "ottimizzare
+> le $u_k$" sono imprecisi: l'incognita sono i modi.)*
+>
+> **A cosa serve davvero il vincolo $\|\phi_i\|=1$.** Non solo a "evitare un modo grande": senza
+> vincolo l'obiettivo $\max\sum_k\langle u_k,\phi_i\rangle^2$ è **illimitato** (scalando $\phi_i$ di un
+> fattore $c$, l'obiettivo scala di $c^2$) e **non esiste un massimo**. Normalizzando si confrontano i
+> modi **a parità di taglia** e la magnitudine finisce tutta nel **coefficiente** $\tilde u_i$: il
+> prodotto modo×coefficiente non cambia, ma il problema diventa **ben posto**. Più che un "imbroglio
+> sull'energia", è una questione di **buona posizione** del problema di ottimo.
 
 **Passo 5 — Problema agli autovalori.** La soluzione del problema vincolato è un **problema agli
 autovalori** (sulla matrice di correlazione degli snapshot):
@@ -118,16 +165,26 @@ I parametri $\mu_1,\mu_2,\dots$ definiscono uno **spazio di progetto discreto**:
 calcolati solo in **alcuni punti** (la "griglia" di campionamento). Per un design **nuovo** (un punto
 non calcolato) si **interpola** la mappa $\bar\mu \to \tilde u_i$.
 
-> **Perché lo spazio dei parametri è discreto (chiarimento).** Lo è perché possiamo permetterci solo
-> un **numero finito di simulazioni full-order**: si **campiona** lo spazio dei parametri in $N_s$
-> punti e quelli sono gli unici design "noti". È una **scelta pratica** (non potremmo calcolare la
-> soluzione per un *continuo* di parametri), non una proprietà intrinseca del problema. Di conseguenza
-> **non abbiamo la soluzione ovunque** nello spazio $\bar\mu$: per un punto non campionato si è
-> **costretti a interpolare**. ⚠️ Attenzione a non confonderlo con l'altra discretizzazione, di
-> **natura spaziale**, che compare nel prodotto scalare ($\int_\Omega\!\to\!\sum_\ell V_\ell$): quella
-> è la **quadratura sui volumi di cella** (volumi finiti) e riguarda lo spazio fisico $\bar x$, non lo
-> spazio dei parametri. Sono **due discretizzazioni diverse**: una sui **parametri** (campionamento
-> degli snapshot), una sullo **spazio fisico** (mesh FV).
+> **Perché lo spazio dei parametri è discreto, e che c'entra il numero di simulazioni (chiarimento).**
+> Il punto chiave è che **un snapshot = un punto dello spazio dei parametri**. Ogni simulazione
+> full-order (o esperimento) viene lanciata per **una** combinazione $\bar\mu_J$: quel calcolo
+> "**occupa**" il punto $\bar\mu_J$ della griglia di campionamento. Perciò **"numero di simulazioni" e
+> "numero di punti campionati nello spazio dei parametri" sono la stessa cosa**: i due conteggi
+> coincidono. Aggiungere una simulazione significa **aggiungere un punto** alla griglia dei parametri
+> (la *infittisce*); toglierne una la *dirada*. Lo spazio è discreto proprio perché possiamo
+> permetterci solo un **numero finito** di questi punti (non un *continuo* di simulazioni): è una
+> **scelta pratica/economica**, non una proprietà del problema. Di conseguenza **non abbiamo la
+> soluzione ovunque** in $\bar\mu$ e per un punto non campionato si è **costretti a interpolare**.
+>
+> ⚠️ **Dove entra (e dove NON entra) la mesh.** La **mesh / i volumi di cella $V_\ell$** non hanno
+> **nulla** a che fare con la discretizzazione dello spazio dei parametri: servono **solo** a calcolare
+> il **prodotto scalare** $\langle\cdot,\cdot\rangle$ nello **spazio fisico** $\bar x$
+> ($\int_\Omega\!\to\!\sum_\ell V_\ell$, Passo 3), cioè a misurare norme, energia e ortogonalità dei
+> modi su ogni singolo campo. Sono quindi **due discretizzazioni indipendenti**: (i) quella dei
+> **parametri** $\bar\mu$ = i punti campionati = gli snapshot (ne controlli la finezza decidendo
+> *quante* simulazioni fare); (ii) quella **spaziale** = la mesh FV interna a *ciascuna* simulazione
+> (la stessa per tutti gli snapshot). Infittire la mesh **non** aggiunge punti nello spazio dei
+> parametri, e aggiungere una simulazione **non** cambia la mesh: agiscono su piani diversi.
 
 ```
    μ2 ↑
@@ -286,51 +343,5 @@ ricostruisce con pochi modi: servirebbero **molti** modi per "spostare" l'urto, 
 lentamente e la ricostruzione mostrerebbe **oscillazioni/urto spalmato**. Rimedi: **campionamento più
 fitto** vicino all'urto, oppure tecniche **non lineari** (registrazione/allineamento dell'urto,
 autoencoder, manifold learning) al posto della POD pura.
-
-</details>
-
-<details>
-<summary><strong>Chiarimenti aggiuntivi (06-04) — modi "calcolati" vs imposti, cosa si ottimizza, vincolo di norma, "spazio vs parametri", tempo vs parametri.</strong></summary>
-
-**Perché i modi si *calcolano* (e non si *impongono* a priori con senso fisico).** Si potrebbe in
-linea di principio fissare una base a priori (Fourier, polinomi, modi "fisici"), ma si perderebbe il
-vantaggio della POD: la base POD è quella **ottima per quel database**, perché è **estratta dai dati**
-risolvendo un **problema di ottimo** (massima energia catturata a parità di numero di modi). Una base
-imposta a priori sarebbe ottimale **solo** se avessimo **conoscenza assoluta** del problema (cosa che
-non abbiamo). Il **senso fisico non si perde**: emerge **a posteriori** — i primi modi POD coincidono
-spesso con strutture coerenti riconoscibili (campo medio, strutture dominanti). Quindi "calcolati"
-non vuol dire "arbitrari/numerici" ma **i migliori possibili rispetto ai dati**.
-
-**Cosa si ottimizza: i modi, non le soluzioni.** ✅ Confermato (correzione rispetto agli appunti di
-lezione). Le $u_k$ (gli **snapshot**) sono **dati noti e immutabili**: non ha senso "ottimizzarle".
-L'incognita del problema di ottimo sono i **modi** $\phi_i$ — un'estrazione **matematica** che possiamo
-scegliere — proprio quelli che **rappresentano al meglio** le soluzioni catturando più **energia** del
-database (vedi definizione di energia in §2, Passo 5). Gli appunti di Claude (questo file) sono
-corretti su questo punto.
-
-**Il vincolo di norma $\|\phi_i\|=1$.** La tua intuizione è giusta nello spirito, ma il motivo preciso
-è di **buona posizione** del problema: senza vincolo l'obiettivo $\max\sum_k\langle u_k,\phi_i\rangle^2$
-è **illimitato** (scalando $\phi_i$ di un fattore $c$ l'obiettivo scala di $c^2$), quindi **non esiste
-un massimo**. Normalizzando si confrontano i modi **a parità di taglia** e la "magnitudine" finisce
-tutta nel **coefficiente** $\tilde u_i$. Non è tanto un "imbroglio sull'energia" quanto il fatto che,
-senza normalizzazione, il problema **degenererebbe** (massimo all'infinito).
-
-**"La soluzione dipende solo dallo spazio, la soluzione ridotta da spazio e parametri": non è un
-errore.** È una distinzione corretta, purché si chiarisca **chi è cosa**. Un singolo **snapshot
-full-order** $u_J(\bar x)$ è calcolato a **un valore fissato** dei parametri $\bar\mu_J$: come dato, è
-quindi una funzione del **solo spazio** ($\bar\mu$ è un'etichetta fissa). Il **modello ridotto**
-$u(\bar x,\bar\mu)=\sum_i \tilde u_i(\bar\mu)\phi_i(\bar x)$ è invece un **surrogato parametrico**:
-dipende **esplicitamente da spazio e parametri** perché deve poter essere valutato a **qualunque**
-$\bar\mu$. Le due affermazioni sono coerenti: il **campo "vero"** dipende sì da entrambi, ma ogni
-**snapshot** ne è una "fetta" a $\bar\mu$ fissato (spazio), mentre il **ROM** ricostruisce la
-dipendenza continua dai parametri. Quindi: snapshot → spazio; ROM → spazio + parametri.
-
-**Tempo vs parametri (per non confondersi).** Nell'esempio **RANS stazionario** il **tempo non
-compare**: la dipendenza "extra" della soluzione è solo dai **parametri di design** $\bar\mu$
-(geometria, valori al contorno…), non dal tempo. La confusione nasce dal fatto che si cita la RANS
-(che *media* il tempo) e i fenomeni instazionari: ma nello schema POD presentato, le due "dimensioni"
-sono **spazio** $\bar x$ (catturato dai **modi**) e **parametri** $\bar\mu$ (catturati dai
-**coefficienti**). Il **tempo** entrerebbe **solo** in una POD instazionaria, come ulteriore variabile
-di campionamento (collezione di campi a istanti diversi), separata dai parametri di design.
 
 </details>

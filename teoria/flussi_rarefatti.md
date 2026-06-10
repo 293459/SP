@@ -3,8 +3,9 @@
 > Teoria + simulazione d'esame sul **macroargomento 3** della lezione 06-04: i **flussi rarefatti**
 > (plume di ugello nel vuoto), il **numero di Knudsen** e il metodo **Monte Carlo / DSMC**. Formato
 > toggle Notion; **parole chiave** in grassetto; formule LaTeX (`$...$`, `$$...$$`).
-> Risponde alle domande **9–16** del file di dubbi e ai **chiarimenti aggiuntivi del 06-04**
-> (punti 10–14: $Kn$ come campo e $\lambda$ variabile, VHS e viscosità, $\Delta t<\tau_c$, $\Delta x\le\lambda$, vincolo CFL).
+> I **chiarimenti** ($Kn$ come campo e $\lambda$ variabile, VHS e meccanismo della viscosità,
+> $\Delta t<\tau_c$, $\Delta x\le\lambda$, vincolo CFL, rumore statistico) sono **integrati direttamente
+> nella teoria** come note `>`. La **Parte II** raccoglie le sole domande di **simulazione d'esame**.
 
 ---
 
@@ -128,6 +129,26 @@ continuo: la viscosità non è una proprietà imposta dal modello (come in Navie
 > microscopiche ↔ viscosità macroscopica) sono **la stessa cosa** vista a due scale: la viscosità *è*
 > l'effetto medio di quelle collisioni, e il modello collisionale (HS/VHS/VSS) decide **quanto bene**
 > quel trasporto riproduce la $\mu(T)$ del gas reale.
+>
+> **Ma com'è che un urto "più forte/più debole" diventa viscosità?** È il dubbio giusto da farsi. La
+> viscosità è trasferimento di quantità di moto, e in **ogni** collisione i due partner se la scambiano
+> a prescindere dall'"intensità": ciò che conta non è il singolo urto, ma **due effetti** che la
+> sezione d'urto $\sigma$ (cioè il diametro di collisione) controlla insieme:
+> - la **frequenza di collisione** $\nu_{coll}\propto n\,\sigma\,\bar c$ → **quanto spesso** si scambia
+>   quantità di moto;
+> - il **libero cammino medio** $\lambda\propto 1/(n\sigma)$ → **quanto lontano** una molecola
+>   **trasporta** la propria quantità di moto prima di "consegnarla" in un urto.
+>
+> La viscosità è la **diffusività di quantità di moto** $\mu\propto\rho\,\bar c\,\lambda$: molecole che
+> attraversano uno strato e collidono **più in là** trasportano momento dagli strati veloci a quelli
+> lenti. Da qui il ruolo del **diametro variabile**: un diametro di collisione **minore** (urto più
+> "molle"/penetrante, tipico delle collisioni **energetiche**) ⟹ $\sigma$ minore ⟹ $\lambda$
+> **maggiore** ⟹ la quantità di moto viaggia **più lontano** ⟹ **più viscosità** a parità d'altro.
+> Poiché le molecole **più calde sono più veloci** (urti più energetici, $\sigma$ più piccola), **come**
+> $\sigma$ dipende dalla velocità relativa **decide come $\mu$ cresce con $T$** (l'esponente $\omega$).
+> Quindi non è "l'urto più forte" a dare viscosità: è che la **dimensione di collisione fissa frequenza
+> e distanza** del trasporto di quantità di moto, e la sua variazione con l'energia produce la **giusta
+> $\mu(T)$**.
 
 ---
 
@@ -138,13 +159,55 @@ Perché la simulazione sia fisicamente corretta servono vincoli su **cella**, **
 
 - **Dimensione di cella ≤ libero cammino medio:** $\Delta x \le \lambda$. Altrimenti dentro la cella
   ci sarebbero molte collisioni "saltate": la cella deve risolvere la scala del libero cammino medio.
+
+  > **Perché (e perché non troppo piccola).** Se la cella fosse **molto più grande** di $\lambda$, per
+  > come è imposto il modello (collidono solo particelle **della stessa cella**, trattate come
+  > "co-locate") delle particelle sarebbero costrette a **interagire con compagne fisicamente troppo
+  > lontane** (oltre un $\lambda$) — **privo di senso fisico**, perché le collisioni reali sono
+  > **locali** sulla scala $\lambda$. Meglio quindi $\Delta x\le\lambda$, che garantisce compagni di
+  > collisione **genuinamente vicini**. Il limite opposto — celle **troppo piccole** — fa salire il
+  > **costo** e, soprattutto, il **rumore statistico** (vedi sotto).
+
 - **Passo temporale ≤ tempo di collisione:** $\Delta t \le \tau_c$, con $\tau_c = \lambda/\bar{c}$ e
   $\bar{c}$ velocità molecolare media. Garantisce che il moto e le collisioni siano **disaccoppiati
   correttamente** (una particella non "salta" più collisioni in un passo).
+
+  > **$\Delta t\le\tau_c$ non *azzera* le collisioni.** Il vincolo dice che, **in media**, una
+  > particella fa **al più ~una** collisione per passo — non che ne faccia esattamente una né zero. Le
+  > collisioni **non** sono decise particella-per-particella in modo deterministico: **dentro ogni
+  > cella** l'algoritmo (es. **NTC, No-Time-Counter**) calcola il **numero atteso di coppie collidenti**
+  > nel passo $\Delta t$ da densità, sezione d'urto e velocità relative, e ne **estrae stocasticamente**
+  > quel numero. Quindi su una cella con $N$ particelle avvengono comunque **diverse** collisioni a ogni
+  > passo, anche se la singola particella ne fa in media meno di una. La **frequenza di collisione**
+  > esce corretta **per costruzione** ($\#\text{coppie}=$ tasso $\times N\times\Delta t$): non si
+  > "perdono" collisioni, le si **risolve finemente nel tempo**.
+
 - **Vincolo tipo CFL:** $\Delta t \le \Delta x/|v_{max}|$. Una particella **non deve attraversare più
   di una cella** per passo, così collide solo con i vicini immediati prima di proseguire.
+
+  > **Perché.** Se "saltasse" una o più celle, **non campionerebbe l'ambiente collisionale** delle
+  > celle intermedie — celle in cui avrebbe dovuto avere la possibilità di collidere — e finirebbe per
+  > **interagire in una cella lontana** bypassando quelle in mezzo. Questo **viola la località delle
+  > collisioni** (interagiscono solo particelle co-localizzate nella stessa cella) e **falsa il
+  > trasporto** di quantità di moto ed energia. La particella va quindi fatta **avanzare cella per
+  > cella**, raccogliendo a ogni tappa le collisioni locali: è un vincolo di **coerenza fisica del
+  > trasporto**, non (come nel continuo) di pura stabilità numerica.
+
 - **Statistica:** $N \approx 10\text{–}50$ particelle numeriche **per cella**, per avere medie
   statistiche significative.
+
+  > **Di che "rumore statistico" si parla (chiarimento importante).** Attenzione a un equivoco: una
+  > **particella numerica non è una media di molecole reali** e **non ha una distribuzione interna da
+  > mediare** — porta **un solo** stato (una posizione, una velocità, una specie) e *rappresenta* molte
+  > molecole reali tramite un **peso** $F_{num}$, nient'altro. Le grandezze macroscopiche (densità,
+  > velocità, temperatura) si ottengono **mediando sulle particelle numeriche *dentro la cella***:
+  > **la numerosità campionaria è il numero di particelle numeriche per cella**. Perciò se la cella ne
+  > contiene **poche**, la media di cella ha **varianza alta** = **rumore**. Ecco il legame col punto
+  > precedente: una **cella più piccola** (a parità di densità) contiene **meno particelle numeriche**
+  > ⟹ **media più rumorosa** (e anche **meno coppie candidate** per il campionamento delle collisioni,
+  > quindi statistiche collisionali più rumorose). Il rumore riguarda dunque **sia i valori medi di
+  > cella sia il campionamento delle collisioni**, e in entrambi i casi nasce dallo **stesso** motivo:
+  > **troppe poche particelle numeriche per cella**. Per questo si chiede $\ge$30–50 particelle/cella.
 
 ---
 
@@ -340,41 +403,5 @@ particelle DSMC.
 **piccolissimo**, quindi servirebbero celle $\Delta x\le\lambda$ molto fini, $\Delta t\le\tau_c$ molto
 piccoli e **moltissime particelle** (≥30–50 per cella su tantissime celle): il costo esplode. Lì il
 **continuo** è sia valido sia molto più economico.
-
-</details>
-
-<details>
-<summary><strong>Chiarimenti aggiuntivi (06-04) — $\Delta t<\tau_c$ rischia di "saltare" tutte le collisioni? Perché $\Delta x\le\lambda$? Perché una particella non deve attraversare più di una cella?</strong></summary>
-
-**$\Delta t \le \tau_c$ non azzera le collisioni.** Il vincolo dice che, **in media**, una particella
-fa **al più ~una** collisione per passo: **non** che ne faccia esattamente una né zero. Le collisioni
-**non** sono decise particella-per-particella in modo deterministico: in DSMC, **dentro ogni cella**,
-l'algoritmo (es. **NTC, No-Time-Counter**) calcola il **numero atteso di coppie collidenti** nel passo
-$\Delta t$ a partire da densità, sezione d'urto e velocità relative, e ne **estrae stocasticamente**
-quel numero. Quindi su una cella con $N$ particelle avvengono comunque **diverse** collisioni a ogni
-passo, anche se la **singola** particella ne fa in media meno di una. La **frequenza di collisione**
-risulta corretta **per costruzione** (numero di coppie $=$ tasso di collisione $\times N \times
-\Delta t$): non si "perdono" collisioni, le si **risolve finemente nel tempo**. Lo scopo del vincolo è
-tenere valido il **disaccoppiamento moto↔collisione**, non garantire un urto a testa.
-
-**$\Delta x \le \lambda$ (la tua lettura è corretta).** ✅ Esatto: se la cella fosse **molto più grande**
-del libero cammino medio, per come è imposto il modello collisionale (collidono solo particelle
-**della stessa cella**, trattate come "co-locate") delle particelle sarebbero costrette a **interagire
-con compagne fisicamente troppo lontane** (oltre un $\lambda$), cosa **priva di senso fisico**: le
-collisioni reali sono **locali** sulla scala $\lambda$. Quindi meglio una cella $\le\lambda$, che
-garantisce **compagni di collisione genuinamente vicini** e risolve la scala su cui avvengono gli urti.
-Il limite opposto è quello che noti tu: **celle troppo piccole** ⟹ poche particelle per cella ⟹
-**rumore statistico** + costo elevato. Il compromesso è $\Delta x\!\sim\!\lambda$ con $\ge$30–50
-particelle/cella.
-
-**Una particella non deve attraversare più di una cella per passo (il tuo ragionamento regge).** ✅
-L'idea è quella: con $\Delta t\le\Delta x/v_{max}$ la particella avanza **al più di una cella**, così
-collide con i **vicini immediati** prima di proseguire. Se "saltasse" una o più celle, **non
-campionerebbe l'ambiente collisionale** delle celle intermedie — celle in cui avrebbe dovuto avere la
-possibilità di collidere — e finirebbe per **interagire in una cella lontana** bypassando quelle in
-mezzo. Questo **viola la località delle collisioni** (solo le particelle co-localizzate nella stessa
-cella interagiscono) e **falsa il trasporto** di quantità di moto ed energia. Quindi la particella va
-fatta **avanzare cella per cella**, raccogliendo a ogni tappa le collisioni locali: è un vincolo di
-**coerenza fisica del trasporto**, non (come nel continuo) di pura stabilità numerica.
 
 </details>
