@@ -81,6 +81,27 @@ $$u_J(\bar{x}),\qquad 1\le J\le N_s \quad(\text{snapshot }J).$$
 > **campo vero e ROM** → spazio **+** parametri; **i singoli snapshot** (le loro fette) → solo spazio.
 > La frase degli appunti — *"la soluzione dipende solo dallo spazio, la ridotta da spazio e parametri"*
 > — **non è un errore**: per "soluzione" si intende lo **snapshot**, per "ridotta" il **modello**.
+>
+> **Esempio pratico (snapshot a parametri fissati).** Sì, è esattamente così: *tu decidi* i valori dei
+> parametri e fai girare quell'esperimento/simulazione. Se i parametri sono **velocità $v$** e
+> **temperatura $T$** a monte, allora:
+> - **snapshot 1** → imposti $v=50$ m/s, $T=300$ K, lanci la CFD (o fai la prova sperimentale) e ottieni
+>   il campo completo $u_1(\bar x)$;
+> - **snapshot 2** → imposti $v=60$ m/s, $T=320$ K → campo $u_2(\bar x)$;
+> - **snapshot 3** → $v=55$ m/s, $T=310$ K → $u_3(\bar x)$; e così via.
+>
+> Ogni snapshot è quindi **un campo intero** (definito su tutta la mesh) ottenuto a una **coppia
+> $(v,T)$ scelta**. La coppia $(v,T)$ è l'**etichetta** dello snapshot: dentro quel campo $v$ e $T$ non
+> variano, sono i dati di ingresso di *quel* calcolo.
+>
+> **La "soluzione reale" è un continuo di snapshot (la tua lettura è corretta).** La soluzione "vera"
+> $u(\bar x,\bar\mu)$ è concettualmente una **collezione infinita** di campi — uno per **ogni** punto
+> $\bar\mu$ del (continuo) spazio dei parametri. Con $N_s$ snapshot ne hai una versione **reale ma
+> discreta**: campi *veri*, però solo in $N_s$ punti scelti. Il **ROM** è invece una versione
+> **continua ma modellata** (approssimata): può essere valutato in *qualunque* $\bar\mu$, ma fuori dai
+> punti di training è una **stima** (≈ esatto sui punti del database, interpolato/approssimato in mezzo).
+> In sintesi: **vero+continuo** (la verità) → **vero+discreto** (gli snapshot) → **approssimato+continuo**
+> (il ROM).
 
 **Passo 2 — Ipotesi di decomposizione modale.** Si assume che la soluzione si scriva come
 **combinazione lineare di $N$ modi** (con $N\le N_s$):
@@ -185,6 +206,18 @@ non calcolato) si **interpola** la mappa $\bar\mu \to \tilde u_i$.
 > *quante* simulazioni fare); (ii) quella **spaziale** = la mesh FV interna a *ciascuna* simulazione
 > (la stessa per tutti gli snapshot). Infittire la mesh **non** aggiunge punti nello spazio dei
 > parametri, e aggiungere una simulazione **non** cambia la mesh: agiscono su piani diversi.
+>
+> **In base a cosa si infittisce la mesh, e che effetto ha (chiarimento).** La mesh si infittisce con
+> i **criteri classici della CFD**, *non* con criteri legati al ROM: dove i **gradienti sono forti** o
+> ci sono **strutture da risolvere** (strato limite → controllo del $y^+$, urti, scie), e in generale
+> fino a raggiungere l'**indipendenza dalla griglia** (si raffina finché le grandezze d'interesse non
+> cambiano più sotto una soglia). L'**effetto diretto** è sulla **qualità del singolo snapshot**:
+> riduce l'**errore numerico di discretizzazione** di *ciascun* campo full-order, rendendolo più
+> vicino alla soluzione esatta delle equazioni. Non tocca invece la **copertura dello spazio dei
+> parametri** (quella dipende da *quanti* snapshot fai). In breve: **più simulazioni → mappa
+> $\bar\mu\to\tilde u_i$ meglio campionata** (meno errore di *interpolazione* fra i design); **mesh più
+> fine → ogni snapshot più accurato** (meno errore *numerico* dentro il campo). Sono due leve su due
+> errori diversi.
 
 ```
    μ2 ↑

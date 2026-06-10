@@ -149,6 +149,30 @@ continuo: la viscosità non è una proprietà imposta dal modello (come in Navie
 > Quindi non è "l'urto più forte" a dare viscosità: è che la **dimensione di collisione fissa frequenza
 > e distanza** del trasporto di quantità di moto, e la sua variazione con l'energia produce la **giusta
 > $\mu(T)$**.
+>
+> **Schema della catena causale.**
+> ```
+>   velocità relativa g ↑  (gas più caldo → molecole più veloci)
+>            │
+>            ▼
+>   diametro di collisione  σ ↓     (urto energetico = più "penetrante")
+>            │
+>      ┌─────┴───────────────────────────┐
+>      ▼                                  ▼
+>   frequenza urti                  libero cammino medio
+>   ν_coll ∝ n·σ·c̄  ↓              λ ∝ 1/(n·σ)  ↑
+>   (quanto SPESSO                  (quanto LONTANO viaggia
+>    si scambia q.d.m.)              la q.d.m. prima dell'urto)
+>            └─────────────┬────────────────┘
+>                          ▼
+>            viscosità  μ ∝ ρ·c̄·λ   (diffusività di quantità di moto)
+>                          │
+>                          ▼
+>      come σ dipende da g  ⇒  esponente ω in  μ ∝ T^ω
+> ```
+> Lettura: la velocità (quindi la temperatura) cambia $\sigma$; $\sigma$ governa insieme **frequenza**
+> e **distanza** del trasporto di quantità di moto; il loro bilancio *è* la viscosità, e il **modo** in
+> cui $\sigma$ varia con $g$ fissa la dipendenza $\mu(T)$.
 
 ---
 
@@ -208,6 +232,27 @@ Perché la simulazione sia fisicamente corretta servono vincoli su **cella**, **
   > quindi statistiche collisionali più rumorose). Il rumore riguarda dunque **sia i valori medi di
   > cella sia il campionamento delle collisioni**, e in entrambi i casi nasce dallo **stesso** motivo:
   > **troppe poche particelle numeriche per cella**. Per questo si chiede $\ge$30–50 particelle/cella.
+
+  > **La particella numerica è una media delle particelle reali? No — è un *campione rappresentativo*.**
+  > Questo è il punto che chiarisce tutto: una particella numerica **non** si ottiene mediando le
+  > grandezze di molte molecole reali. È piuttosto **una sola molecola "campione"** a cui si assegna
+  > **uno** stato — posizione $\bar x$, velocità $\bar v$, specie, energia interna — **estratto dalla
+  > distribuzione locale** (es. una Maxwelliana), e che vale per **$F_{num}$ molecole reali assunte
+  > nello stesso stato** (stessa velocità). Quindi:
+  > - **come valuti le grandezze della particella numerica?** Non le "calcoli" come medie: la particella
+  >   **porta i propri valori singoli** (esattamente come una molecola reale ne avrebbe di propri).
+  >   All'inizializzazione si **campionano** dalla distribuzione di equilibrio; durante la simulazione si
+  >   **aggiornano** col free-flight ($\bar x \mathrel{+}= \bar v\,\Delta t$) e con le **collisioni**
+  >   (che cambiano $\bar v$). Il peso $F_{num}$ dice solo *quante* molecole reali rappresenta, non entra
+  >   nei suoi valori di stato.
+  > - **dov'è allora la media?** **Solo** a livello di **cella**, sulle particelle numeriche presenti:
+  >   $\rho \propto F_{num}\,N_{cella}/V$, $\bar u_{macro} = \frac{1}{N}\sum_p \bar v_p$,
+  >   $T \propto \frac{1}{N}\sum_p |\bar v_p - \bar u_{macro}|^2$, ecc.
+  >
+  > Quindi le "scale" sono tre e **non** vanno confuse: **molecole reali** (non seguite una a una) →
+  > **particella numerica** (un campione con stato singolo, pesa $F_{num}$ molecole) → **media di cella**
+  > (l'unica vera media, sulle particelle numeriche). La media *sulle molecole reali dentro una
+  > particella* **non esiste**: la particella *è già* il campione.
 
 ---
 
