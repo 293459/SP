@@ -8,6 +8,12 @@ Si parte dalla forma differenziale conservativa:
 
 $$\frac{\partial u}{\partial t} + \frac{\partial f}{\partial x} = 0, \qquad f = f(u)$$
 
+> **Perché considerare solo il flusso convettivo equivale alle equazioni di Eulero.** Le Navier–Stokes
+> hanno flusso **convettivo + diffusivo**; il flusso diffusivo è proporzionale a $\mu$ (viscosità) e
+> $k$ (conducibilità termica). **Eulero = Navier–Stokes con $\mu=k=0$** → resta il solo flusso
+> convettivo $\mathbf F^c$, cioè $\partial_t\mathbf U + \nabla\cdot\mathbf F^c = 0$. È per questo che
+> qui si lavora con il flusso $f=f(u)$ convettivo.
+
 Si integra su ogni cella $[x_{j-\frac{1}{2}}, x_{j+\frac{1}{2}}]$, ottenendo la forma integrale:
 
 $$\frac{\partial}{\partial t}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx = -\left(f_{j+\frac12} - f_{j-\frac12}\right)$$
@@ -87,6 +93,12 @@ La connettività deve essere memorizzata esplicitamente (maggiore memoria, massi
 > La griglia duale ha un overhead trascurabile: si costruisce una volta sola. I nodi centrati offrono più gdl per la stessa mesh, spesso maggiore accuratezza, ma BC più complesse.
 > 
 
+> **Quale griglia si usa a livello commerciale.** Mesh **ibride non strutturate** (ICEM, Pointwise,
+> ANSA, Gmsh): **strati prismatici strutturati** vicino alla parete (per il boundary layer) +
+> **tetraedri** non strutturati nel campo lontano. Per le turbomacchine si usano mesh **strutturate
+> multi-blocco** (TurboGrid). I codici a **nodi centrati** (CFX) sono spesso preferiti su geometrie
+> complesse, quelli a **celle centrate** (Fluent) sui casi più semplici.
+
 ---
 
 ## 5. Metodo di Godunov & Problema di Riemann
@@ -160,19 +172,6 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 
 ---
 
-## Domande & Risposte dalla Lezione
-
-**D: Perché considerare solo il flusso convettivo equivale alle equazioni di Eulero?**
-Le equazioni di Navier-Stokes hanno flusso convettivo + diffusivo. Il flusso diffusivo è proporzionale a $\mu$ (viscosità) e $k$ (conducibilità termica). Eulero = Navier-Stokes con $\mu = k = 0$ → solo flusso convettivo $\mathbf{F}^c$ → $\partial_t \mathbf{U} + \nabla\cdot\mathbf{F}^c = 0$.
-
-**D: FVS vs FDS — da cosa prende il nome?**
-FVS (“Vector”): si spezza il vettore $\mathbf{F} = \mathbf{F}^+ + \mathbf{F}^-$. FDS (“Difference”): si spezza la differenza $\Delta F = F_R - F_L$ tramite la Jacobiana.
-
-**D: Quale griglia si usa a livello commerciale?**
-Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici strutturati vicino alla parete (BL) + tetraedri non strutturati nel campo lontano. Mesh strutturate multi-blocco per turbomachinario (TurboGrid). Nodi centrati (CFX) spesso preferiti per geometrie complesse; celle centrate (Fluent) per casi più semplici.
-
----
-
 ## Key Takeaways
 
 - $U_j$ nel FVM è una **media di cella**, non un valore puntuale — in 1D centrato coincide con le differenze finite, ma l’interpretazione è diversa.
@@ -181,7 +180,7 @@ Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici str
 - FDS spezza la differenza di flusso (Roe); FVS spezza il vettore flusso stesso (AUSM+).
 - Lo schema di Roe richiede che $\bar{A}\Delta U = \Delta F$ — questa condizione di consistenza garantisce la cattura esatta degli urti.
 
-![Confronto Volumi-Differenze Finite.jpg](Confronto_Volumi-Differenze_Finite.jpg)
+![Whiteboard: derivazione del metodo dei volumi finiti e confronto con le differenze finite](images/fvm_confronto_volumi_vs_differenze_finite.jpg)
 
 - Metodi di ordine elevati nello spazio
     1. Weighted Essentially Non Oscillatory 5
@@ -195,7 +194,7 @@ Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici str
         
         </aside>
         
-        ![IMG_0546.jpeg](IMG_0546.jpeg)
+        ![WENO5: stencil di 5 punti diviso in 3 sottogruppi (parabole) pesati](images/weno5_stencil_sottogruppi.jpg)
         
     2. Discontinuous Galerkin 
 - Time integration
@@ -204,7 +203,7 @@ Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici str
     
     Questo metodo trasforma un insieme sparso di punti in una rete di triangoli connessi. La sua caratteristica principale è che massimizza gli angoli minimi dei triangoli, evitando triangoli troppo "sottili" o deformati, (evitando i problemi di skewness della mesh) il che è ideale per molte simulazioni e rappresentazioni grafiche.
     
-    ![IMG_0595.png](IMG_0595.png)
+    ![Procedura di triangolazione di Delaunay: nube di punti → diagramma di Voronoi → Delaunay (duale)](images/delaunay_voronoi_procedura.png)
     
     ## 1. Nube di Punti (Point Cloud)
     
@@ -358,7 +357,7 @@ Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici str
     È il caso generico, non sfortunato. Ogni interfaccia  nel metodo di Godunov è per definizione un problema di Riemann locale — indipendentemente da cosa ci sia nel flusso fisico. La struttura delle caratteristiche che si vedono nel diagramma - non è “a cavallo di un urto reale”: è la struttura della soluzione matematica del problema di Riemann che il metodo costruisce artificialmente a ogni interfaccia a ogni passo temporale.
     La soluzione del problema di Riemann per le equazioni di Eulero 1D produce sempre 3 onde (perché ci sono 3 autovalori , , ):
     
-    ![IMG_0621.jpeg](IMG_0621.jpeg)
+    ![Soluzione del problema di Riemann: ventaglio di 3 onde a ogni interfaccia](images/godunov_problema_riemann_ventaglio_onde.jpg)
     
     Se i due stati sono quasi uguali (interfaccia “normale” lontana da fenomeni forti), le 3 onde sono debolissime (onde acustiche quasi nulle) — ma esistono. Se l’interfaccia è in corrispondenza di un urto fisico, una delle onde diventa forte. Le caratteristiche si propagano da ogni interfaccia, sempre, con questa struttura a ventaglio. L’onda sinistra può essere un’onda di rarefazione (ventaglio di caratteristiche) oppure un urto (singola linea), e lo stesso per l’onda destra — il solver di Riemann determina quale caso si applica in base ai due stati  e .
     
@@ -417,7 +416,7 @@ Mesh ibride non strutturate (ICEM, Pointwise, ANSA, Gmsh): strati prismatici str
     
     Il **salto totale dei flussi** $F_B - F_A$ si scompone in tre contributi:
     
-    ![IMG_0620.jpeg](IMG_0620.jpeg)
+    ![Scomposizione del salto di flusso nelle onde 1-2-3 (stati A, C, D, B all'interfaccia)](images/godunov_splitting_flussi_onde_ABCD.jpg)
     
     $$
     
