@@ -51,11 +51,9 @@ graph LR
     
     Matematicamente è definita come il valore atteso (o media) del prodotto degli scarti:
     
-    ![IMG_0579.jpeg](IMG_0579.jpeg)
+    $$Cov(X,Y) = E\big[(X-\bar X)(Y-\bar Y)\big] = E[XY] - E[X]\,E[Y]$$
     
-    ![IMG_0580.jpeg](IMG_0580.jpeg)
-    
-    (In fluidodinamica, l'operatore media \overline{(\cdot)} sostituisce il valore atteso E[\cdot]).
+    (In fluidodinamica, l'operatore media $\overline{(\cdot)}$ sostituisce il valore atteso $E[\cdot]$).
     
     **Perché nella turbolenza non è nulla e i termini non coincidono?**
     
@@ -394,7 +392,7 @@ graph LR
         
         </aside>
         
-        ![IMG_0651.jpeg](IMG_0651.jpeg)
+        ![Bolla di separazione laminare su profilo: short bubble (riattacco turbolento) vs long bubble (laminare)](images/separazione_bolla_short_vs_long.jpg)
         
     4. Heat transfer turbina HP — vane LS89 (Cação Ferreira et al.)
         
@@ -405,7 +403,7 @@ graph LR
         
         </aside>
         
-        ![IMG_0652.jpeg](IMG_0652%201.jpeg)
+        ![Coefficiente di scambio termico lungo il suction side della vane LS89: picco di transizione](images/ls89_heat_transfer_coefficient_suction_side.jpg)
         
         > Sovrastimare lo scambio termico non è detto sia conservativo: se è il flusso caldo che va dissipato e lo sovrastimo nel peggiore dei casi ho sovradimensionato la struttura ma se sovrastimo le capacità di un flusso refrigerante va a finire che mi si squaglia il componente
         > 
@@ -418,7 +416,7 @@ graph LR
         
         </aside>
         
-        ![IMG_0653.jpeg](IMG_0653.jpeg)
+        ![Perdite di profilo ζ vs Re per la turbina LP T106C: modelli di transizione vs LES/DNS](images/t106c_perdite_zeta_vs_reynolds.jpg)
         
 - Fondamenti della LES
     1. **Idea di base**
@@ -468,7 +466,7 @@ graph LR
         
         </aside>
         
-        ![IMG_0654.jpeg](IMG_0654.jpeg)
+        ![Confronto tra Top-hat filter e Gaussian filter (ampiezza Δ del filtro)](images/les_filtri_top_hat_vs_gaussian.jpg)
         
         > Nel caso di filtri non sharp (tipo quello Gaussiano) apparentemente non è chiaro come scegliere l’ampiezza $\Delta$ .
         > 
@@ -481,13 +479,13 @@ graph LR
         
         </aside>
         
-        ![IMG_0655.jpeg](IMG_0655.jpeg)
+        $$(f * g)(x) = \int_{-\infty}^{+\infty} f(\xi)\,g(x-\xi)\,d\xi$$
         
     6. **Equazioni NS filtrate e tensore sottogriglIa** $τ_{ij}^s$
         
         Filtrando le equazioni di Navier-Stokes emerge un termine non chiuso derivante dal termine convettivo non lineare: il **tensore degli sforzi di sottogriglia** (SGS stress tensor).
         
-        ![IMG_0658.jpeg](IMG_0658.jpeg)
+        $$\frac{\partial \bar{u}_i}{\partial t} + \frac{\partial (\bar{u}_i \bar{u}_j)}{\partial x_j} = -\frac{1}{\rho}\frac{\partial \bar{p}}{\partial x_i} + \nu\frac{\partial^2 \bar{u}_i}{\partial x_j \partial x_j} - \frac{\partial \tau_{ij}^{sgs}}{\partial x_j}$$
         
         > L’equazione LES è formalmente identica alle RANS solo che cambia il significato del termine aggiuntivo
         > 
@@ -592,7 +590,7 @@ graph LR
             
             Hai ragione: l'identità di Germano calcola un tensore (chiamato Tensore di Leonard, L_{ij}) che rappresenta lo stress turbolento dovuto esclusivamente ai vortici compresi tra la griglia \Delta e il test filter \widehat{\Delta}.
             
-            ![IMG_0662.jpeg](IMG_0662.jpeg)
+            ![Smagorinsky dinamico: griglia Δ e test filter 2Δ, con regione non risolta (A), banda intermedia (B) e regione risolta (C); ipotesi Cs(B)=Cs(A)](images/smagorinsky_dinamico_filtri_test_germano.jpg)
             
             Qui entra in gioco l'**ipotesi di similitudine di scala (scale-similarity)** di Germano: si assume che i vortici appena sopra la griglia (tra \Delta e \widehat{\Delta}) si comportino esattamente come i vortici appena sotto la griglia (più piccoli di \Delta).
             
@@ -604,7 +602,7 @@ graph LR
             
             Una volta che l'identità di Germano ha sputato fuori il valore locale di C_s^2, questo viene preso e inserito direttamente nella formula classica di Smagorinsky per la viscosità di sottogriglia della griglia di calcolo:
             
-            ![IMG_0657.jpeg](IMG_0657.jpeg)
+            $$\nu_{sgs} = (C_s\,\Delta)^2\,|\bar{S}|$$
             
             L'obiettivo finale è chiuso: abbiamo trovato una \nu_{sgs} che ora dipende da un coefficiente non più fisso, ma calcolato punto per punto.
             
@@ -622,11 +620,11 @@ graph LR
             
             Prima di tutto si definisce il **Tensore della velocità di deformazione risolto** $(\bar{S}_{ij})$, che misura come la velocità del fluido varia nello spazio (gradienti):
             
-            ![IMG_0659.jpeg](IMG_0659.jpeg)
+            $$\bar{S}_{ij} = \frac{1}{2}\left(\frac{\partial \bar{u}_i}{\partial x_j} + \frac{\partial \bar{u}_j}{\partial x_i}\right)$$
             
-            Il termine |\bar{S}| (notazione contratta) rappresenta la **norma (o modulo)** di questo tensore, definita come:
+            Il termine $|\bar{S}|$ (notazione contratta) rappresenta la **norma (o modulo)** di questo tensore, definita come:
             
-            ![IMG_0660.jpeg](IMG_0660.jpeg)
+            $$|\bar{S}| = \sqrt{2\,\bar{S}_{ij}\bar{S}_{ij}}$$
             
     - **Raffinamento mesh: RANS, LES → DNS**
         
@@ -712,7 +710,7 @@ graph LR
         
     - Come distinguo le parti isotrope e anisotrope del tensore di griglia
         
-        ![IMG_0649.jpeg](IMG_0649.jpeg)
+        $$\tau_{ij}^{s} = \frac{1}{3}\,\delta_{ij}\,\tau_{kk}^{s} - 2\,\nu_T\,\bar{S}_{ij}$$
         
         Parte isotropa:  — è proporzionale al delta di Kronecker, agisce ugualmente in tutte le direzioni. Viene assorbita nel termine di pressione modificata e quindi non compare esplicitamente nelle equazioni del momento.
         Parte anisotropa (deviatorica):  — dipende dal tensore del tasso di deformazione filtrato , che non è isotropo perché dipende dal flusso locale. È questa la parte che devi modellare.
@@ -739,7 +737,7 @@ graph LR
         
         Il filtro LES in spazio fisico non è mai veramente sharp — anche il filtro “a gradino” (top-hat) ha un’ampiezza finita. La convenzione standard è di legare alla dimensione della cella della mesh:
         
-        ![IMG_0650.jpeg](IMG_0650.jpeg)
+        $$\Delta = \max(\Delta x,\,\Delta y,\,\Delta z) \qquad \text{oppure} \qquad \Delta = (\Delta x\cdot\Delta y\cdot\Delta z)^{1/3}$$
         
         Il significato fisico è: tutto ciò che ha scale spaziali  non è risolto dalla mesh e viene modellato. Non c’è una soglia di intensità convenzionale come per i filtri elettronici — la mesh stessa è il filtro. In spettrale,  corrisponde a un numero d’onda di cutoff : le scale con  vengono modellate.
         
@@ -771,7 +769,16 @@ graph LR
         La shielding function è introdotta nel DDES per proteggere il boundary layer dall’essere erroneamente trattato in modalità LES.
         Nel DES originale la lunghezza di scala modificata è:
         
-        ![IMG_0648.jpeg](IMG_0648.jpeg)
+        $$\tilde{d} = \min(d,\; C_{DES}\,\Delta)$$
+        
+        dove $d$ è la distanza dalla parete. Il problema è che se la mesh è raffinata parallelamente alla
+        parete ($\Delta$ piccolo), $C_{DES}\Delta < d$ anche dentro il boundary layer, e il modello passa a
+        LES — ma **non c'è contenuto turbolento risolto** per sostenere quella modalità. Il **DDES**
+        introduce allora la *shielding function* $f_d$:
+        
+        $$\tilde{d} = d - f_d\,\max(0,\; d - C_{DES}\,\Delta), \qquad
+        f_d = 1 - \tanh\!\big([8\,r_d]^3\big), \qquad
+        r_d = \frac{\nu + \nu_t}{\kappa^2 d^2 \sqrt{U_{i,j}U_{i,j}}}$$
         
         Come funziona:
         •	Dentro il BL,  o : , quindi  → rimane in RANS
