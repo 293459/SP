@@ -3,11 +3,11 @@
 - Tipologie
     1. Strutturate e non 
         
-        ![IMG_0584.jpeg](IMG_0584.jpeg)
+        ![Mesh strutturata vs non strutturata (2D)](images/mesh_strutturata_vs_non_strutturata.jpg)
         
     2. Algebrica 
         
-        ![IMG_0585.jpeg](IMG_0585.jpeg)
+        ![Mappatura algebrica: dal piano reale (x,y) al piano trasformato (η,ξ)](images/mesh_mappatura_algebrica_piano_reale_trasformato.jpg)
         
         $$
         x = x_1 + \eta(x_2 - x_1) \Rightarrow \eta = \frac{x - x_1}{x_2 - x_1} \longrightarrow \begin{cases} \text{Se } x = x_1 \Rightarrow \eta = 0 \text{ (estremo sinistro)} \\ \text{Se } x = x_2 \Rightarrow \eta = 1 \text{ (estremo destro)} \end{cases}
@@ -48,7 +48,14 @@
         | Non strutturata | Frontale |  |  |
 - Facce e Nodi centrati
     
-    ![IMG_0599.jpeg](IMG_0599.jpeg)
+    Introdotta la discretizzazione spaziale, si definisce il **valor medio di cella**
+    $U_j = \frac{1}{V}\int_V u\,dV$, e la legge di conservazione in forma integrale diventa:
+    
+    $$\frac{\partial}{\partial t}\int_V u\,dV = -\int_S \vec{F}\cdot\vec{n}\,dS
+    \;\;\Rightarrow\;\; V\,\frac{\partial U_j}{\partial t} = -\int_S \vec{F}\cdot\vec{n}\,dS$$
+    
+    (questa forma presuppone **volumi di controllo fissi nel tempo**; se il dominio si deforma —
+    flutter aeroelastico, vibrazione di pale — si passa ai metodi **ALE**, vedi sotto).
     
     In una griglia **Cell-Centered**, le variabili sono al centro della cella. In una **Vertex-Centered**, sono ai nodi.
     
@@ -56,7 +63,7 @@
     - **Vantaggio:** In geometrie complesse o mesh strutturate "adattive", la griglia duale permette una gestione più rigorosa della **conservazione della massa** e una stima dei gradienti più fluida tra elementi adiacenti.
     - **Costo:** Devi memorizzare due strutture dati (la mesh originale e quella duale), aumentando il consumo di RAM.
     
-    ![IMG_0588.jpeg](IMG_0588.jpeg)
+    ![Conteggio di facce e nodi e relativi gradi di libertà su griglia strutturata](images/mesh_facce_nodi_gradi_di_liberta.jpg)
     
     > Noi ci focalizzeremo principalmente su quelli a facce centrate
     > 
@@ -77,7 +84,7 @@
     | **Tetraedrica** | FEM / FVM | Geometrie complesse (motori, valvole). | **+** Automatica al 100%.<br>**-** Molta diffusione numerica. |
     | **Poliedrica** | FVM (Volumi Finiti) | Standard moderno (Fluent, Star-CCM+). | **+** Molte facce = gradienti migliori.<br>**-** Pesante in memoria. |
     
-    ![IMG_0594.jpeg](IMG_0594.jpeg)
+    ![Elementi prismatici per il boundary layer vs tetraedrici per il far field](images/mesh_elementi_boundary_layer_vs_far_field.jpg)
     
 - Arbitrary Lagrangian-Eulerian ALE (approfondimento)
     
@@ -92,21 +99,23 @@
     
     L'approccio ALE introduce una terza via: la velocità della mesh (\vec{v}_g) non deve essere né zero (Euleriano), né uguale alla velocità del fluido \vec{v} (Lagrangiano). **Può essere arbitraria.**
     
-    Ecco come funziona la logica:
+    Ecco come funziona la logica: si introduce una **velocità relativa** tra fluido e griglia,
     
-    ![IMG_0600.jpeg](IMG_0600.jpeg)
+    $$\vec{v}_{rel} = \vec{v} - \vec{v}_g$$
+    
+    dove $\vec v_g$ è la velocità della mesh ($\vec v_g=0$ → Euleriano, $\vec v_g=\vec v$ → Lagrangiano).
     
     **3. Modifica delle Equazioni (Rispetto al tuo screenshot)**
     
     Nel tuo screenshot, l'equazione (3.1) assume volumi fissi. In un contesto ALE, l'equazione del trasporto deve essere corretta per tenere conto del fatto che i confini S si muovono.
     
-    Utilizzando il **Teorema del Trasporto di Reynolds**, la variazione di una grandezza u in un volume V(t) che cambia nel tempo diventa:
+    Utilizzando il **Teorema del Trasporto di Reynolds**, la variazione di una grandezza $u$ in un volume $V(t)$ che cambia nel tempo diventa:
     
-    ![IMG_0602.jpeg](IMG_0602.jpeg)
+    $$\frac{d}{dt}\int_{V(t)} u\,dV + \int_{S(t)} \vec{F}(u)\cdot\vec{n}\,dS = 0$$
     
-    Dove il flusso \vec{F}(u) deve ora considerare che la superficie "scappa" o "viene incontro" al fluido. Se consideriamo un termine convettivo semplice u\vec{v}, in ALE diventa:
+    Dove il flusso $\vec{F}(u)$ deve ora considerare che la superficie "scappa" o "viene incontro" al fluido. Se consideriamo un termine convettivo semplice $u\vec{v}$, in ALE diventa:
     
-    ![IMG_0601.jpeg](IMG_0601.jpeg)
+    $$\int_{S(t)} u\,(\vec{v} - \vec{v}_g)\cdot\vec{n}\,dS$$
     
     **4. Perché è fondamentale? (Applicazioni pratiche)**
     

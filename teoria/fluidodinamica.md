@@ -94,7 +94,7 @@
     
     Per un fluido comprimibile, l'equazione del potenziale linearizzata è:
     
-    ![IMG_0478.jpeg](IMG_0478.jpeg)
+    $$(1 - M^2)\,\phi_{xx} + \phi_{yy} = 0$$
     
     1. **Subsonico (**M < 1**):** (1 - M^2) > 0. Il segno è concorde. \Delta < 0. **Equazione Ellittica**.
     
