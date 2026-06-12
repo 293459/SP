@@ -1,5 +1,28 @@
 # Fluid dynamics
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $U$ | vettore delle **variabili conservative** | massa, q. di moto, energia |
+| $F(U)$ | vettore di **flusso** | $\partial_t U+\partial_x F=0$ |
+| $A(U)=\partial F/\partial U$ | **matrice Jacobiana** del flusso | governa la propagazione |
+| $\lambda,\ \Lambda$ | **autovalori** / matrice diagonale | Eulero 1D: $\{u,\ u+c,\ u-c\}$ |
+| $L,\ L^{-1}$ | matrici di **autovettori** | $A=L\Lambda L^{-1}$ |
+| $u$ | velocità del fluido | — |
+| $c$ | **velocità del suono** | $c=\sqrt{\gamma R T}$ |
+| $M=u/c$ | numero di **Mach** | $<1$ subsonico, $>1$ supersonico |
+| $\phi$ | **potenziale** di velocità | $(1-M^2)\phi_{xx}+\phi_{yy}=0$ |
+| $\Delta=B^2-4AC$ | **discriminante** della PDE 2° ordine | $<0$ ellittica, $>0$ iperbolica |
+| $A,B,C$ | coefficienti della PDE quasi-lineare | classificazione matematica |
+| Rankine–Hugoniot | relazioni di **salto** attraverso l'urto | monte ↔ valle |
+
+> **Natura del problema:** **ellittico** (subsonico) → informazione ovunque, schemi **centrati**;
+> **iperbolico** (supersonico) → informazione lungo le **caratteristiche** (cono di Mach),
+> schemi **upwind/marching**.
+
+---
+
 - Conservations laws
     
     

@@ -1,5 +1,24 @@
 # Meshing
 
+## Nomenclatura essenziale
+
+| Simbolo / termine | Nome | Note |
+|---|---|---|
+| $U_j=\frac1V\int_V u\,dV$ | **valor medio di cella** | incognita dei volumi finiti |
+| $V,\ S$ | volume di controllo / sua superficie | $V\,\partial_t U_j=-\int_S\vec F\cdot\vec n\,dS$ |
+| $\vec F,\ \vec n$ | flusso / **normale uscente** | bilancio di bordo |
+| $\eta,\ \xi$ | **coordinate computazionali** | mapping algebrico al piano trasformato |
+| $\vec v_g$ | **velocità della mesh** (ALE) | $\vec v_g=0$ Euleriano, $\vec v_g=\vec v$ Lagrangiano |
+| $\vec v_{rel}=\vec v-\vec v_g$ | velocità **relativa** fluido–griglia | termine convettivo ALE |
+| ALE / GCL | *Arbitrary Lagrangian–Eulerian* / *Geometric Conservation Law* | mesh mobili; GCL evita "massa fantasma" |
+| Aspect Ratio | lato lungo / lato corto | alto → mal condizionamento |
+| Skewness | deformazione vs forma regolare | $\approx0$ ideale |
+| Orthogonality | allineamento centro-celle vs normale faccia | $\approx1$ ideale |
+| Expansion (Smoothness) Ratio | salto di dimensione tra celle vicine | salti bruschi → riflessioni |
+| Jacobiano (det) | distorsione della trasformazione | $\det\le0$ → **volume negativo** (overlap) |
+
+---
+
 - Tipologie
     1. Strutturate e non 
         

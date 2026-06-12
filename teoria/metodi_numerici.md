@@ -1,3 +1,24 @@
+## Glossario essenziale
+
+> Questa pagina è **organizzativa** (dove collocare ciascun metodo): di seguito un glossario
+> dei termini ricorrenti.
+
+| Termine | Significato | Asse |
+|---|---|---|
+| **Esplicito / Implicito** | $u^{n+1}$ dipende solo dal passato / anche da sé stesso | tempo |
+| **Regione di assoluta stabilità / CFL** | vincolo di stabilità degli espliciti | tempo |
+| **WENO** | ricostruzione spaziale ad alto ordine non oscillatoria | spazio |
+| **Discontinuous Galerkin (DG)** | alto ordine, polinomi a tratti **discontinui** per cella | spazio |
+| **Teorema barriera di Godunov** | uno schema **lineare e monotono** è al più del **1° ordine** | spazio |
+| **Limitatori di pendenza** (minmod, van Leer, superbee) | rendono **non lineare** lo schema → alto ordine senza oscillazioni (**TVD**) | spazio |
+| **MUSCL** | ricostruzione lineare in cella (2° ordine) | spazio |
+| **Upwind / Centrato** | adatto a **iperbolico** / **ellittico** | spazio |
+| **Cella-centrata / Nodo-centrata** | dove sono collocate le incognite | spazio |
+
+La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Schemes**.
+
+---
+
 ## Premessa — la suddivisione attuale del Notion
 
 | Pagina Notion | Cosa contiene (natura) |
