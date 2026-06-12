@@ -1,5 +1,28 @@
 # Finite Volumes Schemes
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $U_j$ | **valor medio di cella** | incognita dei volumi finiti |
+| $j\pm 1/2$ | **interfacce** della cella $j$ | dove si valuta il flusso numerico |
+| $\mathbf F(U)$ | flusso fisico | $\partial_t U+\partial_x F=0$ |
+| $\mathbf F^+,\ \mathbf F^-$ | flussi **splittati** (FVS) | parte a monte / a valle |
+| $\mathbf F^c$ | flusso convettivo | — |
+| $u_L,\ u_R$ | stati **sinistro / destro** | problema di **Riemann** all'interfaccia |
+| $a$ | velocità del suono | regimi $u\lessgtr a$ (sub/supersonico) |
+| $\lambda_k$ | autovalori (velocità d'onda) | Eulero: $u,\ u\pm a$ |
+| $\sigma_k\in\{-1,+1\}$ | **segno** dell'autovalore | direzione upwind |
+| $\lvert\lambda_k\rvert<\epsilon$ | **entropy fix** (Harten) | soglia sui punti sonici |
+| $\Delta t$ | passo temporale | vincolo **CFL** |
+| $\mu=k=0$ | limite di **Eulero** | niente viscosità/conduzione |
+| $\overrightarrow{DF},\ \overleftarrow{DF}$ | differenze finite (forward/backward) | ricostruzione gradiente |
+
+> Schemi chiave: **Godunov** (problema di Riemann), **Roe** (upwind linearizzato),
+> **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
+
+---
+
 ## 1. Metodo dei Volumi Finiti in 1D
 
 ### Equazione conservativa

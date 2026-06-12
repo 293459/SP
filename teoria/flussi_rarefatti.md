@@ -9,6 +9,26 @@
 
 ---
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $Kn=\dfrac{\lambda}{L}$ | **numero di Knudsen** | è un **campo** (varia localmente) |
+| $\lambda$ | **libero cammino medio** | distanza media tra due collisioni; variabile |
+| $L$ | lunghezza caratteristica | scala del problema |
+| $Kn<10^{-2}$ / $10^{-2}\!-\!1$ / $>1$ | regimi | **continuo** / **slip-transizionale** / **molecolare libero** |
+| $\bar c$ | velocità media molecolare | da teoria cinetica |
+| $\tau_c=\lambda/\bar c$ | **tempo medio tra collisioni** | scala temporale della collisione |
+| $\mu(T)\propto\sqrt T$ | viscosità del gas | legata a $\lambda$; modello **VHS** |
+| $\sigma\propto g^{-2\nu},\ \omega\approx0.74$ | sezione d'urto / esponente | $g$ = velocità relativa, VHS |
+| $\Delta x\le\lambda$ | vincolo di **cella** (DSMC) | cella più piccola del cammino libero |
+| $\Delta t\le\tau_c$ | vincolo di **passo** (DSMC) | passo più piccolo del tempo di collisione |
+| $F_{num}$ | **peso** numerico | molecole reali per particella simulata |
+| $\nu_{max}$ | frequenza di collisione max | schema **NTC** (No Time Counter) |
+| DSMC | *Direct Simulation Monte Carlo* | particelle statistiche, non un continuo |
+
+---
+
 ## Parte I — Teoria
 
 ### 1. Il problema fisico: il plume di un ugello nel vuoto

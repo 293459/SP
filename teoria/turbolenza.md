@@ -1,5 +1,26 @@
 # Turbolence
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $\overline{(\cdot)},\ \bar f$ | **media** (di Reynolds) / filtraggio (LES) | RANS media, LES filtra |
+| $(\cdot)'$ | **fluttuazione** turbolenta | $u=\bar u+u'$, $\overline{u'}=0$ |
+| $\overline{u_i'u_j'}$ | **sforzi di Reynolds** | $\neq0$: chiusura RANS |
+| $k$ | energia cinetica turbolenta | $k=\tfrac12\overline{u_i'u_i'}$ |
+| $\epsilon$ | dissipazione di $k$ | modello $k$–$\epsilon$ |
+| $\omega$ | dissipazione specifica | modello $k$–$\omega$ (SST) |
+| $\mu_T,\ \nu_{sgs}$ | viscosità **turbolenta** / di sotto-griglia | Boussinesq; LES (SGS) |
+| $\bar S_{ij},\ \lvert\bar S\rvert$ | tensore velocità di deformazione filtrato | $\nu_{sgs}=(C_s\Delta)^2\lvert\bar S\rvert$ |
+| $C_s$ | costante di **Smagorinsky** | modello SGS |
+| $\Delta,\ \widehat{\Delta}$ | larghezza del **filtro** / *test filter* | LES; $\widehat{(\cdot)}$ = test filter |
+| $L_{ij},\ T_{ij}$ | tensori di Leonard / Germano | modello **dinamico** |
+| $\tau_{ij},\ \tau_{ij}^s$ | sforzi (Reynolds / SGS) | — |
+| $d,\ C_{DES}\Delta$ | distanza da parete / scala DES | switch RANS↔LES (DES), $f_d$ shielding |
+| $\gamma\text{–}Re_\theta$ | modello di **transizione** | intermittenza |
+
+---
+
 ```mermaid
 graph LR
     A["**Scale Grandi**<br/>Dipendono dalla geometria"] 

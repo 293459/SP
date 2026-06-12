@@ -9,6 +9,27 @@
 
 ---
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $u(\bar x,\bar\mu)$ | soluzione **full-order** | dipende da spazio $\bar x$ e parametri $\bar\mu$ |
+| $\bar x$ | coordinata **spaziale** (mesh) | dominio fisico |
+| $\bar\mu$ | vettore dei **parametri** | es. $(v,T)$, condizioni operative |
+| $u_J(\bar x)$ | **snapshot** $J$-esimo | soluzione calcolata a un dato $\bar\mu_J$ |
+| $N_s$ | numero di **snapshot** | colonne della matrice degli snapshot |
+| $\phi_i(\bar x)$ | **modi POD** (base spaziale) | ortonormali, $\lVert\phi_i\rVert=1$ |
+| $\lambda_i$ | **autovalori** della POD | "energia" catturata dal modo $i$ |
+| $\tilde u_i(\bar\mu)$ | **coefficienti modali** | dipendono dai parametri; si interpolano |
+| $V_\ell$ | sottospazio **ridotto** ($\ell$ modi) | $u\approx\sum_{i\le\ell}\tilde u_i\phi_i$ |
+| $\langle\cdot,\cdot\rangle,\ L^2$ | prodotto scalare / norma | definiscono energia e ortogonalità |
+
+> Idea: **POD** estrae i modi $\phi_i$ più "energetici" dagli snapshot (autovalori $\lambda_i$);
+> il **ROM** ricostruisce nuove soluzioni combinando i modi con coefficienti $\tilde u_i(\bar\mu)$
+> **interpolati** nello spazio dei parametri. Limite: la **non linearità** (urti) degrada la base.
+
+---
+
 ## Parte I — Teoria
 
 ### 1. Cos'è un ROM e a cosa serve

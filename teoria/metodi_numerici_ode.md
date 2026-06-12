@@ -1,5 +1,25 @@
 # Numerical Methods (ODE)
 
+## Nomenclatura essenziale
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $y(t_k)$ / $y_k$ | soluzione **esatta** / **numerica** al tempo $t_k$ | $y_k\approx y(t_k)$ |
+| $h=\dfrac{t-a}{N}$ | **passo** temporale | $N$ = numero di passi, $t\in[a,b]$ |
+| $e_k$ | **errore globale** | convergenza: $e_N\to0$ per $N\to\infty$ |
+| $\tau(h)$ | errore di **troncamento locale** | residuo del singolo passo |
+| $d(h)=\dfrac{\tau(h)}{h}=\mathcal O(h^p)$ | errore di **consistenza** | $\lim_{h\to0}d(h)=0$ |
+| $p$ | **ordine** del metodo | pendenza nel grafico log–log |
+| $\lambda,\ \lambda_i$ | autovalori dell'eq. test $y'=\lambda y$ | stabilità per $\lambda<0$ |
+| $F(h\lambda)$ | **fattore di amplificazione** | stabile se $\lvert F(h\lambda)\rvert<1$ |
+| $\bar h,\ K$ | passo limite / costante di Lipschitz | $\exists K>0,\ \bar h$ |
+| $\{i-1,i,i+1\}$ | **stencil** | n. di nodi coinvolti |
+
+> Teorema di **Lax**: *consistenza* + *zero-stabilità* ⇒ **convergenza**. Espliciti →
+> stabilità **condizionata** (regione limitata); impliciti → spesso **A-stabili**.
+
+---
+
 - **Tipologie di errore**
     1. Nomenclatura 
         

@@ -1,3 +1,27 @@
+# Turbomacchine — interfaccia statore/rotore
+
+## Nomenclatura essenziale
+
+| Simbolo / termine | Nome | Note |
+|---|---|---|
+| $Z_1,\ Z_2$ | numero di **pale** di statore / rotore | spesso $Z_1\neq Z_2$ |
+| $Z_1/Z_2$ | rapporto dei conteggi pale | determina la **periodicità** |
+| $\mathrm{MCD}(Z_1,Z_2)$ | massimo comun divisore | n. minimo di canali per la periodicità rotazionale |
+| pitch $=360^\circ/Z$ | **passo** angolare di un canale | es. $360/30=12^\circ$ |
+| $\Omega_1,\ \Omega_2$ | velocità **angolari** | $\lvert\Omega_1-\Omega_2\rvert$ = velocità relativa |
+| $\delta_t$ | passo **temporale** | $\delta_t=0$ → stazionario/frozen |
+| $t,\ n$ | tempo / indice di iterazione | $t+\delta_t$, $n\to n+1$ |
+| **Mixing plane** | media circonferenziale all'interfaccia | stazionario, passi qualsiasi |
+| **Frozen rotor** | posizione relativa congelata | stazionario |
+| **Sliding mesh** | mesh che scorre, interfaccia non conforme | instazionario, alta fedeltà |
+| **Phase-lag / corocroniche** | sfasamento temporale tra canali | sfrutta la periodicità |
+| **Tempo inclinato** | riformulazione spazio-tempo inclinata | gestisce passi diversi |
+
+> Filo conduttore: tutti i metodi si distinguono per **quanta interazione instazionaria
+> statore–rotore** conservano (scie, campi di potenziale) e a **quale costo**.
+
+---
+
 ## Parte I — Teoria
 
 ### 1. Il problema di base
