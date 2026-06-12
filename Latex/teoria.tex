@@ -20,6 +20,10 @@ Il codice risolve le \textbf{equazioni di Eulero}, che descrivono il moto di un
 fluido comprimibile \textbf{non viscoso} e \textbf{non conduttivo}: rappresentano
 cioè il limite delle equazioni di Navier--Stokes quando si trascurano gli sforzi
 viscosi e il flusso di calore.
+La scelta di trasportare le \emph{variabili conservative} e di ricavare la pressione
+\emph{a valle} dall'equazione di stato colloca fin da subito il solutore nella famiglia
+dei metodi \textbf{density-based}, contrapposti ai \textbf{pressure-based}: il confronto
+sistematico tra i due paradigmi è sviluppato nella Sezione~\ref{sec:paradigmi}.
 
 \subsection{Forma vettoriale generale}
 
@@ -159,6 +163,7 @@ incognite e il problema è ben posto.
 
 % ============================================================
 \section{Adimensionalizzazione}
+\label{sec:adim}
 % ============================================================
 
 \subsection{Perché risolvere in forma adimensionale}
@@ -274,6 +279,370 @@ campo di Eulero privo di onde d'urto $\bar{S}$ è conservata lungo le linee di f
 quindi ogni deviazione da zero è imputabile all'errore numerico di discretizzazione.
 
 % ============================================================
+\section{Paradigmi di Soluzione: Solutori Density-Based e Pressure-Based}
+\label{sec:paradigmi}
+% ============================================================
+
+Una volta scritte le equazioni di governo in forma conservativa
+(Eq.~\eqref{eq:eulero_diff}), resta da decidere \emph{come} risolvere il sistema
+accoppiato. In CFD esistono due grandi famiglie di solutori, distinte non dalle
+equazioni in sé ma dalla \textbf{variabile attorno a cui si organizza l'avanzamento}
+e dal \textbf{modo in cui si recupera la pressione}: i solutori
+\textbf{density-based} (basati sulla densità) e i solutori \textbf{pressure-based}
+(basati sulla pressione).
+
+\begin{quote}
+\small Vale la pena un'annotazione metodologica: il codice sviluppato nel corso è --- a
+tutti gli effetti --- un \textbf{solutore density-based}. Questa consapevolezza è in parte
+maturata \emph{a posteriori}: mentre lo si scriveva si ragionava in termini di ``equazioni
+di Eulero conservative + volumi finiti + avanzamento esplicito'', senza etichettarlo, ma la
+struttura adottata (densità trasportata dalla continuità, pressione ricavata
+\emph{dopo} dall'equazione di stato) è esattamente quella di un metodo density-based. La
+presente sezione colloca il codice in questo quadro e ne chiarisce il contraltare, il
+metodo pressure-based, che nel corso compare invece nei flussi reagenti a basso Mach.
+\end{quote}
+
+\subsection{La distinzione di fondo}
+\label{sub:distinzione_paradigmi}
+
+\paragraph{Solutori density-based.} Si avanzano nel tempo le \textbf{variabili
+conservative} $(\rho E,\ \rho,\ \rho u,\ \rho v)$ tramite le rispettive equazioni di
+trasporto. In particolare la \textbf{densità} è ottenuta direttamente
+dall'\emph{equazione di continuità}, mentre la \textbf{pressione non ha una propria
+equazione}: è una grandezza \emph{derivata}, ricavata \emph{a valle}
+dall'\textbf{equazione di stato}~\eqref{eq:stato},
+$P = (\gamma-1)\big(\rho E - \tfrac12\rho|\bm q|^2\big)$. L'ordine logico è dunque
+``\textbf{prima la densità, poi la pressione}''. Il forte legame densità--pressione
+tipico dei gas (compressibilità) è ciò che questi metodi sfruttano: sono nati per i
+\textbf{flussi comprimibili ad alto numero di Mach}, dove tale legame è
+essenziale (onde d'urto, espansioni).
+
+\paragraph{Solutori pressure-based.} La variabile primaria è la \textbf{pressione}.
+Qui l'equazione di continuità \emph{non} serve a calcolare la densità (che nel limite
+incomprimibile è costante) ma diventa un \textbf{vincolo} sul campo di velocità
+($\nabla\cdot\bm u = 0$); è da questo vincolo che si costruisce un'\textbf{equazione
+per la pressione} (di tipo \emph{ellittico}, una Poisson), risolta separatamente. La
+densità, se varia, è aggiornata per ultima. Storicamente questi metodi nascono per i
+\textbf{flussi incomprimibili} (o a basso Mach), ma si estendono ai comprimibili con
+opportune correzioni (algoritmi \textsc{simple}/\textsc{piso}, schemi
+\emph{pressure-based coupled}, formulazioni \emph{all-Mach}).
+
+\begin{table}[H]
+\centering
+\caption{Distinzione macroscopica tra i due paradigmi di soluzione.}
+\label{tab:paradigmi_caratteristiche}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{0.24\linewidth} p{0.33\linewidth} p{0.33\linewidth}}
+\toprule
+\textbf{Caratteristica} & \textbf{Solutori density-based} & \textbf{Solutori pressure-based} \\
+\midrule
+Variabile principale & Densità $\rho$ (var.\ conservative) & Pressione $P$ \\
+Come si ottiene $P$ & Dall'\emph{equazione di stato} (a valle) & Da un'\emph{equazione di pressione} (Poisson) \\
+Ruolo della continuità & Trasporta la densità $\rho$ & Vincolo $\nabla\cdot\bm u=0$ sul campo di velocità \\
+Accoppiamento var. & Forte e simultaneo (sistema iperbolico) & Segregato (predittore--correttore) o accoppiato \\
+Natura matematica & Iperbolica (onde a $\tilde u\pm a$, $\tilde u$) & Ellittica (informazione in tutte le direzioni) \\
+Regime ottimale & Comprimibile, \textbf{alto Mach}, urti & Incomprimibile, \textbf{basso Mach} \\
+Origine storica & Aerodinamica comprimibile / supersonica & Idraulica / flussi incomprimibili \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{L'algoritmo density-based: quello del nostro codice}
+\label{sub:algoritmo_db}
+
+Tutto l'impianto descritto nelle sezioni seguenti --- volumi finiti
+(Sez.~\ref{sec:flussi} e seguenti), flussi numerici, integrazione esplicita di Eulero
+in avanti --- \textbf{è} il solutore density-based. Riassumendone la logica per ogni
+passo temporale $k\to k+1$ su ciascuna cella:
+\begin{enumerate}
+  \item \textbf{Flussi.} Dalle variabili conservative $\uvec_i=(\rho E,\rho,\rho u,\rho v)$
+    si calcolano i flussi numerici $\Fvec_{ij}$ alle interfacce (Lax--Friedrichs o Roe).
+  \item \textbf{Avanzamento.} Si aggiornano \emph{simultaneamente} tutte le variabili
+    conservative con lo schema esplicito,
+    $\uvec_i^{k+1}=\uvec_i^{k}+\dt\,\partial_t\uvec_i^{k}$; in particolare la
+    \textbf{densità} è il risultato dell'equazione di continuità.
+  \item \textbf{Chiusura.} Dalle nuove conservative si ricavano le primitive e, tramite
+    l'\textbf{equazione di stato}~\eqref{eq:stato}, la \textbf{pressione}. È il passo che
+    rende il metodo ``density-based'': la pressione \emph{segue} la densità, non la
+    precede.
+\end{enumerate}
+Non compare alcuna equazione di Poisson: l'accoppiamento è gestito ``naturalmente'' dalla
+struttura iperbolica del sistema e dalla velocità del suono $a$, che porta l'informazione
+acustica all'interno del medesimo avanzamento esplicito.
+
+\subsection{L'algoritmo pressure-based: il metodo a proiezione di Chorin}
+\label{sub:chorin}
+
+Il prototipo dei metodi pressure-based è il \textbf{metodo a proiezione (fractional
+step)} di \textbf{Chorin (1968)} per le Navier--Stokes incomprimibili. Vale la pena
+svolgerlo per intero perché è il rovescio concettuale del nostro solutore e perché ne
+illumina il funzionamento. L'idea è separare (\emph{split}) gli effetti di
+\textbf{convezione--diffusione} da quelli di \textbf{pressione}, in tre fasi.
+
+\paragraph{Fase 1 --- Predittore (calcolo di $\bm u^*$).} Si avanza la quantità di moto
+\textbf{ignorando} il gradiente di pressione, ottenendo una velocità
+\emph{intermedia} (o \emph{fittizia}) $\bm u^*$.
+
+\paragraph{Fase 2 --- Proiezione (Poisson per la pressione).} Si determina la pressione
+che rende il campo finale a divergenza nulla, risolvendo un'equazione di Poisson.
+
+\paragraph{Fase 3 --- Correzione.} Si ``proietta'' $\bm u^*$ sottraendo il gradiente di
+pressione, ottenendo $\bm u^{n+1}$ solenoidale.
+
+\subsubsection*{Dimostrazione completa}
+
+Si parte dalle equazioni di conservazione della massa e della quantità di moto.
+Ipotizzando un flusso \textbf{incomprimibile} ($\rho=\text{cost}$,
+$\nabla\cdot\bm u=0$) e \textbf{newtoniano}, esse si riducono a:
+\begin{align}
+  \nabla\cdot\bm u &= 0, \label{eq:incomp_cont}\\
+  \parziale{\bm u}{t} + (\bm u\cdot\nabla)\bm u
+  &= -\frac{1}{\rho}\nabla p + \nu\,\nabla^2\bm u . \label{eq:incomp_mom}
+\end{align}
+Si \textbf{discretizza la sola derivata temporale} (non quelle spaziali) con uno schema
+esplicito. A partire da un istante $n$ si definisce la velocità fittizia $\bm u^*$
+considerando \emph{solo} convezione e diffusione e \textbf{trascurando la pressione}:
+\begin{equation}
+  \frac{\bm u^{*}-\bm u^{n}}{\dt}
+  = -(\bm u^{n}\cdot\nabla)\bm u^{n} + \nu\,\nabla^2\bm u^{n}
+  \;\;\Longrightarrow\;\;
+  \bm u^{*} = \bm u^{n} + \dt\Big[-(\bm u^{n}\cdot\nabla)\bm u^{n}
+  + \nu\,\nabla^2\bm u^{n}\Big].
+  \label{eq:predittore}
+\end{equation}
+Questo campo \emph{predittore} non rispetta in generale la
+continuità~\eqref{eq:incomp_cont} (trascurando la pressione si ottiene una soluzione
+\textbf{non fisica}): occorre quindi un termine correttivo basato sulla \emph{sola}
+pressione. Si scrive allora il passo di correzione, che reintroduce \emph{esclusivamente}
+il gradiente di pressione:
+\begin{equation}
+  \frac{\bm u^{n+1}-\bm u^{*}}{\dt} = -\frac{1}{\rho}\nabla p^{\,n+1}.
+  \label{eq:correttore}
+\end{equation}
+Si osservi che sommando~\eqref{eq:predittore} e~\eqref{eq:correttore} si \textbf{ricostruisce
+esattamente} la~\eqref{eq:incomp_mom} discretizzata: lo splitting non altera l'equazione,
+la \emph{spezza} solo in due sotto-passi.
+
+Ora si \textbf{impone la fisica} che mancava: il campo finale $\bm u^{n+1}$ deve essere
+solenoidale, $\nabla\cdot\bm u^{n+1}=0$. Sfruttando la \textbf{linearità} dell'operatore
+$\nabla$ si applica la divergenza alla~\eqref{eq:correttore}:
+\begin{equation}
+  \underbrace{\nabla\cdot\bm u^{n+1}}_{=\,0}-\nabla\cdot\bm u^{*}
+  = -\frac{\dt}{\rho}\,\nabla^2 p^{\,n+1},
+\end{equation}
+da cui l'\textbf{equazione di Poisson per la pressione}:
+\begin{equation}
+  \boxed{\;\nabla^2 p^{\,n+1} = \frac{\rho}{\dt}\,\nabla\cdot\bm u^{*}\;}
+  \label{eq:poisson}
+\end{equation}
+(con la convenzione di pressione cinematica $p\leftarrow p/\rho$, usuale
+nell'incomprimibile, il fattore $\rho$ scompare e si ritrova
+$\nabla^2 p=\tfrac{1}{\dt}\nabla\cdot\bm u^{*}$). Si noti che il secondo membro
+\textbf{non} è nullo: il laplaciano della pressione è proprio uguale alla divergenza
+(non nulla) del predittore, scalata da $\rho/\dt$. Risolta la~\eqref{eq:poisson} per
+$p^{\,n+1}$, si \textbf{corregge} la velocità con la~\eqref{eq:correttore}:
+\begin{equation}
+  \bm u^{n+1} = \bm u^{*} - \frac{\dt}{\rho}\,\nabla p^{\,n+1}.
+  \label{eq:proiezione}
+\end{equation}
+Questa è la \textbf{decomposizione di Helmholtz--Hodge}: il campo provvisorio $\bm u^{*}$
+viene scomposto in modo \emph{unico e ortogonale} nella somma di una parte
+\textbf{solenoidale} (il $\bm u^{n+1}$ cercato) e del \textbf{gradiente di uno scalare}
+(il termine di pressione). Il metodo ``\textbf{proietta}'' $\bm u^{*}$ sullo spazio dei
+campi a divergenza nulla, eliminandone la parte irrotazionale: da qui il nome
+\emph{metodo di proiezione}. $\qquad\blacksquare$
+
+\subsection{Risoluzione dei dubbi concettuali}
+\label{sub:dubbi_chorin}
+
+La derivazione precedente lascia aperte alcune domande naturali, che conviene sciogliere
+una per una perché toccano il cuore della differenza fra i due paradigmi.
+
+\paragraph{Come si calcola la densità nei solutori density-based?}
+Non con un'equazione di stato ``invertita'', ma \textbf{trasportandola}: la densità
+$\rho$ è una delle variabili conservative e si aggiorna risolvendo l'\textbf{equazione di
+continuità} $\partial_t\rho + \nabla\cdot(\rho\bm q)=0$ (la seconda componente del
+sistema~\eqref{eq:eulero_diff}). È la pressione, semmai, a essere ``invertita'' dalla
+densità e dall'energia tramite la~\eqref{eq:stato}. Questo è l'opposto del pressure-based,
+dove la pressione viene per prima e la densità (se serve) per ultima.
+
+\paragraph{Perché la variazione temporale è $\bm u^{*}-\bm u^{n}$ e non
+$\bm u^{n+1}-\bm u^{n}$?}
+Perché $\bm u^{*}$ è una velocità di un \textbf{sotto-passo intermedio} (da cui ``fractional
+step''), \emph{non} la velocità all'istante $n+1$. Il passo completo $n\to n+1$ è
+spezzato in due: prima si va da $\bm u^{n}$ a $\bm u^{*}$ (convezione+diffusione), poi da
+$\bm u^{*}$ a $\bm u^{n+1}$ (pressione). Temporalmente $\bm u^{*}$ va collocato ``tra''
+$n$ e $n+1$: è uno stato ausiliario di calcolo, non un istante fisico.
+
+\paragraph{Perché il termine $(\bm u\cdot\nabla)\bm u$ cambia segno?}
+Non cambia segno per una ragione fisica ma perché viene \textbf{portato a secondo membro}.
+Nella~\eqref{eq:incomp_mom} il termine convettivo sta a sinistra con il segno $+$; isolando
+$\partial_t\bm u$ lo si sposta a destra e diventa $-(\bm u\cdot\nabla)\bm u$. È un semplice
+passaggio algebrico di riscrittura, non una variazione di significato.
+
+\paragraph{È lecito trascurare il gradiente di pressione per calcolare $\bm u^{*}$?
+Che senso fisico ha?}
+Sì, ed è il fulcro del metodo. Lo si fa \emph{di proposito}: si \textbf{separano gli
+effetti}. Il predittore $\bm u^{*}$ porta con sé tutta la fisica di \emph{convezione e
+diffusione} ma, ignorando la pressione, in generale \textbf{viola la continuità}. Non è
+un'approssimazione ``sperata'': è uno stato volutamente incompleto, che verrà
+\textbf{corretto} esattamente al passo successivo imponendo $\nabla\cdot\bm u^{n+1}=0$. La
+somma dei due sotto-passi, lo si è visto, restituisce l'equazione completa: nulla viene
+perso.
+
+\paragraph{Se poi cerco comunque la pressione che garantisce la continuità, a che è
+servito il ``giro'' su $\bm u^{*}$?}
+È servito a \textbf{sapere quanta} correzione applicare. Senza $\bm u^{*}$ non avrei un
+secondo membro per la Poisson: è proprio la divergenza \emph{non nulla} di $\bm u^{*}$
+(``di quanto il predittore sbaglia'') a fissare la sorgente
+$\tfrac{\rho}{\dt}\nabla\cdot\bm u^{*}$ nell'Eq.~\eqref{eq:poisson}, e quindi la pressione.
+In termini di Helmholtz--Hodge: $\bm u^{*}$ è il campo ``grezzo'' che contiene
+\emph{sia} la parte solenoidale cercata \emph{sia} la parte di gradiente da rimuovere; il
+giro serve a costruirlo per poi proiettarlo.
+
+\paragraph{Nella Poisson non dovrebbe esserci un laplaciano uguagliato a zero?}
+\textbf{No.} Il laplaciano della pressione è uguagliato alla \emph{sorgente}
+$\tfrac{\rho}{\dt}\nabla\cdot\bm u^{*}$, non a zero (Eq.~\ref{eq:poisson}). Sarebbe
+un'equazione di Laplace ($\nabla^2 p=0$) solo se il predittore fosse già a divergenza
+nulla --- ma in quel caso non servirebbe alcuna correzione.
+
+\paragraph{Perché la pressione qui ``non ha valore termodinamico''?}
+Perché nell'incomprimibile la pressione \textbf{non} è legata a densità e temperatura da
+un'equazione di stato: non è una variabile termodinamica ma un \textbf{moltiplicatore di
+Lagrange} che impone il vincolo $\nabla\cdot\bm u=0$. Il suo unico compito è generare il
+campo di velocità a divergenza nulla; per questo si lavora sempre con \emph{pressioni
+relative} (la costante additiva è irrilevante). È la differenza più profonda rispetto al
+density-based, dove invece la pressione~\eqref{eq:stato} è una grandezza
+\emph{termodinamica} a tutti gli effetti.
+
+\subsection{Confronto operativo: pro, contro e campo di impiego}
+\label{sub:confronto_paradigmi}
+
+\begin{table}[H]
+\centering
+\caption{Pro e contro dei due paradigmi.}
+\label{tab:paradigmi_procontro}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{0.13\linewidth} p{0.40\linewidth} p{0.40\linewidth}}
+\toprule
+ & \textbf{Density-based} & \textbf{Pressure-based} \\
+\midrule
+\textbf{Pro} &
+Cattura naturalmente urti ed espansioni (forma conservativa, Rankine--Hugoniot);
+accoppiamento implicito nella fisica iperbolica; ideale ad alto Mach. &
+Efficiente e ben condizionato a basso Mach e nell'incomprimibile; nessun vincolo CFL
+acustico se implicito; robusto su flussi quasi-incomprimibili. \\[3pt]
+\textbf{Contro} &
+\textbf{Stiff e mal condizionato a basso Mach} (disparità $a\gg|\bm q|$); passo esplicito
+limitato dalla velocità del suono; richiede \emph{preconditioning} per $M\to0$. &
+Trattamento degli urti meno naturale; richiede correzioni dedicate per l'alto Mach;
+la Poisson ellittica è globale e costosa da risolvere. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Algoritmo risolutivo a confronto, passo per passo.}
+\label{tab:paradigmi_algoritmo}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c p{0.41\linewidth} p{0.41\linewidth}}
+\toprule
+\textbf{Passo} & \textbf{Density-based (esplicito)} & \textbf{Pressure-based (proiezione)} \\
+\midrule
+1 & Flussi conservativi alle interfacce & Predittore $\bm u^{*}$ (convez.+diffus., no $\nabla p$) \\
+2 & Avanzamento di $\rho,\rho u,\rho v,\rho E$ (continuità $\to\rho$) & Poisson per la pressione $\nabla^2p=\tfrac{\rho}{\dt}\nabla\cdot\bm u^{*}$ \\
+3 & Pressione \emph{a valle} da eq.\ di stato $P=f(\rho,e)$ & Correzione/proiezione $\bm u^{n+1}=\bm u^{*}-\tfrac{\dt}{\rho}\nabla p$ \\
+\midrule
+Esito & $\rho$ prima, $P$ dopo & $P$ prima, $\bm u$ solenoidale dopo \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Regime di Mach e scelta del paradigma: i nostri due casi}
+\label{sub:mach_paradigma}
+
+Resta da rispondere alla domanda più importante: la regola ``\emph{density-based ad alto
+Mach, pressure-based a basso Mach}'' è un \textbf{suggerimento di efficienza} o una
+\textbf{restrizione}? E perché abbiamo usato un solutore density-based anche per il
+\textbf{bump}, che è subsonico ($M_{\rm in}=0.3$)?
+
+\paragraph{Perché ``alto Mach'' per i density-based --- l'origine della stiffness.}
+Il sistema di Eulero ha onde che viaggiano a $\tilde u$ e $\tilde u\pm a$. A \emph{basso}
+Mach la velocità del suono $a$ è enormemente più grande della velocità del fluido
+$|\bm q|$: il rapporto fra autovalori
+$\lambda_{\max}/\lambda_{\min}\sim(|\bm q|+a)/|\bm q|=1+1/M$ \textbf{diverge} per
+$M\to0$. Il sistema diventa \textbf{stiff} e \textbf{mal condizionato}, e il passo
+esplicito, vincolato dalla CFL acustica $\dt\propto h/(|\bm q|+a)$
+(Eq.~\eqref{eq:cfl}), diventa minuscolo rispetto alla scala dei tempi convettivi
+$h/|\bm q|$: servono moltissime iterazioni per far evolvere il flusso ``lento''. È in
+questo senso che i density-based sono \emph{poco efficienti} a basso Mach (e richiedono il
+\emph{low-Mach preconditioning}). I pressure-based, trattando la pressione come campo
+ellittico, \textbf{non soffrono} di questa disparità: per questo dominano l'incomprimibile.
+
+\paragraph{Suggerimento, non restrizione.} La casistica è una \textbf{linea guida di
+efficienza}, non un divieto fisico. Un solutore density-based \emph{può} risolvere
+correttamente anche un flusso subsonico: produce la soluzione giusta, semplicemente
+converge più lentamente man mano che $M\to0$. La soglia convenzionale $M\approx0.3$ separa
+il regime in cui la comprimibilità è trascurabile ($M\!\lesssim\!0.3$, errori di densità
+$\sim M^2\!\lesssim\!9\%$) da quello in cui va tenuta in conto. Il bump si trova
+\textbf{proprio sul bordo} di questa soglia: è abbastanza comprimibile da essere ben
+gestito da un solutore density-based, e \emph{non} così lento da rendere proibitivo il
+calcolo.
+
+\paragraph{Il caso della presa a doppia rampa ($M_{\rm in}=3$).} Qui il density-based non
+è solo opportuno, è \textbf{la scelta corretta per natura}. Il flusso è supersonico
+all'ingresso ($M_\infty=3$, imposto come condizione al contorno) e resta supersonico fino
+all'uscita (la doppia compressione porta il Mach da $3$ a $\approx1.35$, vedi
+Cap.~\ref{cap:doppia_presa}): il campo è dominato da \textbf{onde d'urto oblique}, che solo
+la forma conservativa density-based cattura con la corretta posizione e intensità
+(Rankine--Hugoniot). Un approccio pressure-based di tipo incomprimibile sarebbe qui del
+tutto inadeguato. Nessuna ambiguità: density-based obbligato.
+
+\paragraph{Il caso del bump ($M_{\rm in}=0.3$) --- perché density-based?} La scelta è
+\emph{legittima} e in buona parte \emph{conveniente}, per tre ragioni concomitanti, in
+ordine di importanza:
+\begin{enumerate}
+  \item \textbf{Coerenza dello strumento.} Avevamo già sviluppato e validato un unico
+    solutore --- quello di Eulero comprimibile density-based --- e usarlo su \emph{tutti}
+    i casi (bump, rampa, paletta) garantisce \textbf{omogeneità} di confronto e di
+    post-processing. Riscrivere da zero un solutore a proiezione pressure-based solo per il
+    bump non era giustificato dal guadagno.
+  \item \textbf{Adeguatezza fisica.} $M=0.3$ è sul confine dell'incomprimibilità: il flusso
+    è \textbf{ancora comprimibile} (accelera sopra l'apice fino a $M\approx0.46$,
+    Cap.~\ref{cap:bump}) e il density-based lo tratta senza entrare nel regime
+    \emph{severamente} stiff dei Mach molto bassi. La convergenza è più lenta che nel
+    supersonico, ma resta praticabile (di qui i $\sim10^5$ iterazioni del caso bump).
+  \item \textbf{Necessità metodologica.} L'analisi di convergenza del bump si fonda sulla
+    \textbf{norma $L_2$ dell'entropia} (Sez.~\ref{sec:conv_entropia}), una grandezza che
+    \emph{esiste solo} in un solutore comprimibile con equazione dell'energia ed equazione
+    di stato. Un solutore a proiezione \emph{puramente incomprimibile} non ha nemmeno un
+    campo di entropia da analizzare: il density-based non è quindi solo comodo, è
+    \textbf{funzionale} all'obiettivo dello studio (misurare la dissipazione numerica come
+    deviazione di $\bar S$ da zero).
+\end{enumerate}
+In sintesi: density-based è stato usato per il bump in parte per \textbf{convenienza
+implementativa} (un solo codice per tutti i casi) ma soprattutto perché era
+\textbf{appropriato e funzionale} --- $M=0.3$ è abbastanza comprimibile e l'intero
+impianto di validazione (entropia, energia, urti negli altri casi) richiede proprio la
+formulazione comprimibile.
+
+\begin{table}[H]
+\centering
+\caption{Adeguatezza del paradigma density-based nei due casi studio del report.}
+\label{tab:paradigma_casi}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{0.16\linewidth} p{0.12\linewidth} p{0.16\linewidth} p{0.42\linewidth}}
+\toprule
+\textbf{Caso} & \textbf{$M_{\rm in}$} & \textbf{Regime} & \textbf{Density-based: motivazione} \\
+\midrule
+Doppia rampa & $3$ & Supersonico (urti) & \textbf{Obbligato}: forma conservativa per Rankine--Hugoniot; pressure-based incomprimibile inadeguato \\
+Bump & $0.3$ & Subsonico al limite di comprimibilità & \textbf{Appropriato}: ancora comprimibile; serve l'entropia/energia per lo studio di convergenza; un solo codice per tutti i casi \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
 \section{Discretizzazione a Volumi Finiti}
 % ============================================================
 
@@ -332,6 +701,7 @@ una somma sui lati della cella si ottiene la forma \emph{semidiscreta}:
 
 % ============================================================
 \section{Calcolo dei Flussi Numerici}
+\label{sec:flussi}
 % ============================================================
 
 \subsection{Schema di Lax--Friedrichs Locale}
@@ -538,6 +908,14 @@ dove i due pedici/apici hanno significati distinti: \textbf{$k$ è l'indice del 
 temporale} (l'iterazione: $k\to k+1$ avanza la soluzione nel tempo), mentre
 \textbf{$i$ è l'indice della cella} della mesh, dato che lo schema di Eulero esplicito
 va applicato separatamente al valore medio $\uvec_i$ di ogni cella.
+
+Subito dopo l'aggiornamento delle variabili conservative, le \textbf{primitive} (e in
+particolare la \textbf{pressione}, tramite l'equazione di stato~\eqref{eq:stato}) vengono
+\textbf{ricalcolate} per il passo successivo. Questo ``avanzo la densità con la continuità,
+poi ricavo la pressione dall'equazione di stato'' è precisamente la firma del paradigma
+\textbf{density-based} (Sez.~\ref{sec:paradigmi}): l'accoppiamento pressione--velocità non
+passa per alcuna equazione di Poisson ma è già contenuto nel sistema iperbolico, attraverso
+la velocità del suono che entra nel calcolo dei flussi e nella condizione CFL.
 
 \subsection{Condizione CFL e scelta del passo}
 
