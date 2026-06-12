@@ -170,26 +170,27 @@ continuo: la viscosità non è una proprietà imposta dal modello (come in Navie
 > e distanza** del trasporto di quantità di moto, e la sua variazione con l'energia produce la **giusta
 > $\mu(T)$**.
 >
-> **Schema della catena causale.**
-> ```
->   velocità relativa g ↑  (gas più caldo → molecole più veloci)
->            │
->            ▼
->   diametro di collisione  σ ↓     (urto energetico = più "penetrante")
->            │
->      ┌─────┴───────────────────────────┐
->      ▼                                  ▼
->   frequenza urti                  libero cammino medio
->   ν_coll ∝ n·σ·c̄  ↓              λ ∝ 1/(n·σ)  ↑
->   (quanto SPESSO                  (quanto LONTANO viaggia
->    si scambia q.d.m.)              la q.d.m. prima dell'urto)
->            └─────────────┬────────────────┘
->                          ▼
->            viscosità  μ ∝ ρ·c̄·λ   (diffusività di quantità di moto)
->                          │
->                          ▼
->      come σ dipende da g  ⇒  esponente ω in  μ ∝ T^ω
-> ```
+**Schema della catena causale.**
+
+```mermaid
+graph TD
+    G["velocità relativa g ↑<br/>(gas più caldo, molecole più veloci)"]
+    S["diametro di collisione σ ↓<br/>(urto energetico = più penetrante)"]
+    NU["frequenza urti<br/>ν_coll ∝ n·σ·c̄  ↓<br/>(quanto SPESSO si scambia q.d.m.)"]
+    L["libero cammino medio<br/>λ ∝ 1/(n·σ)  ↑<br/>(quanto LONTANO viaggia la q.d.m.)"]
+    MU["viscosità μ ∝ ρ·c̄·λ<br/>(diffusività di quantità di moto)"]
+    OUT["σ dipende da g ⇒ esponente ω in μ ∝ T^ω"]
+    G --> S
+    S --> NU
+    S --> L
+    NU --> MU
+    L --> MU
+    MU --> OUT
+    style G fill:#ef5350,color:#fff,stroke:none
+    style S fill:#ffb74d,color:#222,stroke:none
+    style MU fill:#4fc3f7,color:#111,stroke:none
+    style OUT fill:#aed581,color:#111,stroke:none
+```
 > Lettura: la velocità (quindi la temperatura) cambia $\sigma$; $\sigma$ governa insieme **frequenza**
 > e **distanza** del trasporto di quantità di moto; il loro bilancio *è* la viscosità, e il **modo** in
 > cui $\sigma$ varia con $g$ fissa la dipendenza $\mu(T)$.
