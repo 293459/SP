@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 470" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="940" height="470" fill="#ffffff"/>
+
+  <!-- ===================== PANNELLO A: PREMISCELATA ===================== -->
+  <text x="245" y="30" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Fiamma PREMISCELATA</text>
+  <text x="245" y="50" text-anchor="middle" font-size="13" fill="#666">fronte sottile che si propaga a S_L</text>
+
+  <!-- zone -->
+  <rect x="70" y="70" width="150" height="300" fill="#e3f2fd"/>
+  <rect x="220" y="70" width="55" height="300" fill="#ffe0b2"/>
+  <rect x="275" y="70" width="145" height="300" fill="#ffccbc"/>
+  <text x="140" y="92" text-anchor="middle" font-size="12" fill="#1565c0">gas fresco</text>
+  <text x="247" y="360" text-anchor="middle" font-size="11" fill="#bf360c" transform="rotate(-90 247 220)">zona di reazione</text>
+  <text x="350" y="92" text-anchor="middle" font-size="12" fill="#bf360c">gas combusto</text>
+
+  <!-- assi -->
+  <line x1="70" y1="370" x2="420" y2="370" stroke="#444" stroke-width="1.5"/>
+  <line x1="70" y1="370" x2="70" y2="65" stroke="#444" stroke-width="1.5"/>
+  <text x="245" y="395" text-anchor="middle" font-size="12" fill="#444">distanza attraverso il fronte  →</text>
+
+  <!-- T (rossa) -->
+  <path d="M70,330 L200,327 C238,322 250,110 285,106 L420,104" fill="none" stroke="#e53935" stroke-width="2.6"/>
+  <text x="408" y="98" font-size="12" fill="#e53935" font-weight="bold">T</text>
+  <!-- c progress variable (nera) -->
+  <path d="M70,368 L200,366 C238,362 250,90 285,86 L420,85" fill="none" stroke="#222" stroke-width="2.4" stroke-dasharray="6 3"/>
+  <text x="408" y="80" font-size="12" fill="#222" font-weight="bold">c</text>
+  <!-- Y reagenti (blu) -->
+  <path d="M70,90 L200,92 C238,96 250,366 285,368 L420,369" fill="none" stroke="#1e88e5" stroke-width="2.4"/>
+  <text x="120" y="112" font-size="12" fill="#1e88e5" font-weight="bold">Y_reag</text>
+  <!-- omega reaction rate (viola) -->
+  <path d="M70,369 L210,367 C238,362 246,180 250,180 C254,180 262,362 285,367 L420,369" fill="none" stroke="#8e24aa" stroke-width="2.4"/>
+  <text x="300" y="200" font-size="12" fill="#8e24aa" font-weight="bold">&#969;</text>
+
+  <!-- freccia propagazione -->
+  <line x1="250" y1="410" x2="150" y2="410" stroke="#2e7d32" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="200" y="430" text-anchor="middle" font-size="12" fill="#2e7d32">propagazione a S_L</text>
+
+  <!-- ===================== PANNELLO B: DIFFUSIVA ===================== -->
+  <text x="710" y="30" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Fiamma DIFFUSIVA (non premiscelata)</text>
+  <text x="710" y="50" text-anchor="middle" font-size="13" fill="#666">brucia dove si incontrano, su Z = Z_st</text>
+
+  <!-- zone -->
+  <rect x="535" y="70" width="190" height="300" fill="#fff3e0"/>
+  <rect x="725" y="70" width="20" height="300" fill="#ffccbc"/>
+  <rect x="745" y="70" width="140" height="300" fill="#e8f5e9"/>
+  <text x="615" y="92" text-anchor="middle" font-size="12" fill="#ef6c00">lato combustibile</text>
+  <text x="815" y="92" text-anchor="middle" font-size="12" fill="#2e7d32">lato ossidante</text>
+  <text x="735" y="362" text-anchor="middle" font-size="10" fill="#bf360c" transform="rotate(-90 735 220)">Z = Z_st</text>
+
+  <!-- assi -->
+  <line x1="535" y1="370" x2="885" y2="370" stroke="#444" stroke-width="1.5"/>
+  <line x1="535" y1="370" x2="535" y2="65" stroke="#444" stroke-width="1.5"/>
+  <text x="710" y="395" text-anchor="middle" font-size="12" fill="#444">coordinata nello strato di mescolamento  →</text>
+
+  <!-- Z mixture fraction (verde, lineare 1->0) -->
+  <path d="M535,86 L885,368" fill="none" stroke="#43a047" stroke-width="2.4" stroke-dasharray="6 3"/>
+  <text x="556" y="100" font-size="12" fill="#2e7d32" font-weight="bold">Z</text>
+  <!-- T (rossa, picco a Z_st) -->
+  <path d="M535,335 C640,328 705,120 735,112 C760,120 840,330 885,338" fill="none" stroke="#e53935" stroke-width="2.6"/>
+  <text x="700" y="128" font-size="12" fill="#e53935" font-weight="bold">T</text>
+  <!-- Y combustibile (arancio) -->
+  <path d="M535,110 C620,118 700,330 735,360 L885,368" fill="none" stroke="#ef6c00" stroke-width="2.4"/>
+  <text x="560" y="132" font-size="12" fill="#ef6c00" font-weight="bold">Y_comb</text>
+  <!-- Y ossidante (blu) -->
+  <path d="M535,368 L735,360 C770,330 850,118 885,110" fill="none" stroke="#1e88e5" stroke-width="2.4"/>
+  <text x="845" y="132" font-size="12" fill="#1e88e5" font-weight="bold">Y_oss</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 z" fill="#2e7d32"/>
+    </marker>
+  </defs>
+</svg>
