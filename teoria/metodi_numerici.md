@@ -117,8 +117,9 @@ che non ha senso fisico.
 comparisse una **tasca subsonica**, le equazioni di Eulero stazionarie cambierebbero natura da
 **iperbolica** (supersonico) a **ellittica** (subsonico), richiedendo un trattamento diverso delle
 condizioni al contorno all'outlet. Ed è anche il motivo per cui il **metodo di proiezione di
-Chorin** (Domanda 6) deve risolvere un'**equazione di Poisson ellittica** per la pressione:
-l'incomprimibilità ha natura ellittica.
+Chorin** (trattato nella teoria del report, sezione *Solutori Density-Based e Pressure-Based*)
+deve risolvere un'**equazione di Poisson ellittica** per la pressione: l'incomprimibilità ha
+natura ellittica.
 
 **In una frase:** *upwind = direzionale = rispetta le caratteristiche delle iperboliche;
 centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
