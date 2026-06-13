@@ -459,7 +459,11 @@ Hai ragione: il **lato sinistro** è analogo alle leggi di conservazione (deriva
 
 > ⚠️ **Perché compare $Y_M$ se stiamo trattando l'incompressibile?** Perché l'equazione è scritta nella sua forma **generale (comprimibile)**, così com'è implementata nei codici CFD. Nel **caso incompressibile $Y_M=0$** (si ha $M_t\to0$): semplicemente lo si trascura. È presente per generalità, non perché serva all'incompressibile.
 
-**Il termine di $\varepsilon$ in parallelo:** produzione $C_{1\varepsilon}(\varepsilon/k)G_k$ (proporzionale alla produzione di $k$) e distruzione $C_{2\varepsilon}\bar\rho\varepsilon^2/k$; $C_{1\varepsilon},C_{2\varepsilon}$ sono costanti empiriche.
+> 📌 **Cosa sono $\sigma_k$ e $\sigma_\varepsilon$ al denominatore del termine diffusivo?** Sono i **numeri di Prandtl turbolenti** di $k$ e $\varepsilon$: costanti empiriche adimensionali (tipicamente $\sigma_k\approx1.0$, $\sigma_\varepsilon\approx1.3$) che fissano **quanto la turbolenza diffonde $k$ (o $\varepsilon$) rispetto a quanto diffonde la quantità di moto**. La diffusività turbolenta di $k$ è infatti $\mu_T/\sigma_k$: è la stessa $\mu_T$ che agisce sulla QdM, "riscalata" da $\sigma_k$. Esattamente come il numero di Prandtl lega diffusività di quantità di moto e termica, $\sigma$ lega la diffusione turbolenta (eddy) della QdM a quella di $k$/$\varepsilon$. Un $\sigma$ più grande → quella grandezza diffonde di meno.
+
+**Il termine di $\varepsilon$ in parallelo:** stessi termini (non stazionario, convettivo, diffusivo con $\sigma_\varepsilon$), più produzione $C_{1\varepsilon}(\varepsilon/k)G_k$ (proporzionale alla produzione di $k$) e distruzione $C_{2\varepsilon}\bar\rho\varepsilon^2/k$; $C_{1\varepsilon},C_{2\varepsilon}$ sono costanti empiriche.
+
+> ⚠️ **Perché nel trasporto di $\varepsilon$ non c'è il termine di comprimibilità $Y_M$ (presente invece in quello di $k$)?** Perché $Y_M$ modella la **dissipazione di dilatazione**, un meccanismo che sottrae energia **direttamente a $k$** per effetto della comprimibilità: è fisicamente un **pozzo del bilancio di $k$**. La variabile $\varepsilon$ **è già** il tasso di dissipazione, e le correzioni standard di comprimibilità (Sarkar, Zeman) sono formulate come contributo al bilancio di $k$, **non** come sorgente separata nell'equazione di $\varepsilon$. L'effetto della comprimibilità arriva a $\varepsilon$ **indirettamente**, tramite l'accoppiamento con il campo di $k$ modificato (i termini $\propto\varepsilon/k\,G_k$ e $\varepsilon^2/k$), senza bisogno di un termine esplicito dedicato.
 
 **Chiusura finale** — da $k$ ed $\varepsilon$ si costruisce per analisi dimensionale la viscosità turbolenta:
 
@@ -468,21 +472,62 @@ $$\mu_T=C_\mu\,\bar\rho\,\frac{k^2}{\varepsilon}\qquad\left([k]=\tfrac{m^2}{s^2}
 </details>
 
 <details>
-<summary><strong>Modello k-ω, relazione con ε, e SST di Menter</strong></summary>
-
-### k-ω
+<summary><strong>Modello k-ω: equazioni di trasporto, relazione con ε e cross-diffusion</strong></summary>
 
 Concettualmente analogo al $k$-$\varepsilon$: due equazioni di trasporto, una per $k$ e una per $\omega$ (frequenza di dissipazione, o **dissipazione specifica**). La relazione tra le variabili è:
 
 $$\omega=\frac{\varepsilon}{k}$$
 
-**Dimensionalmente:** $\varepsilon$ è una potenza per unità di massa $[m^2/s^3]$, $k$ un'energia per unità di massa $[m^2/s^2]$, quindi $\omega\sim[1/s]$ è l'**inverso di un tempo caratteristico** del decadimento dei vortici. La viscosità turbolenta:
+**Dimensionalmente:** $\varepsilon$ è una potenza per unità di massa $[m^2/s^3]$, $k$ un'energia per unità di massa $[m^2/s^2]$, quindi $\omega\sim[1/s]$ è l'**inverso di un tempo caratteristico** del decadimento dei vortici. La viscosità turbolenta è:
 
 $$\mu_T=\frac{\bar\rho k}{\omega}$$
 
-L'equazione di $\omega$ ha gli stessi termini (non stazionario, convettivo, diffusivo, produzione, distruzione) più un **termine di cross-diffusion** $\propto \partial_j k\,\partial_j\omega$ che la accoppia a $k$.
+**Equazione per $k$:**
 
-### SST (Shear Stress Transport, Menter)
+$$\frac{\partial(\bar\rho k)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i k)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\left[\left(\mu+\frac{\mu_T}{\sigma_k}\right)\frac{\partial k}{\partial x_j}\right]+G_k-\beta^*\bar\rho\,\omega k$$
+
+**Equazione per $\omega$:**
+
+$$\frac{\partial(\bar\rho\omega)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\omega)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\left[\left(\mu+\frac{\mu_T}{\sigma_\omega}\right)\frac{\partial\omega}{\partial x_j}\right]+\frac{\alpha\,\omega}{k}G_k-\beta\bar\rho\,\omega^2+\underbrace{\bar\rho\frac{\sigma_d}{\omega}\frac{\partial k}{\partial x_j}\frac{\partial\omega}{\partial x_j}}_{\text{cross-diffusion}}$$
+
+La struttura è identica al $k$-$\varepsilon$, con due differenze: (i) la **distruzione di $k$** è $\beta^*\bar\rho\omega k$ invece di $\bar\rho\varepsilon$ (coerente con $\varepsilon=\beta^*\omega k$); (ii) compare il **termine di cross-diffusion** nell'equazione di $\omega$.
+
+| Termine | Formula (eq. di $k$) | Nome / tipo | Significato fisico ed effetto |
+| --- | --- | --- | --- |
+| **Variazione temporale** | $\partial(\bar\rho k)/\partial t$ | non stazionario | Accumulo/decadimento locale di $k$. Nullo a regime. |
+| **Convettivo** | $\partial(\bar\rho\tilde u_i k)/\partial x_i$ | trasporto convettivo (flusso) | $k$ trasportata dal campo medio attraverso le facce della cella. |
+| **Diffusivo** | $\partial_j[(\mu+\mu_T/\sigma_k)\,\partial_j k]$ | diffusione (divergenza di un gradiente) | Diffusione molecolare $+$ turbolenta di $k$; $\sigma_k$ è il numero di Prandtl turbolento di $k$. |
+| **Produzione** $G_k$ | $G_k=\tau^F_{ij}\,\partial\tilde u_j/\partial x_i$ | sorgente | Energia estratta dal moto medio (shear) e versata nella turbolenza. |
+| **Distruzione** | $-\beta^*\bar\rho\,\omega k$ | pozzo | Dissipazione di $k$; equivale a $-\bar\rho\varepsilon$ scritto con $\omega$. |
+
+| Termine (eq. di $\omega$) | Formula | Nome / tipo | Significato |
+| --- | --- | --- | --- |
+| **Variazione temporale** | $\partial(\bar\rho\omega)/\partial t$ | non stazionario | Evoluzione locale di $\omega$. |
+| **Convettivo** | $\partial(\bar\rho\tilde u_i\omega)/\partial x_i$ | trasporto (flusso) | $\omega$ trasportata dal campo medio. |
+| **Diffusivo** | $\partial_j[(\mu+\mu_T/\sigma_\omega)\,\partial_j\omega]$ | diffusione | Diffusione di $\omega$; $\sigma_\omega$ è il Prandtl turbolento di $\omega$. |
+| **Produzione** | $(\alpha\omega/k)\,G_k$ | sorgente | Produzione di $\omega$ proporzionale a quella di $k$. |
+| **Distruzione** | $-\beta\bar\rho\,\omega^2$ | pozzo | Decadimento di $\omega$ (analogo a $-C_{2\varepsilon}\bar\rho\varepsilon^2/k$). |
+| **Cross-diffusion** | $\bar\rho(\sigma_d/\omega)\,\partial_j k\,\partial_j\omega$ | accoppiamento $k$–$\omega$ | Vedi sotto. |
+
+> 💡 **Significato del termine di cross-diffusion.** È un termine **proporzionale al prodotto scalare dei gradienti** $\nabla k\cdot\nabla\omega$, che accoppia i due campi. Matematicamente nasce **quando si trasforma l'equazione di $\varepsilon$ in quella di $\omega$** ponendo $\omega=\varepsilon/k$: la regola della catena fa comparire un termine $\propto\nabla k\cdot\nabla\omega$. Fisicamente, dove $k$ e $\omega$ crescono nella stessa direzione (gradienti concordi) aggiunge produzione di $\omega$. È **il termine chiave del SST**: attivandolo solo lontano dalla parete (tramite $1-F_1$) si fa comportare il $k$-$\omega$ come un $k$-$\varepsilon$ nel free-stream, **riducendone la sensibilità** al valore di $\omega$ imposto in ingresso. Nel $k$-$\omega$ standard originale era assente, ed è una delle cause della sua freestream-sensitivity.
+
+</details>
+
+<details>
+<summary><strong>k-ε vs k-ω: perché funzionano meglio in regioni diverse se ω = ε/k?</strong></summary>
+
+L'osservazione è corretta: **puntualmente** $\omega=\varepsilon/k$, quindi le due variabili sono algebricamente legate. La differenza **non sta nella definizione** delle grandezze, ma nelle **equazioni di trasporto** che esse soddisfano e nel loro **comportamento asintotico a parete**.
+
+- **Equazioni diverse:** $\varepsilon$ e $\omega$ obbediscono a PDE con **termini sorgente, di distruzione e di diffusione diversi**; l'equazione di $\omega$ ha in più il **termine di cross-diffusion** $\propto\partial_jk\,\partial_j\omega$. Anche se $\omega=\varepsilon/k$ in un punto, il *bilancio modellato* (come $\varepsilon$ o $\omega$ vengono prodotte/distrutte/trasportate) è diverso → i campi predetti differiscono.
+- **A parete:** l'equazione di $\omega$ ha un comportamento analitico pulito ($\omega\sim1/y^2$ per $y\to0$) che si **integra fino alla parete senza funzioni di smorzamento** → $k$-$\omega$ è accurato nel sottostrato viscoso e con gradienti avversi/separazione. L'equazione di $\varepsilon$ si comporta male vicino a parete (richiede *damping functions* empiriche) → $k$-$\varepsilon$ è impreciso lì.
+- **Nel free-stream:** $\omega$ è **difficile da stimare in ingresso** e il $k$-$\omega$ ne è molto sensibile; $k$-$\varepsilon$ è più robusto lontano dalle pareti.
+
+> 💡 È quindi una questione di **equazioni di trasporto e condizioni al contorno/asintotiche**, non di definizioni. Proprio per questo il modello **SST** (qui sotto) usa $k$-$\omega$ vicino a parete e $k$-$\varepsilon$ lontano, fondendoli con la funzione $F_1$.
+
+</details>
+
+<details>
+<summary><strong>SST (Shear Stress Transport, Menter)</strong></summary>
 
 Idea: il $k$-$\omega$ è migliore **vicino a parete** e in presenza di separazione, ma molto **sensibile al valore di $\omega$ imposto in ingresso** (difficile da stimare); il $k$-$\varepsilon$ è più robusto **lontano dalle pareti**. Menter ha riscritto l'equazione di $\varepsilon$ in funzione di $\omega$ (usando $\varepsilon=\omega k$) e ha introdotto una **funzione di blending $F_1$** che vale 1 a parete (→ $k$-$\omega$) e 0 lontano (→ $k$-$\varepsilon$). Tutte le costanti diventano combinazioni pesate delle due formulazioni. È oggi lo **standard industriale** per flussi con separazione e gradienti di pressione avversi.
 
@@ -496,9 +541,17 @@ Modello a **una sola equazione** di trasporto per una variabile ausiliaria $\til
 $$\frac{\partial(\bar\rho\tilde\nu)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\tilde\nu)}{\partial x_i}=\bar\rho(P-D)+\text{(diffusione)}$$
 
 - **Produzione** $P=c_{b1}\tilde S\tilde\nu$ ($\tilde S$ = strain rate modificato).
-- **Distruzione** $D=c_{w1}f_w(\tilde\nu/d)^2$ con $d$ = distanza dalla parete: progettata per **dominare a parete** ($d\to0$) e forzare $\tilde\nu\to0$, in accordo con la fisica.
-- Viscosità turbolenta: $\mu_T=\bar\rho\tilde\nu f_{v1}$.
-- **BC:** $\tilde\nu=0$ a parete; in ingresso (flussi esterni) $\tilde\nu/\nu\approx3$.
+- **Distruzione** $D=c_{w1}f_w(\tilde\nu/d)^2$ con $d$ = distanza dalla parete: progettata per **dominare a parete** ($d\to0$).
+
+**Cosa rappresenta $\tilde\nu$?** È una **variabile di lavoro** legata, ma **non identica**, alla viscosità turbolenta cinematica $\nu_t$. Lontano dalle pareti $\tilde\nu\approx\nu_t$; vicino a parete invece differiscono, e il legame è $\nu_t=\tilde\nu\,f_{v1}$, dove $f_{v1}=\chi^3/(\chi^3+c_{v1}^3)$ con $\chi=\tilde\nu/\nu$ è una **funzione di smorzamento** che fa tendere $\nu_t$ a zero più rapidamente di $\tilde\nu$ vicino al muro. Si trasporta $\tilde\nu$ (e non direttamente $\nu_t$) perché la sua equazione ha un comportamento più semplice/quasi-lineare a parete ed è quindi numericamente più comoda; la $\nu_t$ "vera" si recupera poi algebricamente.
+
+**Perché si impone $\tilde\nu=0$ a parete?** Sì, è legato al fatto che a parete la velocità è nulla (no-slip): di conseguenza le fluttuazioni turbolente ($u',v',w'$) sono **schiacciate e smorzate dalla viscosità molecolare**, quindi non c'è turbolenza e $\nu_t\to0$. La condizione $\tilde\nu=0$ esprime proprio "niente turbolenza al muro"; il termine di distruzione $D\propto(\tilde\nu/d)^2$ è costruito apposta per dominare quando $d\to0$ e forzare questo annullamento.
+
+**Quanto influisce la condizione in ingresso? È sensibile come il $k$-$\omega$?** **No, molto meno.** La raccomandazione $\tilde\nu/\nu\approx3$ conta soprattutto quando si **assume lo strato limite completamente turbolento** (aerodinamica esterna): in tal caso garantisce che il flusso entri già turbolento e che il BL si sviluppi correttamente. Se invece il BL è in parte laminare, la condizione **non è critica**. La Spalart-Allmaras è anzi apprezzata proprio per la sua **robustezza** e non soffre della patologica freestream-sensitivity di $\omega$.
+
+**Formula della viscosità turbolenta:**
+
+$$\mu_t=\bar\rho\,\tilde\nu\,f_{v1},\qquad f_{v1}=\frac{\chi^3}{\chi^3+c_{v1}^3},\qquad \chi=\frac{\tilde\nu}{\nu}$$
 
 **Pro:** molto più **robusto numericamente** dei modelli a 2 equazioni → larga diffusione in aerospazio. **Contro:** niente equazione per $k$, quindi nell'ipotesi di Boussinesq il termine $-\tfrac23\bar\rho k\,\delta_{ij}$ **manca** → non può garantire la realizzabilità.
 
@@ -519,6 +572,8 @@ $$\tau^R_{ii}=-\rho\,\overline{(u_i')^2}\le 0\qquad(\text{nessuna somma su }i)$$
 
 Poiché $\overline{(u_i')^2}\ge0$ sempre, **ogni sforzo normale di Reynolds deve essere $\le0$** (tutti concordi, negativi o nulli).
 
+> 🔬 **È solo una questione matematica o ha anche senso fisico?** Entrambe, ma soprattutto **fisica**. I termini diagonali $\overline{(u_i')^2}$ non sono numeri astratti: sono le **varianze** delle fluttuazioni, cioè (a meno di $\tfrac12$) l'**energia cinetica turbolenta contenuta in ciascuna componente** di velocità. $\overline{(u_1')^2}$ misura "quanto vibra" $u'$ lungo $x$. Un'energia (la media di un quadrato) **non può essere negativa**: lo sarebbe solo se ci fosse energia cinetica negativa lungo quella direzione, cosa priva di senso. Quindi $\overline{(u_i')^2}\ge0$ non è una convenzione matematica, ma il fatto fisico che ogni componente porta un'energia non negativa.
+
 **Perché solo la diagonale?** Perché la diagonale contiene le **varianze** $\overline{(u_i')^2}$, intrinsecamente $\ge0$. I termini **fuori diagonale** sono **covarianze** $\overline{u_i'u_j'}$ ($i\ne j$): possono legittimamente essere **positive o negative** (due componenti possono correlarsi in un verso o nell'altro). Quindi il vincolo di segno ha senso solo per la diagonale; per i termini incrociati vale invece la disuguaglianza di Schwarz.
 
 **Come si può ottenere numericamente un valore positivo (sbagliato)?** Applicando Boussinesq alla componente $\tau^F_{11}$:
@@ -535,27 +590,36 @@ Se il gradiente di deformazione è abbastanza intenso, $\tau^F_{11}$ può divent
 
 $$\big(\overline{u_i'u_j'}\big)^2\le\overline{(u_i')^2}\;\overline{(u_j')^2}$$
 
-Il quadrato dello sforzo fuori diagonale deve essere $\le$ del prodotto delle due componenti diagonali corrispondenti. **Idea:** è la disuguaglianza di Cauchy-Schwarz per le covarianze, $|\mathrm{Cov}(X,Y)|\le\sigma_X\sigma_Y$, cioè il coefficiente di correlazione $|\rho_{xy}|\le1$: due componenti di velocità non possono essere "più che perfettamente correlate". Se violata, la matrice di covarianza ha un **autovalore negativo** → varianza negativa lungo qualche direzione → non fisico. Anche questa va imposta esplicitamente, altrimenti alcuni modelli la violano.
+Il quadrato dello sforzo fuori diagonale deve essere $\le$ del prodotto delle due componenti diagonali corrispondenti. **Idea:** è la disuguaglianza di Cauchy-Schwarz per le covarianze, $|\mathrm{Cov}(X,Y)|\le\sigma_X\sigma_Y$, cioè il coefficiente di correlazione $|\rho_{xy}|\le1$. Anche questa va imposta esplicitamente, altrimenti alcuni modelli la violano.
+
+**Cosa significa "non più che perfettamente correlate"?** Si definisce il **coefficiente di correlazione** tra due componenti:
+
+$$\rho_{uv}=\frac{\overline{u'v'}}{\sqrt{\overline{u'^2}}\,\sqrt{\overline{v'^2}}}\in[-1,+1]$$
+
+Pensando a $u'$ e $v'$ come "vettori" nello spazio delle variabili casuali, $\rho_{uv}$ è il **coseno dell'angolo** tra loro: per questo $|\rho_{uv}|\le1$ (un coseno non supera 1). I casi limite:
+
+- $\rho=+1$: correlazione **perfetta** → $u'$ e $v'$ sono **esattamente proporzionali** ($u'=c\,v'$, stesso verso): sapere uno significa sapere l'altro;
+- $\rho=-1$: anticorrelazione perfetta → $u'=-c\,v'$ (versi opposti);
+- $|\rho|>1$: "**più che perfettamente correlate**", cioè "più legate che identiche" → **non ha senso**, è impossibile come un coseno $>1$.
+
+La disuguaglianza di Schwarz $\big(\overline{u'v'}\big)^2\le\overline{u'^2}\,\overline{v'^2}$ è **esattamente** la condizione $\rho_{uv}^2\le1$. Un modello che la viola pretende $|\rho|>1$, cioè una matrice di covarianza impossibile.
+
+**Perché una varianza negativa "lungo una direzione" è non fisica — e cosa c'entra con le velocità.**
+
+- *Matematicamente:* la matrice $R_{ij}=\overline{u_i'u_j'}$ deve essere **semidefinita positiva**, cioè per **ogni** direzione (versore $\mathbf n$):
+$$n_i\,R_{ij}\,n_j=\overline{(u_i'n_i)^2}=\overline{(\mathbf u'\!\cdot\mathbf n)^2}\ge0$$
+Questo è semplicemente la **varianza della fluttuazione di velocità proiettata** lungo $\mathbf n$: è la media di un quadrato, quindi $\ge0$. Se $R$ avesse un autovalore negativo, esisterebbe una direzione $\mathbf n$ con varianza proiettata negativa → impossibile.
+- *Fisicamente:* $\overline{(\mathbf u'\!\cdot\mathbf n)^2}$ è l'energia cinetica delle fluttuazioni **lungo $\mathbf n$**; negativa significherebbe energia negativa.
+
+> 💡 **Allora l'aumento di una velocità non può implicare la diminuzione di un'altra?** Sì che può! È proprio il significato di una **covarianza negativa** $\overline{u'v'}<0$ (quando $u'$ sale, $v'$ tende a scendere): è del tutto **fisica e ammessa**. La realizzabilità **non** impone il segno dei termini fuori diagonale (le covarianze possono essere $+$ o $-$): ne limita solo l'**intensità** ($|\rho|\le1$). Ciò che è vietato non è l'anticorrelazione, ma una correlazione **così forte** da rendere negativa la varianza in qualche direzione combinata.
 
 ### Quanto contano davvero? (big picture)
 
 - **Molti modelli, anche industriali, le violano** localmente e vengono usati lo stesso. Perché? Le violazioni si concentrano in **regioni localizzate** (punti di ristagno, forte stiramento, accelerazioni intense), spesso non rovinano la soluzione globale, e i modelli restano **robusti, economici e ben calibrati** altrove.
 - Le **varianti realizzabili** (es. $k$-$\varepsilon$ *realizable*) rendono $C_\mu$ una **funzione del campo di moto** invece che una costante, così da soddisfare le condizioni dove servono.
+- **Si impongono selettivamente solo nelle zone critiche (es. stagnation point) o ovunque?** Concettualmente la realizzabilità deve valere **in ogni punto** (il tensore dev'essere valido sempre). In pratica però **non si etichettano a mano le regioni**: le varianti *realizable* applicano la correzione **ovunque**, ma in forma **auto-adattiva** (la $C_\mu$ locale dipende da strain e rotazione). Così nelle zone "tranquille" il modello si riduce a quello standard, e la correzione "morde" solo dove servirebbe (alto strain, ristagno). Questo è più pulito ed economico del taggare manualmente le singole regioni.
 - **Dove contano di più:** punti di ristagno (la famosa *stagnation point anomaly*, con sovrapproduzione di $k$), forte strain, separazione, scambio termico.
 - **Ruolo nella big picture:** sono una **garanzia di coerenza fisica e di robustezza numerica**, non un requisito assoluto per ottenere risultati utili. Imporle migliora accuratezza e stabilità nelle regioni critiche; non imporle è accettabile in molte applicazioni dove gli errori restano localizzati.
-
-</details>
-
-<details>
-<summary><strong>k-ε vs k-ω: perché funzionano meglio in regioni diverse se ω = ε/k?</strong></summary>
-
-L'osservazione è corretta: **puntualmente** $\omega=\varepsilon/k$, quindi le due variabili sono algebricamente legate. La differenza **non sta nella definizione** delle grandezze, ma nelle **equazioni di trasporto** che esse soddisfano e nel loro **comportamento asintotico a parete**.
-
-- **Equazioni diverse:** $\varepsilon$ e $\omega$ obbediscono a PDE con **termini sorgente, di distruzione e di diffusione diversi**; l'equazione di $\omega$ ha in più un **termine di cross-diffusion** $\propto\partial_jk\,\partial_j\omega$. Anche se $\omega=\varepsilon/k$ in un punto, il *bilancio modellato* (come $\varepsilon$ o $\omega$ vengono prodotte/distrutte/trasportate) è diverso → i campi predetti differiscono.
-- **A parete:** l'equazione di $\omega$ ha un comportamento analitico pulito ($\omega\sim1/y^2$ per $y\to0$) che si **integra fino alla parete senza funzioni di smorzamento** → $k$-$\omega$ è accurato nel sottostrato viscoso e con gradienti avversi/separazione. L'equazione di $\varepsilon$ si comporta male vicino a parete (richiede *damping functions* empiriche) → $k$-$\varepsilon$ è impreciso lì.
-- **Nel free-stream:** $\omega$ è **difficile da stimare in ingresso** e il $k$-$\omega$ ne è molto sensibile; $k$-$\varepsilon$ è più robusto lontano dalle pareti.
-
-> 💡 È quindi una questione di **equazioni di trasporto e condizioni al contorno/asintotiche**, non di definizioni. Proprio per questo il modello **SST** usa $k$-$\omega$ vicino a parete e $k$-$\varepsilon$ lontano, fondendoli con la funzione $F_1$.
 
 </details>
 
