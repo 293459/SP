@@ -572,6 +572,195 @@ I modelli ibridi nascono per superare il costo computazionale proibitivo della L
 
 ---
 
+## Approfondimenti sulla derivazione RANS
+
+> Nota sulla notazione: in questo capitolo la velocità è indicata con $u_i$; gli appunti del corso usano $q_i$ per la stessa grandezza. Le due notazioni sono intercambiabili.
+
+<details>
+<summary><strong>1. Notazione indiciale: cosa significano $\partial/\partial x_i$ e $\partial\tau_{ij}/\partial x_j$, e perché si usa al posto di $\nabla$</strong></summary>
+
+### La regola degli indici (convenzione di Einstein)
+
+La notazione indiciale (o di Einstein) si basa su due tipi di indice:
+
+- **Indice libero** — compare **una sola volta** in ogni termine. Identifica una componente e, poiché vale per ogni suo valore $i = 1,2,3$, indica che stiamo scrivendo **un'equazione vettoriale/tensoriale** (cioè 3 equazioni scalari in 3D). Esempio: la $i$ in $\partial p/\partial x_i$.
+- **Indice ripetuto (muto)** — compare **due volte** nello stesso termine. Per convenzione implica una **sommatoria** su $1,2,3$ (non serve scrivere $\sum$). Rappresenta quindi una **contrazione** (prodotto scalare, traccia, divergenza).
+
+### Caso 1 — $\dfrac{\partial u_i}{\partial x_i}$ (indice ripetuto → divergenza)
+
+L'indice $i$ è ripetuto, quindi è sommato:
+
+$$\frac{\partial u_i}{\partial x_i} = \frac{\partial u_1}{\partial x_1} + \frac{\partial u_2}{\partial x_2} + \frac{\partial u_3}{\partial x_3} = \nabla\cdot\mathbf{u}$$
+
+È esattamente la **divergenza** del campo vettoriale: un singolo numero (scalare). Derivare "rispetto a ciascuna componente e sommare" è proprio l'operazione di divergenza.
+
+### Caso 2 — $\dfrac{\partial \tau_{ij}}{\partial x_j}$ (un indice libero, uno ripetuto → divergenza di un tensore)
+
+Qui $j$ è ripetuto (**sommato**) mentre $i$ è **libero**. Il risultato non è uno scalare ma un **vettore**: per ogni $i$ fissato si somma sulla seconda colonna del tensore.
+
+$$\frac{\partial \tau_{ij}}{\partial x_j} = \sum_{j=1}^{3}\frac{\partial \tau_{ij}}{\partial x_j} = \frac{\partial \tau_{i1}}{\partial x_1} + \frac{\partial \tau_{i2}}{\partial x_2} + \frac{\partial \tau_{i3}}{\partial x_3} = (\nabla\cdot\boldsymbol{\tau})_i$$
+
+**Significato fisico:** $\tau_{ij}$ è lo sforzo nella direzione $i$ che agisce sulla faccia del cubetto di fluido orientata secondo $j$. Sommare le derivate rispetto a $x_j$ significa fare il **bilancio netto** di tutti gli sforzi (sulle 3 coppie di facce) che danno una **forza risultante in direzione $i$**. È quindi la **divergenza del tensore degli sforzi**, ovvero la forza viscosa netta per unità di volume lungo $i$. Lo stesso vale per il tensore di Reynolds: $\partial_j(-\rho\overline{u_i'u_j'})$ è la forza apparente per unità di volume dovuta alle fluttuazioni.
+
+### Perché la notazione indiciale e non $\nabla$, grad, div, rot?
+
+| Motivo | Spiegazione |
+| --- | --- |
+| **Tensori di ordine ≥ 2** | Le incognite delle RANS includono tensori del secondo ordine ($\tau_{ij}$, $\overline{u_i'u_j'}$). Per un tensore, scrivere $\nabla\cdot\boldsymbol{\tau}$ è **ambiguo**: non si capisce *quale* indice viene contratto. $\partial\tau_{ij}/\partial x_j$ lo dice esplicitamente. |
+| **Termine non lineare** | Il termine convettivo $u_j\,\partial u_i/\partial x_j$ e la correlazione $\overline{u_i'u_j'}$ che ne nasce sono naturali per componenti; con grad/div la struttura si nasconde. |
+| **Contrazioni compatte** | Tracce, energia $k=\tfrac12\overline{u_i'u_i'}$, produzione $\tau_{ij}\,\partial\bar u_j/\partial x_i$: tutte si scrivono con un indice ripetuto, senza simboli speciali ($:$, $\otimes$, traccia). |
+| **Discretizzazione/CFD** | I solutori lavorano componente per componente: la notazione indiciale si mappa **1-a-1** sul codice e sulle equazioni discretizzate (flussi attraverso le facce). |
+| **Una sola regola** | "Indice ripetuto = sommatoria" copre divergenze, gradienti, prodotti scalari e contrazioni tensoriali, evitando la proliferazione di operatori distinti. |
+
+### Tabella delle notazioni
+
+| Notazione indiciale | Operatore classico | Tipo del risultato | Significato |
+| --- | --- | --- | --- |
+| $\dfrac{\partial \phi}{\partial x_i}$ | $\nabla\phi$ (componente $i$) | vettore | gradiente di uno scalare |
+| $\dfrac{\partial u_i}{\partial x_i}$ | $\nabla\cdot\mathbf{u}$ | scalare | divergenza (indice ripetuto) |
+| $u_j\dfrac{\partial u_i}{\partial x_j}$ | $(\mathbf{u}\cdot\nabla)\mathbf{u}$ (comp. $i$) | vettore | convezione (non lineare, $j$ sommato) |
+| $\dfrac{\partial \tau_{ij}}{\partial x_j}$ | $(\nabla\cdot\boldsymbol{\tau})_i$ | vettore | divergenza di un tensore |
+| $\dfrac{\partial^2 u_i}{\partial x_j\partial x_j}$ | $\nabla^2 u_i$ | vettore | laplaciano (diffusione, $j$ sommato) |
+| $\overline{u_i'u_j'}$ | $\overline{\mathbf{u}'\otimes\mathbf{u}'}$ | tensore $2°$ ord. | correlazione / sforzi di Reynolds |
+| $\overline{u_i'u_i'}$ | $\overline{\mathbf{u}'\cdot\mathbf{u}'}$ | scalare | $=2k$, traccia del tensore |
+| $\delta_{ij}$ | $\mathbf{I}$ | tensore $2°$ ord. | delta di Kronecker (identità) |
+| $S_{ij}=\tfrac12(\partial_j u_i+\partial_i u_j)$ | parte simm. di $\nabla\mathbf{u}$ | tensore $2°$ ord. | velocità di deformazione |
+| $\tau_{ij}\,\dfrac{\partial \bar u_j}{\partial x_i}$ | $\boldsymbol{\tau}:\nabla\bar{\mathbf{u}}$ | scalare | produzione (doppia contrazione) |
+
+</details>
+
+<details>
+<summary><strong>2. Perché la pressione segue la decomposizione di Reynolds ma il tensore degli sforzi viscosi no? Il tensore di Reynolds "non varia nel tempo"?</strong></summary>
+
+### Non è una scelta arbitraria: è lineare vs non lineare
+
+Il punto chiave è **quali termini sono lineari** nelle incognite e quali no.
+
+- **Pressione $p$** — è un'**incognita primitiva** del problema (come la velocità). Compare nelle equazioni solo tramite il suo **gradiente** $\partial p/\partial x_i$, cioè **linearmente**. La si decompone $p = \bar p + p'$ proprio perché va mediata insieme a tutto il resto; ma essendo lineare, la media è banale: $\overline{\partial_i p} = \partial_i\bar p$ e il contributo di $p'$ sparisce ($\overline{p'}=0$).
+- **Tensore degli sforzi viscosi $\tau_{ij}$** — **non è un'incognita indipendente**: per fluido newtoniano incomprimibile è una **funzione lineare della velocità**,
+  $$\tau_{ij} = \mu\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right).$$
+  Anch'esso *si decompone*, ma la decomposizione è **automatica** e ridondante: $\tau_{ij} = \bar\tau_{ij} + \tau_{ij}'$ con $\bar\tau_{ij}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)$. Poiché la media è lineare e commuta con le derivate,
+  $$\overline{\tau_{ij}} = \mu\left(\frac{\partial \bar u_i}{\partial x_j}+\frac{\partial \bar u_j}{\partial x_i}\right) = \tau_{ij}(\bar u), \qquad \overline{\tau_{ij}'}=0.$$
+  In parole: **lo sforzo viscoso medio è semplicemente lo sforzo viscoso calcolato sul campo medio.** Non compare nessuna incognita nuova, quindi non c'è motivo di scrivere esplicitamente $\tau_{ij}'$: si annulla mediando e non aggiunge nulla.
+
+### Da dove nasce allora il problema di chiusura?
+
+**Solo dal termine convettivo**, che è **quadratico** in $u$. Per un prodotto, la media non è il prodotto delle medie:
+
+$$\overline{u_i u_j} = \bar u_i\bar u_j + \overline{u_i'u_j'}$$
+
+Il termine $\overline{u_i'u_j'}$ è l'**unica** vera nuova incognita (lo sforzo di Reynolds). Pressione e sforzo viscoso, essendo lineari, non generano correlazioni: la chiusura nasce esclusivamente dalla non linearità della convezione.
+
+### "Il tensore di Reynolds non varia nel tempo?" — è solo idempotenza
+
+Il tensore di Reynolds $-\rho\overline{u_i'u_j'}$ è, **per costruzione, una grandezza già mediata**. Applicando l'operatore di media si ottengono **campi medi**, e per un flusso **statisticamente stazionario** (RANS classiche) tutte le grandezze medie sono **indipendenti dal tempo**. Questo non è un'ipotesi calata dall'alto: è la proprietà di **idempotenza** dell'operatore ($\overline{\overline{(\cdot)}}=\overline{(\cdot)}$) applicata a un processo stazionario. Le equazioni mediate sono equazioni **per i campi medi**, quindi ogni termine in esse è una grandezza media — incluso $\bar\tau_{ij}$, che dipende dal tempo solo attraverso $\bar u(t)$.
+
+- **RANS stazionarie:** $\bar u$, $\bar p$, $\overline{u_i'u_j'}$ non dipendono da $t$.
+- **URANS:** la media è presa su una finestra intermedia $T_{avg}$, quindi sopravvive una **dipendenza lenta** dal tempo; il tensore di Reynolds può variare lentamente.
+
+### E la densità?
+
+Esatto come dici tu: $\rho = \text{cost}$ deriva dall'**incomprimibilità** ed ha quindi una giustificazione **fisica** diretta. Per lo sforzo viscoso, invece, non serve alcuna ipotesi fisica analoga: la sua "scomparsa" come incognita extra è una conseguenza **puramente matematica** della sua linearità nella velocità.
+
+</details>
+
+<details>
+<summary><strong>3. Media del prodotto costante × variabile: la costante "filtra" fuori dalla media</strong></summary>
+
+Sì, la tua intuizione è corretta. Bisogna distinguere due situazioni:
+
+- **Prodotto di due grandezze fluttuanti** (es. $u'$ e $v'$): la media del prodotto **non** è il prodotto delle medie ($\overline{u'v'}\neq\overline{u'}\,\overline{v'}=0$). È da qui che nasce il tensore di Reynolds.
+- **Prodotto di una grandezza media per una fluttuante**: la grandezza media si comporta come una **costante** rispetto all'operatore di media e **esce dalla media** (per linearità):
+  $$\overline{\bar u\,v} = \bar u\,\bar v, \qquad \overline{\bar u\,u'} = \bar u\,\overline{u'} = 0.$$
+
+**Perché $\bar u$ è "costante" rispetto alla media?** Per la media temporale, $\bar u(\mathbf{x})$ è il risultato dell'integrazione su $t$: **non dipende più dal tempo**, quindi rispetto a una media nel tempo è letteralmente una costante e si porta fuori dall'integrale. Per la media d'insieme, $\bar u$ è una grandezza **deterministica** (non aleatoria) e quindi è invariante sotto la media. Formalmente è la combinazione di **linearità** + **idempotenza** ($\overline{\bar u}=\bar u$).
+
+È esattamente questo il meccanismo che fa sopravvivere solo il termine quadratico nello sviluppo
+
+$$\overline{uv} = \overline{(\bar u+u')(\bar v+v')} = \bar u\bar v + \underbrace{\bar u\,\overline{v'}}_{0} + \underbrace{\overline{u'}\,\bar v}_{0} + \overline{u'v'} = \bar u\bar v + \overline{u'v'}.$$
+
+I due termini misti si annullano proprio perché la parte media filtra fuori e resta $\overline{u'}=0$ o $\overline{v'}=0$.
+
+</details>
+
+<details>
+<summary><strong>4. Perché alcuni termini si annullano (e per ragioni diverse)</strong></summary>
+
+Mediando il termine convettivo $\overline{u_j\,\partial u_i/\partial x_j}$ e sostituendo $u=\bar u+u'$ si ottengono **quattro** contributi:
+
+$$\overline{(\bar u_j+u_j')\frac{\partial(\bar u_i+u_i')}{\partial x_j}} = \underbrace{\bar u_j\frac{\partial\bar u_i}{\partial x_j}}_{(1)} + \underbrace{\overline{\bar u_j\frac{\partial u_i'}{\partial x_j}}}_{(2)} + \underbrace{\overline{u_j'\frac{\partial\bar u_i}{\partial x_j}}}_{(3)} + \underbrace{\overline{u_j'\frac{\partial u_i'}{\partial x_j}}}_{(4)}$$
+
+Analizziamoli uno per uno — i meccanismi di annullamento **non sono tutti uguali**:
+
+| Termine | Si annulla? | Perché |
+| --- | --- | --- |
+| **(1)** $\bar u_j\,\partial_j\bar u_i$ | No | È tutto medio: resta invariato (media di una media = media). È il trasporto convettivo del campo medio. |
+| **(2)** $\overline{\bar u_j\,\partial_j u_i'}$ | **Sì** | $\bar u_j$ è una grandezza media → **esce dalla media** (punto 3); commutando media e derivata resta $\bar u_j\,\partial_j\overline{u_i'} = \bar u_j\,\partial_j(0)=0$. |
+| **(3)** $\overline{u_j'\,\partial_j\bar u_i}$ | **Sì** | $\partial_j\bar u_i$ è una grandezza **già mediata** (deterministica) → **esce dalla media** come una costante, lasciando $(\partial_j\bar u_i)\,\overline{u_j'}=0$. |
+| **(4)** $\overline{u_j'\,\partial_j u_i'}$ | **No** | Prodotto di **due fluttuazioni** → sopravvive → diventa il tensore di Reynolds (vedi punto 5). |
+
+### La tua domanda specifica — il termine (3)
+
+"Perché $\overline{u_j'\,\partial_j\bar u_i}$ è nullo?" **Non** per la stazionarietà statistica, ma perché $\partial\bar u_i/\partial x_j$ è una grandezza **media** (deterministica): si porta fuori dall'operatore di media come una costante (è il meccanismo del punto 3), e ciò che resta è $\overline{u_j'}=0$. Quindi:
+
+$$\overline{u_j'\frac{\partial\bar u_i}{\partial x_j}} = \frac{\partial\bar u_i}{\partial x_j}\,\overline{u_j'} = 0.$$
+
+Sono due fatti **distinti** da non confondere:
+
+1. **$\overline{u'}=0$** è una proprietà **definitoria** (idempotenza): la fluttuazione è lo scarto dalla *propria* media, quindi la sua media è nulla per costruzione. Vale per qualsiasi media ben definita (la stazionarietà serve solo a garantire che la media temporale *esista*, non a rendere nullo $\overline{u'}$).
+2. **L'annullamento del termine (3)** sfrutta in più la **linearità**: la derivata media filtra fuori e riconduce tutto a $\overline{u_j'}=0$.
+
+### La fluttuazione di pressione $\overline{p'}=0$
+
+Per la **stessa, identica** ragione di $\overline{u'}=0$: è una conseguenza definitoria della decomposizione $p=\bar p+p'$. Infatti
+
+$$\overline{p'} = \overline{p-\bar p} = \bar p - \overline{\bar p} = \bar p - \bar p = 0$$
+
+(usando l'idempotenza $\overline{\bar p}=\bar p$). Non c'è nessuna ragione aggiuntiva o diversa rispetto alla velocità: il fatto che $p$ sia uno scalare e $u$ un vettore è irrilevante. Nell'equazione mediata il termine di pressione resta $-\partial_i\bar p$ perché $\overline{\partial_i p}=\partial_i\bar p$ e $\overline{\partial_i p'}=\partial_i\overline{p'}=0$.
+
+</details>
+
+<details>
+<summary><strong>5. L'ultimo passaggio: l'equazione di continuità per scrivere il termine in forma conservativa</strong></summary>
+
+Dopo gli annullamenti, l'unico termine turbolento sopravvissuto è $\overline{u_j'\,\partial_j u_i'}$ (il termine (4)). L'obiettivo dell'ultimo passaggio è **riscriverlo come la divergenza di un tensore**, cioè nella forma $\partial_j\overline{u_i'u_j'}$, così da poterlo accorpare allo sforzo viscoso.
+
+### Passo 1 — regola del prodotto
+
+$$\frac{\partial(u_i'u_j')}{\partial x_j} = u_j'\frac{\partial u_i'}{\partial x_j} + u_i'\frac{\partial u_j'}{\partial x_j}$$
+
+Il primo addendo a destra è proprio il termine che vogliamo; basta dimostrare che il secondo è nullo.
+
+### Passo 2 — incomprimibilità applicata alla fluttuazione
+
+L'incomprimibilità vale per il **campo completo**: $\dfrac{\partial u_j}{\partial x_j}=0$. Decomponendo $u_j=\bar u_j+u_j'$:
+
+$$\frac{\partial \bar u_j}{\partial x_j} + \frac{\partial u_j'}{\partial x_j} = 0$$
+
+Mediando l'equazione di continuità si ottiene la **continuità del campo medio**, $\dfrac{\partial\bar u_j}{\partial x_j}=0$. Sottraendo, segue che **anche la fluttuazione è a divergenza nulla**:
+
+$$\frac{\partial u_j'}{\partial x_j} = 0 \quad\Longrightarrow\quad u_i'\frac{\partial u_j'}{\partial x_j} = 0$$
+
+### Passo 3 — forma conservativa
+
+Il secondo addendo sparisce, quindi (mediando):
+
+$$\overline{u_j'\frac{\partial u_i'}{\partial x_j}} = \frac{\partial \overline{u_i'u_j'}}{\partial x_j}$$
+
+Sostituendo nell'equazione della quantità di moto mediata:
+
+$$\rho\left(\frac{\partial\bar u_i}{\partial t} + \bar u_j\frac{\partial\bar u_i}{\partial x_j}\right) = -\frac{\partial\bar p}{\partial x_i} + \frac{\partial}{\partial x_j}\Big(\underbrace{\bar\tau_{ij} - \rho\,\overline{u_i'u_j'}}_{\text{sforzo totale}}\Big)$$
+
+### Perché questo passaggio è importante
+
+- **Forma di sforzo:** porta il termine turbolento dentro una divergenza, così $-\rho\overline{u_i'u_j'}$ appare **esattamente come uno sforzo aggiuntivo** (apparente) che si somma a quello viscoso $\bar\tau_{ij}$. Le fluttuazioni si comportano come uno stress sul campo medio — da cui il nome "sforzi di Reynolds".
+- **Forma conservativa:** è la forma richiesta dai metodi a **volumi finiti** (flusso netto attraverso le facce della cella), quindi è la più comoda numericamente.
+- **Validità:** tutto il passaggio si regge sul fatto che $\partial_j u_j'=0$, cioè sull'**incomprimibilità**. Nel caso comprimibile questo step pulito fallisce (le fluttuazioni di densità rompono l'argomento): è proprio questa la ragione per cui si introduce la **media di Favre**.
+
+</details>
+
+---
+
 ## Domande
 
 <details>
