@@ -42,6 +42,8 @@ graph LR
 
 ---
 
+## Teoria di base e derivazione RANS
+
 <details>
 <summary><strong>Covarianza tra le fluttuazioni e interpretazione fisica</strong></summary>
 
@@ -266,6 +268,29 @@ Le URANS usano una media su un intervallo $T_{avg}$ tale che $\tau_{turb} \ll T_
 </details>
 
 <details>
+<summary><strong>RANS compressibili: quali sono i termini aggiuntivi (e dove)</strong></summary>
+
+Della derivazione compressibile **non serve ricordare tutti i passaggi**: la relazione finale è quasi identica alle RANS incompressibili, basta sostituire la media di Reynolds con la **media di Favre** $\tilde{(\cdot)}=\overline{\rho(\cdot)}/\bar\rho$ e far comparire la densità media $\bar\rho$. Le equazioni mediate alla Favre sono:
+
+$$\frac{\partial\bar\rho}{\partial t}+\frac{\partial(\bar\rho\tilde u_i)}{\partial x_i}=0$$
+
+$$\frac{\partial(\bar\rho\tilde u_i)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\tilde u_j)}{\partial x_j}=-\frac{\partial\bar p}{\partial x_i}+\frac{\partial\bar\tau_{ij}}{\partial x_j}\underbrace{-\frac{\partial}{\partial x_j}\big(\bar\rho\,\widetilde{u_i''u_j''}\big)}_{\text{sforzi di Reynolds (Favre)}}$$
+
+La struttura è la stessa dell'incompressibile; gli unici termini realmente "nuovi" sono le correlazioni di Favre. La tabella riassume **dove** vengono aggiunti e **cosa** rappresentano:
+
+| Termine aggiuntivo | In quale bilancio | Espressione | Contributo fisico |
+| --- | --- | --- | --- |
+| **(nessuno!)** | **Massa / continuità** | $\partial_t\bar\rho+\partial_i(\bar\rho\tilde u_i)=0$ | È proprio il **motivo per cui si usa Favre**: la continuità mediata resta **formalmente identica** a quella istantanea, senza correlazioni. Con la media di Reynolds ordinaria comparirebbe invece il termine $\partial_i\overline{\rho'u_i'}$. |
+| **Sforzi di Reynolds (Favre)** | **Quantità di moto** | $-\partial_j\big(\bar\rho\,\widetilde{u_i''u_j''}\big)$ | Trasporto di quantità di moto dovuto alle fluttuazioni turbolente (analogo all'incompressibile, ma pesato sulla densità). È il termine da chiudere con un modello. |
+| **Flusso di calore turbolento** | **Energia** | $-\partial_j\big(\bar\rho\,\widetilde{u_j''h''}\big)$ | Trasporto turbolento di entalpia/energia: i vortici trasportano calore in aggiunta alla conduzione molecolare. |
+| **Diffusione / lavoro turbolento** | **Energia** | termini tipo $\overline{u_i''\tau_{ij}}$, $\overline{u_j''p'}$ | Lavoro e diffusione delle fluttuazioni (scambio tra energia media e turbolenta); spesso raccolti nel trasporto di $\bar\rho k$. |
+| **Dissipazione di dilatazione $Y_M$** | **Energia / eq. di $k$** | $Y_M=2\bar\rho\varepsilon M_t^2,\ \ M_t=\sqrt{2k}/a$ | Dissipazione aggiuntiva dovuta alla **comprimibilità** (Mach turbolento): conta solo in flussi molto comprimibili (getti supersonici, urti). |
+
+> 💡 In sintesi: **massa → nessun termine extra** (è il vantaggio di Favre), **quantità di moto → sforzi di Reynolds di Favre**, **energia → flussi turbolenti di calore + termini di lavoro/diffusione + correzioni di comprimibilità**.
+
+</details>
+
+<details>
 <summary><strong>Tensore di Reynolds e energia cinetica turbolenta</strong></summary>
 
 ### Tensore di Reynolds
@@ -274,19 +299,53 @@ $$\mathbf{R} = -\rho\overline{u_i'u_j'} = -\rho\begin{pmatrix} \overline{u_1'^2}
 
 > 💡 **Struttura del tensore.** Il tensore è simmetrico ($\overline{u_i'u_j'} = \overline{u_j'u_i'}$), quindi ha solo **6 componenti indipendenti**. Queste 6 incognite non possono essere ricavate dalle sole equazioni RANS (il sistema è aperto): servono modelli di chiusura.
 
-### Energia cinetica turbolenta $k$
+### Dal tensore di Reynolds all'energia cinetica turbolenta (colmare il "gap")
 
-📘 **Definizione**
+Nelle RANS il tensore di Reynolds è l'incognita da chiudere, ma è comodo riassumere l'**intensità globale** della turbolenza con un **singolo scalare**: l'energia cinetica turbolenta $k$. Non c'è un vero salto concettuale — $k$ è semplicemente l'**energia cinetica (per unità di massa) del campo di fluttuazione**, mediata:
 
-$$k = \frac{1}{2}\overline{u_i'u_i'} = \frac{1}{2}\left(\overline{u'^2} + \overline{v'^2} + \overline{w'^2}\right)$$
+$$k = \frac{1}{2}\overline{u_i'u_i'} = \frac{1}{2}\left(\overline{u_1'^2} + \overline{u_2'^2} + \overline{u_3'^2}\right)$$
 
-È la traccia del tensore di Reynolds (a meno di un segno e del fattore $\rho/2$): $k = -\frac{1}{2\rho}\,\text{tr}(\mathbf{R})$.
+Cioè $k$ è **metà della somma dei termini diagonali** della matrice $\overline{u_i'u_j'}$:
+
+$$\overline{u_i'u_j'}=\begin{pmatrix}\overline{u_1'^2}&\overline{u_1'u_2'}&\overline{u_1'u_3'}\\ \overline{u_2'u_1'}&\overline{u_2'^2}&\overline{u_2'u_3'}\\ \overline{u_3'u_1'}&\overline{u_3'u_2'}&\overline{u_3'^2}\end{pmatrix}\ \Rightarrow\ \text{tr}=\overline{u_1'^2}+\overline{u_2'^2}+\overline{u_3'^2}=2k$$
+
+Poiché il tensore di Reynolds è $\mathbf{R}=-\rho\overline{u_i'u_j'}$, la sua traccia vale $\text{tr}(\mathbf{R})=-\rho\,\overline{u_i'u_i'}=-2\rho k$, da cui la riscrittura di $k$ **in funzione del tensore di Reynolds**:
+
+$$\boxed{\,k = -\frac{1}{2\rho}\,\text{tr}(\mathbf{R})\,}$$
+
+È (a meno del fattore $-1/2\rho$) la traccia del tensore di Reynolds.
 
 ### Scale di Kolmogorov
 
 $$\eta = \left(\frac{\nu^3}{\varepsilon}\right)^{1/4} \qquad \tau_\eta = \left(\frac{\nu}{\varepsilon}\right)^{1/2} \qquad u_\eta = (\nu\varepsilon)^{1/4}$$
 
 > 💡 **Risposta alla domanda 1 — Universalità delle piccole scale.** Le scale di Kolmogorov $\eta, \tau_\eta, u_\eta$ dipendono solo da $\nu$ (proprietà del fluido) e $\varepsilon$ (tasso di dissipazione). La *dissipazione* è determinata dalle grandi scale (che impongono la quantità di energia da smaltire), ma le *piccole scale* si adattano per dissipare quella energia. Per questo la loro struttura è **universale**: non dipende dalla geometria, dalle condizioni al contorno o dal numero di Reynolds. Dipendono solo dall'ambiente (il fluido, $\nu$) e dalla domanda di energia (la cascata, $\varepsilon$).
+
+</details>
+
+<details>
+<summary><strong>Parte isotropa e anisotropa del tensore di Reynolds: come si riconoscono</strong></summary>
+
+Qualunque tensore simmetrico del secondo ordine $T_{ij}$ si decompone in modo **unico** in:
+
+$$T_{ij} = \underbrace{\frac{1}{3}T_{kk}\,\delta_{ij}}_{\text{isotropo}} + \underbrace{\Big(T_{ij}-\frac{1}{3}T_{kk}\,\delta_{ij}\Big)}_{\text{anisotropo (deviatorico)}}$$
+
+dove $T_{kk}=T_{11}+T_{22}+T_{33}$ è la **traccia**.
+
+**Come si riconoscono in pratica:**
+
+1. **Calcola la traccia** $T_{kk}$ (somma della diagonale).
+2. **Parte isotropa** $=\frac13 T_{kk}\,\delta_{ij}$: è il tensore proporzionale all'identità → **stesso valore su tutta la diagonale, zero fuori diagonale**. Agisce ugualmente in tutte le direzioni (come una pressione).
+3. **Parte anisotropa** $=$ ciò che resta: ha **traccia nulla** per costruzione e contiene gli sforzi di taglio (fuori diagonale) e gli squilibri tra le componenti normali.
+
+**Criterio rapido:** un tensore è *puramente isotropo* se e solo se ha la forma $c\,\delta_{ij}$ (diagonale uguale, fuori diagonale nulla). Ogni deviazione (diagonale non uniforme oppure termini fuori diagonale) è *anisotropa*.
+
+**Applicato al tensore di Reynolds** $-\rho\overline{u_i'u_j'}$: la traccia vale $-\rho\,\overline{u_i'u_i'}=-2\rho k$, quindi
+
+$$-\rho\overline{u_i'u_j'} = \underbrace{-\frac{2}{3}\rho k\,\delta_{ij}}_{\text{isotropa}\ \to\ \text{pressione}} + \underbrace{\Big(-\rho\overline{u_i'u_j'}+\frac{2}{3}\rho k\,\delta_{ij}\Big)}_{\text{anisotropa}\ \to\ \text{da modellare}}$$
+
+- La **parte isotropa** $-\tfrac23\rho k\,\delta_{ij}$ porta **tutta la traccia** (cioè tutta l'energia $k$) ed è una pressione turbolenta: viene **assorbita nella pressione modificata** $\bar p^*=\bar p+\tfrac23\rho k$ e non si modella esplicitamente.
+- La **parte anisotropa** (deviatorica, traccia nulla) è l'unica responsabile del **trasporto netto di quantità di moto**: è quella che l'ipotesi di Boussinesq lega a $\bar S_{ij}$ tramite $2\mu_T\bar S_{ij}$. Ecco perché nell'ipotesi di Boussinesq compaiono proprio i due pezzi: $\tau^R_{ij}=2\mu_T S_{ij}-\tfrac23\rho k\,\delta_{ij}$.
 
 </details>
 
@@ -337,6 +396,272 @@ Nota: in letteratura si trovano esponenti leggermente diversi (es. $Re^{11/4}$) 
 </details>
 
 </details>
+
+## Modelli di turbolenza RANS
+
+<details>
+<summary><strong>Schema della procedura generale di chiusura RANS</strong></summary>
+
+L'intera logica dei modelli RANS è una **catena**: ogni passo risolve un problema ma ne introduce uno nuovo, finché un modello ausiliario lo chiude.
+
+```mermaid
+flowchart TD
+    A["1 · Medio le NS<br/>→ equazioni RANS"] --> B["Compare il tensore di Reynolds<br/>−ρ⟨u'u'⟩ : 6 incognite nuove"]
+    B --> C{"Sistema APERTO<br/>problema di chiusura"}
+    C --> D["2 · Ipotesi di Boussinesq<br/>τ = 2 μ_T S − ⅔ ρk δ"]
+    D --> E{"Ma μ_T è incognita!<br/>problema spostato"}
+    E --> F["3 · Modello di turbolenza per μ_T"]
+    F --> G["k-ε : μ_T = ρ C_μ k²/ε"]
+    F --> H["k-ω : μ_T = ρ k/ω"]
+    F --> I["Spalart-Allmaras : 1 eq. per ν̃"]
+    G --> L["4 · Sistema CHIUSO → risolvo"]
+    H --> L
+    I --> L
+    style C fill:#ef5350,color:#fff,stroke:none
+    style E fill:#ffb74d,color:#222,stroke:none
+    style L fill:#66bb6a,color:#fff,stroke:none
+```
+
+**In parole:**
+
+1. **Scrivo le RANS** mediando Navier-Stokes → spunta il tensore di Reynolds (6 incognite in più delle equazioni disponibili → sistema aperto).
+2. **Modello il tensore di Reynolds** con l'**ipotesi di Boussinesq**, che lo lega al gradiente del campo medio tramite una **viscosità turbolenta** $\mu_T$.
+3. **Ma $\mu_T$ non la conosco:** il problema non è risolto, è solo *spostato*. La calcolo con un **modello di turbolenza** ($k$-$\varepsilon$, $k$-$\omega$, SST, Spalart-Allmaras...), che aggiunge una o due equazioni di trasporto.
+4. **Sistema chiuso** → risolvo numericamente.
+
+> ⚠️ Ogni livello introduce nuove costanti empiriche e nuove ipotesi: la "chiusura" non è mai esatta, è un compromesso calibrato.
+
+</details>
+
+<details>
+<summary><strong>Modello k-ε: le due equazioni di trasporto e il significato di ogni termine</strong></summary>
+
+Il modello $k$-$\varepsilon$ (famiglia di modelli a **2 equazioni**) risolve due equazioni di trasporto **strutturalmente identiche**: cambia solo la variabile trasportata ($k$ oppure $\varepsilon$). La forma è quella tipica delle **leggi di conservazione**.
+
+**Equazione per $k$** (energia cinetica turbolenta):
+
+$$\frac{\partial(\bar\rho k)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i k)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\left[\left(\mu+\frac{\mu_T}{\sigma_k}\right)\frac{\partial k}{\partial x_j}\right]+G_k-\bar\rho\varepsilon+Y_M$$
+
+**Equazione per $\varepsilon$** (tasso di dissipazione):
+
+$$\frac{\partial(\bar\rho\varepsilon)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\varepsilon)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\left[\left(\mu+\frac{\mu_T}{\sigma_\varepsilon}\right)\frac{\partial\varepsilon}{\partial x_j}\right]+C_{1\varepsilon}\frac{\varepsilon}{k}G_k-C_{2\varepsilon}\bar\rho\frac{\varepsilon^2}{k}$$
+
+Hai ragione: il **lato sinistro** è analogo alle leggi di conservazione (derivata temporale + convezione), e i due trasporti differiscono solo per la variabile e i termini sorgente.
+
+| Termine | Formula (eq. di $k$) | Nome / tipo | Significato fisico ed effetto |
+| --- | --- | --- | --- |
+| **Variazione temporale** | $\partial(\bar\rho k)/\partial t$ | non stazionario | Accumulo/decadimento locale di $k$ nel tempo. Nullo a regime stazionario. |
+| **Convettivo** | $\partial(\bar\rho\tilde u_i k)/\partial x_i$ | trasporto convettivo (**flusso**) | **Sì, è corretto parlare di flusso:** in forma conservativa è la divergenza del flusso convettivo $\bar\rho\tilde u_i k$, cioè $k$ trasportata dal campo medio attraverso le facce della cella. |
+| **Diffusivo** | $\partial_j[(\mu+\mu_T/\sigma_k)\,\partial_j k]$ | diffusione (divergenza di un gradiente) | **Stessa struttura** del termine viscoso/diffusivo nelle leggi di bilancio classiche (Fourier per il calore, Fick per le specie, Newton per la QdM): "divergenza di un gradiente", che a coefficiente costante è un **laplaciano**. Qui la diffusività è $\mu$ (molecolare) $+\,\mu_T/\sigma_k$ (turbolenta): la turbolenza **diffonde** $k$ verso le zone a minor $k$. |
+| **Produzione** $G_k$ | $G_k=\tau^F_{ij}\,\partial\tilde u_j/\partial x_i$ | sorgente (produzione) | Energia **estratta dal moto medio** e convertita in turbolenza. Grande dove i gradienti di velocità media (shear) sono intensi (strati limite, scie). Alimenta $k$. |
+| **Distruzione / dissipazione** | $-\bar\rho\varepsilon$ | pozzo (distruzione) | Tasso con cui $k$ viene trasferita alle piccole scale e infine **dissipata in calore** alla scala di Kolmogorov. Sottrae $k$. |
+| **Comprimibilità** $Y_M$ | $Y_M=2\bar\rho\varepsilon M_t^2$ | correzione comprimibile | Dissipazione di **dilatazione**, attiva solo in flussi molto comprimibili (Mach turbolento $M_t$ non trascurabile). |
+
+> ⚠️ **Perché compare $Y_M$ se stiamo trattando l'incompressibile?** Perché l'equazione è scritta nella sua forma **generale (comprimibile)**, così com'è implementata nei codici CFD. Nel **caso incompressibile $Y_M=0$** (si ha $M_t\to0$): semplicemente lo si trascura. È presente per generalità, non perché serva all'incompressibile.
+
+**Il termine di $\varepsilon$ in parallelo:** produzione $C_{1\varepsilon}(\varepsilon/k)G_k$ (proporzionale alla produzione di $k$) e distruzione $C_{2\varepsilon}\bar\rho\varepsilon^2/k$; $C_{1\varepsilon},C_{2\varepsilon}$ sono costanti empiriche.
+
+**Chiusura finale** — da $k$ ed $\varepsilon$ si costruisce per analisi dimensionale la viscosità turbolenta:
+
+$$\mu_T=C_\mu\,\bar\rho\,\frac{k^2}{\varepsilon}\qquad\left([k]=\tfrac{m^2}{s^2},\ [\varepsilon]=\tfrac{m^2}{s^3}\right)$$
+
+</details>
+
+<details>
+<summary><strong>Modello k-ω, relazione con ε, e SST di Menter</strong></summary>
+
+### k-ω
+
+Concettualmente analogo al $k$-$\varepsilon$: due equazioni di trasporto, una per $k$ e una per $\omega$ (frequenza di dissipazione, o **dissipazione specifica**). La relazione tra le variabili è:
+
+$$\omega=\frac{\varepsilon}{k}$$
+
+**Dimensionalmente:** $\varepsilon$ è una potenza per unità di massa $[m^2/s^3]$, $k$ un'energia per unità di massa $[m^2/s^2]$, quindi $\omega\sim[1/s]$ è l'**inverso di un tempo caratteristico** del decadimento dei vortici. La viscosità turbolenta:
+
+$$\mu_T=\frac{\bar\rho k}{\omega}$$
+
+L'equazione di $\omega$ ha gli stessi termini (non stazionario, convettivo, diffusivo, produzione, distruzione) più un **termine di cross-diffusion** $\propto \partial_j k\,\partial_j\omega$ che la accoppia a $k$.
+
+### SST (Shear Stress Transport, Menter)
+
+Idea: il $k$-$\omega$ è migliore **vicino a parete** e in presenza di separazione, ma molto **sensibile al valore di $\omega$ imposto in ingresso** (difficile da stimare); il $k$-$\varepsilon$ è più robusto **lontano dalle pareti**. Menter ha riscritto l'equazione di $\varepsilon$ in funzione di $\omega$ (usando $\varepsilon=\omega k$) e ha introdotto una **funzione di blending $F_1$** che vale 1 a parete (→ $k$-$\omega$) e 0 lontano (→ $k$-$\varepsilon$). Tutte le costanti diventano combinazioni pesate delle due formulazioni. È oggi lo **standard industriale** per flussi con separazione e gradienti di pressione avversi.
+
+</details>
+
+<details>
+<summary><strong>Modello di Spalart-Allmaras (1 equazione)</strong></summary>
+
+Modello a **una sola equazione** di trasporto per una variabile ausiliaria $\tilde\nu$ legata (ma non coincidente) alla viscosità turbolenta. Sviluppato alla NASA per **flussi esterni aerodinamici ad alto Reynolds** (profili alari, transonico/supersonico); non pensato per basso $Re$ o transizione.
+
+$$\frac{\partial(\bar\rho\tilde\nu)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\tilde\nu)}{\partial x_i}=\bar\rho(P-D)+\text{(diffusione)}$$
+
+- **Produzione** $P=c_{b1}\tilde S\tilde\nu$ ($\tilde S$ = strain rate modificato).
+- **Distruzione** $D=c_{w1}f_w(\tilde\nu/d)^2$ con $d$ = distanza dalla parete: progettata per **dominare a parete** ($d\to0$) e forzare $\tilde\nu\to0$, in accordo con la fisica.
+- Viscosità turbolenta: $\mu_T=\bar\rho\tilde\nu f_{v1}$.
+- **BC:** $\tilde\nu=0$ a parete; in ingresso (flussi esterni) $\tilde\nu/\nu\approx3$.
+
+**Pro:** molto più **robusto numericamente** dei modelli a 2 equazioni → larga diffusione in aerospazio. **Contro:** niente equazione per $k$, quindi nell'ipotesi di Boussinesq il termine $-\tfrac23\bar\rho k\,\delta_{ij}$ **manca** → non può garantire la realizzabilità.
+
+</details>
+
+<details>
+<summary><strong>Condizioni di realizzabilità dei modelli di viscosità turbolenta</strong></summary>
+
+### Idea di base
+
+Un modello di turbolenza dovrebbe produrre un tensore di Reynolds **fisicamente realizzabile**, cioè che possa effettivamente provenire da un campo di velocità fluttuante reale. Matematicamente, $\overline{u_i'u_j'}$ deve essere una **matrice di covarianza valida** (semidefinita positiva). Da qui due condizioni.
+
+### Condizione 1 — componenti diagonali
+
+Le componenti normali (diagonale) sono **medie di un quadrato**:
+
+$$\tau^R_{ii}=-\rho\,\overline{(u_i')^2}\le 0\qquad(\text{nessuna somma su }i)$$
+
+Poiché $\overline{(u_i')^2}\ge0$ sempre, **ogni sforzo normale di Reynolds deve essere $\le0$** (tutti concordi, negativi o nulli).
+
+**Perché solo la diagonale?** Perché la diagonale contiene le **varianze** $\overline{(u_i')^2}$, intrinsecamente $\ge0$. I termini **fuori diagonale** sono **covarianze** $\overline{u_i'u_j'}$ ($i\ne j$): possono legittimamente essere **positive o negative** (due componenti possono correlarsi in un verso o nell'altro). Quindi il vincolo di segno ha senso solo per la diagonale; per i termini incrociati vale invece la disuguaglianza di Schwarz.
+
+**Come si può ottenere numericamente un valore positivo (sbagliato)?** Applicando Boussinesq alla componente $\tau^F_{11}$:
+
+$$\tau^F_{11}=2\mu_T\frac{\partial\tilde u_1}{\partial x_1}-\frac{2}{3}\mu_T\frac{\partial\tilde u_k}{\partial x_k}-\frac{2}{3}\bar\rho k$$
+
+- il primo termine $2\mu_T\,\partial\tilde u_1/\partial x_1$ può essere **grande e positivo** in un flusso fortemente accelerato/stirato;
+- il secondo cambia segno (negativo in compressione, positivo in espansione);
+- il terzo $-\tfrac23\bar\rho k$ è **sempre negativo** ma può non bastare a compensare gli altri.
+
+Se il gradiente di deformazione è abbastanza intenso, $\tau^F_{11}$ può diventare **positivo**, violando la realizzabilità (implicherebbe una varianza negativa, impossibile). Il problema è acuto nei modelli **senza $k$** (Spalart-Allmaras): manca del tutto il termine $-\tfrac23\bar\rho k$ che faceva da freno.
+
+### Condizione 2 — disuguaglianza di Schwarz (fuori diagonale)
+
+$$\big(\overline{u_i'u_j'}\big)^2\le\overline{(u_i')^2}\;\overline{(u_j')^2}$$
+
+Il quadrato dello sforzo fuori diagonale deve essere $\le$ del prodotto delle due componenti diagonali corrispondenti. **Idea:** è la disuguaglianza di Cauchy-Schwarz per le covarianze, $|\mathrm{Cov}(X,Y)|\le\sigma_X\sigma_Y$, cioè il coefficiente di correlazione $|\rho_{xy}|\le1$: due componenti di velocità non possono essere "più che perfettamente correlate". Se violata, la matrice di covarianza ha un **autovalore negativo** → varianza negativa lungo qualche direzione → non fisico. Anche questa va imposta esplicitamente, altrimenti alcuni modelli la violano.
+
+### Quanto contano davvero? (big picture)
+
+- **Molti modelli, anche industriali, le violano** localmente e vengono usati lo stesso. Perché? Le violazioni si concentrano in **regioni localizzate** (punti di ristagno, forte stiramento, accelerazioni intense), spesso non rovinano la soluzione globale, e i modelli restano **robusti, economici e ben calibrati** altrove.
+- Le **varianti realizzabili** (es. $k$-$\varepsilon$ *realizable*) rendono $C_\mu$ una **funzione del campo di moto** invece che una costante, così da soddisfare le condizioni dove servono.
+- **Dove contano di più:** punti di ristagno (la famosa *stagnation point anomaly*, con sovrapproduzione di $k$), forte strain, separazione, scambio termico.
+- **Ruolo nella big picture:** sono una **garanzia di coerenza fisica e di robustezza numerica**, non un requisito assoluto per ottenere risultati utili. Imporle migliora accuratezza e stabilità nelle regioni critiche; non imporle è accettabile in molte applicazioni dove gli errori restano localizzati.
+
+</details>
+
+<details>
+<summary><strong>k-ε vs k-ω: perché funzionano meglio in regioni diverse se ω = ε/k?</strong></summary>
+
+L'osservazione è corretta: **puntualmente** $\omega=\varepsilon/k$, quindi le due variabili sono algebricamente legate. La differenza **non sta nella definizione** delle grandezze, ma nelle **equazioni di trasporto** che esse soddisfano e nel loro **comportamento asintotico a parete**.
+
+- **Equazioni diverse:** $\varepsilon$ e $\omega$ obbediscono a PDE con **termini sorgente, di distruzione e di diffusione diversi**; l'equazione di $\omega$ ha in più un **termine di cross-diffusion** $\propto\partial_jk\,\partial_j\omega$. Anche se $\omega=\varepsilon/k$ in un punto, il *bilancio modellato* (come $\varepsilon$ o $\omega$ vengono prodotte/distrutte/trasportate) è diverso → i campi predetti differiscono.
+- **A parete:** l'equazione di $\omega$ ha un comportamento analitico pulito ($\omega\sim1/y^2$ per $y\to0$) che si **integra fino alla parete senza funzioni di smorzamento** → $k$-$\omega$ è accurato nel sottostrato viscoso e con gradienti avversi/separazione. L'equazione di $\varepsilon$ si comporta male vicino a parete (richiede *damping functions* empiriche) → $k$-$\varepsilon$ è impreciso lì.
+- **Nel free-stream:** $\omega$ è **difficile da stimare in ingresso** e il $k$-$\omega$ ne è molto sensibile; $k$-$\varepsilon$ è più robusto lontano dalle pareti.
+
+> 💡 È quindi una questione di **equazioni di trasporto e condizioni al contorno/asintotiche**, non di definizioni. Proprio per questo il modello **SST** usa $k$-$\omega$ vicino a parete e $k$-$\varepsilon$ lontano, fondendoli con la funzione $F_1$.
+
+</details>
+
+## Condizioni al contorno
+
+<details>
+<summary><strong>Condizioni al contorno per i modelli di turbolenza</strong></summary>
+
+### A parete
+
+La velocità totale (media + fluttuazione) si annulla a parete (no-slip), quindi le fluttuazioni si spengono e $k=0$. Per la seconda variabile dipende dal modello:
+
+| Modello | Variabile a parete | Condizione | Criticità |
+| --- | --- | --- | --- |
+| $k$-$\varepsilon$ | $\varepsilon$ | spesso via wall functions o forme asintotiche | impreciso a parete senza damping |
+| $k$-$\omega$ | $\omega$ | $\omega=\dfrac{60\nu}{\beta_1(\Delta y_1)^2}$ | **molto sensibile alla mesh**: se $\Delta y_1\to0$ allora $\omega\to\infty$ |
+| Spalart-Allmaras | $\tilde\nu$ | $\tilde\nu=0$ | robusto, semplice |
+
+### In ingresso (inlet)
+
+Si parte dall'**intensità turbolenta** $Tu=u'/|\bar{\mathbf q}|$, da cui:
+
+$$k=\frac{3}{2}\big(Tu\,|\bar{\mathbf q}|\big)^2$$
+
+(es. $Tu=1\%$ flussi esterni/quiete, $5\%$ condotti a bassa pressione, $\ge10\%$ compressori). Poi, tramite la **scala integrale** $l_t$ (stimata dalla geometria, es. $l_t=0.1D$):
+
+$$\varepsilon=C\frac{k^{3/2}}{l_t},\qquad \omega=\frac{\varepsilon}{k}=C\frac{\sqrt{k}}{l_t}$$
+
+Per Spalart-Allmaras: $\tilde\nu/\nu\approx3$ (flusso già turbolento all'ingresso).
+
+### Differenze di approccio e impatto sui risultati
+
+- **$k$-$\omega$**: ottimo a parete ma **sensibile al valore di $\omega$ in ingresso** (freestream sensitivity) → un valore sbagliato corrompe la soluzione.
+- **$k$-$\varepsilon$**: più **robusto** rispetto alle condizioni esterne, ma poco accurato a parete (di solito con wall functions).
+- **Spalart-Allmaras**: la più semplice (una sola variabile), molto stabile.
+- **SST**: combina robustezza in ingresso ($k$-$\varepsilon$) e accuratezza a parete ($k$-$\omega$).
+
+> ⚠️ Attenzione al **sistema di riferimento**: $Tu$ dipende da $|\bar{\mathbf q}|$, che cambia passando da un riferimento solidale al rotore a uno allo statore → cambia $k$. L'intensità turbolenta va trattata come **guida ingegneristica** in un contesto ben definito. È buona pratica fare sempre una **analisi di sensitività** alle condizioni al contorno.
+
+</details>
+
+## Trattamento a parete
+
+<details>
+<summary><strong>Risoluzione a parete: variabili di parete y⁺, u⁺ e le tre regioni</strong></summary>
+
+Lo strato limite è **sottilissimo** rispetto al corpo: per una lastra piana $\delta/L\sim1/\sqrt{Re}$, quindi a $Re\sim10^6$ si ha $\delta/L\sim10^{-3}$. Risolverlo richiede una griglia **molto fine in direzione normale** alla parete: è il punto più costoso anche in RANS (che pure dà solo il campo medio).
+
+Si normalizza con le **scale viscose di parete**:
+
+$$u^+=\frac{u}{u_\tau},\qquad y^+=\frac{y}{\ell_\tau},\qquad u_\tau=\sqrt{\frac{\tau_w}{\rho}},\quad \ell_\tau=\frac{\nu}{u_\tau},\quad \tau_w=\mu\frac{\partial u}{\partial y}\Big|_{w}$$
+
+Il profilo $u^+(y^+)$ è **universale** e mostra **tre regioni**:
+
+| Regione | Intervallo | Legge |
+| --- | --- | --- |
+| **Sottostrato viscoso** | $y^+\lesssim5$ | $u^+=y^+$ (lineare) |
+| **Buffer layer** | $5\lesssim y^+\lesssim30$ | transizione, legge non univoca (blending) |
+| **Regione logaritmica** | $y^+\gtrsim30$ | $u^+=\dfrac{1}{\kappa}\ln y^+ + B$, con $\kappa\approx0.41$, $B\approx5.2$ |
+
+**Requisiti di prima cella** secondo il modello:
+
+- $k$-$\omega$, LES: $y^+\lesssim1$ (risolvere il sottostrato viscoso);
+- Spalart-Allmaras: primo nodo con $y^+<5$;
+- modelli ad alto $Re$ con wall functions: prima cella nella regione logaritmica ($y^+\approx30\text{-}100$).
+
+**Procedura pratica:** si stima la dimensione della prima cella da correlazioni note (lastra piana) per ottenere il $y^+$ voluto, si applica al problema reale e si **verifica a posteriori** il $y^+$ effettivo, raffinando localmente se serve.
+
+</details>
+
+<details>
+<summary><strong>Wall functions per RANS: a cosa servono e come funzionano</strong></summary>
+
+Quando la mesh **non** risolve il sottostrato viscoso, calcolare lo sforzo a parete con il rapporto incrementale $\tau_w\approx\mu\,u_p/\Delta y$ assume un profilo **lineare**, mentre nella prima cella il profilo è già **logaritmico** → la stima del flusso viscoso è sbagliata. Le **wall functions** correggono usando la legge di parete come "ponte".
+
+### Caso risolto vs sottorisolto
+
+- **Strato limite risolto** (prima cella nel sottostrato, $y^+\lesssim1$): profilo lineare $u(y)\approx(\partial u/\partial y)\,y$; lo sforzo $\tau_w\approx\mu(u_p-u_w)/\Delta y$ è **accurato**.
+- **Strato limite sottorisolto** (prima cella in zona log): si usa $u^+=\tfrac1\kappa\ln y^+ + B$ per legare $u_p$ a $\tau_w$.
+
+### Procedura iterativa (wall function)
+
+1. stima iniziale $\tau_w^{(0)}=\mu\,u_p/\Delta y$;
+2. velocità d'attrito $u_\tau=\sqrt{\tau_w/\rho}$;
+3. lunghezza di parete $\ell_\tau=\nu/u_\tau$;
+4. distanza adimensionale $y^+=y/\ell_\tau$;
+5. $u^+$ dalla wall function ($u^+=y^+$ se $y^+<5$; $u^+=\tfrac1\kappa\ln y^+ +B$ se $y^+>30$);
+6. aggiorna $u_\tau=u_p/u^+$ e quindi $\tau_w=\rho u_\tau^2$;
+7. itera fino a convergenza (o usa $\tau_w$ del passo precedente in stazionario).
+
+### Problemi e varianti
+
+- **Separazione:** dove $\tau_w=0$ si ha $u_\tau=0$ → $u^+,y^+$ **singolari**. Si usano variabili alternative basate su $k^{1/2}$ invece di $u_\tau$ (Patankar-Spalding / Papailiou): $u^*=u\,C_\mu^{1/4}k^{1/2}/(\tau_w/\rho)$, $y^*=\rho C_\mu^{1/4}k^{1/2}y/\mu$.
+- **Wall function unica** (es. Kader): copre con continuità sottostrato, buffer e zona log con una formula di blending. Implementata nei codici commerciali (ANSYS Fluent).
+
+### Validità (attenzione!)
+
+Le wall functions **non risolvono** lo strato limite: danno una chiusura empirica valida **solo se la prima cella cade nella regione logaritmica**:
+
+- $y^+<11$ → sottostrato/buffer: wall function **non affidabile**;
+- $y^+\approx30\text{-}100$ → zona log: **valida**;
+- $y^+>150$ → possibilmente fuori dallo strato limite: legge logaritmica **non applicabile**.
+
+</details>
+
+## Benchmark, LES e modelli ibridi
 
 <details>
 <summary><strong>Benchmark / limiti delle RANS</strong></summary>
@@ -756,6 +1081,8 @@ $$\rho\left(\frac{\partial\bar u_i}{\partial t} + \bar u_j\frac{\partial\bar u_i
 - **Forma di sforzo:** porta il termine turbolento dentro una divergenza, così $-\rho\overline{u_i'u_j'}$ appare **esattamente come uno sforzo aggiuntivo** (apparente) che si somma a quello viscoso $\bar\tau_{ij}$. Le fluttuazioni si comportano come uno stress sul campo medio — da cui il nome "sforzi di Reynolds".
 - **Forma conservativa:** è la forma richiesta dai metodi a **volumi finiti** (flusso netto attraverso le facce della cella), quindi è la più comoda numericamente.
 - **Validità:** tutto il passaggio si regge sul fatto che $\partial_j u_j'=0$, cioè sull'**incomprimibilità**. Nel caso comprimibile questo step pulito fallisce (le fluttuazioni di densità rompono l'argomento): è proprio questa la ragione per cui si introduce la **media di Favre**.
+
+> 🎯 **In una frase:** tutto questo "giro" con l'equazione di continuità serve a portare le due fluttuazioni **dentro un unico prodotto $\overline{u_i'u_j'}$ sotto la derivata**, così da poterlo identificare con il **tensore di Reynolds** (che compare appunto dentro la divergenza). Senza questo passaggio avremmo un pezzo *dentro* e un pezzo *fuori* dalla derivata, e non potremmo raccoglierli in un unico tensore.
 
 </details>
 
