@@ -555,6 +555,165 @@ Letture:
 </details>
 
 <details>
+<summary><strong>🟩 [E] Estrapolazione di Richardson — approfondimenti e FAQ (Q1–Q8) ✅</strong></summary>
+
+> Chiarimenti puntuali emersi sul punto precedente. Gli stessi contenuti sono stati integrati anche
+> nella **parte teorica del report** (`Latex/teoria.tex`, sezione Richardson, e `Latex/bump.tex`).
+
+#### Q1 — Perché si dice che **stima** la soluzione esatta e non la **calcola**? Da dove viene il $\approx$?
+
+Perché la legge $E = k\,h^p$ è solo il **termine dominante** di uno sviluppo asintotico:
+
+$$
+E = u_h - u_{\rm esatto} = k_p\,h^p + k_{p+1}\,h^{p+1} + k_{p+2}\,h^{p+2} + \dots
+$$
+
+Richardson **tronca al primo termine**, trascurando i contributi $O(h^{p+1})$. Il risultato è un
+valore **migliorato** (di un ordine più accurato di $u_h$) ma **non esatto**: l'errore residuo è
+quello dei termini buttati via. Le altre approssimazioni che giustificano il $\approx$: $k$ assunta
+**uguale** sulle due griglie, $p$ assunto **pari** a quello vero, più la contaminazione da
+**round-off** e da convergenza iterativa imperfetta. Da qui "**stima** (estrapolazione)", non
+"calcolo".
+
+#### Q2 — Grafico: come varia l'ordine di convergenza, regione asintotica vs transitorio iniziale
+
+![Ordine di convergenza: errore in funzione di h (log–log)](images/ordine_convergenza_loglog.png)
+
+In scala **log–log** ($\log E = \log k + p\log h$) la **pendenza** è l'ordine $p$. Su **griglie rade**
+($h$ grande, **regione pre-asintotica**, in arancione) i termini di ordine superiore non sono
+trascurabili e la pendenza osservata è **diversa** (qui più bassa: $p\approx0.19$) da quella teorica.
+**Raffinando** ($h\to0$, **regione asintotica**, in verde) la curva si dispone **parallela** alla
+retta ideale di pendenza $p=1$ ($p$ locale che sale a $0.76$, $0.90$, …).
+
+> ⚠️ Il "**transitorio iniziale**" qui è quello sulle **griglie rade** (convergenza **spaziale** di
+> griglia, $E$ vs $h$): **non** confonderlo col transitorio dei **residui vs iterazioni**, che è la
+> convergenza **temporale** verso lo stazionario. Sono due cose diverse.
+
+#### Q3 — Perché proprio il **root mean square** dell'entropia? E quel $|\Omega_i|$ è un valore assoluto?
+
+Sì, $\bar S$ è l'**entropia adimensionale** ($\bar S = \gamma\ln\bar T - (\gamma-1)\ln\bar P$),
+riferita a zero, quindi coincide con l'errore locale. Si usa l'**RMS** (valore quadratico medio) per
+ridurre il *campo* d'errore a **un solo scalare** confrontabile tra griglie:
+- il **quadrato** impedisce che errori locali di segno opposto si **cancellino** (come farebbe una
+  media semplice) e pesa di più gli scostamenti grandi;
+- la **radice** riporta tutto alle unità di $\bar S$;
+- la **media** (divisione per l'area totale) lo rende un valore *tipico per cella*, indipendente dal
+  **numero** di celle.
+
+$|\Omega_i|$ **non è un valore assoluto** (modulo di un numero con segno): è la **misura della cella**
+$\Omega_i$ — la sua **area** (2D) o **volume** (3D), per definizione positiva. Pesare $\bar S_i^2$ con
+$|\Omega_i|$ rende la somma una **quadratura** dell'integrale $\int_\Omega \bar S^2\,d\Omega$:
+senza il peso, le tante celle piccole di una zona raffinata sarebbero sovra-rappresentate. In breve è
+la versione **discreta, pesata sul volume e mediata** della norma $L_2$ continua.
+
+#### Q4 — Nella dimostrazione (ordine teorico), perché sembra che $u_{h_1}$ venga "trascurato"?
+
+Non viene trascurato — anzi è il **termine principale**. Riscrivendo la formula:
+
+$$
+u_{\rm esatto} \approx \underbrace{u_{h_1}}_{\text{valore fine}} + \underbrace{\frac{u_{h_1}-u_{h_2}}{r^p-1}}_{\text{stima dell'errore } E_1}
+$$
+
+l'estrapolazione **parte** dalla soluzione sulla griglia **più fine** $u_{h_1}$ (la migliore che
+abbiamo) e le **somma** la stima dell'errore residuo per "proiettare" verso $h\to0$. Nella forma
+compatta $u_{\rm esatto}\approx (r^p u_{h_1}-u_{h_2})/(r^p-1)$: per $r^p\gg1$ il peso di $u_{h_1}$
+**domina** e $u_{\rm esatto}\to u_{h_1}$; $u_{h_2}$ (griglia rada) entra **solo nella correzione**.
+"Estrapolare verso $h\to0$" = correggere il valore fine, non scartarlo.
+
+#### Q5 — Perché si va sempre verso una mesh **più rada**? Non sarebbe più comodo un rapporto di **infittimento**?
+
+Hai ragione sul piano progettuale: **in pratica si infittisce** (si parte rada e si raffina:
+$l_c=0.02\to0.01\to\dots$, cioè $h$ **diminuisce**). Il punto è che **l'ordine in cui esegui le
+simulazioni è irrilevante**: per Richardson le **riordini a posteriori** rispetto ad $h$ e le
+etichetti nel modo più comodo. La convenzione fissa come **riferimento la griglia più fine** $h_1$ e
+scrive le altre come multipli $h_2 = r\,h_1$ con **$r>1$** (quindi $h_2$ più rada). Perché questo
+ordine è "comodo"? Perché **l'estrapolazione è una correzione applicata alla soluzione migliore**:
+si parte da $u_{h_1}$ (la più accurata) e si guarda di quanto cambia andando verso la rada.
+
+- Definire un **rapporto di infittimento** $r'=h_1/h_2<1$ sarebbe **del tutto equivalente** (basta
+  mettere $1/r$ nelle formule): pura convenzione, la matematica non cambia.
+- Il tuo esempio $0.02\to0.01$ è infatti un **infittimento** ($h$ dimezzato); per Richardson lo leggi
+  ponendo $h_1=0.01$ (fine), $h_2=0.02$ (rada), $r=h_2/h_1=2>1$.
+
+In una riga: **infittisci per ottenere le griglie, ma descrivi il salto col rapporto di diradamento
+$r>1$ riferito alla più fine**.
+
+#### Q6 — Cosa vuol dire che $k$ dipende dal **problema**? Set diversi di mesh danno $k$ diversi?
+
+$k$ **non è universale**. Dall'analisi dell'errore di troncamento (Taylor), $k$ è proporzionale alle
+**derivate di ordine elevato della soluzione esatta** (per uno schema del 1° ordine, le derivate
+seconde del campo) per coefficienti propri dello schema. Quindi $k$ dipende da:
+- **schema** (Roe e LF, stesso $p=1$, hanno $k$ diversi → errori diversi a parità di $h$);
+- **problema = geometria + condizioni al contorno + regime**: sono questi a fissare la soluzione e
+  quindi le sue derivate. Geometria con curvature/gradienti più forti → derivate maggiori → $k$
+  maggiore. "Dipende dal problema" significa **questo, non la singola mesh**;
+- **non** da $h$ (è fattorizzato in $h^p$), purché si sia nel regime asintotico.
+
+**Set diversi di 2 mesh → $k$ diverse?**
+- **In regime asintotico** (raffinamento self-simile): *circa la stessa* $k$ (è proprietà di
+  schema + problema).
+- **Fuori dal regime asintotico** (mesh rade, come il bump): **sì, $k$ apparente cambia** da coppia a
+  coppia, perché il fit a **un solo termine** $k h^p$ deve **assorbire** i termini di ordine superiore
+  trascurati, che pesano diversamente a $h$ diversi. Per questo $k$ non si riusa altrove e non
+  interessa calcolarla: in entrambe le modalità viene **eliminata**.
+
+*(Discusso anche nel report: `Latex/teoria.tex` §"Da che cosa dipende la costante $k$" e
+`Latex/bump.tex` §"Perché l'ordine effettivo è basso e perché $k$ cambia".)*
+
+#### Q7 — Perché l'inaffidabilità dell'ordine effettivo "permette" di usare il teorico? Causa dell'ordine basso? È un problema?
+
+Non è che "l'effettivo inaccurato **autorizza** il teorico": è una questione di **affidabilità della
+stima**. L'ordine effettivo è una **misura** dai dati; se i dati sono **pre-asintotici** la misura è
+**rumorosa** e l'estrapolazione che ne segue è inaffidabile. Allora ci si appoggia a un'informazione
+**a priori** più solida:
+- se **conosci la soluzione esatta** (bump, $\bar S_{\rm esatto}=0$): la usi **direttamente** (ordine
+  dalla pendenza log–log, niente estrapolazione);
+- altrimenti **assumi l'ordine teorico** come stima ingegneristica (sai che lo schema è formalmente
+  del 1° ordine e che $p\to1$ raffinando) → lo usi come **prior** al posto di una misura troppo
+  rumorosa.
+
+**Perché l'ordine pratico è basso?** Griglie non abbastanza fini (regione pre-asintotica, causa
+principale), **mesh non uniforme** (stretching/Bump/progressione), **effetti di bordo**, dissipazione
+non lineare/limitatori.
+
+**È un problema? Si risolve?** Non è un bug (codice validato) e non impedisce la convergenza
+(monotòna, errori piccoli, GCI ~0.3%). Vuol dire solo che la stima **rigorosa** dell'ordine su quelle
+griglie è incerta. Rimedi: **raffinare ancora** (costoso), raffinamento **self-simile/uniforme**,
+oppure **schema di ordine più alto**. In sintesi: l'effettivo è preferibile *quando è affidabile*;
+quando non lo è, ci si affida al teorico o alla soluzione esatta.
+
+*(Discusso anche nel report: `Latex/teoria.tex` §"Ordine effettivo più basso del teorico" e
+`Latex/bump.tex`.)*
+
+#### Q8 — Cosa vuol dire "**sottraendo a coppie**" nella dimostrazione dell'ordine effettivo?
+
+Significa sottrarre le tre relazioni d'errore **a due a due**, per griglie **consecutive**. Partendo da
+
+$$
+u_h - u_{\rm esatto}=k h^p,\quad
+u_{2h}-u_{\rm esatto}=2^p k h^p,\quad
+u_{4h}-u_{\rm esatto}=4^p k h^p
+$$
+
+faccio (seconda − prima) e (terza − seconda): in ogni differenza **sparisce $u_{\rm esatto}$** (è in
+tutte e tre con lo stesso segno):
+
+$$
+u_{2h}-u_h = k h^p(2^p-1),\qquad u_{4h}-u_{2h}=k h^p\,2^p(2^p-1)
+$$
+
+Il **rapporto** di queste due differenze elimina anche $k h^p$ e lascia solo $2^p$:
+
+$$
+\frac{u_{4h}-u_{2h}}{u_{2h}-u_h}=2^p \;\;\Longrightarrow\;\; p=\frac{\ln\!\big(\frac{u_{4h}-u_{2h}}{u_{2h}-u_h}\big)}{\ln 2}
+$$
+
+"A coppie" = abbinamenti consecutivi; serve proprio a **cancellare $u_{\rm esatto}$** prima, e
+**$k h^p$** poi.
+
+</details>
+
+<details>
 <summary><strong>🟩 [E] Discutere la simulazione della paletta (LS59)</strong></summary>
 
 > 📌 *Risposta da compilare* (parte del punto d'esame originale, separata). Riferimento:

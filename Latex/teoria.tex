@@ -1103,6 +1103,23 @@ $|\Omega_i|$ rende inoltre la misura \textbf{indipendente dalla non uniformità 
 mesh}, requisito essenziale per confrontare griglie diverse in uno studio di
 convergenza.
 
+\paragraph{Perché un valore quadratico medio (RMS) e cosa indica $|\Omega_i|$.}
+La grandezza monitorata è l'\textbf{entropia adimensionale} $\bar S = \gamma\ln\bar T - (\gamma-1)\ln\bar P$
+(introdotta nell'adimensionalizzazione), definita a meno di una costante e qui riferita a zero, così
+che $\bar S$ \emph{coincide} con l'errore locale. Per ridurre il \emph{campo} d'errore a un \textbf{unico scalare} confrontabile tra griglie si
+usa il \textbf{valore quadratico medio} (\emph{root mean square}): (i) l'\textbf{elevamento al
+quadrato} evita che errori locali di segno opposto si \textbf{cancellino} (cosa che accadrebbe con
+una media semplice) e penalizza maggiormente gli scostamenti grandi; (ii) la \textbf{radice} riporta
+la misura alle stesse unità di $\bar S$; (iii) la \textbf{media} (divisione per l'area totale) la
+rende un valore \emph{tipico} per cella, indipendente dal \textbf{numero} di celle. Il simbolo
+$|\Omega_i|$ \textbf{non è un valore assoluto} nel senso di modulo di un numero con segno: è la
+\textbf{misura} (area in 2D, volume in 3D) \textbf{della cella} $\Omega_i$, per definizione positiva.
+Pesare $\bar S_i^2$ con $|\Omega_i|$ trasforma la somma in una \textbf{quadratura} dell'integrale
+$\int_\Omega \bar S^2\,d\Omega$: senza tale peso, su mesh non uniformi le numerose celle piccole di
+una zona raffinata risulterebbero sovra-rappresentate. In sintesi $\|\bar S\|_2$ è la versione
+\textbf{discreta, pesata sul volume e mediata} della norma $L_2$ continua
+$\sqrt{\int_\Omega \bar S^2\,d\Omega \big/ \int_\Omega d\Omega}$.
+
 \paragraph{Ordine di convergenza dal grafico log--log.}
 Assumendo che l'errore segua un andamento asintotico a \emph{legge di potenza}
 $E = k \cdot h^p$, dove $h$ è la dimensione caratteristica della griglia e $p$ l'ordine
@@ -1120,6 +1137,56 @@ bump} (flusso subsonico, privo di urti e quindi isentropico nel solutore invisci
 \textbf{non} si applica ai casi con onde d'urto (rampa, presa), dove l'entropia
 \emph{deve} crescere attraverso gli urti per ragioni fisiche e non solo numeriche, come
 già discusso nei rispettivi capitoli.
+
+\paragraph{Regione asintotica e regione pre-asintotica.}
+La pendenza locale del grafico log--log coincide con l'ordine $p$ \textbf{solo asintoticamente}, cioè
+per $h$ sufficientemente piccolo. La Figura~\ref{fig:ordine_loglog} lo illustra: su \textbf{griglie
+rade} ($h$ grande, regione \emph{pre-asintotica}) i termini di ordine superiore dell'errore non sono
+trascurabili e la pendenza misurata è \textbf{diversa} (qui \emph{inferiore}) da quella teorica;
+\textbf{raffinando} ($h\to0$) si entra nella \textbf{regione asintotica}, dove la curva diventa
+parallela alla retta ideale di pendenza $p$. Si noti che questa è una proprietà della
+\textbf{convergenza spaziale di griglia} (errore in funzione di $h$): è concettualmente diversa dalla
+\textbf{convergenza temporale} verso lo stato stazionario (residui in funzione delle iterazioni),
+e il ``transitorio iniziale'' di cui si parla qui è quello sulle \emph{griglie rade}, non quello
+sulle prime iterazioni.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=12.5cm, height=7.6cm,
+        xmode=log, ymode=log, log basis x=10, log basis y=10,
+        xlabel={dimensione caratteristica della cella $h$ (scala log)},
+        ylabel={errore $\|\bar S\|_2$ (scala log)},
+        xmin=0.0022, xmax=0.023, ymin=6e-4, ymax=9e-3,
+        legend pos=south east, grid=both, thick]
+      % divisore indicativo asintotica / pre-asintotica
+      \draw[gray, dotted, very thick] (axis cs:0.0058,6e-4) -- (axis cs:0.0058,9e-3);
+      % retta ideale pendenza p=1 ancorata al punto piu' fine
+      \addplot[black, dashed, domain=0.0025:0.02, samples=2] {0.000924*(x/0.0025)};
+      \addlegendentry{pendenza ideale $p=1$ (ordine teorico)}
+      % errore osservato (dati bump, Roe di riferimento)
+      \addplot[blue!70!black, mark=*, mark size=2.5pt] coordinates
+        {(0.02,3.35e-3)(0.01,2.929e-3)(0.005,1.728e-3)(0.0025,0.924e-3)};
+      \addlegendentry{errore osservato (bump, Roe)}
+      % ordini locali
+      \node[blue!50!black, font=\footnotesize] at (axis cs:0.0035,1.5e-3) {$p\approx0.90$};
+      \node[blue!50!black, font=\footnotesize] at (axis cs:0.0072,2.7e-3) {$p\approx0.76$};
+      \node[blue!50!black, font=\footnotesize] at (axis cs:0.0145,3.6e-3) {$p\approx0.19$};
+      % etichette regioni
+      \node[green!40!black, font=\footnotesize\bfseries, align=center] at (axis cs:0.0031,6.2e-3)
+        {REGIONE\\ASINTOTICA};
+      \node[orange!60!black, font=\footnotesize\bfseries, align=center] at (axis cs:0.0145,8.0e-4)
+        {REGIONE\\PRE-ASINTOTICA};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Errore (norma $L_2$ dell'entropia) in funzione della dimensione di cella $h$ in scala
+    log--log. Su griglie rade ($h$ grande, regione pre-asintotica) la pendenza osservata è inferiore
+    all'ordine teorico ($p=1$, tratteggiato); raffinando si entra nella regione asintotica e la curva
+    tende a disporsi parallela alla retta ideale. I valori di $p$ indicati sono gli ordini
+    \emph{locali} tra griglie consecutive.}
+  \label{fig:ordine_loglog}
+\end{figure}
 
 \subsection{Estrapolazione di Richardson}
 
@@ -1143,7 +1210,35 @@ Risolvendo il sistema per l'incognita $u_{\rm esatto}$, si ottiene la formula di
 estrapolazione:
 \begin{equation}
   u_{\rm esatto} \approx \frac{r^p u_{h_1} - u_{h_2}}{r^p - 1}
+  \label{eq:richardson_esatta}
 \end{equation}
+
+\paragraph{Perché ``stima'' e non ``calcolo'': il senso del $\approx$.}
+La formula reca un \textbf{circa uguale} (e non un uguale) perché la legge $E=k\,h^p$ è soltanto il
+\textbf{termine dominante} di uno sviluppo asintotico dell'errore di discretizzazione:
+\begin{equation}
+  E = u_h - u_{\rm esatto} = k_p\,h^p + k_{p+1}\,h^{p+1} + k_{p+2}\,h^{p+2} + \dots
+\end{equation}
+Richardson \textbf{tronca} lo sviluppo al primo termine, trascurando i contributi $O(h^{p+1})$.
+L'estrapolazione fornisce quindi un valore \textbf{migliorato} (formalmente più accurato di un ordine
+rispetto a $u_h$), ma \textbf{non esatto}: l'errore residuo è quello dei termini trascurati. A ciò si
+aggiungono le altre ipotesi --- che $k$ sia \textbf{la stessa} sulle due griglie, che $p$ sia
+\textbf{davvero} l'ordine assunto --- e la contaminazione da \textbf{round-off} e da convergenza
+iterativa non perfetta. Per questo si parla di \textbf{stima} (estrapolazione) e non di calcolo
+esatto della soluzione.
+
+\paragraph{Interpretazione: $u_{h_1}$ non viene trascurato.}
+Conviene riscrivere la~\eqref{eq:richardson_esatta} nella forma equivalente
+\begin{equation}
+  u_{\rm esatto} \approx \underbrace{u_{h_1}}_{\text{valore fine}}
+  + \underbrace{\frac{u_{h_1}-u_{h_2}}{r^p-1}}_{\text{stima dell'errore } E_1},
+\end{equation}
+che mostra come l'estrapolazione \textbf{parta} dalla soluzione sulla griglia \textbf{più fine}
+$u_{h_1}$ (la migliore disponibile) e le \textbf{sommi} la stima dell'errore residuo per
+``proiettarla'' verso $h\to0$. Dunque $u_{h_1}$ \textbf{non è affatto trascurato}: ne è anzi il
+\textbf{termine principale}. Lo si vede anche nella forma compatta: per $r^p\gg1$ il peso di
+$u_{h_1}$ domina e $u_{\rm esatto}\to u_{h_1}$, mentre $u_{h_2}$ (griglia rada) entra solo nella
+\emph{correzione}.
 
 \paragraph{Attenzione all'ipotesi di regione asintotica.}
 L'ipotesi che $p$ coincida con l'ordine teorico ha senso \textbf{solo se la mesh è già
@@ -1159,8 +1254,22 @@ dai dati stessi.
 Se non si conosce a priori l'ordine reale del metodo sulla specifica griglia (ad esempio
 a causa di effetti di bordo o mesh non sufficientemente fitta), l'ordine $p$ diventa
 un'\textbf{incognita}. È necessario introdurre una \textbf{terza} simulazione per chiudere
-il sistema. Date tre griglie con passo $h$, $2h$ e $4h$ (rapporto costante $r=2$), si
-valuta prima l'ordine effettivo $p$:
+il sistema. Date tre griglie con passo $h$, $2h$ e $4h$ (rapporto costante $r=2$), si scrivono le
+tre relazioni d'errore
+\begin{equation}
+  u_h - u_{\rm esatto}=k\,h^p,\qquad
+  u_{2h}-u_{\rm esatto}=2^p k\,h^p,\qquad
+  u_{4h}-u_{\rm esatto}=4^p k\,h^p .
+\end{equation}
+Le si \textbf{sottrae a coppie} (cioè a due a due, per griglie consecutive: la seconda meno la
+prima, e la terza meno la seconda): in ogni differenza \textbf{si elimina l'incognita}
+$u_{\rm esatto}$, che compare in tutte e tre con lo stesso segno,
+\begin{equation}
+  u_{2h}-u_h = k\,h^p\,(2^p-1),\qquad
+  u_{4h}-u_{2h} = k\,h^p\,2^p(2^p-1).
+\end{equation}
+Il \textbf{rapporto} delle due differenze elimina anche il fattore $k\,h^p$ e lascia il solo $2^p$,
+da cui si ricava l'ordine effettivo:
 \begin{equation}
   p = \frac{\ln\!\left(\dfrac{u_{4h}-u_{2h}}{u_{2h}-u_h}\right)}{\ln 2}
 \end{equation}
@@ -1203,6 +1312,98 @@ dell'incertezza numerica associata alla discretizzazione:
   \text{GCI} = F_s \cdot |u_h - u_{\rm esatto}|, \qquad F_s = 3 \quad \text{(fattore di sicurezza)}
   \label{eq:gci}
 \end{equation}
+
+\subsection{Verso una griglia più fitta o più rada? La convenzione del rapporto $r$}
+
+Il \textbf{rapporto di diradamento} $r=h_2/h_1$ misura il salto di risoluzione tra due griglie. Va
+chiarito un punto che genera spesso confusione: \textbf{l'ordine in cui si eseguono le simulazioni è
+irrilevante}. In fase di progetto si procede quasi sempre \emph{infittendo} (si parte da una mesh
+rada di tentativo e la si raffina: $l_c=0.02\to0.01\to\dots$, cioè $h$ \emph{diminuisce}); per
+applicare Richardson, però, si \textbf{riordinano} a posteriori le soluzioni rispetto ad $h$ e le si
+etichetta nel modo più comodo per la formula. La convenzione usuale (e quella del report) fissa come
+\textbf{riferimento la griglia più fine} $h_1$ ed esprime le altre come suoi multipli,
+$h_2=r\,h_1$ con $\mathbf{r>1}$ (quindi $h_2$ è \textbf{più rada}). Il motivo è che
+\textbf{l'estrapolazione è una correzione applicata alla soluzione migliore}: si parte da $u_{h_1}$
+(la più accurata) e si stima quanto dista dall'esatto osservando di quanto cambia la soluzione
+passando alla griglia rada. Il nome ``diradamento'' nasce quindi solo da questa \emph{scelta di
+riferimento}, \textbf{non} dal verso in cui si è lavorati.
+
+Definire un \textbf{rapporto di infittimento} $r'=h_1/h_2<1$ sarebbe del tutto equivalente: si
+otterrebbe la stessa stima riscrivendo le formule con $1/r$ al posto di $r$ (puro cambio di
+convenzione, la matematica non cambia). L'esempio $l_c=0.02$ poi $0.01$ è infatti un
+\textbf{infittimento} ($h$ si è dimezzato); ai fini di Richardson lo si legge ponendo $h_1=0.01$
+(fine) e $h_2=0.02$ (rada), da cui $r=h_2/h_1=2>1$. In breve: si \emph{infittisce} per
+\textbf{ottenere} le griglie, ma si \emph{descrive} il salto con il rapporto di diradamento $r>1$
+riferito alla più fine.
+
+\subsection{Da che cosa dipende la costante $k$}
+
+Nella legge $E\simeq k\,h^p$ la costante $k$ \textbf{non} è universale. Da un'analisi dell'errore di
+troncamento (sviluppo di Taylor dello schema) $k$ risulta proporzionale alle \textbf{derivate di
+ordine elevato della soluzione esatta} (per uno schema del primo ordine, alle derivate seconde del
+campo) moltiplicate per coefficienti propri dello schema. Di conseguenza $k$ dipende da:
+\begin{itemize}
+  \item lo \textbf{schema numerico} (il suo coefficiente di troncamento: Roe e Lax--Friedrichs, pur
+    condividendo l'ordine $p=1$, hanno $k$ diversi, da cui errori diversi a parità di $h$);
+  \item il \textbf{problema}, cioè \textbf{geometria + condizioni al contorno + regime di flusso}:
+    sono questi a determinare la soluzione e dunque le sue derivate. Una geometria con curvature o
+    gradienti più intensi ha derivate maggiori e quindi $k$ maggiore. ``Dipende dal problema''
+    significa esattamente questo --- \textbf{non} la singola mesh;
+  \item \textbf{non} da $h$ (fattorizzato in $h^p$) \emph{purché} si sia nel regime asintotico, dove
+    $k$ è costante.
+\end{itemize}
+
+\paragraph{Set diversi di griglie danno $k$ diversi?} Dipende dal regime:
+\begin{itemize}
+  \item \textbf{in regime asintotico}, con raffinamento self-simile, scegliendo coppie diverse di
+    griglie si ottiene \emph{circa lo stesso} $k$ (proprietà di schema $+$ problema);
+  \item \textbf{fuori dal regime asintotico} (mesh rade) \textbf{sì}: il $k$ \emph{apparente} cambia
+    da coppia a coppia, perché il \textbf{fit a un solo termine} $k\,h^p$ deve \textbf{assorbire} i
+    termini di ordine superiore trascurati, che pesano in modo diverso a $h$ diversi. È anche il
+    motivo per cui $k$ non ha valore predittivo da riusare altrove e per cui non interessa calcolarla:
+    in entrambe le modalità di Richardson viene \textbf{eliminata} algebricamente.
+\end{itemize}
+
+\subsection{Ordine effettivo più basso del teorico: cause, conseguenze e rimedi}
+\label{subsec:ordine_basso}
+
+Può sorprendere che l'ordine \textbf{effettivo} misurato sia \emph{inferiore} a quello teorico: non
+si vorrebbe forse il massimo accordo tra teoria e pratica? Il punto è che l'ordine teorico è una
+proprietà \textbf{asintotica} ($h\to0$) e vale ``alla lettera'' solo quando $k\,h^p$ domina sui
+termini $O(h^{p+1})$. Su \textbf{griglie rade} questi ultimi non sono trascurabili e l'ordine
+\emph{osservato} se ne discosta.
+
+\paragraph{Cause dell'ordine effettivo basso.}
+\begin{itemize}
+  \item \textbf{griglie non abbastanza fini}: regione \textbf{pre-asintotica}, con termini di ordine
+    superiore non trascurabili (causa principale nel bump);
+  \item \textbf{non uniformità della mesh} (stretching, distribuzione \texttt{Bump}, progressione
+    geometrica a parete), che ``sporca'' la legge di potenza pulita;
+  \item \textbf{effetti di bordo} e influenza delle condizioni al contorno;
+  \item \textbf{dissipazione non lineare / limitatori}, che possono localmente abbassare l'ordine.
+\end{itemize}
+
+\paragraph{È un problema? Si può risolvere?} Non è sintomo di un \textbf{errore di codice} (il
+solutore è validato sui dati di riferimento) né impedisce la convergenza, che resta \textbf{monotòna}
+e con errori piccoli. Significa soltanto che la \textbf{stima rigorosa dell'ordine} su quelle griglie
+è incerta. Lo si ``risolve'' (i) \textbf{raffinando ancora} fino a entrare nel regime asintotico
+(costoso), (ii) usando un raffinamento \textbf{self-simile e più uniforme}, oppure (iii) uno schema
+di \textbf{ordine più alto}.
+
+\paragraph{Perché allora ci si appoggia all'ordine teorico (o alla soluzione esatta nota)?}
+Non è che ``l'inaccuratezza dell'effettivo \emph{autorizza} l'uso del teorico'': è una questione di
+\textbf{affidabilità della stima}. L'ordine effettivo è una \textbf{misura} ricavata dai dati; se i
+dati sono pre-asintotici, quella misura è \textbf{rumorosa} e l'estrapolazione che ne segue è
+inaffidabile. In tal caso conviene appoggiarsi a un'informazione \textbf{a priori} più solida:
+\begin{itemize}
+  \item se \textbf{si conosce la soluzione esatta} (caso del bump, $\bar S_{\rm esatto}=0$): la si
+    usa \textbf{direttamente}, leggendo l'ordine dalla pendenza log--log, senza estrapolare;
+  \item altrimenti si \textbf{assume l'ordine teorico} dello schema come stima ingegneristica
+    ragionevole (sappiamo che lo schema è formalmente del primo ordine e che $p\to1$ raffinando),
+    usandolo come \textbf{prior} al posto di una misura troppo rumorosa.
+\end{itemize}
+In sintesi: l'ordine effettivo è preferibile \emph{quando è affidabile}; quando non lo è, ci si
+affida al teorico o, meglio, alla soluzione esatta se disponibile.
 
 \subsection{Lunghezza caratteristica nominale ed effettiva}
 \label{subsec:lc_eff}

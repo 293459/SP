@@ -479,6 +479,22 @@ terna a rapporto costante $r=2$ ($4h,\,2h,\,h$).
     coincide entro l'$1.5\%$ con il valore di riferimento, a conferma della consistenza del codice.
 \end{itemize}
 
+\paragraph{Perché l'ordine effettivo è basso e perché $k$ ``cambia''.}
+Gli ordini effettivi qui ottenuti ($p_{\rm eff}\approx0.50$ per Lax--Friedrichs e $\approx0.82$ per
+Roe) sono \textbf{inferiori} all'unità teorica perché le griglie impiegate sono ancora in
+\textbf{regime pre-asintotico}: i termini di ordine superiore dell'errore non sono trascurabili e
+sono amplificati dalla \textbf{non uniformità} della mesh (distribuzione \texttt{Bump} e progressione
+geometrica a parete). Per la stessa ragione la costante $k$ della legge $E\simeq k\,h^p$ \textbf{non
+risulta stabile} cambiando la coppia di griglie usata nell'estrapolazione: il fit a un solo termine
+deve assorbire i contributi $O(h^{p+1})$, che pesano diversamente a $h$ diversi. Questo \textbf{non}
+indica un errore di implementazione --- la convergenza è monotòna e il codice è validato sul dato di
+riferimento --- ma solo che la stima \emph{rigorosa} dell'ordine richiederebbe griglie più fini (o
+più uniformi). È proprio perché l'estrapolazione a ordine effettivo è qui poco affidabile che,
+\textbf{disponendo della soluzione esatta} ($\bar S_{\rm esatto}=0$), si privilegia la stima diretta
+a ``soluzione esatta nota'', leggendo l'ordine dalla pendenza log--log. La trattazione generale di
+queste dipendenze (ruolo di $k$, regione asintotica, scelta tra ordine teorico ed effettivo) è in
+Sez.~\ref{subsec:ordine_basso} della teoria.
+
 \subsection{Considerazioni sulla Scelta dello Schema Numerico}
 
 La superiorità dello schema di Roe in termini di accuratezza è la conseguenza diretta della
