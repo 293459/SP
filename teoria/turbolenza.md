@@ -150,6 +150,10 @@ Usata per flussi statisticamente stazionari. Si calcola come limite dell'integra
 
 $$\bar{u}_i(\mathbf{x}) = \lim_{T \to \infty} \frac{1}{T} \int_t^{t+T} u_i(\mathbf{x}, t')\, dt'$$
 
+> 📌 **Si usa $T$ grande perché si individua un periodo?** No: la turbolenza **non è periodica**. "Statisticamente stazionario" non significa che il segnale si ripeta, ma che le sue **proprietà statistiche** (media, varianza...) non cambiano nel tempo. Non si individua quindi alcun periodo: si media su un intervallo **lungo** affinché le fluttuazioni caotiche — che hanno media nulla — si compensino e l'integrale converga al vero valore medio.
+
+> 📌 **Perché far tendere $T\to\infty$ se il flusso "si ripete"?** Proprio perché **non si ripete**. Per un segnale davvero **periodico** (es. vortex shedding laminare) basterebbe mediare su **un solo periodo** per avere la media esatta — aggiungere altri periodi sarebbe inutile, come osservi tu. Ma nella turbolenza ogni "ciclo" è **diverso** (processo aleatorio): per far convergere la media occorre mediare su **molti tempi caratteristici integrali** $\tau_{int}$. Il limite $T\to\infty$ è l'idealizzazione matematica che garantisce la convergenza e che il risultato **non dipenda più da $T$**; in pratica basta $T\gg\tau_{int}$.
+
 ### Media spaziale (d'insieme)
 
 Usata per flussi con turbolenza omogenea (invariante per traslazione spaziale):
@@ -163,6 +167,22 @@ Per flussi compressibili, la media standard di Reynolds crea accoppiamenti tra l
 $$\tilde{u}_i(\mathbf{x}) = \frac{\overline{\rho\, u_i}}{\bar{\rho}} = \frac{1}{\bar{\rho}} \lim_{T\to\infty} \frac{1}{T}\int_t^{t+T} \rho(\mathbf{x},t')\, u_i(\mathbf{x},t')\, dt'$$
 
 > ⚠️ **Risposta alla domanda 6 — Perché la pressione non è mediata con Favre?** Nella media di Favre si usa la ponderazione per densità per *semplificare* l'equazione di continuità e di quantità di moto compressibile. La pressione **non** viene mediata con Favre ma con la media di Reynolds ordinaria ($\bar{p}$), perché la pressione è già un termine scalare che compare linearmente: ponderarla per $\rho$ introdurrebbe correlazioni aggiuntive senza vantaggio. In pratica, si sceglie quale variabile mediare con Favre in base a dove la semplificazione algebrica è massima.
+
+</details>
+
+<details>
+<summary><strong>$\bar u(\mathbf x)$ è 1D o 3D? E fin dove valgono le RANS (incompr. vs compr.)?</strong></summary>
+
+**$\mathbf x$ è un vettore posizione, in generale 3D.** In $\bar u_i(\mathbf x)$, $\mathbf x=(x_1,x_2,x_3)$ è il **punto dello spazio** in cui valuti la media, mentre l'indice $i$ indica la **componente** di velocità ($u_1,u_2,u_3$). Non stai quindi affatto considerando un caso unidimensionale: la media si fa **punto per punto in tutto il dominio 3D** e, per ogni punto, restituisce un campo medio $\bar u_i(\mathbf x)$ che (per flusso statisticamente stazionario) **non dipende più dal tempo**. La media temporale "consuma" la variabile $t$ ma lascia intatta la dipendenza spaziale $\mathbf x$.
+
+**Fin dove valgono le RANS?** Bisogna distinguere due cose:
+
+- La **decomposizione di Reynolds + l'operazione di media** sono **esatte e generali**: valgono per qualunque $Re$ e qualunque geometria, e da sole non introducono approssimazioni (vedi la *dimostrazione passo-passo*).
+- Ad avere **validità limitata** è il **modello di chiusura** (Boussinesq, $k$-$\varepsilon$...): è lì che si concentra l'errore, ed è il motivo dei limiti discussi nel capitolo *Benchmark / limiti delle RANS* (separazione, transizione, forti curvature, basso $Re$...).
+
+**Incompressibili — fin dove?** L'ipotesi di incomprimibilità ($\rho\approx$ cost) regge tipicamente per **basso numero di Mach** ($M\lesssim0.3$), dove le variazioni di densità sono trascurabili. Il numero di Reynolds invece può essere qualsiasi — anzi le RANS si usano proprio ad **alti $Re$**, dove DNS/LES sarebbero troppo costose.
+
+**Compressibili — cosa cambia?** Per $M\gtrsim0.3$ (o flussi con forti gradienti di temperatura/densità) la densità fluttua e si passa alle **RANS compressibili** con la **media di Favre**: $\mathbf x$ resta un punto 3D e la struttura delle equazioni è quasi identica, ma compaiono i termini aggiuntivi (sforzi di Reynolds di Favre, flussi turbolenti di calore, $Y_M$) descritti nel toggle *RANS compressibili*.
 
 </details>
 
@@ -201,6 +221,26 @@ Decomposizione di Reynolds: il segnale totale $u(t)$ (viola) = media temporale c
 > - **non commuta** con $\partial/\partial t$ se si usa la media temporale e il campo è non stazionario (caso URANS).
 >
 > Fisicamente: la commutazione è valida quando l'operazione di media non "vede" variazioni nella direzione di derivazione — cioè quando la separazione di scale tra le fluttuazioni e il campo medio è netta.
+
+### Dimostrazione: linearità e idempotenza
+
+**Linearità (la media di una somma è la somma delle medie).** Discende direttamente dalla **linearità dell'integrale** che definisce la media. Con la media temporale:
+
+$$\overline{a\,u+b\,v}=\lim_{T\to\infty}\frac1T\int_t^{t+T}\!\big(a\,u+b\,v\big)\,dt'=a\lim_{T\to\infty}\frac1T\int_t^{t+T}\!u\,dt'+b\lim_{T\to\infty}\frac1T\int_t^{t+T}\!v\,dt'=a\,\bar u+b\,\bar v$$
+
+Le costanti $a,b$ escono dall'integrale e l'integrale di una somma è la somma degli integrali: ecco perché $\overline{au+bv}=a\bar u+b\bar v$ (proprietà usata di continuo nella derivazione delle RANS).
+
+**Idempotenza ($\bar{\bar u}=\bar u$), dalla definizione di media.** Il primo passaggio di media dà
+
+$$\bar u(\mathbf x)=\lim_{T\to\infty}\frac1T\int_t^{t+T}u(\mathbf x,t')\,dt'$$
+
+Il risultato dipende solo da $\mathbf x$: **rispetto al tempo è una costante**. Applicando la media una seconda volta, e notando che $\bar u(\mathbf x)$ **non dipende dalla variabile di integrazione $t'$**, esso **filtra fuori** dall'integrale:
+
+$$\bar{\bar u}(\mathbf x)=\lim_{T\to\infty}\frac1T\int_t^{t+T}\bar u(\mathbf x)\,dt'=\bar u(\mathbf x)\,\lim_{T\to\infty}\frac1T\int_t^{t+T}dt'=\bar u(\mathbf x)\,\lim_{T\to\infty}\frac1T\,T=\bar u(\mathbf x)$$
+
+L'integrale di una costante vale (costante) $\times$ (ampiezza dell'intervallo) $=\bar u\cdot T$; diviso per $T$ e al limite restituisce esattamente $\bar u$. Quindi $\bar{\bar u}=\bar u$.
+
+> ✅ **Conseguenza immediata.** Da idempotenza e linearità segue subito $\overline{u'}=0$: infatti $\overline{u'}=\overline{u-\bar u}=\bar u-\bar{\bar u}=\bar u-\bar u=0$.
 
 ### Prodotto di due fluttuazioni sinusoidali
 
@@ -991,6 +1031,12 @@ $$\frac{\partial \tau_{ij}}{\partial x_j} = \sum_{j=1}^{3}\frac{\partial \tau_{i
 
 **Significato fisico:** $\tau_{ij}$ è lo sforzo nella direzione $i$ che agisce sulla faccia del cubetto di fluido orientata secondo $j$. Sommare le derivate rispetto a $x_j$ significa fare il **bilancio netto** di tutti gli sforzi (sulle 3 coppie di facce) che danno una **forza risultante in direzione $i$**. È quindi la **divergenza del tensore degli sforzi**, ovvero la forza viscosa netta per unità di volume lungo $i$. Lo stesso vale per il tensore di Reynolds: $\partial_j(-\rho\overline{u_i'u_j'})$ è la forza apparente per unità di volume dovuta alle fluttuazioni.
 
+> ❓ **Cosa indicano $i$ e $j$, e cos'è $x_j$ rispetto a $x_i$?** Entrambi gli indici sono **direzioni spaziali**, cioè spaziano su $\{1,2,3\}\leftrightarrow\{x,y,z\}$: $x_i$ e $x_j$ sono **le stesse coordinate spaziali**, solo con un'etichetta diversa. La differenza è di **ruolo**:
+> - **$i$ (indice libero)** = direzione della **componente fisica** considerata. Per la pressione, $\partial p/\partial x_i$ è la $i$-esima componente del gradiente: indica in quale delle 3 **equazioni di quantità di moto** (verso $x$, $y$ o $z$) sto lavorando. Per lo sforzo $\tau_{ij}$, è la **direzione della forza**.
+> - **$j$ (indice ripetuto/muto)** = la coordinata **lungo cui derivo** e, fisicamente, l'**orientazione della faccia** del cubetto su cui agisce lo sforzo. Essendo ripetuto, è **sommato** su tutte e tre le direzioni: $\partial\tau_{ij}/\partial x_j$ raccoglie il contributo delle facce orientate lungo $x$, $y$ e $z$.
+>
+> In breve: la pressione, essendo uno **scalare**, ha una sola "direzione" da specificare (quella del suo gradiente, $i$); lo sforzo viscoso, essendo un **tensore**, ne ha due — la direzione della forza ($i$) e quella della faccia su cui agisce ($j$, che viene sommata facendo la divergenza).
+
 ### Perché la notazione indiciale e non $\nabla$, grad, div, rot?
 
 | Motivo | Spiegazione |
@@ -1147,6 +1193,82 @@ $$\rho\left(\frac{\partial\bar u_i}{\partial t} + \bar u_j\frac{\partial\bar u_i
 - **Validità:** tutto il passaggio si regge sul fatto che $\partial_j u_j'=0$, cioè sull'**incomprimibilità**. Nel caso comprimibile questo step pulito fallisce (le fluttuazioni di densità rompono l'argomento): è proprio questa la ragione per cui si introduce la **media di Favre**.
 
 > 🎯 **In una frase:** tutto questo "giro" con l'equazione di continuità serve a portare le due fluttuazioni **dentro un unico prodotto $\overline{u_i'u_j'}$ sotto la derivata**, così da poterlo identificare con il **tensore di Reynolds** (che compare appunto dentro la divergenza). Senza questo passaggio avremmo un pezzo *dentro* e un pezzo *fuori* dalla derivata, e non potremmo raccoglierli in un unico tensore.
+
+</details>
+
+<details>
+<summary><strong>⭐ Dimostrazione completa delle RANS incompressibili (passo per passo, da esame)</strong></summary>
+
+Dimostrazione completa con la discussione di **ogni** passaggio — in particolare perché il termine "fluttuazione × derivata di un valore medio" si annulla.
+
+### Passo 0 — Equazioni di partenza (Navier-Stokes incompressibili)
+
+$$\underbrace{\frac{\partial u_i}{\partial x_i}=0}_{\text{continuità}}\qquad\qquad \rho\frac{\partial u_i}{\partial t}+\rho\,u_j\frac{\partial u_i}{\partial x_j}=-\frac{\partial p}{\partial x_i}+\frac{\partial \tau_{ij}}{\partial x_j}$$
+
+con $\tau_{ij}=\mu\big(\partial_j u_i+\partial_i u_j\big)$ sforzo viscoso (lineare in $u$). L'unico termine **non lineare** è il convettivo $u_j\,\partial_j u_i$.
+
+### Passo 1 — Decomposizione di Reynolds
+
+Si scrive ogni incognita come media + fluttuazione:
+
+$$u_i=\bar u_i+u_i',\qquad p=\bar p+p',\qquad \overline{u_i'}=0,\ \ \overline{p'}=0$$
+
+### Passo 2 — Continuità mediata
+
+Sostituendo e mediando (la media è lineare e commuta con $\partial/\partial x_i$):
+
+$$\overline{\frac{\partial(\bar u_i+u_i')}{\partial x_i}}=\frac{\partial\bar u_i}{\partial x_i}+\frac{\partial\overline{u_i'}}{\partial x_i}=\frac{\partial\bar u_i}{\partial x_i}=0$$
+
+Quindi $\partial_i\bar u_i=0$ (continuità del campo medio) e, sottraendola dalla continuità totale, anche $\partial_i u_i'=0$ (**la fluttuazione è a divergenza nulla**). Servirà al Passo 6.
+
+### Passo 3 — Sostituzione nel momento ed espansione del termine convettivo
+
+Sostituendo $u_i=\bar u_i+u_i'$ nel termine non lineare e sviluppando il prodotto si ottengono **quattro** contributi:
+
+$$u_j\frac{\partial u_i}{\partial x_j}=(\bar u_j+u_j')\frac{\partial(\bar u_i+u_i')}{\partial x_j}=\underbrace{\bar u_j\frac{\partial\bar u_i}{\partial x_j}}_{(1)}+\underbrace{\bar u_j\frac{\partial u_i'}{\partial x_j}}_{(2)}+\underbrace{u_j'\frac{\partial\bar u_i}{\partial x_j}}_{(3)}+\underbrace{u_j'\frac{\partial u_i'}{\partial x_j}}_{(4)}$$
+
+### Passo 4 — Media termine per termine
+
+Si applica l'operatore di media a tutta l'equazione. I termini **lineari** sono immediati:
+
+- **Derivata temporale:** $\overline{\rho\,\partial_t u_i}=\rho\,\partial_t\bar u_i$ (la media commuta con $\partial/\partial t$, campo stazionario in media).
+- **Pressione:** $\overline{-\partial_i p}=-\partial_i\bar p$ (perché $\overline{p'}=0$).
+- **Viscoso:** $\overline{\partial_j\tau_{ij}}=\partial_j\bar\tau_{ij}$ con $\bar\tau_{ij}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)$ — lineare in $u$, quindi nessuna incognita nuova.
+
+Per i quattro pezzi convettivi:
+
+| Termine | Media | Esito |
+| --- | --- | --- |
+| (1) $\bar u_j\,\partial_j\bar u_i$ | $\bar u_j\,\partial_j\bar u_i$ | resta (tutto medio) |
+| (2) $\bar u_j\,\partial_j u_i'$ | $\bar u_j\,\partial_j\overline{u_i'}=0$ | **si annulla** |
+| (3) $u_j'\,\partial_j\bar u_i$ | $(\partial_j\bar u_i)\,\overline{u_j'}=0$ | **si annulla** |
+| (4) $u_j'\,\partial_j u_i'$ | $\overline{u_j'\,\partial_j u_i'}\neq0$ | **sopravvive** |
+
+### Passo 5 — Perché il termine (3) si annulla (il punto delicato)
+
+Il termine è $\overline{u_j'\,\dfrac{\partial\bar u_i}{\partial x_j}}$, cioè la **media del prodotto di una fluttuazione per la derivata di un valore medio**. La chiave logica è: **$\dfrac{\partial\bar u_i}{\partial x_j}$ è una grandezza già mediata**, quindi **deterministica e costante rispetto all'operatore di media**. Per la regola "media di (costante × fluttuazione) = costante × media della fluttuazione" (linearità + la grandezza media filtra fuori), esso esce dalla media:
+
+$$\overline{u_j'\,\frac{\partial\bar u_i}{\partial x_j}}=\frac{\partial\bar u_i}{\partial x_j}\;\overline{u_j'}=\frac{\partial\bar u_i}{\partial x_j}\cdot 0=0$$
+
+perché $\overline{u_j'}=0$ per costruzione. **A livello logico:** stai mediando il prodotto di qualcosa di *fisso* (il campo medio, e quindi anche la sua derivata) per qualcosa che *oscilla a media nulla* (la fluttuazione); il fattore fisso lo puoi portare fuori dalla media come una costante, e ciò che resta dentro — la media della sola fluttuazione — è zero. (Stessa logica per il termine (2), dove a uscire è $\bar u_j$.)
+
+> ⚠️ **Attenzione a non confonderlo con il termine (4).** Lì il prodotto è tra **due fluttuazioni** ($u_j'$ e $\partial_j u_i'$): nessuna delle due è "fissa", quindi **niente** può uscire dalla media, e $\overline{u_j'\,\partial_j u_i'}\neq0$ in generale. È esattamente la differenza tra "media di costante × fluttuazione" (= 0) e "media di fluttuazione × fluttuazione" ($\neq$ 0).
+
+### Passo 6 — Il termine (4) in forma conservativa (uso della continuità)
+
+Per la regola del prodotto e usando $\partial_j u_j'=0$ (Passo 2):
+
+$$\frac{\partial(u_i'u_j')}{\partial x_j}=u_j'\frac{\partial u_i'}{\partial x_j}+\underbrace{u_i'\frac{\partial u_j'}{\partial x_j}}_{=\,0}\quad\Longrightarrow\quad \overline{u_j'\frac{\partial u_i'}{\partial x_j}}=\frac{\partial\,\overline{u_i'u_j'}}{\partial x_j}$$
+
+Così le due fluttuazioni finiscono **dentro un unico prodotto sotto la derivata**: è il **tensore di Reynolds**.
+
+### Passo 7 — Equazione RANS finale
+
+Mettendo tutto insieme:
+
+$$\boxed{\ \rho\frac{\partial\bar u_i}{\partial t}+\rho\,\bar u_j\frac{\partial\bar u_i}{\partial x_j}=-\frac{\partial\bar p}{\partial x_i}+\frac{\partial}{\partial x_j}\Big(\underbrace{\bar\tau_{ij}-\rho\,\overline{u_i'u_j'}}_{\text{sforzo viscoso + sforzo di Reynolds}}\Big)\ }$$
+
+> ✅ **Riepilogo dei "perché".** Fino a qui **non si è fatta alcuna approssimazione**: solo decomposizione, linearità della media, $\overline{u'}=0$ e incomprimibilità. Il termine $(1)$ ricostruisce la convezione del campo medio; $(2)$ e $(3)$ spariscono perché contengono **una** fluttuazione a media nulla moltiplicata per una grandezza media (che filtra fuori); $(4)$ sopravvive perché è il prodotto di **due** fluttuazioni correlate e genera il tensore di Reynolds, l'unica vera incognita nuova (problema di chiusura).
 
 </details>
 
