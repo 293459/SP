@@ -16,6 +16,9 @@ la differenza tra **velocità di reazione** ($q_j$, proprietà di una reazione),
 specie** ($\dot\omega_i$, proprietà di una specie) e **costanti cinetiche** ($K_f,K_b$, che
 **non** sono velocità ma coefficienti): vedi §3.1.
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note / unità |
 |---|---|---|
 | $\rho$ | densità della miscela | kg·m⁻³; varia molto (gas combusto leggero) |
@@ -52,6 +55,8 @@ specie** ($\dot\omega_i$, proprietà di una specie) e **costanti cinetiche** ($K
 | $S_L,\ \delta_L$ | velocità / spessore di fiamma laminare | m·s⁻¹, m |
 | $\chi$ | scalar dissipation rate | s⁻¹ (stiramento/estinzione) |
 | $Le=\alpha/D_i$ | numero di Lewis | diff. termica / di massa |
+
+</details>
 
 ---
 
@@ -1162,3 +1167,75 @@ $\overline{\dot\omega}$. **Non premiscelate**: **mixture fraction** $Z$ (conserv
 > appunti è stata **spostata nel report** (`Latex/teoria.tex`, sezione *Solutori
 > Density-Based e Pressure-Based → Il metodo di proiezione di Chorin*): appartiene infatti
 > alla teoria dei **solutori pressure/density-based** e non ai flussi reagenti.
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Tutte le formule chiave del capitolo, con hint per ricordarle</strong></summary>
+
+### Variabili e frazioni
+
+| Formula | Hint / collegamento |
+|---|---|
+| $Y_i=\dfrac{m_i}{m},\quad \sum_{i=1}^{N_S}Y_i=1$ | **frazione di massa** = massa della specie / massa totale; le frazioni **sommano a 1** (variabili della composizione, §2). |
+| $[X_s]=\dfrac{\rho_s}{M_s}$ | **concentrazione molare** = densità parziale / massa molare (mol·m⁻³); è il "mattone" della legge di azione di massa (§3.2). |
+| $E=\sum_{i=1}^{N_S}Y_i\,e_i+\tfrac12\mathbf u^2$ | **energia totale** = somma pesata delle energie interne di specie **+ cinetica** (§2.4). |
+| $h_i=e_i+\dfrac{p}{\rho}$ | **entalpia** = energia interna + lavoro di pressione; passaggio energia→entalpia (§2.4). |
+| $h_i=h^\circ_{f,i}+\displaystyle\int_{T_0}^{T}c_{p,i}\,dT'$ | entalpia assoluta = **formazione + sensibile**; è ciò che rende l'energia "source-free" (il calore di reazione è già nelle $h^\circ_f$, §2.4). |
+| $H=E+\dfrac{p}{\rho}$ | **entalpia totale** = energia totale + lavoro di pressione (variabile naturale della convezione comprimibile, §2.4). |
+| $Le=\dfrac{\alpha}{D_i}$ | **Lewis** = diffusione termica / di massa; spesso $Le=1$ per chiudere (§2.2). |
+
+### Equazioni di trasporto
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\dfrac{\partial\rho}{\partial t}+\nabla\cdot(\rho\mathbf u)=0$ | **continuità globale**: nessuna sorgente, la massa totale **si conserva** (§2.1). |
+| $\dfrac{\partial(\rho Y_i)}{\partial t}+\nabla\cdot(\rho\mathbf u Y_i)=-\nabla\cdot\mathbf J_i+\dot\omega_i$ | **trasporto specie**: accumulo + convezione = $-$diffusione $+$ **sorgente chimico**; l'unica equazione con sorgente chimica (§2.2). |
+| $\mathbf J_i=-\rho D_i\nabla Y_i,\quad \sum_i\mathbf J_i=0$ | **legge di Fick**: flusso da concentrato a rarefatto (segno meno); i flussi diffusivi **sommano a zero** (§2.2). |
+| $\dfrac{\partial(\rho\mathbf u)}{\partial t}+\nabla\cdot(\rho\mathbf u\otimes\mathbf u)=\nabla\cdot\boldsymbol\sigma,\ \ \boldsymbol\sigma=\boldsymbol\tau-p\mathbf I$ | **quantità di moto**: $\boldsymbol\sigma$ = sforzi viscosi $\boldsymbol\tau$ (deviatorico) + pressione $-p\mathbf I$ (isotropo); chimica solo indiretta via $\rho$ (§2.3). |
+| $\dfrac{\partial(\rho E)}{\partial t}+\nabla\cdot(\rho\mathbf u E)=\nabla\cdot(\boldsymbol\sigma\cdot\mathbf u)-\nabla\cdot\mathbf q_c-\nabla\cdot\mathbf q_m$ | **energia**: lavoro degli sforzi $-$ calore conduttivo $-$ calore diffusivo (§2.4). |
+| $\mathbf q_c=-\lambda\nabla T,\qquad \mathbf q_m=\sum_i h_i\mathbf J_i$ | **Fourier** (conduzione) e **flusso entalpico diffusivo** (ogni specie che diffonde porta la sua $h_i$, §2.4). |
+| $\dot Q=-\sum_i h^\circ_{f,i}\,\dot\omega_i$ | sorgente di calore da aggiungere **solo** se si usa l'entalpia *sensibile*; con entalpia assoluta sparisce (§2.4). |
+
+### Cinetica e termine sorgente
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\dot\omega_i=M_i\displaystyle\sum_{j=1}^{N_r}(\nu^P_{ij}-\nu^R_{ij})\,q_j$ | **tasso di specie** = somma sulle reazioni del rateo $q_j$ pesato sul **coeff. stechiometrico netto**; lega $q_j$ (reazione) a $\dot\omega_i$ (specie) via $M_i$ (§3.1). |
+| $\dot\omega_i=\displaystyle\sum_{j}(\nu^P_{ij}-\nu^R_{ij})\Big[K_{f,j}\prod_s\!\big(\tfrac{\rho_s}{M_s}\big)^{\nu^R_{sj}}-K_{b,j}\prod_s\!\big(\tfrac{\rho_s}{M_s}\big)^{\nu^P_{sj}}\Big]$ | formula completa: **stechiometria × (azione di massa diretta − inversa)**; la parentesi $=q_j$, rateo netto; non linearità = stiffness (§3.2). |
+| $q_j=K_{f,j}\prod_s[X_s]^{\nu^R_{sj}}-K_{b,j}\prod_s[X_s]^{\nu^P_{sj}}$ | **rate of progress**: "avanti − indietro"; all'equilibrio $q_j=0$ (diretta = inversa, §3.2). |
+| $\dot\omega_{\text{OH}}=M_{\text{OH}}(+2\,q_1-1\,q_2+1\,q_3)$ | esempio di "distribuzione": una specie **somma** i contributi di tutte le reazioni che la toccano (R1,R3 producono, R2 consuma, §3.1). |
+
+### Arrhenius ed equilibrio
+
+| Formula | Hint / collegamento |
+|---|---|
+| $K_{f,j}=A_j\,T^{\beta_j}\exp\!\big(-\tfrac{E_{a,j}}{RT}\big)$ | **Arrhenius**: pre-esp. $A$ × correzione debole $T^\beta$ × **fattore di Boltzmann** (motore della dipendenza esponenziale da $T$, §3.3). |
+| $K_{b,j}=\dfrac{K_{f,j}}{K_{eq,j}(T)}$ | costante **inversa** dalla diretta / costante di **equilibrio** → garantisce coerenza termodinamica (§3.3). |
+| $K_{eq,j}(T)=\exp\!\big(-\tfrac{\Delta G^\circ_j}{RT}\big),\ \ \Delta G^\circ_j=\Delta H^\circ_j-T\Delta S^\circ_j$ | **equilibrio** = puramente termodinamico (Gibbs di reazione, dati NASA), non cinetico (§3.3). |
+| $\dfrac{K_{f,j}}{K_{b,j}}=\prod_s[X_s]^{\nu^P_{sj}-\nu^R_{sj}}\equiv K_{c,j}(T)$ | **equilibrio dettagliato**: a $q_j=0$ il rapporto diretta/inversa è la $K_c$ in concentrazioni (§3.3). |
+| $K_{c,j}=K_{eq,j}(RT)^{-\Delta n_j},\quad \Delta n_j=\sum_s(\nu^P_{sj}-\nu^R_{sj})$ | passaggio $K_{eq}\leftrightarrow K_c$: fattore $(RT)$ alla **variazione netta di moli** (§3.3). |
+
+### Numero di Damköhler e scale temporali
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\mathrm{Da}=\dfrac{\tau_t}{\tau_c}=\dfrac{\text{mescolamento}}{\text{chimico}}$ | **Damköhler** = mixing / chimica; $\gg1$ limita il mixing (mixed-is-burnt), $\ll1$ limita la chimica (NOₓ), §4. |
+| $\tau_t=\dfrac{k}{\varepsilon}$ | **tempo di mixing turbolento** = rotazione dei grandi vortici ($k$ energia cinetica turb., $\varepsilon$ dissipazione, §4). |
+| $\tau_c\approx\dfrac{\delta_L}{S_L}$ | **tempo chimico** ≈ spessore / velocità di fiamma laminare (§4); per H₂–O₂ $\tau_c\sim10^{-6}$ s (§3.4). |
+
+### Fiamme premiscelate e diffusive
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\overline{\dot\omega}_c\approx C\,\dfrac{\bar\rho}{\tau_t}\,\tilde c(1-\tilde c)$ | **EDM** (premiscelata): rate controllato dal tempo dei vortici $\tau_t=k/\varepsilon$, massimo a $\tilde c=0.5$; mixed-is-burnt (§6.2). |
+| $\overline{\dot\omega}=\min(\dot\omega_{\text{finite-rate}},\ \dot\omega_{\text{EDM}})$ | **Finite-Rate / EDM**: prende il **più lento** (chimica vs mixing), nessuna ipotesi a priori sul collo di bottiglia (§6.2). |
+| $\widetilde{\dot\omega}_i=\displaystyle\int_0^1\dot\omega_i(Z)\,\tilde P\big(Z;\tilde Z,\widetilde{Z''^2}\big)\,dZ$ | **β-PDF**: chimica pre-tabulata **convoluta** con PDF assunta (media + varianza) → recupera la non linearità (§6.2). |
+| $\tilde Y_i=\displaystyle\int_0^1 Y_i(Z)\,\tilde P(Z)\,dZ$ | stesse PDF per mediare le composizioni $Y_i(Z)$ tabulate (§6.2). |
+| $\dfrac{\partial(\rho Z)}{\partial t}+\nabla\cdot(\rho\mathbf u Z)=\nabla\cdot(\rho D\nabla Z)$ | **mixture fraction** $Z$: scalare **conservato** (senza sorgente!) → una sola eq. di trasporto per le diffusive (§6.3). |
+| $D\to F\,D,\quad \dot\omega\to\dot\omega/F$ | **Thickened Flame**: ingrossa il fronte di un fattore $F$; lo "spalma" su più celle (§6.3). |
+| $S_L\propto\sqrt{D\,\dot\omega},\qquad \delta_L\propto\sqrt{D/\dot\omega}$ | thickening: $D\,\dot\omega$ invariato ⇒ **$S_L$ non cambia**, ma $\delta_L\to F\,\delta_L$ (spessore cresce, §6.3). |
+
+</details>

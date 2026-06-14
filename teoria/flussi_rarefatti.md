@@ -11,6 +11,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $Kn=\dfrac{\lambda}{L}$ | **numero di Knudsen** | è un **campo** (varia localmente) |
@@ -26,6 +29,8 @@
 | $F_{num}$ | **peso** numerico | molecole reali per particella simulata |
 | $\nu_{max}$ | frequenza di collisione max | schema **NTC** (No Time Counter) |
 | DSMC | *Direct Simulation Monte Carlo* | particelle statistiche, non un continuo |
+
+</details>
 
 ---
 
@@ -475,5 +480,56 @@ particelle DSMC.
 **piccolissimo**, quindi servirebbero celle $\Delta x\le\lambda$ molto fini, $\Delta t\le\tau_c$ molto
 piccoli e **moltissime particelle** (≥30–50 per cella su tantissime celle): il costo esplode. Lì il
 **continuo** è sia valido sia molto più economico.
+
+</details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Tutte le formule chiave del capitolo, con hint per ricordarle</strong></summary>
+
+### Rarefazione e Knudsen
+
+| Formula | Hint / collegamento |
+|---|---|
+| $Kn = \dfrac{\lambda}{L}$ | "Quanto è grande il **vuoto tra urti** rispetto al problema": $\lambda$ grande ⟹ rarefatto. Soglie $10^{-2}$ (continuo) e $1$ (molecolare libero). |
+| $Kn = \dfrac{\lambda}{Q/|\nabla Q|}$ | Versione **locale**: $L$ diventa la scala su cui $Q$ varia ($Q/|\nabla Q|$). Rende $Kn$ un **campo**. Usa $Q=T$ (scalare, sempre definito) ⟹ $L\sim T/|\nabla T|$. |
+| $\lambda = \dfrac{1}{\sqrt{2}\,n\,\sigma}$ | $\lambda$ è un **campo**: nel plume $n$ crolla ⟹ $\lambda$ esplode ⟹ $Kn$ sale. Il $\sqrt2$ viene dal moto relativo del bersaglio. |
+
+### Tempi, collisioni e modello VHS
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\tau_c = \dfrac{\lambda}{\bar c}$ | Tempo medio tra urti = distanza tra urti / velocità termica. Fissa il **passo DSMC** ($\Delta t\le\tau_c$). |
+| $\nu_{coll} \propto n\,\sigma\,\bar c$ | **Quanto spesso** si scambia quantità di moto. Frequenza ∝ densità × bersaglio × velocità. |
+| $\sigma \propto g^{-2\nu}$ | **VHS**: urto più **veloce/energetico** ($g$ grande) ⟹ diametro efficace **minore** (più penetrante). È lo stesso gas, cambia solo il peso dell'urto. |
+| $\mu \propto \rho\,\bar c\,\lambda \propto \dfrac{\sqrt{mkT}}{\sigma}$ | Viscosità = **diffusività di quantità di moto**: $\sigma$ minore ⟹ $\lambda$ maggiore ⟹ q.d.m. trasportata **più lontano** ⟹ più $\mu$. |
+| $\mu \propto T^{\omega}$ | HS: $\sigma$ costante ⟹ $\omega=1/2$ ($\mu\propto\sqrt T$, sbagliato). VHS aggancia $\sigma(g)$ ⟹ $\omega\approx0.74$ (aria) reale. |
+
+### Algoritmo DSMC e vincoli numerici
+
+| Formula | Hint / collegamento |
+|---|---|
+| $x^{n+1} = x^{n} + v^{n}\,\Delta t$ | **Free flight**: moto e collisioni **disaccoppiati**. Niente gradienti ⟹ metodo robusto (non "esplode"). |
+| $\Delta x \le \lambda$ | La **cella** deve risolvere la scala degli urti: compagni di collisione **genuinamente vicini**. Troppo piccola ⟹ poche particelle ⟹ rumore. |
+| $\Delta t \le \tau_c$ | Il **passo** risolve il tempo tra urti: in media ≤ ~1 collisione/particella/passo (non zero: NTC estrae il n° di coppie). |
+| $\Delta t \le \dfrac{\Delta x}{|v_{max}|}$ | Vincolo **tipo CFL**: la particella non salta più di una cella/passo. Nel continuo è stabilità, nel DSMC è **coerenza fisica** del trasporto. |
+| $N \approx 10\text{–}50$ /cella | Significatività **statistica**: poche particelle ⟹ varianza alta ⟹ **rumore**. La media di cella è l'unica vera media. |
+
+### Medie di cella e peso numerico
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\rho \propto \dfrac{F_{num}\,N_{cella}}{V}$ | $F_{num}$ = **molecole reali per particella numerica**. La particella porta uno stato singolo, pesa $F_{num}$. |
+| $\bar u_{macro} = \dfrac{1}{N}\sum_p \bar v_p$ | Velocità macroscopica = media delle velocità delle particelle **nella cella**. |
+| $T \propto \dfrac{1}{N}\sum_p \lvert \bar v_p - \bar u_{macro}\rvert^2$ | Temperatura = **varianza** delle velocità attorno alla media (agitazione termica). |
+
+### Continuo vs rarefatto (limite di espansione)
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\nu_{max}\approx130^\circ$ ($M\to\infty$, $\gamma=1.4$) | Angolo limite di **Prandtl–Meyer** (espansione, NON Rankine–Hugoniot). Oltre ⟹ **backflow** ⟹ serve DSMC. |
 
 </details>

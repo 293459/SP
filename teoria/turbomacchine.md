@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo / termine | Nome | Note |
 |---|---|---|
 | $Z_1,\ Z_2$ | numero di **pale** di statore / rotore | spesso $Z_1\neq Z_2$ |
@@ -16,6 +19,8 @@
 | **Sliding mesh** | mesh che scorre, interfaccia non conforme | instazionario, alta fedeltà |
 | **Phase-lag / corocroniche** | sfasamento temporale tra canali | sfrutta la periodicità |
 | **Tempo inclinato** | riformulazione spazio-tempo inclinata | gestisce passi diversi |
+
+</details>
 
 > Filo conduttore: tutti i metodi si distinguono per **quanta interazione instazionaria
 > statore–rotore** conservano (scie, campi di potenziale) e a **quale costo**.
@@ -477,5 +482,39 @@ si usano le **condizioni corocroniche** salvando la storia temporale.
 
 *Discriminante chiave:* **mediare la scia (mixing plane) vs conservarla (sliding/phase-lag)** —
 ovvero scegliere tra **costo basso/stazionario** e **fedeltà alta/instazionario**.
+
+</details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Formule chiave del capitolo (richiamo rapido)</strong></summary>
+
+### Conteggio pale e periodicità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\text{pitch}=\dfrac{360^\circ}{Z}$ | **Passo** angolare di un canale: 360 diviso n. pale. Più pale → passo più stretto (es. $360/30=12^\circ$). |
+| $\text{settore}=\dfrac{360^\circ}{\mathrm{MCD}(Z_1,Z_2)}$ | **Sliding mesh**: settore periodico **più piccolo** → MCD al denominatore (non un divisore qualsiasi). MCD grande → settore piccolo → meno celle. |
+| $\dfrac{Z_1}{\mathrm{MCD}},\ \dfrac{Z_2}{\mathrm{MCD}}$ | Numero di **canali per settore** delle due schiere. Devono coprire lo **stesso angolo**; se MCD$=1$ → full annulus, allora si "barano" le pale (50,61→50,60). |
+
+### Mixing plane: media circonferenziale e troncamento di Fourier
+
+| Formula | Hint / collegamento |
+|---|---|
+| $U(r,\theta)=\sum\limits_{n=-\infty}^{+\infty}\hat U_n(r)\,e^{\,in\theta}$ | **Serie di Fourier** circonferenziale del campo all'interfaccia: $n=0$ è il valor medio, $n\neq0$ sono scia + non-uniformità. |
+| $\bar U(r)=\dfrac{1}{\Delta\theta}\displaystyle\int_{\theta_1}^{\theta_2}U(r,\theta)\,d\theta=\hat U_0(r)$ | La media in $\theta$ **conserva solo $n=0$**: profilo che dipende **solo da $r$** (indip. dal n. pale). |
+| $\hat U_n(r)\xrightarrow{\text{mixing plane}}0\ (n\neq0)$ | **Troncamento della scia**: azzerare le armoniche superiori = miscelamento istantaneo → **perdite di mixing numeriche** (entropia spuria). |
+
+### Corocroniche / phase-lag: periodicità sfasata e time-lag
+
+| Formula | Hint / collegamento |
+|---|---|
+| $U(x,r,\theta,t)=U\!\left(x,r,\theta-\tfrac{2\pi}{Z_2},\,t\right)$ | **Periodicità spaziale** (passi uguali): stesso campo a un passo di distanza, **stesso istante**. |
+| $U(x,r,\theta,t)=U\!\left(x,r,\theta-\tfrac{2\pi}{Z_2},\,t+\delta_t\right)$ | **Periodicità corocronica** (passi diversi): canale adiacente uguale ma a un **istante diverso** $t+\delta_t$. Si sfrutta la periodicità **nel tempo**, non una coincidenza geometrica. |
+| $\delta_t=\dfrac{\left\lvert\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right\rvert}{\lvert\Omega_1-\Omega_2\rvert}$ | **Time-lag**: tempo per percorrere la **differenza di passo** alla **velocità relativa**. Se $Z_1=Z_2$ → $\delta_t=0$ (torna la periodicità spaziale). |
+| $\delta_t=\dfrac{\left\lvert\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right\rvert}{\Omega_{\text{rotore}}}$ | Caso reale statore–rotore: **una schiera è ferma** ($\Omega=0$), quindi la relativa = $\Omega_{\text{rotore}}$. |
 
 </details>

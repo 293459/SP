@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $U$ | vettore delle **variabili conservative** | massa, q. di moto, energia |
@@ -16,6 +19,8 @@
 | $\Delta=B^2-4AC$ | **discriminante** della PDE 2° ordine | $<0$ ellittica, $>0$ iperbolica |
 | $A,B,C$ | coefficienti della PDE quasi-lineare | classificazione matematica |
 | Rankine–Hugoniot | relazioni di **salto** attraverso l'urto | monte ↔ valle |
+
+</details>
 
 > **Natura del problema:** **ellittico** (subsonico) → informazione ovunque, schemi **centrati**;
 > **iperbolico** (supersonico) → informazione lungo le **caratteristiche** (cono di Mach),
@@ -250,5 +255,49 @@ Rappresenta sistemi di equazioni linearizzate (es. onde acustiche).
 | **Linee Caratteristiche** | Percorsi nello spazio-tempo lungo i quali si propagano le onde di perturbazione. | Trasformano PDE in ODE; forniscono una comprensione fisica profonda. | Diventano matematicamente intrattabili in 2D/3D o con urti forti. |
 | **Rankine-Hugoniot** | Relazioni algebriche che collegano le proprietà a monte e a valle di un urto. | Permettono di calcolare i salti di proprietà senza risolvere la struttura dell'urto. | Non forniscono dettagli sulla fisica interna alla zona d'urto. |
 | **Equazione di Burgers** | Modello scalare non lineare ($\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} = 0$) per lo studio delle onde d'urto. | Eccellente per testare schemi numerici e studiare la non-linearità. | Troppo semplificata per fluidi reali (manca il termine di pressione). |
+
+</details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Tutte le formule chiave del capitolo, con hint per ricordarle</strong></summary>
+
+> Specchietto: formule da tenere a memoria, con un gancio mnemonico e i collegamenti tra loro.
+
+### Classificazione delle PDE (ellittico vs iperbolico)
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $A u_{xx} + B u_{xy} + C u_{yy} + \dots = 0$ | Forma generale della **PDE quasi-lineare del 2° ordine**: i coefficienti $A,B,C$ alimentano il discriminante qui sotto. |
+| $\Delta = B^2 - 4AC$ | **Discriminante** (come per le coniche!): $\Delta<0$ → **ellittica** (subsonico, schemi centrati), $\Delta>0$ → **iperbolica** (supersonico, upwind/marching). |
+| $(1 - M^2)\,\phi_{xx} + \phi_{yy} = 0$ | Equazione del **potenziale linearizzato**: qui $A=(1-M^2)$, $C=1$, $B=0$ → $\Delta=-4(1-M^2)$. Il segno di $(1-M^2)$ decide tutto: $M<1$ ellittica, $M>1$ iperbolica. |
+
+### Numero di Mach e velocità del suono
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $c = \sqrt{\gamma R T}$ | **Velocità del suono**: dipende solo dalla temperatura (gas ideale). È il $c$ che compare negli autovalori di Eulero $u\pm c$. |
+| $M = u/c$ | **Mach** = velocità su velocità del suono. È la soglia $M=1$ che fa cambiare natura alla PDE del potenziale ($1-M^2$). |
+
+### Sistema di Eulero e iperbolicità
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\dfrac{\partial U}{\partial t} + \dfrac{\partial F}{\partial x} = 0$ | **Eulero 1D in forma divergente (conservativa)**: $U$ variabili conservative, $F(U)$ flusso. È la forma robusta per gli urti. |
+| $A(U) = \dfrac{\partial F}{\partial U}$ | **Matrice Jacobiana** del flusso: linearizza il flusso e governa la propagazione. Ponte tra forma divergente e quasi-lineare. |
+| $\dfrac{\partial U}{\partial t} + A(U)\dfrac{\partial U}{\partial x} = 0$ | **Forma quasi-lineare**: ottenuta da quella divergente via chain rule con $A=\partial F/\partial U$. |
+| $A = L\,\Lambda\,L^{-1}$ | **Diagonalizzazione**: il sistema è iperbolico perché $A$ è diagonalizzabile con autovalori reali. $L$ = autovettori, $\Lambda$ = autovalori. |
+| $\lambda = \{u,\ u+c,\ u-c\}$ | **Autovalori di Eulero 1D**: tre velocità di propagazione (entropia + due onde acustiche $u\pm c$). Reali → iperbolicità. Usano il $c$ della velocità del suono. |
+
+### Modelli scalari
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\dfrac{\partial u}{\partial t} + u\,\dfrac{\partial u}{\partial x} = 0$ | **Burgers non viscosa**: caso scalare non lineare ($F(u)=u^2/2$). È l'analogo "giocattolo" di Eulero per studiare la formazione di urti. |
+
+> Le relazioni di **Rankine–Hugoniot** (salto monte↔valle attraverso l'urto) sono citate nel capitolo ma senza una formula esplicita sviluppata: ricordale come *condizioni di salto* coerenti con la forma conservativa $\partial_t U+\partial_x F=0$.
 
 </details>

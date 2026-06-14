@@ -156,3 +156,22 @@ natura ellittica.
 centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
 
 </details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Schemi discreti chiave, con hint per ricordarli</strong></summary>
+
+> Specchietto di sintesi: gli schemi discreti che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** con la natura (iperbolica/ellittica) dell'equazione. Sono **discretizzazioni**, non identità: vanno ricordate per la loro *forma dello stencil*.
+
+### Discretizzazione spaziale per natura dell'equazione
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $u_i^{n+1}=u_i^n-\dfrac{a\Delta t}{\Delta x}\big(u_i^n-u_{i-1}^n\big)$ ($a>0$) | schema **upwind** (avvezione): guarda **all'indietro** verso $i-1$, da dove arriva il segnale → rispetta il dominio di dipendenza delle **iperboliche** (Godunov, Roe). Memo: differenza *a monte* + dissipazione numerica stabilizzante. |
+| $\dfrac{u_{i-1}-2u_i+u_{i+1}}{\Delta x^2}=f_i$ | Laplaciano **centrato** (Poisson/diffusione): stencil **simmetrico** a 3 punti → rispetta l'isotropia delle **ellittiche** (nessuna direzione privilegiata). Memo: pattern $1,-2,1$. |
+
+</details>
+

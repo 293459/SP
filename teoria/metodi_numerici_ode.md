@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $y(t_k)$ / $y_k$ | soluzione **esatta** / **numerica** al tempo $t_k$ | $y_k\approx y(t_k)$ |
@@ -14,6 +17,8 @@
 | $F(h\lambda)$ | **fattore di amplificazione** | stabile se $\lvert F(h\lambda)\rvert<1$ |
 | $\bar h,\ K$ | passo limite / costante di Lipschitz | $\exists K>0,\ \bar h$ |
 | $\{i-1,i,i+1\}$ | **stencil** | n. di nodi coinvolti |
+
+</details>
 
 > Teorema di **Lax**: *consistenza* + *zero-stabilità* ⇒ **convergenza**. Espliciti →
 > stabilità **condizionata** (regione limitata); impliciti → spesso **A-stabili**.
@@ -431,102 +436,6 @@ $$
 
 </details>
 
-## Quiz
-
-<details>
-<summary><strong>Implementazione Eulero Esplicito (equazione)</strong></summary>
-
-```matlab
-f = @(t,y) -y^2 + 3*t ; h = 0.1; 
-t = 0:h:9 ; N = length(t); y = zeros(1,N) ; y(1)= 2*pi; 
-for i = 1:N-1
-  y(i+1) = y(i) + h * f(t(i),y(i)); 
-end 
-disp(y(end))
-```
-
-</details>
-
-<details>
-<summary><strong>Implementazione Eulero Implicito (equazione)</strong></summary>
-
-![Quiz: Eulero implicito su problema di Cauchy, con derivazione manuale dell'iterazione](images/quiz_eulero_implicito_cauchy.jpg)
-
-```matlab
-t0 = 0 ; y0 = pi; tf = 10; h = 0.1 ; N = (tf -t0)/h ;
-for i = 1:N
-  y0 = y0/(1-h) - (h*(t0+h).^2)/(1-h);
-  t0 = t0 +h ; % aggiorno la variabile indipendente
-end
-% qui conveniva fare i calcoli a mano e poi implementare il risultato
-```
-
-</details>
-
-<details>
-<summary><strong>Implementazione Eulero Esplicito (sistema)</strong></summary>
-
-![Quiz: Eulero esplicito su sistema (Domanda 6), con impostazione](images/quiz_eulero_esplicito_sistema.jpg)
-
-```matlab
-%% Quiz 2.6 (Eulero Esplicito ed Errore)
-clc; clear; close all
-t0 = 0; tf = 1;  N = 10^3; h = (tf-t0)/N; z = zeros(2,N) ; z(:,1) = [1,1]; t = linspace(t0,tf,N+1);
-y = @(x) 1/3*(exp(3*x)+2); y_true = y(tf); f = @(t,z) [z(2); 3* z(2)]; 
-for i = 1:N
-  z(:,i+1) = z(:,i) + h * f(t(i), z(:,i)); 
-end 
-err = abs(y_true-z(1,end)); 
-% fai attenzione agli indici, qui senza un'iterazione in più il risultato cambiava del 40% 
-% conviene costruire la griglia e salvarla in caso di errori
-```
-
-</details>
-
-<details>
-<summary><strong>Implementazione Eulero Implicito (sistema)</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Implementazione Heun (equazione)</strong></summary>
-
-```matlab
-%% OPZIONE 1 (VERSIONE INLINE CORTA POCO LEGGIBILE)
-h = 0.01; t = 0:h:8; N = length(t); y = zeros(1,N); y(1) = 0;
-f = @(t,y) y^2 -5*t -2 ;
-for i = 1:N-1
-  y(i+1) = y(i) + h/2 *(f(t(i),y(i))+f(t(i+1),y(i)+h*f(t(i),y(i))));
-end
-disp(y(end))
-
-%% OPZIONE 2 (VERSIONE ESTESA CON RANGE KUTTA LEGGIBILE)
-f = @(t,y) -y + 5*t +2 ;  h = 0.15; 
-t = 0:h:6*h ; N = length(t); y = zeros(1,N) ; y(1)= 3; 
-for i = 1:N-1
-  k1 = f(t(i),y(i)); k2 = f(t(i)+h, y(i) +h*k1);  
-  y(i+1) = y(i) + (h/2)*(k1+k2)    ; 
-end 
-disp(y(end))Ode45
-```
-
-</details>
-
-<details>
-<summary><strong>ODE45 su sistema del secondo ordine</strong></summary>
-
-![Quiz: ODE45 su sistema del secondo ordine (Domanda 4), con impostazione](images/quiz_ode45_sistema.jpg)
-
-```matlab
-z0 = [pi; log(2)];
-f = @(t,z) [z(2); -z(1)^2]; 
-% ode è adattiva quindi non specifico il passo (ne il numero di intervalli)
-[T,Z] = ode45(f,t_range,z0); 
-soluzione = Z(end,1)
-```
-
-</details>
-
 ## Esercizi
 
 <details>
@@ -573,6 +482,99 @@ soluzione = Z(end,1)
 <summary><strong>Problemi Stiff</strong></summary>
 
 *Problemi Stiff (PDF allegato Notion, non incluso nell'export)*
+
+</details>
+
+### Implementazioni MATLAB (esercizi di codice)
+
+> Esercizi pratici di implementazione (in precedenza nella sezione "Quiz"): non sono domande da orale ma utili per esercitarsi a scrivere gli schemi.
+
+<details>
+<summary><strong>Eulero Esplicito (equazione)</strong></summary>
+
+```matlab
+f = @(t,y) -y^2 + 3*t ; h = 0.1; 
+t = 0:h:9 ; N = length(t); y = zeros(1,N) ; y(1)= 2*pi; 
+for i = 1:N-1
+  y(i+1) = y(i) + h * f(t(i),y(i)); 
+end 
+disp(y(end))
+```
+
+</details>
+
+<details>
+<summary><strong>Eulero Implicito (equazione)</strong></summary>
+
+![Quiz: Eulero implicito su problema di Cauchy, con derivazione manuale dell'iterazione](images/quiz_eulero_implicito_cauchy.jpg)
+
+```matlab
+t0 = 0 ; y0 = pi; tf = 10; h = 0.1 ; N = (tf -t0)/h ;
+for i = 1:N
+  y0 = y0/(1-h) - (h*(t0+h).^2)/(1-h);
+  t0 = t0 +h ; % aggiorno la variabile indipendente
+end
+% qui conveniva fare i calcoli a mano e poi implementare il risultato
+```
+
+</details>
+
+<details>
+<summary><strong>Eulero Esplicito (sistema)</strong></summary>
+
+![Quiz: Eulero esplicito su sistema (Domanda 6), con impostazione](images/quiz_eulero_esplicito_sistema.jpg)
+
+```matlab
+%% Quiz 2.6 (Eulero Esplicito ed Errore)
+clc; clear; close all
+t0 = 0; tf = 1;  N = 10^3; h = (tf-t0)/N; z = zeros(2,N) ; z(:,1) = [1,1]; t = linspace(t0,tf,N+1);
+y = @(x) 1/3*(exp(3*x)+2); y_true = y(tf); f = @(t,z) [z(2); 3* z(2)]; 
+for i = 1:N
+  z(:,i+1) = z(:,i) + h * f(t(i), z(:,i)); 
+end 
+err = abs(y_true-z(1,end)); 
+% fai attenzione agli indici, qui senza un'iterazione in più il risultato cambiava del 40% 
+% conviene costruire la griglia e salvarla in caso di errori
+```
+
+</details>
+
+<details>
+<summary><strong>Heun (equazione)</strong></summary>
+
+```matlab
+%% OPZIONE 1 (VERSIONE INLINE CORTA POCO LEGGIBILE)
+h = 0.01; t = 0:h:8; N = length(t); y = zeros(1,N); y(1) = 0;
+f = @(t,y) y^2 -5*t -2 ;
+for i = 1:N-1
+  y(i+1) = y(i) + h/2 *(f(t(i),y(i))+f(t(i+1),y(i)+h*f(t(i),y(i))));
+end
+disp(y(end))
+
+%% OPZIONE 2 (VERSIONE ESTESA CON RUNGE-KUTTA LEGGIBILE)
+f = @(t,y) -y + 5*t +2 ;  h = 0.15; 
+t = 0:h:6*h ; N = length(t); y = zeros(1,N) ; y(1)= 3; 
+for i = 1:N-1
+  k1 = f(t(i),y(i)); k2 = f(t(i)+h, y(i) +h*k1);  
+  y(i+1) = y(i) + (h/2)*(k1+k2)    ; 
+end 
+disp(y(end))
+```
+
+</details>
+
+<details>
+<summary><strong>ODE45 su sistema del secondo ordine</strong></summary>
+
+![Quiz: ODE45 su sistema del secondo ordine (Domanda 4), con impostazione](images/quiz_ode45_sistema.jpg)
+
+```matlab
+z0 = [pi; log(2)];
+f = @(t,z) [z(2); -z(1)^2]; 
+% ode è adattiva quindi non specifico il passo (ne il numero di intervalli)
+[T,Z] = ode45(f,t_range,z0); 
+soluzione = Z(end,1)
+```
 
 </details>
 
@@ -1027,3 +1029,57 @@ Con base di Legendre ortogonalizzata, \(M\) diventa diagonale.
 - **WENO risolve l'antitesi accuratezza-oscillazioni:** il peso adattivo basato sugli indicatori di smoothness \(\beta_k\) raggiunge ordine 5 nelle regioni smooth e si riduce automaticamente ad uno schema non oscillatorio vicino ai shock.
 - **DG è la generalizzazione unificante:** FV (p=0) e FE (p≥1) sono casi particolari del DG — la scelta del grado \(p\) è il parametro di controllo del trade-off accuratezza/costo.
 - **La parallelizzazione scala con la dimensione del problema:** per problemi 3D grandi, il rapporto calcolo/comunicazione cresce favorevolmente; è qui che HPC (InfiniBand, decomposizione di dominio) esprime tutto il suo valore.
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Formule da ricordare</strong></summary>
+
+### Errori (locale e globale)
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\tilde y_{k+1} = y(t_k) + h\,f(t_k, y(t_k))$ | un passo di Eulero **partendo dal dato esatto** $y(t_k)$ (non da $y_k$) |
+| $\tau(h) = y(t_{k+1}) - \tilde y_{k+1} = y(t_{k+1}) - y(t_k) - h\,f(t_k,y(t_k))$ | **troncamento locale**: errore di un solo passo; nasce dal troncamento dei termini di grado alto |
+| $d(h) = \dfrac{\tau(h)}{h}$ | **discretizzazione locale**: dipende da come discretizzi l'intervallo; è $\tau$ "per unità di $h$" |
+| $e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1})-\tilde y_{k+1}\big)}_{\text{troncamento}} + \underbrace{\big(\tilde y_{k+1}-y_{k+1}\big)}_{\text{propagazione}}$ | **globale** = troncamento (ultimo passo) + propagazione (passi precedenti) |
+
+### Consistenza, ordine, 0-stabilità, assoluta stabilità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\lim_{h\to0} d(h) = 0$ | **consistenza**: l'errore di discretizzazione svanisce a passo nullo |
+| $d(h) = \mathcal O(h^p)$ | **ordine** $p$ (Eulero: $p=1$); $p$ = pendenza nel grafico log–log |
+| $\lvert y_k-\hat y_k\rvert \le K\,\lvert y_0-\hat y_0\rvert,\ \forall k\le\frac{b-a}{h}$ | **0-stabilità**: $K$ come numero di condizionamento, non amplifica l'errore |
+| $\displaystyle\lim_{k\to\infty} y_k = 0$ | **assoluta stabilità**: ha senso solo se la soluzione esatta tende a 0 (asint. stabile) |
+| Lax: consistenza + 0-stabilità $\Rightarrow$ convergenza, $\lim_{N\to\infty} y_N = y(t)$ | **Lax–Richtmyer**: one-step (stabili) + consistenti $\Rightarrow$ convergenti |
+
+### Regione di assoluta stabilità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $y_{k+1} = \mathcal F(h\lambda)\,y_k \Rightarrow y_{k+1} = \mathcal F(h\lambda)^{k+1} y_0$ | qualsiasi metodo si riscrive con il **fattore di amplificazione** $\mathcal F$ |
+| $R_a = \{\, h\lambda\in\mathbb C : \lvert\mathcal F(h\lambda)\rvert < 1 \,\}$ | **regione** nel piano complesso $h\lambda$; impliciti $\to$ regione ampia |
+| $y'(t)=\lambda y(t) \to \mathrm{Re}(\lambda)<0$;  $\;y'(t)=Ay(t) \to \mathrm{Re}(\lambda_i)<0\ \forall i$ | **sistemi**: la condizione vale per **tutti** gli autovalori di $A$ |
+| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | $A$ diagonalizzabile; asint. stabile se $\mathrm{Re}\,\lambda_i<0\ \forall i$ |
+
+### Runge-Kutta
+
+| Formula | Hint / collegamento |
+|---|---|
+| $y_{k+1}=y_k+h\sum_{i=1}^{s} a_i\,f\!\big(t_k+b_i h,\ y_k+h\sum_{j=1}^{i-1} c_{ij}k_j\big)$ | forma generica a $s$ stadi; la somma fino a $i-1$ lo rende **esplicito** (fino a $i$ $\to$ implicito) |
+| $\sum_{i=1}^{s} a_i = 1,\qquad b_i=\sum_{j=1}^{s} c_{ij}\ \ \forall i$ | **condizioni di consistenza** sul tableau di Butcher |
+| Eulero esplicito: $y_{k+1}=y_k+h f(t_k,y_k)$, $\ \mathcal F=1+h\lambda$ | $p=1$, 1 stadio |
+| Eulero implicito: $y_{k+1}=y_k+h f(t_{k+1},y_{k+1})$, $\ \mathcal F=\dfrac{1}{1-h\lambda}$ | $p=1$, A-stabile (regione ampia) |
+| Heun: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_k+h f(t_k,y_k))\big]$, $\ \mathcal F=1+h\lambda+\frac{(h\lambda)^2}{2}$ | $p=2$, esplicito, 2 stadi |
+| Trapezi: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_{k+1})\big]$ | $p=2$, implicito, 2 stadi |
+| Eulero modificato: $y_{k+1}=y_k+h f\!\big(t_k+\frac h2,\ y_k+\frac h2 f(t_k,y_k)\big)$ | esplicito, 2 stadi (punto medio) |
+
+### Stiffness e CFL
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\max_i \lvert\mathrm{Re}(\lambda_i)\rvert\,L \ll -1$ | **grado di stiffness**: autovalore molto negativo $\to$ passo piccolo forzato su intervallo $L$ grande |
+| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | il termine con $\lambda$ molto negativo decade subito ma vincola il passo (usa impliciti / ode15s) |
+
+</details>

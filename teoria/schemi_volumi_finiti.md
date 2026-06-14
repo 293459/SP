@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $U_j$ | **valor medio di cella** | incognita dei volumi finiti |
@@ -17,6 +20,8 @@
 | $\Delta t$ | passo temporale | vincolo **CFL** |
 | $\mu=k=0$ | limite di **Eulero** | niente viscosità/conduzione |
 | $\overrightarrow{DF},\ \overleftarrow{DF}$ | differenze finite (forward/backward) | ricostruzione gradiente |
+
+</details>
 
 > Schemi chiave: **Godunov** (problema di Riemann), **Roe** (upwind linearizzato),
 > **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
@@ -536,3 +541,60 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
     - **Entropy fix di Harten-Hyman:** aggiunge viscosità numerica artificiale solo dove $|\lambda_k| < \epsilon$ (punti sonici).
     - **Solver HLLC:** un approccio approssimato alternativo che soddisfa nativamente la condizione di entropia.
 - Roe
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Tutte le formule chiave dei volumi finiti, con hint per ricordarle</strong></summary>
+
+> Specchietto di sintesi: le formule che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** tra loro. Schemi chiave: **Godunov** (Riemann), **Roe** (upwind linearizzato), **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
+
+### Bilancio FVM e variabile di cella
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\partial_t u+\partial_x f=0$, $f=f(u)$ | forma conservativa: solo flusso **convettivo** → **Eulero** = NS con $\mu=k=0$. |
+| $U_j=\dfrac{1}{\Delta x}\int_{x_{j-1/2}}^{x_{j+1/2}}u\,dx$ | $U_j$ è la **media di cella**, non il valore puntuale (FD usa il puntuale). |
+| $\dfrac{\partial}{\partial t}\int_{x_{j-1/2}}^{x_{j+1/2}}u\,dx=-(f_{j+1/2}-f_{j-1/2})$ | forma integrale: la cella cambia per **flussi netti alle interfacce** $j\pm1/2$. |
+| $U_j^{n+1}=U_j^n-\dfrac{\Delta t}{\Delta x}\big[F_{j+1/2}-F_{j-1/2}\big]$ | aggiornamento esplicito: tutto sta nel **come scegli $F_{j\pm1/2}$**. |
+
+### Flusso numerico (centrato) e CFL
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $f_{j+1/2}=\tfrac12(f_j+f_{j+1})$ | schema **centrato**: media aritmetica → in 1D coincide con FD, ma instabile sugli urti. |
+| $F_{j+1/2}^{LF}=\tfrac12(F_j+F_{j+1})-\dfrac{\lambda_{max}}{2}(U_{j+1}-U_j)$ | **Lax–Friedrichs/Rusanov** = centrato + **dissipazione scalare** $\propto\lambda_{max}\Delta U$. Rusanov: $\lambda_{max}=\max(|\lambda_j|,|\lambda_{j+1}|)$. |
+| $\text{CFL}=\dfrac{\lambda_{max}\,\Delta t}{\Delta x}\le1$, $\lambda_{max}=\max_j\max_k|\lambda_k^j|$ | $\Delta t$ piccolo abbastanza che le onde di due Riemann adiacenti **non si sovrappongano**. |
+
+### Godunov / problema di Riemann
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $u(x,0)=u_L$ se $x<0$, $u_R$ se $x>0$ | dato a **gradino**: ogni interfaccia è un Riemann locale (tubo di Sod). |
+| $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$ | **3 autovalori** Eulero 1D → 3 onde (rarefazione, contatto, urto). |
+| $\sigma_k=\text{sign}(\lambda_k)\in\{-1,+1\}$ | segno = **direzione di propagazione** dell'onda $k$ (upwind). |
+| $\dfrac{1\pm\sigma_k}{2}$ | **proiettori** upwind: $\tfrac{1+\sigma}{2}$ tiene le onde destre, $\tfrac{1-\sigma}{2}$ le sinistre. |
+
+### Flux splitting (FVS / FDS)
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\mathbf F=\mathbf F^+(U)+\mathbf F^-(U)$ | **FVS**: si spezza il **vettore flusso** ($\lambda\ge0$ a destra, $\lambda\le0$ a sinistra). Steger-Warming, van Leer, AUSM+. |
+| $\Delta F=F(U_R)-F(U_L)=A^+\Delta U+A^-\Delta U$ | **FDS**: si spezza la **differenza di flusso** via Jacobiana $A=\partial F/\partial U$. Roe, Godunov, HLLC. |
+| $F_B-F_A=(F_C-F_A)+(F_D-F_C)+(F_B-F_D)$ | salto totale = somma sulle 3 onde (stati A→C→D→B), aggiungendo/togliendo $F_C,F_D$. |
+| $\overrightarrow{DF}_j=\sum_k\tfrac{1+\sigma_k}{2}\Delta F_k$, $\ \overleftarrow{DF}_j=\sum_k\tfrac{1-\sigma_k}{2}\Delta F_k$ | contributi che vanno a **destra / sinistra** dell'interfaccia. |
+| $F_{j+1/2}=F_j+\overleftarrow{DF}_j=F_{j+1}-\overrightarrow{DF}_j$ | flusso di Godunov: la cella riceve solo le onde **fisicamente entranti** (upwind). |
+| $U_j^{n+1}=U_j^n-\dfrac{\Delta t}{\Delta x}\big[\overleftarrow{DF}_j+\overrightarrow{DF}_{j-1}\big]$ | onde sinistre dall'interfaccia destra + onde destre dall'interfaccia sinistra. |
+
+### Schema di Roe
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\bar A(U_R-U_L)=F(U_R)-F(U_L)$ | **consistenza** di Roe: la Jacobiana media cattura **esattamente** gli urti. |
+| $\bar u=\dfrac{\sqrt{\rho_L}\,u_L+\sqrt{\rho_R}\,u_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}$, $\ \bar H$ analoga | **media di Roe** = media pesata su $\sqrt\rho$ (vale anche per $H$). |
+| $\overrightarrow{\delta F}_j=\sum_k\dfrac{\bar\lambda_k-|\bar\lambda_k|}{2}\,e^k\,\delta w_j^k$ | flusso di Roe: $\tfrac{\lambda-|\lambda|}{2}$ tiene solo i contributi **upwind** (autovettori $e^k$). |
+| $|\lambda|\to\max(|\lambda|,\epsilon)$ | **entropy fix** (Harten-Hyman): viscosità artificiale solo sui **punti sonici** $|\lambda_k|<\epsilon$ → no urti espansivi non fisici. |
+
+</details>

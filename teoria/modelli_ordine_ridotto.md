@@ -11,6 +11,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $u(\bar x,\bar\mu)$ | soluzione **full-order** | dipende da spazio $\bar x$ e parametri $\bar\mu$ |
@@ -23,6 +26,8 @@
 | $\tilde u_i(\bar\mu)$ | **coefficienti modali** | dipendono dai parametri; si interpolano |
 | $V_\ell$ | sottospazio **ridotto** ($\ell$ modi) | $u\approx\sum_{i\le\ell}\tilde u_i\phi_i$ |
 | $\langle\cdot,\cdot\rangle,\ L^2$ | prodotto scalare / norma | definiscono energia e ortogonalità |
+
+</details>
 
 > Idea: **POD** estrae i modi $\phi_i$ più "energetici" dagli snapshot (autovalori $\lambda_i$);
 > il **ROM** ricostruisce nuove soluzioni combinando i modi con coefficienti $\tilde u_i(\bar\mu)$
@@ -441,5 +446,41 @@ ricostruisce con pochi modi: servirebbero **molti** modi per "spostare" l'urto, 
 lentamente e la ricostruzione mostrerebbe **oscillazioni/urto spalmato**. Rimedi: **campionamento più
 fitto** vicino all'urto, oppure tecniche **non lineari** (registrazione/allineamento dell'urto,
 autoencoder, manifold learning) al posto della POD pura.
+
+</details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Le formule chiave della POD/ROM (con hint mnemonici)</strong></summary>
+
+### Snapshot e decomposizione modale
+
+| Formula | Hint / collegamento |
+|---|---|
+| $u_J(\bar{x}),\quad 1\le J\le N_s$ | **Snapshot** = una "fetta" del campo vero a $\bar\mu_J$ **fissato** → funzione del solo spazio. Un snapshot = un punto dello spazio dei parametri = una simulazione full-order (Passo 1). |
+| $u(\bar{x},\bar{\mu})=\displaystyle\sum_{i=1}^{N}\tilde{a}_i(\bar{\mu})\,\phi_i(\bar{x}),\ N\le N_s$ | **Ipotesi di decomposizione modale** (base POD): separazione **spazio (modi $\phi_i$) × parametri (coefficienti $\tilde a_i$)**. Analogo della base FEM (Passo 2). |
+
+### Prodotto scalare e ortogonalità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\langle g,u\rangle=\displaystyle\int_{\Omega} g\,u\,d\Omega\;\simeq\;\sum_{\ell=1}^{N_{cell}} g(\bar{x}_\ell)\,u(\bar{x}_\ell)\,V_\ell$ | Senza un **prodotto scalare** "ortogonale", "rappresentativo" ed "energia" non hanno senso. La discretizzazione **FV** trasforma l'integrale in **somma pesata sui volumi di cella** $V_\ell$ (Passo 3). Norma associata: $\|\phi\|^2=\langle\phi,\phi\rangle$. |
+
+### Ottimo POD e autovalori
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\displaystyle\max_{\phi_i}\sum_{k=1}^{N_s}\langle u_k,\phi_i\rangle^2\quad\text{s.t.}\quad\|\phi_i\|_\Omega^2=1$ | I modi POD **massimizzano la proiezione** degli snapshot (= catturano più **energia**). Il vincolo $\|\phi_i\|=1$ rende il problema **ben posto** (senza, l'obiettivo è illimitato); la magnitudine va tutta nel coefficiente (Passo 4). |
+| $E_{tot}=\displaystyle\sum_{k=1}^{N_s}\|u_k\|_\Omega^2=\mathrm{tr}(C)=\sum_{i=1}^{N_s}\lambda_i$ | **"Energia" = traccia della matrice di correlazione $C$ = somma degli autovalori.** Ogni $\lambda_i$ è l'energia catturata dal modo $i$-esimo. Energia, $\lambda_i$ e RIC sono la **stessa quantità** vista da angolazioni diverse (Passo 5). |
+
+### Troncamento e predizione online
+
+| Formula | Hint / collegamento |
+|---|---|
+| $RIC(n)=\dfrac{\sum_{i=1}^{n}\lambda_i}{\sum_{i=1}^{N_s}\lambda_i}>0.99$ | **Relative Information Content**: frazione **cumulata** di energia. Si tiene il minimo $n$ che supera la soglia (~10 modi bastano) (Passo 6). |
+| $u(\bar{x},\bar{\mu})=\displaystyle\sum_{i=1}^{n}\tilde{u}_i(\bar{\mu})\,\phi_i(\bar{x})$ | **Predizione online**: modi $\phi_i$ dal database (offline), coefficienti $\tilde u_i$ **interpolati** nei parametri (polinomi, RBF, NN, GP). Per ogni punto del database $\tilde u_i$ si ricava **proiettando** sui modi (Passo 7). |
 
 </details>

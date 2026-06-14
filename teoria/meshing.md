@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
+
 | Simbolo / termine | Nome | Note |
 |---|---|---|
 | $U_j=\frac1V\int_V u\,dV$ | **valor medio di cella** | incognita dei volumi finiti |
@@ -16,6 +19,8 @@
 | Orthogonality | allineamento centro-celle vs normale faccia | $\approx1$ ideale |
 | Expansion (Smoothness) Ratio | salto di dimensione tra celle vicine | salti bruschi → riflessioni |
 | Jacobiano (det) | distorsione della trasformazione | $\det\le0$ → **volume negativo** (overlap) |
+
+</details>
 
 ---
 
@@ -323,5 +328,29 @@ Soft/Hard (distingue quelli automatizzati dal pc da quelli definiti in modo rigo
 | Clustering Bias | Concentrating mesh elements in a particular region to achieve higher resolution. | Vicinity of shocks, wakes, or regions with intricate fluid dynamics. |
 | Spacing Bias | Controlling the spacing between mesh elements based on desired accuracy or efficiency criteria. | Balancing computational cost and solution accuracy. |
 | Transition Bias | Gradual transition from fine to coarse mesh to avoid sudden changes and minimize numerical errors. | Regions where abrupt changes in mesh size might lead to instability or inaccuracies. |
+
+</details>
+
+---
+
+## Formule da ricordare (memo)
+
+<details>
+<summary><strong>🧠 Le poche formule/metriche del capitolo (in meshing si misura, non si deriva)</strong></summary>
+
+> Nota: il meshing è soprattutto geometria e criteri di qualità. Quasi tutte le "formule" qui sono **definizioni di metriche**: utili come check, non come derivazioni.
+
+| Formula | Hint / collegamento |
+|---|---|
+| $V\,\dfrac{\partial U_j}{\partial t} = -\int_S \vec F\cdot\vec n\,dS$ | Bilancio FVM su volume **fisso**: la cella cambia solo per i flussi sul bordo. Base dei volumi finiti. |
+| $U_j=\dfrac1V\int_V u\,dV$ | Incognita = **media di cella**, non valore puntuale. "Una cella, un numero". |
+| $\dfrac{d}{dt}\int_{V(t)} u\,dV + \int_{S(t)} u\,(\vec v-\vec v_g)\cdot\vec n\,dS = 0$ | Versione **ALE** (mesh mobile): conta la velocità **relativa** $\vec v_{rel}=\vec v-\vec v_g$. Reynolds transport theorem. |
+| $\vec v_g=0$ → Euleriano,  $\vec v_g=\vec v$ → Lagrangiano | I due estremi dell'ALE: cella ferma (casello) vs cella che insegue il fluido (GPS). |
+| $\eta=\dfrac{x-x_1}{x_2-x_1},\ \ \xi=\dfrac{y-y_1}{y_2-y_1}$ | Mapping **algebrico** al piano $(\eta,\xi)\in[0,1]$: estremi → 0 e 1. Mesh strutturata. |
+| Aspect Ratio $=\dfrac{\text{lato maggiore}}{\text{lato minore}}$ | Ideale $\approx1$; $>1000$ → sistema **mal condizionato**. Alto solo nello strato limite. |
+| Skewness $=\sum\text{angoli interni}-\sum\text{angoli forma regolare}$ | Ideale $\approx0$: lontano dalla forma regolare → interpolazione imprecisa. |
+| Orthogonality $=1-(\text{scarto normale faccia vs allineamento centri})$ | Ideale $\approx1$: se centri e normale non sono allineati → errori sui gradienti. |
+| Expansion (Smoothness) Ratio = salto di dimensione tra celle vicine | Salti bruschi (es. $\times10$) → **riflessioni** numeriche / instabilità. Tienilo dolce. |
+| $\det(J)\le 0$ → **volume negativo** | Jacobiano della trasformazione: $\le0$ = elemento che si rovescia / **overlap**. Sempre $>0$. |
 
 </details>
