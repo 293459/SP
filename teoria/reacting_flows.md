@@ -97,7 +97,8 @@ Le $Y_i$ sono le variabili che descrivono la **composizione locale**. Le equazio
 governo sono le **Navier–Stokes** estese con il **trasporto delle specie** e i relativi
 termini sorgente.
 
-### 2.1 Continuità globale (massa)
+<details>
+<summary><strong>2.1 Continuità globale (massa)</strong></summary>
 
 $$
 \frac{\partial \rho}{\partial t} + \nabla\cdot(\rho \mathbf{u}) = 0
@@ -106,7 +107,10 @@ $$
 La massa **totale** si conserva: le reazioni chimiche trasformano specie in altre specie ma
 non creano né distruggono massa.
 
-### 2.2 Trasporto delle specie chimiche
+</details>
+
+<details>
+<summary><strong>2.2 Trasporto delle specie chimiche</strong></summary>
 
 Per ogni specie $i$ vale un'equazione di bilancio che, a differenza della massa globale,
 ha **un termine diffusivo e un termine sorgente** (la specie viene prodotta/consumata e si
@@ -142,7 +146,8 @@ molecolare** $-\nabla\cdot\mathbf{J}_i$ e **sorgente chimico** $\dot\omega_i$ (�
 > ricavarla per differenza la espone a **valori negativi** non fisici (errori numerici che,
 > sottratti da $1$, possono far diventare negativa una piccola $Y_i$).
 
-#### 🔎 Domanda — Il termine diffusivo è il gradiente di $\mathbf{J}$? Come è definito $\mathbf{J}$?
+<details>
+<summary><strong>🔎 Domanda — Il termine diffusivo è il gradiente di $\mathbf{J}$? Come è definito $\mathbf{J}$?</strong></summary>
 
 Una precisazione preliminare: il termine $-\nabla\cdot\mathbf{J}_i$ compare nell'**equazione
 di trasporto delle specie**, *non* in quella della quantità di moto (lì il termine diffusivo
@@ -181,7 +186,12 @@ proprietà importanti:
   $Le = \alpha/D_i$, è un parametro chiave; molti modelli assumono $Le=1$ (diffusività
   uguali) per semplificare la chiusura.
 
-### 2.3 Quantità di moto
+</details>
+
+</details>
+
+<details>
+<summary><strong>2.3 Quantità di moto</strong></summary>
 
 $$
 \frac{\partial (\rho \mathbf{u})}{\partial t} + \nabla\cdot(\rho \mathbf{u}\otimes\mathbf{u})
@@ -219,7 +229,10 @@ temperatura.
 > Quindi: nessun "qualcosa di nascosto", è la stessa equazione scritta in modo più elegante e
 > coerente con la struttura conservativa.
 
-### 2.4 Energia ed entalpia
+</details>
+
+<details>
+<summary><strong>2.4 Energia ed entalpia</strong></summary>
 
 In forma di **energia totale** $E$ (energia interna + cinetica per unità di massa):
 
@@ -267,7 +280,8 @@ $$
 > $i$, $h_i = h^\circ_{f,i} + \int_{T_0}^T c_{p,i}\,dT'$ (formazione $+$ sensibile) — *non*
 > l'entalpia totale $H$ né quella della miscela: è quella della singola specie che diffonde.
 
-#### 🔎 Domanda — Perché si passa da trattazioni basate sull'energia a quelle basate sull'entalpia? Qual è il vantaggio?
+<details>
+<summary><strong>🔎 Domanda — Perché si passa da trattazioni basate sull'energia a quelle basate sull'entalpia? Qual è il vantaggio?</strong></summary>
 
 Nella combustione si preferisce riscrivere il bilancio energetico in termini di **entalpia**
 anziché di energia interna. La relazione tra le due è
@@ -324,9 +338,15 @@ I **vantaggi** dell'entalpia in questo contesto sono:
 > a pressione costante. Il calore di reazione non scompare: è "nascosto" nelle entalpie di
 > formazione delle specie che si trasportano.
 
-### 2.5 Bilancio vs conservazione: perché cambia (quasi) solo l'equazione di massa?
+</details>
 
-#### 🔎 Domanda — Quindi quantità di moto ed energia non cambiano in modo significativo, ma solo la massa? Perché, a livello fisico?
+</details>
+
+<details>
+<summary><strong>2.5 Bilancio vs conservazione: perché cambia (quasi) solo l'equazione di massa?</strong></summary>
+
+<details>
+<summary><strong>🔎 Domanda — Quindi quantità di moto ed energia non cambiano in modo significativo, ma solo la massa? Perché, a livello fisico?</strong></summary>
 
 Esatto, ed è un punto concettuale importante. Una **reazione chimica** è un
 **riarrangiamento di atomi**: rompe e riforma legami, ma **conserva le grandezze fisiche
@@ -346,7 +366,10 @@ le **equazioni delle specie** (tramite $\dot\omega_i$). Quantità di moto ed ene
 la **stessa forma** del flusso inerte: cambiano solo perché $\rho$, $\lambda$, $\mu$, $c_p$
 diventano **funzioni della composizione e della temperatura** (accoppiamento *indiretto*).
 
-#### 🔎 Domanda — È corretto dire che la massa è "un'equazione di bilancio ma non una legge di conservazione"? E per quantità di moto ed energia?
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — È corretto dire che la massa è "un'equazione di bilancio ma non una legge di conservazione"? E per quantità di moto ed energia?</strong></summary>
 
 Bisogna distinguere bene i due termini, perché la risposta dipende da **quale** equazione di
 massa:
@@ -375,6 +398,10 @@ In sintesi, la frase corretta è: la **massa globale è una legge di conservazio
 individualmente); **quantità di moto ed energia restano leggi di conservazione** (la chimica
 non vi introduce sorgenti, solo accoppiamento indiretto via proprietà).
 
+</details>
+
+</details>
+
 ---
 
 ## 3. Cinetica chimica e termine sorgente
@@ -382,9 +409,11 @@ non vi introduce sorgenti, solo accoppiamento indiretto via proprietà).
 Il termine sorgente $\dot\omega_i$ è il cuore — e la difficoltà — dei flussi reagenti: è il
 termine **più non lineare** e quello che introduce la **stiffness**.
 
-### 3.1 $\dot\omega_i$, $q_j$, $K_f$, $K_b$: chi è chi?
+<details>
+<summary><strong>3.1 $\dot\omega_i$, $q_j$, $K_f$, $K_b$: chi è chi?</strong></summary>
 
-#### 🔎 Domanda — $\dot\omega_i$ è la velocità di reazione o il tasso di produzione/consumo? E allora $K_f,K_b$ cosa sono?
+<details>
+<summary><strong>🔎 Domanda — $\dot\omega_i$ è la velocità di reazione o il tasso di produzione/consumo? E allora $K_f,K_b$ cosa sono?</strong></summary>
 
 Sono **concetti correlati ma, a rigore, distinti**; vengono spesso confusi (e negli appunti
 del corso la formula di $\dot\omega_i$ è etichettata "velocità di reazione"). Fissiamo la
@@ -420,7 +449,10 @@ Quindi:
 | Unità | dipende dall'ordine | mol·m⁻³·s⁻¹ | kg·m⁻³·s⁻¹ |
 | Relazione | entra in $q_j$ | $q_j=$ funzione di $K,[X]$ | $\sum_j(\nu^P-\nu^R)q_j$ |
 
-#### 🔎 Domanda — Come si "distribuiscono" reazioni e specie? (più reazioni concorrono a una specie)
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — Come si "distribuiscono" reazioni e specie? (più reazioni concorrono a una specie)</strong></summary>
 
 In un meccanismo reale ci sono **molte reazioni** e **molte specie**, e una stessa specie è
 in genere **prodotta da alcune reazioni e consumata da altre**. Il tasso netto $\dot\omega_i$
@@ -456,9 +488,15 @@ matrice stechiometrica $\nu^P-\nu^R$), l'indice $i$ sulle **specie** (righe). Og
 ($q_j\equiv\dot\omega_i/M_i$) solo nel caso banale di **una sola reazione con coefficiente
 unitario** per quella specie.
 
-### 3.2 La formula del rateo di reazione spiegata termine per termine
+</details>
 
-#### 🔎 Domanda — Puoi spiegare bene la formula del rateo di reazione?
+</details>
+
+<details>
+<summary><strong>3.2 La formula del rateo di reazione spiegata termine per termine</strong></summary>
+
+<details>
+<summary><strong>🔎 Domanda — Puoi spiegare bene la formula del rateo di reazione?</strong></summary>
 
 Per un meccanismo di $N_r$ reazioni tra $N_S$ specie, il tasso di produzione/consumo della
 specie $i$ è:
@@ -513,7 +551,12 @@ e la **legge di azione di massa** (prodotti di concentrazioni). La sua forte **n
 linearità** (prodotti di potenze delle concentrazioni × esponenziale della temperatura) è
 ciò che rende il termine sorgente così difficile da trattare in un flusso turbolento (§6).
 
-### 3.3 La legge di Arrhenius
+</details>
+
+</details>
+
+<details>
+<summary><strong>3.3 La legge di Arrhenius</strong></summary>
 
 Le costanti cinetiche seguono l'**approccio di Arrhenius**:
 
@@ -546,7 +589,8 @@ $$
 > spesso $|\beta_j|<1$) che dà solo una **correzione debole**; il "motore" della dipendenza
 > da $T$ resta sempre il termine $\exp(-E_a/RT)$.
 
-#### 🔎 Domanda — La costante inversa: formula "alla Arrhenius" oppure via $K_{eq}$? Cos'è $K_{eq}$ e come si passa da un approccio all'altro?
+<details>
+<summary><strong>🔎 Domanda — La costante inversa: formula "alla Arrhenius" oppure via $K_{eq}$? Cos'è $K_{eq}$ e come si passa da un approccio all'altro?</strong></summary>
 
 I due approcci sono **equivalenti** se i parametri sono **termodinamicamente consistenti**, ma
 hanno una logica diversa.
@@ -598,13 +642,19 @@ Sostituendo si ottiene $K_{b,j}=K_{f,j}/K_{c,j}$, che è esattamente la formula 
 (coerenza termodinamica) calcolando una sola coppia di parametri ($K_f$ alla Arrhenius +
 dati termodinamici per $K_{eq}$), senza fittare separatamente l'inversa.
 
-### 3.4 Tempi caratteristici, tabella e stiffness
+</details>
+
+</details>
+
+<details>
+<summary><strong>3.4 Tempi caratteristici, tabella e stiffness</strong></summary>
 
 Il **tempo caratteristico delle reazioni chimiche** $\tau_c$ misura quanto impiega la
 reazione a completarsi. **Può essere estremamente piccolo**: per la combustione
 $\text{H}_2$–$\text{O}_2$ si ha $\tau_c \approx 10^{-6}\,$s.
 
-#### 🔎 Domanda — Una tabella con i tempi di reazione tipici di sostanze comuni
+<details>
+<summary><strong>🔎 Domanda — Una tabella con i tempi di reazione tipici di sostanze comuni</strong></summary>
 
 Valori **indicativi** (ordini di grandezza) del tempo chimico $\tau_c$, utili per avere
 "contezza numerica" del fenomeno. Per confronto, il tempo di **mixing turbolento** tipico è
@@ -639,7 +689,10 @@ e non con i modelli "mixed-is-burnt".
 > accoppiato. Conseguenza pratica: se si forza un passo grande, la **diffusione numerica**
 > dello schema fluidodinamico **cresce enormemente**, degradando la soluzione.
 
-#### 🔎 Domanda — Cosa significa che "i termini chimici vengono disaccoppiati (operator splitting) e integrati a parte"? Perché si fa?
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — Cosa significa che "i termini chimici vengono disaccoppiati (operator splitting) e integrati a parte"? Perché si fa?</strong></summary>
 
 L'**operator splitting** (splitting degli operatori) è una strategia per **separare** in un
 passo temporale i due "mondi" del problema, che hanno nature numeriche opposte:
@@ -671,6 +724,10 @@ sotto-passo chimico, evitando che imponga il passo all'intera simulazione. Il pr
 generalmente accettabile e controllabile riducendo $\Delta t$. È quindi una soluzione
 **parziale ma efficiente**: non risolve il sistema *esattamente accoppiato*, ma lo
 **approssima** in modo numericamente robusto e molto più economico.
+
+</details>
+
+</details>
 
 ---
 
@@ -762,9 +819,11 @@ la **velocità di fiamma laminare** $S_L$ e lo **spessore di fiamma** $\delta_L$
 > sotto è, in fondo, **un modo diverso di stimare $\overline{\dot\omega}_i$** (e quindi il
 > calore rilasciato e la composizione) chiudendo le equazioni RANS/LES.
 
-### 6.1 Lo schema generale dei modelli
+<details>
+<summary><strong>6.1 Lo schema generale dei modelli</strong></summary>
 
-#### 🔎 Domanda — Rifai lo schema che spiega i vari modelli di interazione chimica–turbolenza
+<details>
+<summary><strong>🔎 Domanda — Rifai lo schema che spiega i vari modelli di interazione chimica–turbolenza</strong></summary>
 
 ```mermaid
 graph TD
@@ -796,7 +855,10 @@ graph TD
 
 **Logica dello schema (dall'alto in basso):**
 
-#### 🔎 Domanda — Caso laminare: perché basta "Arrhenius diretto cella per cella"? Da dove esce $\dot\omega_i$ ? Perché è stiff ma comunque calcolabile? Che ruolo ha la turbolenza?
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — Caso laminare: perché basta "Arrhenius diretto cella per cella"? Da dove esce $\dot\omega_i$ ? Perché è stiff ma comunque calcolabile? Che ruolo ha la turbolenza?</strong></summary>
 
 Nel caso **laminare** non esiste il problema di chiusura: il campo è **deterministico** e
 **risolto a tutte le scale**, quindi in ogni cella si conoscono i valori **istantanei e
@@ -818,7 +880,10 @@ serve nessun modello statistico.
   creare il problema di chiusura: in suo assenza (laminare) o se la si risolve interamente
   (DNS), la valutazione diretta è esatta.
 
-#### 🔎 Domanda — Come si imposterebbe la risoluzione con DNS in caso di turbolenza? Quali equazioni e in che ordine?
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — Come si imposterebbe la risoluzione con DNS in caso di turbolenza? Quali equazioni e in che ordine?</strong></summary>
 
 In **DNS** (*Direct Numerical Simulation*) si risolve l'**intero set di equazioni di governo
 senza alcun modello** (né di turbolenza, né di combustione), risolvendo **tutte** le scale:
@@ -843,13 +908,21 @@ differenza rispetto al laminare è **solo** la necessità di una **mesh e un pas
 abbastanza fini** da risolvere $\eta$, $\delta_L$ e $\tau_c$: è questo a rendere la DNS
 **proibitiva** per applicazioni reali, ma è il riferimento "esatto".
 
-#### 🔎 Domanda — Caso turbolento senza DNS (RANS/LES)
+</details>
+
+<details>
+<summary><strong>🔎 Domanda — Caso turbolento senza DNS (RANS/LES)</strong></summary>
 
 Qui le scale turbolente sono **mediate/filtrate**: il termine sorgente medio è **non chiuso**
 e serve un **modello**, diverso a seconda che la fiamma sia **premiscelata** o **non
 premiscelata** (§6.2 e §6.3).
 
-### 6.2 Modelli per fiamme premiscelate
+</details>
+
+</details>
+
+<details>
+<summary><strong>6.2 Modelli per fiamme premiscelate</strong></summary>
 
 **Eddy Dissipation Model (EDM).** Combustione **limitata dal mixing turbolento**: si **assume
 che la cinetica chimica sia molto più veloce** del mescolamento ($\mathrm{Da}\gg1$), quindi
@@ -925,7 +998,10 @@ grandezze) su di essa.
 > In sintesi: **valori medi + varianza dei campi → (convoluzione con β-PDF) → tasso di
 > reazione medio**. È esattamente il modo di chiudere $\overline{\dot\omega}_i$.
 
-### 6.3 Modelli per fiamme non premiscelate
+</details>
+
+<details>
+<summary><strong>6.3 Modelli per fiamme non premiscelate</strong></summary>
 
 **Mixture fraction / Flamelet + β-PDF.** Se la chimica è veloce ($\mathrm{Da}\gg1$), lo stato
 locale dipende solo da **quanto** combustibile e ossidante si sono mescolati, cioè da $Z$:
@@ -994,7 +1070,10 @@ F\,\delta_L$. Così il fronte si "spalma" su più celle.
 > prodotto $D\,\dot\omega$ — da cui dipende $S_L$ — **non cambia**, mentre cambia solo lo
 > spessore. È esattamente ciò che evita di alterare la fisica della propagazione.
 
-### 6.4 Filo conduttore comune
+</details>
+
+<details>
+<summary><strong>6.4 Filo conduttore comune</strong></summary>
 
 In tutti i modelli (RANS/LES) l'idea è **disaccoppiare** la chimica dal trasporto turbolento:
 invece di trasportare tutte le specie con la cinetica completa (costosissimo e stiff), si
@@ -1004,7 +1083,10 @@ chiuso** in **poche equazioni di trasporto di scalari + una tabella**, abbattend
 drasticamente il costo. L'output di interesse è sempre lo stesso: il **tasso di reazione medio**
 $\overline{\dot\omega}_i$.
 
-### 6.5 Tabella riassuntiva dei modelli
+</details>
+
+<details>
+<summary><strong>6.5 Tabella riassuntiva dei modelli</strong></summary>
 
 | Modello | Tipo di fiamma | Regime ($\tau_c$ vs $\tau_t$, $\mathrm{Da}$) | Idea / come si ottiene $\overline{\dot\omega}$ | Pro | Contro |
 |---|---|---|---|---|---|
@@ -1015,6 +1097,8 @@ $\overline{\dot\omega}_i$.
 | **Mixture fraction / Flamelet** | non premiscelata | $\mathrm{Da}\gg1$ | $Z$ conservato + tabella $Y_k(Z,\chi)$ + β-PDF | 1 sola eq. di trasporto, chimica dettagliata | valido se chimica veloce; estinzione difficile |
 | **FGM** | entrambe | $\mathrm{Da}$ medio-alto | database flamelet 1D + look-up su $Z$, $c$ | costo minimo a runtime, chimica dettagliata | ipotesi di manifold; tabella esplode con le variabili |
 | **Thickened Flame** | premiscelata | $\mathrm{Da}\gg1$ | ingrossa il fronte ($D{\to}FD$, $\dot\omega{\to}\dot\omega/F$) mantenendo $S_L$ | risolve la fiamma su mesh grossolana | sovra-diffusione; serve funzione di efficienza |
+
+</details>
 
 ---
 
