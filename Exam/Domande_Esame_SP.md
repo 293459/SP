@@ -952,6 +952,109 @@ e resta prevalentemente laminare (long). Rilevante per droni e turbine LP a bass
 
 </details>
 
+## 🤖 Fluidodinamica ed equazioni di Eulero (AI)
+
+<details>
+<summary><strong>🤖 [AI] Classificazione delle PDE (ellittico/parabolico/iperbolico) e legame con il discriminante: perché conta in CFD?</strong></summary>
+
+Per una PDE del 2° ordine il segno del **discriminante** $\Delta=B^2-4AC$ distingue **iperbolico** ($\Delta>0$, onde, dominio di dipendenza finito → flussi comprimibili/supersonici), **parabolico** ($\Delta=0$, diffusione/transitori) ed **ellittico** ($\Delta<0$, equilibrio, influenza in tutto il dominio → subsonico/incomprimibile). Conta perché determina **come si propaga l'informazione** e quindi schema numerico e **condizioni al contorno** ammissibili.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Sistema di Eulero in forma quasi-lineare: Jacobiana, autovalori e loro significato.</strong></summary>
+
+Scritto $\partial_t U+A\,\partial_x U=0$ con $A=\partial F/\partial U$ (Jacobiana del flusso), il sistema è **iperbolico** perché $A$ è diagonalizzabile con autovalori **reali** $\{u,\,u+c,\,u-c\}$: sono le **velocità delle caratteristiche** (onde di entropia/contatto e onde acustiche). Spiegano perché in supersonico ($u>c$) tutte le onde vanno a valle (niente influenza da monte).
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Cosa cambia numericamente tra flusso subsonico (ellittico) e supersonico (iperbolico)?</strong></summary>
+
+Nel supersonico (iperbolico) l'informazione viaggia lungo caratteristiche a velocità finita → si usano schemi **upwind** che rispettano il verso di propagazione e le condizioni al contorno si impongono in base al **segno degli autovalori** (numero di condizioni = numero di caratteristiche entranti). Nel subsonico/ellittico l'informazione è globale → serve risolvere un problema accoppiato su tutto il dominio.
+
+</details>
+
+## 🤖 Meshing (AI)
+
+<details>
+<summary><strong>🤖 [AI] Metriche di qualità della mesh (skewness, aspect ratio, ortogonalità): perché contano?</strong></summary>
+
+Misurano quanto le celle si discostano dalla forma ideale: **skewness** $\approx0$ (deviazione angolare), **aspect ratio** $\approx1$ (allungamento; $>1000$ mal condiziona), **ortogonalità** $\approx1$ (allineamento facce-congiungenti). Celle scadenti aumentano l'**errore di discretizzazione** (specie nei gradienti/termini diffusivi) e peggiorano la **convergenza**; $\det(J)\le0$ significa volume negativo (cella ribaltata) → calcolo non valido.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Approccio ALE: differenza euleriano/lagrangiano e quando serve la velocità di griglia.</strong></summary>
+
+Nella forma ALE il flusso convettivo usa la **velocità relativa** $(\mathbf v-\mathbf v_g)$, con $\mathbf v_g$ velocità della griglia: $\mathbf v_g=0$ → **euleriano** (griglia fissa), $\mathbf v_g=\mathbf v$ → **lagrangiano** (griglia segue il fluido). Serve quando il dominio si **deforma/muove** (palette mobili, superfici libere, FSI) mantenendo la conservazione (Reynolds transport).
+
+</details>
+
+## 🤖 Flussi rarefatti (AI)
+
+<details>
+<summary><strong>🤖 [AI] Numero di Knudsen: definizione, regimi e perché Navier-Stokes falliscono.</strong></summary>
+
+$Kn=\lambda/L$ (libero cammino medio / scala caratteristica). Regimi: continuo ($Kn<0.01$, NS validi), **slip** ($0.01$–$0.1$, NS con condizioni di scorrimento), **transizionale** ($0.1$–$10$) e **molecolare libero** ($Kn>10$). NS falliscono quando $Kn$ cresce perché vengono meno l'ipotesi del continuo e la **vicinanza all'equilibrio** (distribuzione di Maxwell-Boltzmann) su cui si fondano le relazioni costitutive (viscosità, Fourier).
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] DSMC: idea di base, perché Monte Carlo e quali vincoli numerici.</strong></summary>
+
+Il **Direct Simulation Monte Carlo** segue **particelle rappresentative** (ognuna vale $F_{num}$ molecole reali) alternando **free-flight** deterministico e **collisioni stocastiche** campionate per cella. È statistico perché risolvere l'equazione di Boltzmann direttamente è proibitivo. Vincoli: cella $\Delta x\lesssim\lambda$, passo $\Delta t\lesssim\tau_c$ (tempo di collisione) e abbastanza particelle per cella ($N\sim$ decine) per ridurre il rumore statistico.
+
+</details>
+
+## 🤖 Turbomacchine (AI)
+
+<details>
+<summary><strong>🤖 [AI] Mixing plane vs sliding mesh: fedeltà, costo, cosa si conserva e cosa si perde.</strong></summary>
+
+Il **mixing plane** media in direzione circonferenziale all'interfaccia statore-rotore: **stazionario** ed economico, ma **perde** le interazioni instazionarie (scie, potenziale) e introduce un *mixing* numerico. Lo **sliding mesh** fa scorrere realmente la griglia del rotore: **instazionario**, costoso, ma cattura le interazioni; richiede interfaccia non-conforme con connettività che cambia nel tempo.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Condizioni corocroniche / phase-lag: idea, perché passi diversi danno risultati diversi, time-lag.</strong></summary>
+
+Sfruttano la **periodicità spazio-temporale**: il canale adiacente vede la stessa fisica **sfasata nel tempo** di un *time-lag* legato al rapporto dei passi e alla velocità di rotazione, così si simula **un solo canale** invece di tutta la corona. Passi diversi (numero pale statore≠rotore) cambiano lo sfasamento e quindi il contenuto in frequenza dell'interazione; il costo è in **memoria** (storia temporale da salvare).
+
+</details>
+
+## 🤖 Modelli di ordine ridotto (AI)
+
+<details>
+<summary><strong>🤖 [AI] POD: cosa sono snapshot, modi ed energia catturata (RIC)?</strong></summary>
+
+Si raccolgono **snapshot** (soluzioni a istanti/parametri diversi), se ne estrae una base ottima di **modi** (autovettori della matrice di correlazione) ordinati per **energia** (autovalori). Il **RIC** (Relative Information Content) $\sum_{i\le r}\lambda_i/\sum\lambda_i$ dice quanta energia cattura una base troncata a $r$ modi; tipicamente bastano pochi modi per il 99%.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Come si costruisce il modello ridotto (proiezione di Galerkin) e quali sono i limiti?</strong></summary>
+
+Si **proietta** il sistema completo sulla base POD (Galerkin), ottenendo poche ODE per i coefficienti modali → soluzione **online** rapidissima. Limiti: i ROM lineari faticano con **forti non linearità**, perdono accuratezza per **parametri fuori dal training**, e possono essere instabili; servono iperriduzione (DEIM) o ROM non lineari.
+
+</details>
+
+## 🤖 Flussi reagenti (AI)
+
+<details>
+<summary><strong>🤖 [AI] Mixing fraction: cos'è e perché si usa? Premiscelato vs diffusivo.</strong></summary>
+
+La **mixing fraction** $Z$ misura la frazione di massa proveniente dal combustibile: è uno scalare **conservato** (senza termine sorgente) che disaccoppia mescolamento e chimica. Nelle fiamme **diffusive** (non premiscelate) combustibile e ossidante arrivano separati e bruciano dove si incontrano ($Z$ stechiometrico); nelle **premiscelate** sono già mescolati e il fronte di fiamma si propaga.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Numero di Damköhler: definizione e regimi.</strong></summary>
+
+$Da=\tau_{flow}/\tau_{chem}$ (scala dei tempi fluidodinamica / chimica). $Da\gg1$: chimica **veloce** rispetto al mescolamento → fronte sottile, regime *mixed-is-burnt* (flamelet); $Da\ll1$: chimica **lenta** → reattore ben mescolato. Governa quale modello di combustione usare.
+
+</details>
+
 ## 🤖 Report / esercitazione (AI)
 
 <details>
