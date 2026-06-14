@@ -857,6 +857,101 @@ modificata** che contiene **diffusione numerica** (termini pari, $\partial^2$, d
 
 </details>
 
+## 🤖 Turbolenza (AI)
+
+> Domande vaste da orale ricavate dalle vecchie sezioni *Domande / Quiz / Domande aperte* di
+> `teoria/turbolenza.md`. Sono **generate dall'IA**, non realmente proposte. Il dettaglio completo è
+> nei toggle del file di teoria.
+
+<details>
+<summary><strong>🤖 [AI] Descrivi la cascata energetica di Kolmogorov e spiega la legge $E(k)\propto k^{-5/3}$.</strong></summary>
+
+L'energia è **iniettata alle grandi scale** (produzione), **trasferita** attraverso la regione
+inerziale verso scale via via più piccole, e infine **dissipata** alla scala di Kolmogorov. Nella
+regione inerziale non c'è né produzione né dissipazione: l'energia transita a tasso costante
+$\varepsilon$. Per argomenti dimensionali (Kolmogorov 1941) $E(k)\propto\varepsilon^{2/3}k^{-5/3}$:
+la pendenza **−5/3** in scala log-log è la firma universale della cascata.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Perché $\overline{u'v'}$ non è in generale nullo, anche se $\overline{u'}=\overline{v'}=0$?</strong></summary>
+
+Perché $u'$ e $v'$ sono **statisticamente correlate**: i vortici trasportano in modo coerente
+fluido veloce verso zone lente (es. $v'>0$ porta $u'<0$ vicino a parete). Anche se ogni fluttuazione
+ha media nulla, la loro **covarianza** $\overline{u'v'}$ no, e misura il **trasporto turbolento di
+quantità di moto** (lo sforzo di Reynolds). Due variabili a media nulla possono essere correlate.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Qual è il problema di chiusura delle RANS e quali strategie esistono?</strong></summary>
+
+Mediando le NS compare il tensore di Reynolds $-\rho\overline{u_i'u_j'}$ (**6** incognite nuove) non
+esprimibile con le sole grandezze medie: il sistema è **aperto** (10 incognite, 4 equazioni → 6
+mancanti). Strategie: **modelli a viscosità turbolenta** (Boussinesq → $\mu_T$ via modelli algebrici,
+1 eq. Spalart-Allmaras, 2 eq. $k$-$\varepsilon$/$k$-$\omega$/SST) oppure **Reynolds Stress Models**
+(7 equazioni, trasporto diretto delle componenti, nessuna ipotesi di isotropia).
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Universalità delle piccole scale: da cosa dipendono e perché?</strong></summary>
+
+Le scale di Kolmogorov $\eta=(\nu^3/\varepsilon)^{1/4}$ dipendono **solo** da $\nu$ e $\varepsilon$:
+geometria e condizioni al contorno fissano solo le **grandi** scale, che attraverso la cascata
+impongono $\varepsilon$; le piccole si **auto-organizzano** per dissiparlo. Per questo la loro
+struttura è universale (indipendente da forma del corpo e $Re$).
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Perché il costo della DNS scala come $Re^3$?</strong></summary>
+
+$L/\eta\propto Re^{3/4}$ → in 3D $N_{celle}\propto Re^{9/4}$; il passo temporale aggiunge
+$\propto Re^{3/4}$ → costo totale $\propto Re^{9/4}\cdot Re^{3/4}=Re^3$. Per $Re\sim10^6$ è proibitivo.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] RANS vs URANS: differenza concettuale.</strong></summary>
+
+**RANS:** media temporale $T\to\infty$, tutta l'informazione temporale persa, per flussi stazionari
+in media. **URANS:** media su finestra intermedia $T_{avg}$ con $\tau_{turb}\ll T_{avg}\ll\tau_{slow}$:
+filtra le fluttuazioni turbolente rapide ma **mantiene l'evoluzione lenta** (es. vortex shedding).
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Cos'è la shielding function nel DDES e quale problema risolve?</strong></summary>
+
+Nel DES lo switch RANS→LES avviene per $C_{DES}\Delta<d$; con mesh fini parallele alla parete scatta
+**dentro** il boundary layer, dove non c'è contenuto turbolento risolto → **Modelled Stress
+Depletion** (separazione precoce artificiale). Il DDES introduce $f_d$ che, basata su $r_d$ (alto nel
+BL), **forza la RANS in tutto il boundary layer** a prescindere dalla mesh, attivando la LES solo
+nella regione separata.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Perché le turbine di bassa pressione sono un banco di prova critico per le RANS?</strong></summary>
+
+Operano a **basso Reynolds**: lo strato limite resta laminare per gran parte della pala e la
+**transizione indotta da separazione** (bolla laminare) governa le perdite. Le RANS a turbolenza
+piena assumono il BL già turbolento e sbagliano molto; i modelli di transizione ($\gamma$-$Re_\theta$)
+migliorano ma faticano su riattacco e perdite → spesso serve LES/DNS.
+
+</details>
+
+<details>
+<summary><strong>🤖 [AI] Differenza tra short bubble e long bubble di separazione laminare.</strong></summary>
+
+Il flusso laminare separa sul profilo; se transisce e **si riattacca rapidamente** la bolla resta
+**corta** (short, riattacco turbolento), se la transizione è lontana o assente la bolla si **allunga**
+e resta prevalentemente laminare (long). Rilevante per droni e turbine LP a basso $Re$.
+
+</details>
+
 ## 🤖 Report / esercitazione (AI)
 
 <details>

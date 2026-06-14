@@ -2,6 +2,9 @@
 
 ## Nomenclatura essenziale
 
+<details>
+<summary><strong>📖 Simboli e notazione usati in tutto il capitolo</strong></summary>
+
 | Simbolo | Nome | Note |
 |---|---|---|
 | $\overline{(\cdot)},\ \bar f$ | **media** (di Reynolds) / filtraggio (LES) | RANS media, LES filtra |
@@ -18,6 +21,8 @@
 | $\tau_{ij},\ \tau_{ij}^s$ | sforzi (Reynolds / SGS) | — |
 | $d,\ C_{DES}\Delta$ | distanza da parete / scala DES | switch RANS↔LES (DES), $f_d$ shielding |
 | $\gamma\text{–}Re_\theta$ | modello di **transizione** | intermittenza |
+
+</details>
 
 ---
 
@@ -263,30 +268,7 @@ $$\rho\frac{\partial u_i}{\partial t} + \rho u_j \frac{\partial u_i}{\partial x_
 
 ### Applicazione della decomposizione di Reynolds
 
-Si sostituisce $u_i = \bar{u}_i + u_i'$ e $p = \bar{p} + p'$ e si applica l'operatore di media.
-
-<details>
-<summary><strong>Passaggi dettagliati della derivazione</strong></summary>
-
-**Step 1 — Continuità:**
-
-$$\frac{\partial(\bar{u}_i + u_i')}{\partial x_i} = 0 \quad\Rightarrow\quad \frac{\partial\bar{u}_i}{\partial x_i} + \underbrace{\frac{\partial u_i'}{\partial x_i}}_{=\,0} = 0$$
-
-**Step 2 — Termine non lineare $\rho u_j \partial u_i/\partial x_j$:**
-
-Il termine convettivo si espande e si media. Usando la linearità e le proprietà $A, B, C, D$ del professore:
-
-$$\overline{u_j \frac{\partial u_i}{\partial x_j}} = \underbrace{\bar{u}_j \frac{\partial\bar{u}_i}{\partial x_j}}_{A} + \underbrace{\overline{u_j'\frac{\partial u_i'}{\partial x_j}}}_{B\neq 0}$$
-
-Il termine $B$ si riscrive usando la divergenza di fluttuazione nulla:
-
-$$\overline{u_j'\frac{\partial u_i'}{\partial x_j}} = \frac{\partial}{\partial x_j}\overline{u_i' u_j'}$$
-
-**Step 3 — Equazione RANS risultante:**
-
-$$\rho\frac{\partial\bar{u}_i}{\partial t} + \rho\bar{u}_j\frac{\partial\bar{u}_i}{\partial x_j} = -\frac{\partial\bar{p}}{\partial x_i} + \frac{\partial}{\partial x_j}\left(\bar{\tau}_{ij} - \rho\overline{u_i'u_j'}\right)$$
-
-</details>
+Si sostituisce $u_i = \bar{u}_i + u_i'$ e $p = \bar{p} + p'$ e si applica l'operatore di media. La derivazione completa, passo per passo, è nell'approfondimento *⭐ Dimostrazione completa* qui sotto.
 
 > ✅ **Equazione RANS — forma finale**
 >
@@ -304,6 +286,147 @@ $$\rho\frac{\partial\bar{u}_i}{\partial t} + \rho\bar{u}_j\frac{\partial\bar{u}_
 | **URANS** | Media su $T_{avg}$ piccolo rispetto alla fluttuazione lenta ma grande rispetto alla turbolenza | Conservata per le variazioni lente | Flussi con instazionarietà coerente (es. vortex shedding) |
 
 Le URANS usano una media su un intervallo $T_{avg}$ tale che $\tau_{turb} \ll T_{avg} \ll \tau_{slow}$. In questo modo si filtrano le fluttuazioni turbolente ma si mantiene la variazione lenta del campo medio nel tempo.
+
+</details>
+
+<details>
+<summary><strong>⭐ Approfondimento — Dimostrazione completa delle RANS incompressibili (passo per passo, da esame)</strong></summary>
+
+Dimostrazione completa con la discussione di **ogni** passaggio — in particolare perché il termine "fluttuazione × derivata di un valore medio" si annulla. (Nota: qui la velocità è $u_i$; gli appunti del corso usano $q_i$, intercambiabile.)
+
+### Passo 0 — Equazioni di partenza (Navier-Stokes incompressibili)
+
+$$\underbrace{\frac{\partial u_i}{\partial x_i}=0}_{\text{continuità}}\qquad\qquad \rho\frac{\partial u_i}{\partial t}+\rho\,u_j\frac{\partial u_i}{\partial x_j}=-\frac{\partial p}{\partial x_i}+\frac{\partial \tau_{ij}}{\partial x_j}$$
+
+con $\tau_{ij}=\mu\big(\partial_j u_i+\partial_i u_j\big)$ sforzo viscoso (lineare in $u$). L'unico termine **non lineare** è il convettivo $u_j\,\partial_j u_i$.
+
+### Passo 1 — Decomposizione di Reynolds
+
+Si scrive ogni incognita come media + fluttuazione:
+
+$$u_i=\bar u_i+u_i',\qquad p=\bar p+p',\qquad \overline{u_i'}=0,\ \ \overline{p'}=0$$
+
+### Passo 2 — Continuità mediata
+
+Sostituendo e mediando (la media è lineare e commuta con $\partial/\partial x_i$):
+
+$$\overline{\frac{\partial(\bar u_i+u_i')}{\partial x_i}}=\frac{\partial\bar u_i}{\partial x_i}+\frac{\partial\overline{u_i'}}{\partial x_i}=\frac{\partial\bar u_i}{\partial x_i}=0$$
+
+Quindi $\partial_i\bar u_i=0$ (continuità del campo medio) e, sottraendola dalla continuità totale, anche $\partial_i u_i'=0$ (**la fluttuazione è a divergenza nulla**). Servirà al Passo 6.
+
+### Passo 3 — Sostituzione nel momento ed espansione del termine convettivo
+
+Sostituendo $u_i=\bar u_i+u_i'$ nel termine non lineare e sviluppando il prodotto si ottengono **quattro** contributi:
+
+$$u_j\frac{\partial u_i}{\partial x_j}=(\bar u_j+u_j')\frac{\partial(\bar u_i+u_i')}{\partial x_j}=\underbrace{\bar u_j\frac{\partial\bar u_i}{\partial x_j}}_{(1)}+\underbrace{\bar u_j\frac{\partial u_i'}{\partial x_j}}_{(2)}+\underbrace{u_j'\frac{\partial\bar u_i}{\partial x_j}}_{(3)}+\underbrace{u_j'\frac{\partial u_i'}{\partial x_j}}_{(4)}$$
+
+### Passo 4 — Media termine per termine
+
+Si applica l'operatore di media a tutta l'equazione. I termini **lineari** sono immediati:
+
+- **Derivata temporale:** $\overline{\rho\,\partial_t u_i}=\rho\,\partial_t\bar u_i$ (la media commuta con $\partial/\partial t$, campo stazionario in media).
+- **Pressione:** $\overline{-\partial_i p}=-\partial_i\bar p$ (perché $\overline{p'}=0$).
+- **Viscoso:** $\overline{\partial_j\tau_{ij}}=\partial_j\bar\tau_{ij}$ con $\bar\tau_{ij}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)$ — lineare in $u$, quindi nessuna incognita nuova.
+
+Per i quattro pezzi convettivi:
+
+| Termine | Media | Esito |
+| --- | --- | --- |
+| (1) $\bar u_j\,\partial_j\bar u_i$ | $\bar u_j\,\partial_j\bar u_i$ | resta (tutto medio) |
+| (2) $\bar u_j\,\partial_j u_i'$ | $\bar u_j\,\partial_j\overline{u_i'}=0$ | **si annulla** |
+| (3) $u_j'\,\partial_j\bar u_i$ | $(\partial_j\bar u_i)\,\overline{u_j'}=0$ | **si annulla** |
+| (4) $u_j'\,\partial_j u_i'$ | $\overline{u_j'\,\partial_j u_i'}\neq0$ | **sopravvive** |
+
+### Passo 5 — Perché il termine (3) si annulla (il punto delicato)
+
+Il termine è $\overline{u_j'\,\dfrac{\partial\bar u_i}{\partial x_j}}$, cioè la **media del prodotto di una fluttuazione per la derivata di un valore medio**. La chiave logica è: **$\dfrac{\partial\bar u_i}{\partial x_j}$ è una grandezza già mediata**, quindi **deterministica e costante rispetto all'operatore di media**. Per la regola "media di (costante × fluttuazione) = costante × media della fluttuazione" (linearità + la grandezza media filtra fuori), esso esce dalla media:
+
+$$\overline{u_j'\,\frac{\partial\bar u_i}{\partial x_j}}=\frac{\partial\bar u_i}{\partial x_j}\;\overline{u_j'}=\frac{\partial\bar u_i}{\partial x_j}\cdot 0=0$$
+
+perché $\overline{u_j'}=0$ per costruzione. **A livello logico:** stai mediando il prodotto di qualcosa di *fisso* (il campo medio, e quindi anche la sua derivata) per qualcosa che *oscilla a media nulla* (la fluttuazione); il fattore fisso lo puoi portare fuori dalla media come una costante, e ciò che resta dentro — la media della sola fluttuazione — è zero. (Stessa logica per il termine (2), dove a uscire è $\bar u_j$.)
+
+> ⚠️ **Attenzione a non confonderlo con il termine (4).** Lì il prodotto è tra **due fluttuazioni** ($u_j'$ e $\partial_j u_i'$): nessuna delle due è "fissa", quindi **niente** può uscire dalla media, e $\overline{u_j'\,\partial_j u_i'}\neq0$ in generale. È esattamente la differenza tra "media di costante × fluttuazione" (= 0) e "media di fluttuazione × fluttuazione" ($\neq$ 0).
+
+### Passo 6 — Il termine (4) in forma conservativa (uso della continuità)
+
+Per la regola del prodotto e usando $\partial_j u_j'=0$ (Passo 2):
+
+$$\frac{\partial(u_i'u_j')}{\partial x_j}=u_j'\frac{\partial u_i'}{\partial x_j}+\underbrace{u_i'\frac{\partial u_j'}{\partial x_j}}_{=\,0}\quad\Longrightarrow\quad \overline{u_j'\frac{\partial u_i'}{\partial x_j}}=\frac{\partial\,\overline{u_i'u_j'}}{\partial x_j}$$
+
+Così le due fluttuazioni finiscono **dentro un unico prodotto sotto la derivata**: è il **tensore di Reynolds**. (Senza questo passaggio avremmo un pezzo dentro e uno fuori dalla derivata, impossibili da raccogliere in un tensore.)
+
+### Passo 7 — Equazione RANS finale
+
+$$\boxed{\ \rho\frac{\partial\bar u_i}{\partial t}+\rho\,\bar u_j\frac{\partial\bar u_i}{\partial x_j}=-\frac{\partial\bar p}{\partial x_i}+\frac{\partial}{\partial x_j}\Big(\underbrace{\bar\tau_{ij}-\rho\,\overline{u_i'u_j'}}_{\text{sforzo viscoso + sforzo di Reynolds}}\Big)\ }$$
+
+> ✅ **Riepilogo dei "perché".** Fino a qui **non si è fatta alcuna approssimazione**: solo decomposizione, linearità della media, $\overline{u'}=0$ e incomprimibilità. Il termine $(1)$ ricostruisce la convezione del campo medio; $(2)$ e $(3)$ spariscono perché contengono **una** fluttuazione a media nulla moltiplicata per una grandezza media (che filtra fuori); $(4)$ sopravvive perché è il prodotto di **due** fluttuazioni correlate e genera il tensore di Reynolds, l'unica vera incognita nuova (problema di chiusura).
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — Notazione indiciale: $\partial/\partial x_i$, $\partial\tau_{ij}/\partial x_j$ e perché non $\nabla$</strong></summary>
+
+### La regola degli indici (convenzione di Einstein)
+
+La notazione indiciale (o di Einstein) si basa su due tipi di indice:
+
+- **Indice libero** — compare **una sola volta** in ogni termine. Identifica una componente e, poiché vale per ogni suo valore $i = 1,2,3$, indica che stiamo scrivendo **un'equazione vettoriale/tensoriale** (cioè 3 equazioni scalari in 3D). Esempio: la $i$ in $\partial p/\partial x_i$.
+- **Indice ripetuto (muto)** — compare **due volte** nello stesso termine. Per convenzione implica una **sommatoria** su $1,2,3$ (non serve scrivere $\sum$). Rappresenta quindi una **contrazione** (prodotto scalare, traccia, divergenza).
+
+### Caso 1 — $\dfrac{\partial u_i}{\partial x_i}$ (indice ripetuto → divergenza)
+
+L'indice $i$ è ripetuto, quindi è sommato:
+
+$$\frac{\partial u_i}{\partial x_i} = \frac{\partial u_1}{\partial x_1} + \frac{\partial u_2}{\partial x_2} + \frac{\partial u_3}{\partial x_3} = \nabla\cdot\mathbf{u}$$
+
+È esattamente la **divergenza** del campo vettoriale: un singolo numero (scalare).
+
+### Caso 2 — $\dfrac{\partial \tau_{ij}}{\partial x_j}$ (un indice libero, uno ripetuto → divergenza di un tensore)
+
+Qui $j$ è ripetuto (**sommato**) mentre $i$ è **libero**. Il risultato è un **vettore**: per ogni $i$ fissato si somma sulla seconda colonna del tensore.
+
+$$\frac{\partial \tau_{ij}}{\partial x_j} = \sum_{j=1}^{3}\frac{\partial \tau_{ij}}{\partial x_j} = \frac{\partial \tau_{i1}}{\partial x_1} + \frac{\partial \tau_{i2}}{\partial x_2} + \frac{\partial \tau_{i3}}{\partial x_3} = (\nabla\cdot\boldsymbol{\tau})_i$$
+
+> ❓ **Cosa indicano $i$ e $j$, e cos'è $x_j$ rispetto a $x_i$?** Entrambi gli indici sono **direzioni spaziali** ($\{1,2,3\}\leftrightarrow\{x,y,z\}$): $x_i$ e $x_j$ sono **le stesse coordinate spaziali**, con etichetta diversa. La differenza è di **ruolo**: **$i$ (libero)** = direzione della **componente fisica** (per la pressione, la componente del gradiente / quale equazione di QdM; per lo sforzo, la direzione della forza); **$j$ (ripetuto/sommato)** = la coordinata **lungo cui derivo** e, per lo sforzo, l'**orientazione della faccia** del cubetto. La pressione (scalare) ha un solo indice; lo sforzo (tensore) ne ha due — forza ($i$) e faccia ($j$, sommata nella divergenza).
+
+> ❓ **Nel termine convettivo $u_j\,\partial u_i/\partial x_j$, perché la velocità "esterna" ha pedice $j$ e quella derivata $i$?** Perché è un **prodotto scalare** tra velocità e gradiente: $u_j\,\partial_j(\cdot)=(\mathbf u\cdot\nabla)(\cdot)$. L'indice $j$ è **sommato** e appare in $u_j$ (velocità che trasporta) e in $\partial/\partial x_j$ (direzione di derivazione), perché insieme formano l'operatore di advezione $\mathbf u\cdot\nabla$. L'indice $i$ è **libero** e dice **quale componente** $u_i$ viene trasportata.
+
+### Perché la notazione indiciale e non $\nabla$, grad, div, rot?
+
+| Motivo | Spiegazione |
+| --- | --- |
+| **Tensori di ordine ≥ 2** | Per un tensore $\nabla\cdot\boldsymbol{\tau}$ è **ambiguo** (quale indice si contrae?); $\partial\tau_{ij}/\partial x_j$ lo dice esplicitamente. |
+| **Termine non lineare** | $u_j\,\partial u_i/\partial x_j$ e la correlazione $\overline{u_i'u_j'}$ sono naturali per componenti. |
+| **Contrazioni compatte** | Tracce, energia $k=\tfrac12\overline{u_i'u_i'}$, produzione $\tau_{ij}\,\partial\bar u_j/\partial x_i$: tutte con un indice ripetuto. |
+| **CFD** | I solutori lavorano componente per componente: mappatura **1-a-1** sul codice. |
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — Perché solo la pressione si decompone e il tensore viscoso no (lineare vs non lineare)</strong></summary>
+
+Il punto chiave è **quali termini sono lineari** nelle incognite e quali no.
+
+- **Pressione $p$** — incognita **primitiva**, compare solo tramite il gradiente $\partial p/\partial x_i$, cioè **linearmente**. Si decompone $p=\bar p+p'$, ma essendo lineare la media è banale: $\overline{\partial_i p}=\partial_i\bar p$ e $p'$ sparisce ($\overline{p'}=0$).
+- **Tensore viscoso $\tau_{ij}=\mu(\partial_j u_i+\partial_i u_j)$** — **non è incognita indipendente**: è **funzione lineare della velocità**. Si decompone anch'esso, ma in modo automatico: $\overline{\tau_{ij}}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)=\tau_{ij}(\bar u)$ e $\overline{\tau_{ij}'}=0$. **Lo sforzo viscoso medio è lo sforzo viscoso del campo medio** — nessuna incognita nuova.
+
+**Da dove nasce allora la chiusura?** Solo dal termine convettivo, **quadratico**: $\overline{u_i u_j}=\bar u_i\bar u_j+\overline{u_i'u_j'}$. Il termine $\overline{u_i'u_j'}$ è l'**unica** vera nuova incognita.
+
+**"Il tensore di Reynolds non varia nel tempo?"** È solo **idempotenza**: è una grandezza già mediata, quindi per flusso statisticamente stazionario è indipendente dal tempo (in URANS varia lentamente). Non è un'ipotesi calata dall'alto. La **densità** costante, invece, deriva dall'**incomprimibilità** (giustificazione fisica), mentre la "scomparsa" dello sforzo viscoso come incognita extra è puramente matematica (linearità).
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — Media di (costante × fluttuazione): la costante filtra fuori</strong></summary>
+
+Bisogna distinguere due situazioni:
+
+- **Prodotto di due fluttuazioni** (es. $u'$ e $v'$): $\overline{u'v'}\neq\overline{u'}\,\overline{v'}=0$. Da qui nasce il tensore di Reynolds.
+- **Media per fluttuante**: la grandezza media è una **costante** rispetto all'operatore di media e **esce** (linearità): $\overline{\bar u\,v}=\bar u\,\bar v$, $\overline{\bar u\,u'}=\bar u\,\overline{u'}=0$.
+
+**Perché $\bar u$ è "costante" rispetto alla media?** Per la media temporale non dipende più da $t$ (è il risultato dell'integrazione su $t$), quindi si porta fuori dall'integrale; per la media d'insieme è deterministica. Formalmente: **linearità + idempotenza** ($\overline{\bar u}=\bar u$). È questo che fa sopravvivere solo il termine quadratico:
+
+$$\overline{uv}=\overline{(\bar u+u')(\bar v+v')}=\bar u\bar v+\underbrace{\bar u\,\overline{v'}}_{0}+\underbrace{\overline{u'}\,\bar v}_{0}+\overline{u'v'}=\bar u\bar v+\overline{u'v'}$$
 
 </details>
 
@@ -337,7 +460,11 @@ La struttura è la stessa dell'incompressibile; gli unici termini realmente "nuo
 
 $$\mathbf{R} = -\rho\overline{u_i'u_j'} = -\rho\begin{pmatrix} \overline{u_1'^2} & \overline{u_1'u_2'} & \overline{u_1'u_3'} \\ \overline{u_2'u_1'} & \overline{u_2'^2} & \overline{u_2'u_3'} \\ \overline{u_3'u_1'} & \overline{u_3'u_2'} & \overline{u_3'^2} \end{pmatrix}$$
 
-> 💡 **Struttura del tensore.** Il tensore è simmetrico ($\overline{u_i'u_j'} = \overline{u_j'u_i'}$), quindi ha solo **6 componenti indipendenti**. Queste 6 incognite non possono essere ricavate dalle sole equazioni RANS (il sistema è aperto): servono modelli di chiusura.
+> 💡 **Struttura del tensore e bilancio incognite/equazioni.** Il tensore è simmetrico ($\overline{u_i'u_j'} = \overline{u_j'u_i'}$), quindi ha solo **6 componenti indipendenti**. Facciamo il conto su un flusso incompressibile:
+> - **Incognite:** 3 velocità medie $\bar u_i$ + 1 pressione $\bar p$ + **6 sforzi di Reynolds** $\overline{u_i'u_j'}$ = **10**.
+> - **Equazioni disponibili:** 1 continuità + 3 quantità di moto = **4**.
+>
+> Mancano quindi **6 equazioni** (tante quante le componenti indipendenti del tensore): è il **problema di chiusura**. Le 6 relazioni mancanti si possono fornire in due modi: o **direttamente**, con un'equazione di trasporto per ciascuna delle 6 componenti (→ modelli **RSM**, vedi sotto), oppure **indirettamente**, riducendo le 6 incognite a una sola grandezza ($\mu_T$) con l'ipotesi di Boussinesq e determinando quella con **poche** equazioni ausiliarie (0, 1 o 2). Perché al massimo 2 — e mai 3 — è spiegato nel toggle *"Quante equazioni servono per chiudere?"*.
 
 ### Dal tensore di Reynolds all'energia cinetica turbolenta (colmare il "gap")
 
@@ -399,6 +526,10 @@ $$-\rho\overline{u_i'u_j'} = \underbrace{-\frac{2}{3}\rho k\,\delta_{ij}}_{\text
 $$\tau_{ij}^R = -\rho\overline{u_i'u_j'} = 2\mu_T S_{ij} - \frac{2}{3}\rho k\,\delta_{ij}$$
 
 dove $S_{ij} = \frac{1}{2}\left(\frac{\partial\bar{u}_i}{\partial x_j} + \frac{\partial\bar{u}_j}{\partial x_i}\right)$ è il tensore della velocità di deformazione del campo medio e $\mu_T$ è la viscosità turbolenta (o eddy viscosity).
+
+> ❓ **Che informazione dà il tensore $S_{ij}$ e perché compare in Boussinesq?** $S_{ij}$ è la **parte simmetrica** del gradiente di velocità medio e misura la **velocità con cui gli elementi di fluido vengono deformati** (stirati e tagliati) dal campo medio: dice *quanto* e *in quali direzioni* il fluido si sta deformando. La parte **antisimmetrica** del gradiente è invece la **rotazione rigida** (vorticità $\Omega_{ij}$), che ruota l'elemento **senza deformarlo**. Boussinesq usa $S_{ij}$ (e non l'intero gradiente) per due motivi: (i) lo sforzo deve dipendere dalla **deformazione**, non dalla rotazione rigida — un fluido in rotazione di corpo rigido non genera sforzi viscosi; (ii) il tensore di Reynolds è **simmetrico**, quindi va legato a un tensore simmetrico ($S_{ij}$), in perfetta analogia con la legge di Newton dello sforzo viscoso laminare $\tau=2\mu S$. In sintesi: $S_{ij}$ porta l'informazione su **tasso e orientazione dello stiramento del campo medio**, che è ciò che l'eddy viscosity converte in sforzo turbolento.
+
+> ❓ **L'unica incognita è $\mu_T$, o anche $k$?** Hai ragione: nella formula compaiono **due** incognite, $\mu_T$ **e** $k$ (quest'ultima nel termine isotropo $-\tfrac23\rho k\,\delta_{ij}$). Il punto è che in flusso **incompressibile** la parte isotropa viene **assorbita nella pressione modificata** $\bar p^*=\bar p+\tfrac23\rho k$: nell'equazione di quantità di moto si risolve direttamente $\bar p^*$, quindi per il bilancio della QdM **basta conoscere $\mu_T$** (la $k$ "si nasconde" nella pressione). Tuttavia $k$ resta un'incognita a tutti gli effetti: serve (a) per ricostruire la pressione vera, (b) nei flussi compressibili, e soprattutto (c) per **calcolare $\mu_T$ stessa**, dato che nei modelli a 2 equazioni $\mu_T=C_\mu\rho k^2/\varepsilon$. Ecco perché il $k$-$\varepsilon$ risolve un'equazione di trasporto **per $k$**: non è affatto nota a priori. Nei modelli algebrici o a 1 equazione (mixing length, Spalart-Allmaras), che **non** calcolano $k$, il termine $-\tfrac23\rho k\,\delta_{ij}$ viene semplicemente omesso/assorbito e si modella solo $\mu_T$.
 
 > ⚠️ **Limite dell'ipotesi di Boussinesq.** Boussinesq assume che il tensore di Reynolds sia *allineato* con il tensore di deformazione del campo medio (come in un fluido Newtoniano). Questo è un'approssimazione: in realtà il tensore di Reynolds ha la propria dinamica (equazioni di trasporto). Il modello fallisce in flussi con forti curvature delle linee di flusso, separazione e rotazione.
 
@@ -470,6 +601,47 @@ flowchart TD
 4. **Sistema chiuso** → risolvo numericamente.
 
 > ⚠️ Ogni livello introduce nuove costanti empiriche e nuove ipotesi: la "chiusura" non è mai esatta, è un compromesso calibrato.
+
+</details>
+
+<details>
+<summary><strong>Quante equazioni servono per chiudere? Perché modelli a 0, 1, 2 equazioni — e mai 3</strong></summary>
+
+La domanda "quante equazioni mancano" ha **due risposte diverse** a seconda del quadro:
+
+**Quadro 1 — trasporto diretto degli sforzi (RSM).** Le componenti indipendenti del tensore sono **6**, quindi mancano **6** relazioni. Se le si fornisce con un'equazione di trasporto ciascuna si ottengono i modelli **RSM** (6 equazioni per gli sforzi + 1 per $\varepsilon$ = **7**). Qui sì che ci sono "più di due" equazioni — ma è una **famiglia diversa**, che *non* usa Boussinesq.
+
+**Quadro 2 — eddy viscosity (Boussinesq).** L'ipotesi di Boussinesq **collassa le 6 incognite in una sola**, la viscosità turbolenta $\mu_T$. A questo punto non servono più 6 equazioni: ne basta abbastanza per stimare $\mu_T$. E per dimensione $\mu_T$ richiede **due scale** della turbolenza — una di **velocità** e una di **lunghezza** (o, equivalentemente, due tra $k$, $\varepsilon$, $\omega$, $l_t$):
+
+$$\mu_T \sim \rho\,\underbrace{u_t}_{\text{vel.}}\,\underbrace{l_t}_{\text{lungh.}}\quad\Longleftrightarrow\quad \mu_T=\rho\frac{k}{\omega}=C_\mu\rho\frac{k^2}{\varepsilon}$$
+
+Il **numero di equazioni di trasporto = numero di scale che decido di trasportare** invece di prescrivere algebricamente:
+
+| Modello | Equazioni di trasporto | Come ottiene le due scale |
+| --- | --- | --- |
+| **Algebrico (0 eq.)** | 0 | entrambe le scale da relazioni locali (lunghezza di mixing dalla distanza di parete, velocità da $|\partial\bar u/\partial y|\cdot l$) |
+| **1 equazione** | 1 (es. $k$ o $\tilde\nu$) | una scala trasportata, l'altra **algebrica** (es. lunghezza dalla distanza di parete) |
+| **2 equazioni** | 2 ($k$+$\varepsilon$ o $k$+$\omega$) | **entrambe** le scale trasportate → chiusura eddy-viscosity più generale |
+
+**Perché mai 3 (in ambito eddy-viscosity)?** Perché $\mu_T$ è determinata da **due** scale soltanto: due equazioni di trasporto le forniscono entrambe in modo completo, e una terza sarebbe **ridondante** — non aggiungerebbe alcuna informazione indipendente alla stima di $\mu_T$. Non è "sovradeterminazione" in senso matematico stretto, ma **sovra-modellazione** inutile entro l'ipotesi di Boussinesq. Se vuoi più fisica devi **abbandonare** Boussinesq e passare agli RSM (7 equazioni), che però trasportano direttamente gli sforzi.
+
+> 💡 **"Se mancassero due equazioni, come imporne una sola?"** È esattamente ciò che fa un modello a 1 equazione: trasporta **una** scala (es. $k$) e chiude l'**altra** con una relazione **algebrica** (es. la scala di lunghezza dalla geometria/distanza di parete). Non lasci nulla "in sospeso": la seconda scala la prescrivi invece di trasportarla. Costo minore e più robustezza, al prezzo di minore generalità.
+
+</details>
+
+<details>
+<summary><strong>Come funzionano i modelli a trasporto degli sforzi di Reynolds (RSM)?</strong></summary>
+
+Sì: i **Reynolds Stress Models** abbandonano l'ipotesi di Boussinesq e scrivono **un'equazione di trasporto per ciascuna componente indipendente** di $\overline{u_i'u_j'}$. Essendo il tensore simmetrico, le componenti indipendenti sono **6** ($\overline{u_1'^2},\overline{u_2'^2},\overline{u_3'^2},\overline{u_1'u_2'},\overline{u_1'u_3'},\overline{u_2'u_3'}$), più **1** equazione per $\varepsilon$ (o $\omega$) che fornisce la scala di lunghezza/tempo → **7 equazioni** in totale.
+
+**Che tipo di equazioni sono?** Si **ricavano esattamente dalle Navier-Stokes** prendendo i *momenti del secondo ordine*: si moltiplica l'equazione della QdM per $u_j'$, si somma la versione con gli indici scambiati ($i\leftrightarrow j$) e si media. Si ottiene, per ogni coppia $(i,j)$, un'equazione di trasporto della forma:
+
+$$\underbrace{\frac{\partial \overline{u_i'u_j'}}{\partial t}}_{\text{non staz.}}+\underbrace{\bar u_k\frac{\partial \overline{u_i'u_j'}}{\partial x_k}}_{\text{convezione}}=\underbrace{P_{ij}}_{\text{produzione}}+\underbrace{\Pi_{ij}}_{\substack{\text{redistribuzione}\\\text{(pressure-strain)}}}-\underbrace{\varepsilon_{ij}}_{\text{dissipazione}}+\underbrace{D_{ij}}_{\text{diffusione}}$$
+
+- Il termine di **produzione** $P_{ij}=-\big(\overline{u_i'u_k'}\,\partial_k\bar u_j+\overline{u_j'u_k'}\,\partial_k\bar u_i\big)$ è **esatto (chiuso)**: dipende solo dagli stessi sforzi e dai gradienti medi. È il **grande vantaggio** dell'RSM — la produzione di anisotropia (per shear, rotazione, curvatura) è catturata **senza approssimazioni**.
+- I termini di **pressure-strain $\Pi_{ij}$** (ridistribuisce energia tra le componenti, tende a re-isotropizzare), **dissipazione $\varepsilon_{ij}$** e **diffusione turbolenta $D_{ij}$** sono invece **non chiusi** e vanno modellati: è qui che le varianti RSM differiscono.
+
+**In pratica** risolvi davvero una PDE per $\overline{u_1'^2}$, una per $\overline{u_2'^2}$, ecc.: stessa struttura, cambiano solo gli indici. **Pro:** nessuna ipotesi di eddy-viscosity isotropa → cattura anisotropia, flussi secondari, swirl, forti curvature. **Contro:** 7 equazioni accoppiate, costoso e con convergenza numerica difficile.
 
 </details>
 
@@ -1001,564 +1173,60 @@ I modelli ibridi nascono per superare il costo computazionale proibitivo della L
 
 ---
 
-## Approfondimenti sulla derivazione RANS
-
-> Nota sulla notazione: in questo capitolo la velocità è indicata con $u_i$; gli appunti del corso usano $q_i$ per la stessa grandezza. Le due notazioni sono intercambiabili.
+## Formule da ricordare (memo)
 
 <details>
-<summary><strong>1. Notazione indiciale: cosa significano $\partial/\partial x_i$ e $\partial\tau_{ij}/\partial x_j$, e perché si usa al posto di $\nabla$</strong></summary>
+<summary><strong>🧠 Tutte le formule chiave della turbolenza, con hint per ricordarle</strong></summary>
 
-### La regola degli indici (convenzione di Einstein)
+> Specchietto di sintesi: le formule che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** tra loro. Non tutte sono dimostrabili — alcune (Boussinesq, Smagorinsky, costanti) sono **ipotesi/modelli** da ricordare così come sono.
 
-La notazione indiciale (o di Einstein) si basa su due tipi di indice:
+### Medie e decomposizione
 
-- **Indice libero** — compare **una sola volta** in ogni termine. Identifica una componente e, poiché vale per ogni suo valore $i = 1,2,3$, indica che stiamo scrivendo **un'equazione vettoriale/tensoriale** (cioè 3 equazioni scalari in 3D). Esempio: la $i$ in $\partial p/\partial x_i$.
-- **Indice ripetuto (muto)** — compare **due volte** nello stesso termine. Per convenzione implica una **sommatoria** su $1,2,3$ (non serve scrivere $\sum$). Rappresenta quindi una **contrazione** (prodotto scalare, traccia, divergenza).
-
-### Caso 1 — $\dfrac{\partial u_i}{\partial x_i}$ (indice ripetuto → divergenza)
-
-L'indice $i$ è ripetuto, quindi è sommato:
-
-$$\frac{\partial u_i}{\partial x_i} = \frac{\partial u_1}{\partial x_1} + \frac{\partial u_2}{\partial x_2} + \frac{\partial u_3}{\partial x_3} = \nabla\cdot\mathbf{u}$$
-
-È esattamente la **divergenza** del campo vettoriale: un singolo numero (scalare). Derivare "rispetto a ciascuna componente e sommare" è proprio l'operazione di divergenza.
-
-### Caso 2 — $\dfrac{\partial \tau_{ij}}{\partial x_j}$ (un indice libero, uno ripetuto → divergenza di un tensore)
-
-Qui $j$ è ripetuto (**sommato**) mentre $i$ è **libero**. Il risultato non è uno scalare ma un **vettore**: per ogni $i$ fissato si somma sulla seconda colonna del tensore.
-
-$$\frac{\partial \tau_{ij}}{\partial x_j} = \sum_{j=1}^{3}\frac{\partial \tau_{ij}}{\partial x_j} = \frac{\partial \tau_{i1}}{\partial x_1} + \frac{\partial \tau_{i2}}{\partial x_2} + \frac{\partial \tau_{i3}}{\partial x_3} = (\nabla\cdot\boldsymbol{\tau})_i$$
-
-**Significato fisico:** $\tau_{ij}$ è lo sforzo nella direzione $i$ che agisce sulla faccia del cubetto di fluido orientata secondo $j$. Sommare le derivate rispetto a $x_j$ significa fare il **bilancio netto** di tutti gli sforzi (sulle 3 coppie di facce) che danno una **forza risultante in direzione $i$**. È quindi la **divergenza del tensore degli sforzi**, ovvero la forza viscosa netta per unità di volume lungo $i$. Lo stesso vale per il tensore di Reynolds: $\partial_j(-\rho\overline{u_i'u_j'})$ è la forza apparente per unità di volume dovuta alle fluttuazioni.
-
-> ❓ **Cosa indicano $i$ e $j$, e cos'è $x_j$ rispetto a $x_i$?** Entrambi gli indici sono **direzioni spaziali**, cioè spaziano su $\{1,2,3\}\leftrightarrow\{x,y,z\}$: $x_i$ e $x_j$ sono **le stesse coordinate spaziali**, solo con un'etichetta diversa. La differenza è di **ruolo**:
-> - **$i$ (indice libero)** = direzione della **componente fisica** considerata. Per la pressione, $\partial p/\partial x_i$ è la $i$-esima componente del gradiente: indica in quale delle 3 **equazioni di quantità di moto** (verso $x$, $y$ o $z$) sto lavorando. Per lo sforzo $\tau_{ij}$, è la **direzione della forza**.
-> - **$j$ (indice ripetuto/muto)** = la coordinata **lungo cui derivo** e, fisicamente, l'**orientazione della faccia** del cubetto su cui agisce lo sforzo. Essendo ripetuto, è **sommato** su tutte e tre le direzioni: $\partial\tau_{ij}/\partial x_j$ raccoglie il contributo delle facce orientate lungo $x$, $y$ e $z$.
->
-> In breve: la pressione, essendo uno **scalare**, ha una sola "direzione" da specificare (quella del suo gradiente, $i$); lo sforzo viscoso, essendo un **tensore**, ne ha due — la direzione della forza ($i$) e quella della faccia su cui agisce ($j$, che viene sommata facendo la divergenza).
-
-### Perché la notazione indiciale e non $\nabla$, grad, div, rot?
-
-| Motivo | Spiegazione |
+| Formula | Hint / collegamento |
 | --- | --- |
-| **Tensori di ordine ≥ 2** | Le incognite delle RANS includono tensori del secondo ordine ($\tau_{ij}$, $\overline{u_i'u_j'}$). Per un tensore, scrivere $\nabla\cdot\boldsymbol{\tau}$ è **ambiguo**: non si capisce *quale* indice viene contratto. $\partial\tau_{ij}/\partial x_j$ lo dice esplicitamente. |
-| **Termine non lineare** | Il termine convettivo $u_j\,\partial u_i/\partial x_j$ e la correlazione $\overline{u_i'u_j'}$ che ne nasce sono naturali per componenti; con grad/div la struttura si nasconde. |
-| **Contrazioni compatte** | Tracce, energia $k=\tfrac12\overline{u_i'u_i'}$, produzione $\tau_{ij}\,\partial\bar u_j/\partial x_i$: tutte si scrivono con un indice ripetuto, senza simboli speciali ($:$, $\otimes$, traccia). |
-| **Discretizzazione/CFD** | I solutori lavorano componente per componente: la notazione indiciale si mappa **1-a-1** sul codice e sulle equazioni discretizzate (flussi attraverso le facce). |
-| **Una sola regola** | "Indice ripetuto = sommatoria" copre divergenze, gradienti, prodotti scalari e contrazioni tensoriali, evitando la proliferazione di operatori distinti. |
-
-### Tabella delle notazioni
-
-| Notazione indiciale | Operatore classico | Tipo del risultato | Significato |
-| --- | --- | --- | --- |
-| $\dfrac{\partial \phi}{\partial x_i}$ | $\nabla\phi$ (componente $i$) | vettore | gradiente di uno scalare |
-| $\dfrac{\partial u_i}{\partial x_i}$ | $\nabla\cdot\mathbf{u}$ | scalare | divergenza (indice ripetuto) |
-| $u_j\dfrac{\partial u_i}{\partial x_j}$ | $(\mathbf{u}\cdot\nabla)\mathbf{u}$ (comp. $i$) | vettore | convezione (non lineare, $j$ sommato) |
-| $\dfrac{\partial \tau_{ij}}{\partial x_j}$ | $(\nabla\cdot\boldsymbol{\tau})_i$ | vettore | divergenza di un tensore |
-| $\dfrac{\partial^2 u_i}{\partial x_j\partial x_j}$ | $\nabla^2 u_i$ | vettore | laplaciano (diffusione, $j$ sommato) |
-| $\overline{u_i'u_j'}$ | $\overline{\mathbf{u}'\otimes\mathbf{u}'}$ | tensore $2°$ ord. | correlazione / sforzi di Reynolds |
-| $\overline{u_i'u_i'}$ | $\overline{\mathbf{u}'\cdot\mathbf{u}'}$ | scalare | $=2k$, traccia del tensore |
-| $\delta_{ij}$ | $\mathbf{I}$ | tensore $2°$ ord. | delta di Kronecker (identità) |
-| $S_{ij}=\tfrac12(\partial_j u_i+\partial_i u_j)$ | parte simm. di $\nabla\mathbf{u}$ | tensore $2°$ ord. | velocità di deformazione |
-| $\tau_{ij}\,\dfrac{\partial \bar u_j}{\partial x_i}$ | $\boldsymbol{\tau}:\nabla\bar{\mathbf{u}}$ | scalare | produzione (doppia contrazione) |
-
-</details>
-
-<details>
-<summary><strong>2. Perché la pressione segue la decomposizione di Reynolds ma il tensore degli sforzi viscosi no? Il tensore di Reynolds "non varia nel tempo"?</strong></summary>
-
-### Non è una scelta arbitraria: è lineare vs non lineare
-
-Il punto chiave è **quali termini sono lineari** nelle incognite e quali no.
-
-- **Pressione $p$** — è un'**incognita primitiva** del problema (come la velocità). Compare nelle equazioni solo tramite il suo **gradiente** $\partial p/\partial x_i$, cioè **linearmente**. La si decompone $p = \bar p + p'$ proprio perché va mediata insieme a tutto il resto; ma essendo lineare, la media è banale: $\overline{\partial_i p} = \partial_i\bar p$ e il contributo di $p'$ sparisce ($\overline{p'}=0$).
-- **Tensore degli sforzi viscosi $\tau_{ij}$** — **non è un'incognita indipendente**: per fluido newtoniano incomprimibile è una **funzione lineare della velocità**,
-  $$\tau_{ij} = \mu\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right).$$
-  Anch'esso *si decompone*, ma la decomposizione è **automatica** e ridondante: $\tau_{ij} = \bar\tau_{ij} + \tau_{ij}'$ con $\bar\tau_{ij}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)$. Poiché la media è lineare e commuta con le derivate,
-  $$\overline{\tau_{ij}} = \mu\left(\frac{\partial \bar u_i}{\partial x_j}+\frac{\partial \bar u_j}{\partial x_i}\right) = \tau_{ij}(\bar u), \qquad \overline{\tau_{ij}'}=0.$$
-  In parole: **lo sforzo viscoso medio è semplicemente lo sforzo viscoso calcolato sul campo medio.** Non compare nessuna incognita nuova, quindi non c'è motivo di scrivere esplicitamente $\tau_{ij}'$: si annulla mediando e non aggiunge nulla.
-
-### Da dove nasce allora il problema di chiusura?
-
-**Solo dal termine convettivo**, che è **quadratico** in $u$. Per un prodotto, la media non è il prodotto delle medie:
-
-$$\overline{u_i u_j} = \bar u_i\bar u_j + \overline{u_i'u_j'}$$
-
-Il termine $\overline{u_i'u_j'}$ è l'**unica** vera nuova incognita (lo sforzo di Reynolds). Pressione e sforzo viscoso, essendo lineari, non generano correlazioni: la chiusura nasce esclusivamente dalla non linearità della convezione.
-
-### "Il tensore di Reynolds non varia nel tempo?" — è solo idempotenza
-
-Il tensore di Reynolds $-\rho\overline{u_i'u_j'}$ è, **per costruzione, una grandezza già mediata**. Applicando l'operatore di media si ottengono **campi medi**, e per un flusso **statisticamente stazionario** (RANS classiche) tutte le grandezze medie sono **indipendenti dal tempo**. Questo non è un'ipotesi calata dall'alto: è la proprietà di **idempotenza** dell'operatore ($\overline{\overline{(\cdot)}}=\overline{(\cdot)}$) applicata a un processo stazionario. Le equazioni mediate sono equazioni **per i campi medi**, quindi ogni termine in esse è una grandezza media — incluso $\bar\tau_{ij}$, che dipende dal tempo solo attraverso $\bar u(t)$.
-
-- **RANS stazionarie:** $\bar u$, $\bar p$, $\overline{u_i'u_j'}$ non dipendono da $t$.
-- **URANS:** la media è presa su una finestra intermedia $T_{avg}$, quindi sopravvive una **dipendenza lenta** dal tempo; il tensore di Reynolds può variare lentamente.
-
-### E la densità?
-
-Esatto come dici tu: $\rho = \text{cost}$ deriva dall'**incomprimibilità** ed ha quindi una giustificazione **fisica** diretta. Per lo sforzo viscoso, invece, non serve alcuna ipotesi fisica analoga: la sua "scomparsa" come incognita extra è una conseguenza **puramente matematica** della sua linearità nella velocità.
-
-</details>
-
-<details>
-<summary><strong>3. Media del prodotto costante × variabile: la costante "filtra" fuori dalla media</strong></summary>
-
-Sì, la tua intuizione è corretta. Bisogna distinguere due situazioni:
-
-- **Prodotto di due grandezze fluttuanti** (es. $u'$ e $v'$): la media del prodotto **non** è il prodotto delle medie ($\overline{u'v'}\neq\overline{u'}\,\overline{v'}=0$). È da qui che nasce il tensore di Reynolds.
-- **Prodotto di una grandezza media per una fluttuante**: la grandezza media si comporta come una **costante** rispetto all'operatore di media e **esce dalla media** (per linearità):
-  $$\overline{\bar u\,v} = \bar u\,\bar v, \qquad \overline{\bar u\,u'} = \bar u\,\overline{u'} = 0.$$
-
-**Perché $\bar u$ è "costante" rispetto alla media?** Per la media temporale, $\bar u(\mathbf{x})$ è il risultato dell'integrazione su $t$: **non dipende più dal tempo**, quindi rispetto a una media nel tempo è letteralmente una costante e si porta fuori dall'integrale. Per la media d'insieme, $\bar u$ è una grandezza **deterministica** (non aleatoria) e quindi è invariante sotto la media. Formalmente è la combinazione di **linearità** + **idempotenza** ($\overline{\bar u}=\bar u$).
-
-È esattamente questo il meccanismo che fa sopravvivere solo il termine quadratico nello sviluppo
-
-$$\overline{uv} = \overline{(\bar u+u')(\bar v+v')} = \bar u\bar v + \underbrace{\bar u\,\overline{v'}}_{0} + \underbrace{\overline{u'}\,\bar v}_{0} + \overline{u'v'} = \bar u\bar v + \overline{u'v'}.$$
-
-I due termini misti si annullano proprio perché la parte media filtra fuori e resta $\overline{u'}=0$ o $\overline{v'}=0$.
-
-</details>
-
-<details>
-<summary><strong>4. Perché alcuni termini si annullano (e per ragioni diverse)</strong></summary>
-
-Mediando il termine convettivo $\overline{u_j\,\partial u_i/\partial x_j}$ e sostituendo $u=\bar u+u'$ si ottengono **quattro** contributi:
-
-$$\overline{(\bar u_j+u_j')\frac{\partial(\bar u_i+u_i')}{\partial x_j}} = \underbrace{\bar u_j\frac{\partial\bar u_i}{\partial x_j}}_{(1)} + \underbrace{\overline{\bar u_j\frac{\partial u_i'}{\partial x_j}}}_{(2)} + \underbrace{\overline{u_j'\frac{\partial\bar u_i}{\partial x_j}}}_{(3)} + \underbrace{\overline{u_j'\frac{\partial u_i'}{\partial x_j}}}_{(4)}$$
-
-Analizziamoli uno per uno — i meccanismi di annullamento **non sono tutti uguali**:
-
-| Termine | Si annulla? | Perché |
-| --- | --- | --- |
-| **(1)** $\bar u_j\,\partial_j\bar u_i$ | No | È tutto medio: resta invariato (media di una media = media). È il trasporto convettivo del campo medio. |
-| **(2)** $\overline{\bar u_j\,\partial_j u_i'}$ | **Sì** | $\bar u_j$ è una grandezza media → **esce dalla media** (punto 3); commutando media e derivata resta $\bar u_j\,\partial_j\overline{u_i'} = \bar u_j\,\partial_j(0)=0$. |
-| **(3)** $\overline{u_j'\,\partial_j\bar u_i}$ | **Sì** | $\partial_j\bar u_i$ è una grandezza **già mediata** (deterministica) → **esce dalla media** come una costante, lasciando $(\partial_j\bar u_i)\,\overline{u_j'}=0$. |
-| **(4)** $\overline{u_j'\,\partial_j u_i'}$ | **No** | Prodotto di **due fluttuazioni** → sopravvive → diventa il tensore di Reynolds (vedi punto 5). |
-
-### La tua domanda specifica — il termine (3)
-
-"Perché $\overline{u_j'\,\partial_j\bar u_i}$ è nullo?" **Non** per la stazionarietà statistica, ma perché $\partial\bar u_i/\partial x_j$ è una grandezza **media** (deterministica): si porta fuori dall'operatore di media come una costante (è il meccanismo del punto 3), e ciò che resta è $\overline{u_j'}=0$. Quindi:
-
-$$\overline{u_j'\frac{\partial\bar u_i}{\partial x_j}} = \frac{\partial\bar u_i}{\partial x_j}\,\overline{u_j'} = 0.$$
-
-Sono due fatti **distinti** da non confondere:
-
-1. **$\overline{u'}=0$** è una proprietà **definitoria** (idempotenza): la fluttuazione è lo scarto dalla *propria* media, quindi la sua media è nulla per costruzione. Vale per qualsiasi media ben definita (la stazionarietà serve solo a garantire che la media temporale *esista*, non a rendere nullo $\overline{u'}$).
-2. **L'annullamento del termine (3)** sfrutta in più la **linearità**: la derivata media filtra fuori e riconduce tutto a $\overline{u_j'}=0$.
-
-### La fluttuazione di pressione $\overline{p'}=0$
-
-Per la **stessa, identica** ragione di $\overline{u'}=0$: è una conseguenza definitoria della decomposizione $p=\bar p+p'$. Infatti
-
-$$\overline{p'} = \overline{p-\bar p} = \bar p - \overline{\bar p} = \bar p - \bar p = 0$$
-
-(usando l'idempotenza $\overline{\bar p}=\bar p$). Non c'è nessuna ragione aggiuntiva o diversa rispetto alla velocità: il fatto che $p$ sia uno scalare e $u$ un vettore è irrilevante. Nell'equazione mediata il termine di pressione resta $-\partial_i\bar p$ perché $\overline{\partial_i p}=\partial_i\bar p$ e $\overline{\partial_i p'}=\partial_i\overline{p'}=0$.
-
-</details>
-
-<details>
-<summary><strong>5. L'ultimo passaggio: l'equazione di continuità per scrivere il termine in forma conservativa</strong></summary>
-
-Dopo gli annullamenti, l'unico termine turbolento sopravvissuto è $\overline{u_j'\,\partial_j u_i'}$ (il termine (4)). L'obiettivo dell'ultimo passaggio è **riscriverlo come la divergenza di un tensore**, cioè nella forma $\partial_j\overline{u_i'u_j'}$, così da poterlo accorpare allo sforzo viscoso.
-
-### Passo 1 — regola del prodotto
-
-$$\frac{\partial(u_i'u_j')}{\partial x_j} = u_j'\frac{\partial u_i'}{\partial x_j} + u_i'\frac{\partial u_j'}{\partial x_j}$$
-
-Il primo addendo a destra è proprio il termine che vogliamo; basta dimostrare che il secondo è nullo.
-
-### Passo 2 — incomprimibilità applicata alla fluttuazione
-
-L'incomprimibilità vale per il **campo completo**: $\dfrac{\partial u_j}{\partial x_j}=0$. Decomponendo $u_j=\bar u_j+u_j'$:
-
-$$\frac{\partial \bar u_j}{\partial x_j} + \frac{\partial u_j'}{\partial x_j} = 0$$
-
-Mediando l'equazione di continuità si ottiene la **continuità del campo medio**, $\dfrac{\partial\bar u_j}{\partial x_j}=0$. Sottraendo, segue che **anche la fluttuazione è a divergenza nulla**:
-
-$$\frac{\partial u_j'}{\partial x_j} = 0 \quad\Longrightarrow\quad u_i'\frac{\partial u_j'}{\partial x_j} = 0$$
-
-### Passo 3 — forma conservativa
-
-Il secondo addendo sparisce, quindi (mediando):
-
-$$\overline{u_j'\frac{\partial u_i'}{\partial x_j}} = \frac{\partial \overline{u_i'u_j'}}{\partial x_j}$$
-
-Sostituendo nell'equazione della quantità di moto mediata:
-
-$$\rho\left(\frac{\partial\bar u_i}{\partial t} + \bar u_j\frac{\partial\bar u_i}{\partial x_j}\right) = -\frac{\partial\bar p}{\partial x_i} + \frac{\partial}{\partial x_j}\Big(\underbrace{\bar\tau_{ij} - \rho\,\overline{u_i'u_j'}}_{\text{sforzo totale}}\Big)$$
-
-### Perché questo passaggio è importante
-
-- **Forma di sforzo:** porta il termine turbolento dentro una divergenza, così $-\rho\overline{u_i'u_j'}$ appare **esattamente come uno sforzo aggiuntivo** (apparente) che si somma a quello viscoso $\bar\tau_{ij}$. Le fluttuazioni si comportano come uno stress sul campo medio — da cui il nome "sforzi di Reynolds".
-- **Forma conservativa:** è la forma richiesta dai metodi a **volumi finiti** (flusso netto attraverso le facce della cella), quindi è la più comoda numericamente.
-- **Validità:** tutto il passaggio si regge sul fatto che $\partial_j u_j'=0$, cioè sull'**incomprimibilità**. Nel caso comprimibile questo step pulito fallisce (le fluttuazioni di densità rompono l'argomento): è proprio questa la ragione per cui si introduce la **media di Favre**.
-
-> 🎯 **In una frase:** tutto questo "giro" con l'equazione di continuità serve a portare le due fluttuazioni **dentro un unico prodotto $\overline{u_i'u_j'}$ sotto la derivata**, così da poterlo identificare con il **tensore di Reynolds** (che compare appunto dentro la divergenza). Senza questo passaggio avremmo un pezzo *dentro* e un pezzo *fuori* dalla derivata, e non potremmo raccoglierli in un unico tensore.
-
-</details>
-
-<details>
-<summary><strong>⭐ Dimostrazione completa delle RANS incompressibili (passo per passo, da esame)</strong></summary>
-
-Dimostrazione completa con la discussione di **ogni** passaggio — in particolare perché il termine "fluttuazione × derivata di un valore medio" si annulla.
-
-### Passo 0 — Equazioni di partenza (Navier-Stokes incompressibili)
-
-$$\underbrace{\frac{\partial u_i}{\partial x_i}=0}_{\text{continuità}}\qquad\qquad \rho\frac{\partial u_i}{\partial t}+\rho\,u_j\frac{\partial u_i}{\partial x_j}=-\frac{\partial p}{\partial x_i}+\frac{\partial \tau_{ij}}{\partial x_j}$$
-
-con $\tau_{ij}=\mu\big(\partial_j u_i+\partial_i u_j\big)$ sforzo viscoso (lineare in $u$). L'unico termine **non lineare** è il convettivo $u_j\,\partial_j u_i$.
-
-### Passo 1 — Decomposizione di Reynolds
-
-Si scrive ogni incognita come media + fluttuazione:
-
-$$u_i=\bar u_i+u_i',\qquad p=\bar p+p',\qquad \overline{u_i'}=0,\ \ \overline{p'}=0$$
-
-### Passo 2 — Continuità mediata
-
-Sostituendo e mediando (la media è lineare e commuta con $\partial/\partial x_i$):
-
-$$\overline{\frac{\partial(\bar u_i+u_i')}{\partial x_i}}=\frac{\partial\bar u_i}{\partial x_i}+\frac{\partial\overline{u_i'}}{\partial x_i}=\frac{\partial\bar u_i}{\partial x_i}=0$$
-
-Quindi $\partial_i\bar u_i=0$ (continuità del campo medio) e, sottraendola dalla continuità totale, anche $\partial_i u_i'=0$ (**la fluttuazione è a divergenza nulla**). Servirà al Passo 6.
-
-### Passo 3 — Sostituzione nel momento ed espansione del termine convettivo
-
-Sostituendo $u_i=\bar u_i+u_i'$ nel termine non lineare e sviluppando il prodotto si ottengono **quattro** contributi:
-
-$$u_j\frac{\partial u_i}{\partial x_j}=(\bar u_j+u_j')\frac{\partial(\bar u_i+u_i')}{\partial x_j}=\underbrace{\bar u_j\frac{\partial\bar u_i}{\partial x_j}}_{(1)}+\underbrace{\bar u_j\frac{\partial u_i'}{\partial x_j}}_{(2)}+\underbrace{u_j'\frac{\partial\bar u_i}{\partial x_j}}_{(3)}+\underbrace{u_j'\frac{\partial u_i'}{\partial x_j}}_{(4)}$$
-
-### Passo 4 — Media termine per termine
-
-Si applica l'operatore di media a tutta l'equazione. I termini **lineari** sono immediati:
-
-- **Derivata temporale:** $\overline{\rho\,\partial_t u_i}=\rho\,\partial_t\bar u_i$ (la media commuta con $\partial/\partial t$, campo stazionario in media).
-- **Pressione:** $\overline{-\partial_i p}=-\partial_i\bar p$ (perché $\overline{p'}=0$).
-- **Viscoso:** $\overline{\partial_j\tau_{ij}}=\partial_j\bar\tau_{ij}$ con $\bar\tau_{ij}=\mu(\partial_j\bar u_i+\partial_i\bar u_j)$ — lineare in $u$, quindi nessuna incognita nuova.
-
-Per i quattro pezzi convettivi:
-
-| Termine | Media | Esito |
-| --- | --- | --- |
-| (1) $\bar u_j\,\partial_j\bar u_i$ | $\bar u_j\,\partial_j\bar u_i$ | resta (tutto medio) |
-| (2) $\bar u_j\,\partial_j u_i'$ | $\bar u_j\,\partial_j\overline{u_i'}=0$ | **si annulla** |
-| (3) $u_j'\,\partial_j\bar u_i$ | $(\partial_j\bar u_i)\,\overline{u_j'}=0$ | **si annulla** |
-| (4) $u_j'\,\partial_j u_i'$ | $\overline{u_j'\,\partial_j u_i'}\neq0$ | **sopravvive** |
-
-### Passo 5 — Perché il termine (3) si annulla (il punto delicato)
-
-Il termine è $\overline{u_j'\,\dfrac{\partial\bar u_i}{\partial x_j}}$, cioè la **media del prodotto di una fluttuazione per la derivata di un valore medio**. La chiave logica è: **$\dfrac{\partial\bar u_i}{\partial x_j}$ è una grandezza già mediata**, quindi **deterministica e costante rispetto all'operatore di media**. Per la regola "media di (costante × fluttuazione) = costante × media della fluttuazione" (linearità + la grandezza media filtra fuori), esso esce dalla media:
-
-$$\overline{u_j'\,\frac{\partial\bar u_i}{\partial x_j}}=\frac{\partial\bar u_i}{\partial x_j}\;\overline{u_j'}=\frac{\partial\bar u_i}{\partial x_j}\cdot 0=0$$
-
-perché $\overline{u_j'}=0$ per costruzione. **A livello logico:** stai mediando il prodotto di qualcosa di *fisso* (il campo medio, e quindi anche la sua derivata) per qualcosa che *oscilla a media nulla* (la fluttuazione); il fattore fisso lo puoi portare fuori dalla media come una costante, e ciò che resta dentro — la media della sola fluttuazione — è zero. (Stessa logica per il termine (2), dove a uscire è $\bar u_j$.)
-
-> ⚠️ **Attenzione a non confonderlo con il termine (4).** Lì il prodotto è tra **due fluttuazioni** ($u_j'$ e $\partial_j u_i'$): nessuna delle due è "fissa", quindi **niente** può uscire dalla media, e $\overline{u_j'\,\partial_j u_i'}\neq0$ in generale. È esattamente la differenza tra "media di costante × fluttuazione" (= 0) e "media di fluttuazione × fluttuazione" ($\neq$ 0).
-
-### Passo 6 — Il termine (4) in forma conservativa (uso della continuità)
-
-Per la regola del prodotto e usando $\partial_j u_j'=0$ (Passo 2):
-
-$$\frac{\partial(u_i'u_j')}{\partial x_j}=u_j'\frac{\partial u_i'}{\partial x_j}+\underbrace{u_i'\frac{\partial u_j'}{\partial x_j}}_{=\,0}\quad\Longrightarrow\quad \overline{u_j'\frac{\partial u_i'}{\partial x_j}}=\frac{\partial\,\overline{u_i'u_j'}}{\partial x_j}$$
-
-Così le due fluttuazioni finiscono **dentro un unico prodotto sotto la derivata**: è il **tensore di Reynolds**.
-
-### Passo 7 — Equazione RANS finale
-
-Mettendo tutto insieme:
-
-$$\boxed{\ \rho\frac{\partial\bar u_i}{\partial t}+\rho\,\bar u_j\frac{\partial\bar u_i}{\partial x_j}=-\frac{\partial\bar p}{\partial x_i}+\frac{\partial}{\partial x_j}\Big(\underbrace{\bar\tau_{ij}-\rho\,\overline{u_i'u_j'}}_{\text{sforzo viscoso + sforzo di Reynolds}}\Big)\ }$$
-
-> ✅ **Riepilogo dei "perché".** Fino a qui **non si è fatta alcuna approssimazione**: solo decomposizione, linearità della media, $\overline{u'}=0$ e incomprimibilità. Il termine $(1)$ ricostruisce la convezione del campo medio; $(2)$ e $(3)$ spariscono perché contengono **una** fluttuazione a media nulla moltiplicata per una grandezza media (che filtra fuori); $(4)$ sopravvive perché è il prodotto di **due** fluttuazioni correlate e genera il tensore di Reynolds, l'unica vera incognita nuova (problema di chiusura).
-
-</details>
-
----
-
-## Domande
-
-<details>
-<summary><strong>Universalità delle piccole scale di turbolenza</strong></summary>
-
-Le piccole scale dipendono *solo* da $\nu$ (viscosità cinematica) e $\varepsilon$ (dissipazione). La geometria e le condizioni al contorno influenzano solo le grandi scale (scala integrale). Attraverso la cascata energetica, le grandi scale impongono il valore di $\varepsilon$ alle piccole scale, le quali si "auto-organizzano" in modo universale. Le scale di Kolmogorov $\eta = (\nu^3/\varepsilon)^{1/4}$ dipendono quindi solo da proprietà fluide e dalla potenza dissipata — non dalla forma del corpo.
-
-</details>
-
-<details>
-<summary><strong>Costo computazionale DNS ∝ Re³</strong></summary>
-
-Il rapporto tra scala integrale e scala di Kolmogorov è $L/\eta \propto Re^{3/4}$. In 3D, il numero di celle scala come $Re^{9/4}$ e il numero di passi temporali come $Re^{3/4}$. Il costo totale è quindi $\propto Re^3$.
-
-</details>
-
-<details>
-<summary><strong>Media delle fluttuazioni: vale solo per flussi stazionari?</strong></summary>
-
-No. $\overline{u'} = 0$ vale per *costruzione* della decomposizione. La stazionarietà statistica garantisce che la media temporale sia ben definita e coincida con la media d'insieme (ergodicità), ma la proprietà $\overline{u'} = 0$ è intrinseca alla definizione di fluttuazione rispetto alla propria media.
-
-</details>
-
-<details>
-<summary><strong>RANS vs URANS — le due definizioni</strong></summary>
-
-- **RANS:** media temporale con $T\to\infty$; tutta l'informazione temporale è persa; adatta a flussi stazionari in media.
-- **URANS:** media su un intervallo $T_{avg}$ tale che $\tau_{turb} \ll T_{avg} \ll \tau_{slow}$. Si filtrano le fluttuazioni turbolente rapide ma si mantiene l'evoluzione temporale lenta (es. vortex shedding, cicli di separazione/riattacco). È un ottimo compromesso.
-
-</details>
-
-<details>
-<summary><strong>Commutazione media–derivate: quando è valida?</strong></summary>
-
-La commutazione $\overline{\partial u/\partial x_i} = \partial\bar{u}/\partial x_i$ è valida quando i limiti dell'integrale di media non dipendono dalla variabile di derivazione. Per la media temporale commuta con le derivate spaziali (limiti di integrazione $[t,t+T]$ non dipendono da $\mathbf{x}$). Per la media spaziale su dominio fisso commuta con $\partial/\partial t$. Fisicamente: è valida quando c'è una netta separazione di scale e la media "non vede" le variazioni nella direzione di derivazione.
-
-</details>
-
-<details>
-<summary><strong>Perché la pressione non è mediata con Favre?</strong></summary>
-
-La media di Favre $\tilde{q} = \overline{\rho q}/\bar{\rho}$ viene applicata alle variabili cinematiche ($u_i, h, T$) per eliminare le correlazioni $\overline{\rho u_i'}$ dall'equazione di continuità compressibile. La pressione appare linearmente nelle equazioni di moto e il suo trattamento con Favre non semplifica le equazioni — al contrario, introdurrebbe correlazioni aggiuntive $\overline{\rho' p'}$ difficili da modellare. Si usa quindi la media di Reynolds ordinaria per $p$.
-
-</details>
-
-<details>
-<summary><strong>La long bubble è per flusso laminare o turbolento?</strong></summary>
-
-La long bubble è laminare. Nelle slide e negli appunti è scritto esplicitamente — short bubble (turbolento), long bubble (laminare). La distinzione fisica è questa: il flusso laminare separa sulla superficie del profilo; se riesce a riattaccarsi rapidamente dopo la transizione il bubble rimane corto (turbolento post-riattacco); se la transizione avviene lontana o non avviene affatto il bubble si allunga e rimane in regime prevalentemente laminare. È il caso rilevante per droni e turbine LP a basso Reynolds.
-
-</details>
-
-<details>
-<summary><strong>Come distinguo le parti isotrope e anisotrope del tensore di griglia</strong></summary>
-
-$$\tau_{ij}^{s} = \frac{1}{3}\,\delta_{ij}\,\tau_{kk}^{s} - 2\,\nu_T\,\bar{S}_{ij}$$
-
-- **Parte isotropa** ($\tfrac{1}{3}\,\delta_{ij}\,\tau_{kk}^{s}$): è proporzionale al delta di Kronecker, agisce ugualmente in tutte le direzioni. Viene assorbita nel termine di pressione modificata e quindi non compare esplicitamente nelle equazioni del momento.
-- **Parte anisotropa (deviatorica)** ($-2\,\nu_T\,\bar{S}_{ij}$): dipende dal tensore del tasso di deformazione filtrato $\bar{S}_{ij}$, che non è isotropo perché dipende dal flusso locale. È questa la parte che devi modellare.
-
-Regola pratica: se un tensore ha la forma $c\,\delta_{ij}$ è isotropo; tutto il resto è anisotropo.
-
-</details>
-
-<details>
-<summary><strong>La versione dinamica dell'eddy viscosity si può fare per ogni metodo LES?</strong></summary>
-
-In linea di principio sì: l'identità di Germano è un meccanismo generale. Si applica a qualsiasi modello di eddy viscosity della forma $\nu_{sgs} = (C\,\Delta)^2|\bar S|$. Si eseguono due filtrature — con $\Delta$ (griglia) e con $\widehat{\Delta}$ (test) — e si ricava $C$ variabile nello spazio e nel tempo invece di usare una costante globale.
-
-In pratica la procedura dinamica è usata principalmente con Smagorinsky, ma esiste anche per il modello WALE, il modello $\sigma$ e altri. Il vantaggio è che $C \to 0$ automaticamente in regioni laminari e vicino alla parete, cosa che il Smagorinsky statico non fa.
-
-</details>
-
-<details>
-<summary><strong>Perché abbiamo considerato le turbine di bassa pressione?</strong></summary>
-
-Le turbine LP operano a Reynolds più bassi rispetto alle HP. A questi regimi il numero di Reynolds è abbastanza basso da rendere lo strato limite laminare per gran parte della pala — il flusso esterno è turbolento ma non abbastanza da forzare subito la transizione (come evidenziato nelle slide sulla turbina LS89: "uno strato limite può essere laminare anche se il flusso esterno è turbolento").
-
-Le conseguenze pratiche sono:
-
-- la separation-induced transition (bolla di separazione laminare) governa le perdite;
-- i modelli RANS a turbolenza piena sbagliano di molto, perché assumono lo strato limite già turbolento;
-- i modelli di transizione ($\gamma$-$Re_\theta$) migliorano, ma faticano nella predizione della posizione di riattacco e nelle perdite post-bolla.
-
-Le turbine LP sono quindi un banco di prova critico per capire quando RANS non basta e LES/DNS è necessario.
-
-</details>
-
-<details>
-<summary><strong>Come si definisce Δ se il filtro non è on-off?</strong></summary>
-
-Il filtro LES in spazio fisico non è mai veramente sharp — anche il filtro "a gradino" (top-hat) ha un'ampiezza finita. La convenzione standard è di legare $\Delta$ alla dimensione della cella della mesh:
-
-$$\Delta = \max(\Delta x,\,\Delta y,\,\Delta z) \qquad \text{oppure} \qquad \Delta = (\Delta x\cdot\Delta y\cdot\Delta z)^{1/3}$$
-
-Il significato fisico è: tutto ciò che ha scale spaziali $< \Delta$ non è risolto dalla mesh e viene modellato. Non c'è una soglia di intensità convenzionale come per i filtri elettronici — la mesh stessa è il filtro. In spettrale, $\Delta$ corrisponde a un numero d'onda di cutoff $k_c \approx \pi/\Delta$: le scale con $k > k_c$ vengono modellate.
-
-</details>
-
-<details>
-<summary><strong>Altri modelli di eddy viscosity per LES — differenze con RANS</strong></summary>
-
-Modelli alternativi a Smagorinsky:
-
-- **WALE** (Wall-Adapting Local Eddy-viscosity) — si annulla naturalmente in regioni di puro taglio e a parete;
-- **Modello $\sigma$** — basato sui valori singolari del gradiente di velocità filtrato, proprietà di annullamento migliori;
-- **Modello dinamico di Germano** — applicabile a qualsiasi base;
-- **Vreman** — efficiente computazionalmente, buone proprietà a parete.
-
-**Perché non usare direttamente i modelli RANS?** La differenza non è solo formale ma concettuale:
-
-| Aspetto | RANS | LES SGS |
-| --- | --- | --- |
-| **Cosa modella** | **Tutto** lo stress di Reynolds | Solo le scale **sotto** il filtro |
-| **Dipendenza da $\Delta$** | Nessuna | Esplicita — via $\Delta$ |
-| **Comportamento al raffinamento** | $\to$ costante finita | $\nu_{sgs}\to 0$, LES $\to$ DNS |
-| **Backscatter** | Non previsto | Possibile (con modelli dinamici) |
-
-Anche usando un'espressione identica (es. Smagorinsky $\equiv$ mixing length), il significato è diverso: in RANS si modella tutto il trasporto turbolento; in LES si modella solo l'effetto delle scale non risolte. Concettualmente le due famiglie rimangono distinte anche a parità di forma matematica.
-
-</details>
-
-<details>
-<summary><strong>Cos'è la shielding function?</strong></summary>
-
-La shielding function è introdotta nel DDES per proteggere il boundary layer dall'essere erroneamente trattato in modalità LES. Nel DES originale la lunghezza di scala modificata è:
-
-$$\tilde{d} = \min(d,\; C_{DES}\,\Delta)$$
-
-dove $d$ è la distanza dalla parete. Il problema è che se la mesh è raffinata parallelamente alla parete ($\Delta$ piccolo), $C_{DES}\Delta < d$ anche dentro il boundary layer, e il modello passa a LES — ma **non c'è contenuto turbolento risolto** per sostenere quella modalità. Il **DDES** introduce allora la *shielding function* $f_d$:
-
-$$\tilde{d} = d - f_d\,\max(0,\; d - C_{DES}\,\Delta), \qquad
-f_d = 1 - \tanh\!\big([8\,r_d]^3\big), \qquad
-r_d = \frac{\nu + \nu_t}{\kappa^2 d^2 \sqrt{U_{i,j}U_{i,j}}}$$
-
-Come funziona:
-
-- dentro il BL, $r_d$ è grande: $f_d \to 0$, quindi $\tilde d \to d$ → rimane in RANS;
-- nella regione separata lontana dalla parete, $r_d$ è piccolo: $f_d \to 1$ → $\tilde d$ ridotto → si attiva LES.
-
-La shielding function è quindi un sensore di boundary layer: riconosce automaticamente se ci si trova dentro il BL (alto $r_d$, flusso fortemente shear-driven) e blocca l'attivazione prematura del ramo LES.
-
-</details>
-
-<details>
-<summary><strong>Perché il DES originale ha problemi nei BL spessi — collegamento con DDES</strong></summary>
-
-**Il problema:** nel DES originale lo switch RANS→LES avviene quando $C_{DES}\Delta < d$. Se raffini la mesh parallelamente alla parete (riduci $\Delta$ mantenendo $d$ piccolo), $C_{DES}\Delta$ si riduce e il criterio si attiva dentro il boundary layer, dove però non esiste contenuto turbolento risolto.
-
-Il risultato è il **Modelled Stress Depletion (MSD):**
-
-1. il modello passa a LES → $\nu_t$ cala bruscamente;
-2. gli sforzi di Reynolds modellati calano;
-3. ma le strutture turbolente risolte non si sono ancora sviluppate (il campo iniziale era RANS, liscio);
-4. il momentum nel BL non è sostenuto → separazione artificiale e precoce.
-
-Nelle slide si vede chiaramente: con mesh più fini (33k, 45k, 56k celle) il vortice intrappolato cambia topologia — non è convergenza fisica, è MSD.
-
-**Come lo risolve il DDES:** la shielding function $f_d$, basata su $r_d$ (che è alto dentro il BL per via di $\nu_t$ elevato), forza la RANS in tutto il BL indipendentemente dalla finezza della mesh parallela. Solo nella regione separata, dove $r_d$ è basso e il flusso è governato da strutture coerenti, $f_d \to 1$ e si attiva correttamente la modalità LES.
-
-</details>
-
-<details>
-<summary><strong>L'ampiezza del filtro (Δ) è scelta dall'ingegnere? E in base a cosa?</strong></summary>
-
-Sì e no, dipende dall'approccio, ma **nella quasi totalità delle applicazioni ingegneristiche (es. su software commerciali come Ansys Fluent) la scelta è implicita e dettata dalla mesh**.
-
-- **Approccio esplicito (raro nell'industria):** l'ingegnere applica matematicamente un filtro alle equazioni di ampiezza $\Delta$ definita a priori, indipendente dalla griglia, a patto che $\Delta > \Delta x_{mesh}$.
-- **Approccio implicito (Implicit LES / ILES — lo standard):** il filtro spaziale non è un'equazione separata, ma è **la dimensione della cella della mesh stessa** a fungere da filtro passa-basso. La formula standard è $\Delta = (\Delta x\, \Delta y\, \Delta z)^{1/3}$ (il volume della cella).
-
-**In base a cosa la sceglie l'ingegnere?** L'ingegnere sceglie $\Delta$ costruendo la mesh. Per essere una "vera" LES, la mesh (e quindi $\Delta$) deve essere sufficientemente fine da catturare almeno l'**80% dell'energia cinetica turbolenta** (criterio di Pope). Se la cella è troppo grande, la maggior parte dell'energia cade nella zona di sottogriglia, il modello SGS fa tutto il lavoro e la simulazione degrada a una pessima RANS.
-
-</details>
-
-<details>
-<summary><strong>Parte isotropa e anisotropa del tensore di griglia (approfondimento)</strong></summary>
-
-**Parte isotropa:** $\delta_{ij}$ è la delta di Kronecker (vale 1 se $i=j$, vale 0 se $i \neq j$). Il termine $\tau_{kk}^s$ è la **traccia** del tensore (la somma dei tre elementi sulla diagonale principale: $\tau_{11}^s + \tau_{22}^s + \tau_{33}^s$). Moltiplicare la traccia per $\delta_{ij}$ significa creare un tensore che ha valori identici sulla diagonale e zero ovunque altrove.
-
-**Parte anisotropa:** se prendi il tensore di partenza e gli sottrai questa parte isotropa, ottieni un nuovo tensore (il deviatorico, che nel modello equivale a $-2\,\nu_T\,\bar{S}_{ij}$) la cui traccia è rigorosamente **nulla** (assumendo fluido incomprimibile, dove $\bar{S}_{ii} = 0$). Contiene solo gli sforzi di taglio tangenziali e gli squilibri netti di quelli normali.
-
-**A livello concettuale.** *Isotropo* significa "uguale in tutte le direzioni": questa componente rappresenta una pressione uniforme esercitata dai piccoli vortici non risolti. Comprime o dilata il cubetto di fluido nello stesso modo lungo $x$, $y$ e $z$. *Anisotropo* significa "che cambia a seconda della direzione": questa componente descrive la vera natura distorsiva della turbolenza. Rappresenta come i piccoli vortici stirano, strappano e creano scorrimento asimmetrico tra i filetti fluidi.
-
-**A livello intuitivo (perché lo facciamo nel CFD?).** Immagina un cubetto di fluido immerso nella turbolenza di sottogriglia. I piccoli vortici generano due tipi di azioni su di esso:
-
-1. lo **schiacciano** da tutti i lati con la stessa intensità (effetto analogo alla pressione idrostatica). Questa è la **parte isotropa**. Poiché agisce esattamente come una pressione, dal punto di vista del moto non genera deformazioni angolari o scorrimenti. Nei codici CFD non si perde tempo a modellarla con la viscosità; semplicemente la si "prende" e la si scarica all'interno del termine di pressione delle equazioni di Navier-Stokes, definendo una pressione modificata $\bar{p}_{mod} = \bar{p} + \frac{1}{3}\rho\tau_{kk}^s$;
-2. lo **distorcono**, facendolo scivolare e rompendone la simmetria. Questa è la **parte anisotropa**. Questa componente è l'unica responsabile del trasporto netto di quantità di moto e della dissipazione della turbolenza. È questa la componente "cattiva" che l'ipotesi di Boussinesq deve modellare forzatamente, legandola ai gradienti di deformazione macroscopici $\bar{S}_{ij}$ attraverso la viscosità turbolenta $\nu_T$.
-
-</details>
-
----
-
-## Quiz
-
-<details>
-<summary><strong>Vero / Falso</strong></summary>
-
-**V/F** — Le piccole scale di turbolenza dipendono dalla geometria del corpo attorno al quale scorre il fluido. → **Falso.** Le piccole scale di Kolmogorov dipendono solo da $\nu$ e $\varepsilon$ — sono universali indipendentemente dalla geometria.
-
-**V/F** — Il costo computazionale della DNS scala come $Re^2$. → **Falso.** Il costo scala come $Re^3$: $Re^{9/4}$ per le celle in 3D $\times\ Re^{3/4}$ per i passi temporali.
-
-**V/F** — Nella decomposizione di Reynolds si ha sempre $\overline{u'} = 0$, anche per flussi non stazionari in media. → **Vero.** $\overline{u'} = 0$ è vero per costruzione: la fluttuazione è definita come la differenza tra il segnale e la sua media, quindi la media della fluttuazione è zero per definizione.
-
-**V/F** — Il tensore di Reynolds ha 9 componenti indipendenti. → **Falso.** Il tensore di Reynolds è simmetrico ($\overline{u_i'u_j'} = \overline{u_j'u_i'}$), quindi ha solo 6 componenti indipendenti.
-
-**V/F** — La LES risolve solo le scale piccole e modella le scale grandi. → **Falso.** È il contrario: la LES risolve *direttamente* le scale grandi (quelle sopra il filtro) e usa modelli SGS (Sub-Grid Scale) per le scale piccole.
-
-</details>
-
-<details>
-<summary><strong>Scelta multipla</strong></summary>
-
-**MC** — In un flusso turbolento incompressibile, il termine aggiuntivo che compare nelle equazioni RANS rispetto alle NS ordinarie è:
-
-- La viscosità dinamica aumentata
-- ✅ Il divergente del tensore di Reynolds $\partial_j(-\rho\overline{u_i'u_j'})$
-- Un termine sorgente proporzionale al gradiente di temperatura
-- Il gradiente della pressione fluttuante $\nabla p'$
-
-> Le RANS aggiungono il termine $\partial/\partial x_j(-\rho\overline{u_i'u_j'})$ = divergente del tensore di Reynolds, che quantifica il trasporto di quantità di moto dovuto alle fluttuazioni turbolente.
-
-**MC** — L'energia cinetica turbolenta $k$ è legata al tensore di Reynolds come:
-
-- $k = \overline{u_1'u_2'}$
-- ✅ $k = \tfrac{1}{2}\,\overline{u_i'u_i'}$ (metà traccia del tensore)
-- $k = \overline{u'^2}$ (solo componente assiale)
-- $k = \overline{p'u_i'}/\rho$
-
-> $k = \tfrac{1}{2}(\overline{u'^2}+\overline{v'^2}+\overline{w'^2}) = \tfrac{1}{2}\overline{u_i'u_i'}$. È metà della traccia del tensore di Reynolds diviso $\rho$.
-
-**MC** — Il modello $k$-$\omega$ SST (Menter) è particolarmente vantaggioso perché:
-
-- Risolve tutte le scale di turbolenza senza modellazione
-- Richiede una sola equazione di trasporto aggiuntiva
-- ✅ Combina i vantaggi di $k$-$\varepsilon$ (free-stream) e $k$-$\omega$ (regione di parete)
-- Non fa uso dell'ipotesi di Boussinesq
-
-> SST usa una funzione di blending per passare dal $k$-$\omega$ vicino a parete (dove è preciso) al $k$-$\varepsilon$ nel free-stream (dove $k$-$\omega$ è sensibile alle condizioni esterne).
-
-**MC** — Nelle URANS, l'intervallo di media $T_{avg}$ deve essere scelto tale che:
-
-- $T_{avg} \gg \tau_{slow}$
-- ✅ $\tau_{turb} \ll T_{avg} \ll \tau_{slow}$
-- $T_{avg} = \tau_{turb}$
-- $T_{avg}$ uguale al periodo di vortex shedding
-
-> L'intervallo $T_{avg}$ deve essere abbastanza grande da mediare le fluttuazioni turbolente rapide ma abbastanza piccolo da non cancellare le variazioni lente del campo medio (es. oscillazioni coerenti).
-
-**MC** — La media di Favre $\tilde{u} = \overline{\rho u}/\bar{\rho}$ viene usata nei flussi compressibili principalmente per:
-
-- Aumentare la precisione del calcolo di $\bar{p}$
-- ✅ Eliminare le correlazioni densità-velocità dall'equazione di continuità mediata
-- Ridurre il costo computazionale delle equazioni RANS
-- Mediare anche la pressione in modo coerente
-
-> La media di Favre elimina i termini $\overline{\rho' u_i'}$ dall'equazione di continuità compressibile, semplificando notevolmente la forma delle equazioni RANS compressibili.
-
-</details>
-
----
-
-## Domande aperte
-
-<details>
-<summary><strong>Spiega intuitivamente perché il prodotto $\overline{u'v'}$ non è in generale nullo, anche se $\overline{u'} = 0$ e $\overline{v'} = 0$.</strong></summary>
-
-Le fluttuazioni $u'$ e $v'$ possono essere *correlate statisticamente*: i vortici turbolenti trasportano contemporaneamente fluido veloce (alto $u'$) verso zone a bassa velocità (alto $v'$ verso il basso). Anche se ciascuna fluttuazione ha media nulla, la loro covarianza $\overline{u'v'}$ è non nulla e misura l'intensità del trasporto di quantità di moto turbolento. È come dire che due variabili casuali possono essere correlate pur avendo entrambe media zero.
-
-</details>
-
-<details>
-<summary><strong>Descrivi la cascata energetica di Kolmogorov e spiega perché le scale inerziali mostrano una legge di potenza $E(k) \propto k^{-5/3}$.</strong></summary>
-
-Energia viene iniettata alle grandi scale (produzione), trasferita attraverso la cascata inerziale verso scale sempre più piccole, e infine dissipata a scala di Kolmogorov. Nella regione inerziale non c'è né produzione né dissipazione: l'energia transita a tasso costante $\varepsilon$. Per argomenti dimensionali (Kolmogorov 1941): $E(k) \propto \varepsilon^{2/3} k^{-5/3}$. La pendenza $-5/3$ in scala log-log è la firma universale della cascata inerziale.
-
-</details>
-
-<details>
-<summary><strong>Qual è il problema di chiusura delle RANS e quali strategie esistono per risolverlo?</strong></summary>
-
-Mediando le equazioni di Navier-Stokes compare il tensore di Reynolds $-\rho\overline{u_i'u_j'}$ (6 incognite indipendenti) che non è esprimibile in funzione delle sole grandezze medie: il sistema ha più incognite che equazioni ed è quindi **aperto**. Serve un modello di chiusura.
-
-Le strategie principali:
-
-- **Modelli a viscosità turbolenta (ipotesi di Boussinesq):** legano il tensore di Reynolds al tensore di deformazione medio tramite $\mu_T$. Comprendono modelli algebrici (mixing length), a 1 equazione (Spalart-Allmaras) e a 2 equazioni ($k$-$\varepsilon$, $k$-$\omega$, SST).
-- **Reynolds Stress Models (RSM):** abbandonano Boussinesq e risolvono un'equazione di trasporto per ciascuna delle 6 componenti del tensore, catturando l'anisotropia ma a costo elevato e con convergenza difficile.
+| $u_i=\bar u_i+u_i'$, $\overline{u_i'}=0$ | decomposizione di Reynolds: "segnale = media + rumore a media nulla". |
+| $\bar u_i(\mathbf x)=\lim_{T\to\infty}\tfrac1T\int_t^{t+T}u_i\,dt'$ | media temporale: integrale lungo, normalizzato. |
+| $\tilde u_i=\overline{\rho u_i}/\bar\rho$ | media di **Favre** = media pesata sulla densità (compressibile). |
+| $\overline{uv}=\bar u\bar v+\overline{u'v'}$ | **regola d'oro**: media del prodotto ≠ prodotto delle medie; l'extra $\overline{u'v'}$ è la covarianza che genera il tensore di Reynolds. |
+
+### RANS e tensore di Reynolds
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\rho\big(\partial_t\bar u_i+\bar u_j\partial_j\bar u_i\big)=-\partial_i\bar p+\partial_j(\bar\tau_{ij}-\rho\overline{u_i'u_j'})$ | RANS = NS mediata + un solo termine nuovo, il tensore di Reynolds, **dentro la divergenza** (come uno sforzo). |
+| $\tau^R_{ij}=-\rho\overline{u_i'u_j'}$ | simmetrico → **6** incognite indipendenti. |
+| $k=\tfrac12\overline{u_i'u_i'}=-\tfrac1{2\rho}\mathrm{tr}(\mathbf R)$ | $k$ = metà della **traccia** (somma diagonale) del tensore di Reynolds. |
+
+### Chiusura: Boussinesq e scale
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\tau^R_{ij}=2\mu_T S_{ij}-\tfrac23\rho k\,\delta_{ij}$ | **ipotesi** (da ricordare): analogia col viscoso newtoniano $\tau=2\mu S$ + termine isotropo $\to$ pressione. $S_{ij}=\tfrac12(\partial_j\bar u_i+\partial_i\bar u_j)$. |
+| $\mu_T=C_\mu\rho\dfrac{k^2}{\varepsilon}$ (k-ε) | dimensionale: $[k^2/\varepsilon]=$ viscosità cinematica. $C_\mu\approx0.09$. |
+| $\mu_T=\rho\dfrac{k}{\omega}$ (k-ω) | usa $\omega=\varepsilon/k$ → stessa cosa di k-ε. |
+| $\mu_T=\bar\rho\,\tilde\nu\,f_{v1}$ (Spalart-Allmaras) | $\tilde\nu\neq\nu_t$: $f_{v1}$ smorza a parete. |
+
+### Scale di Kolmogorov e costi
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\eta=(\nu^3/\varepsilon)^{1/4}$, $\tau_\eta=(\nu/\varepsilon)^{1/2}$, $u_\eta=(\nu\varepsilon)^{1/4}$ | piccole scale **universali**: solo $\nu$ e $\varepsilon$. Memo: esponenti $3,1,1$ su $\nu$ con $\varepsilon$ a denominatore (tranne $u_\eta$). |
+| $L/\eta\propto Re^{3/4}$ → $N_{celle}\propto Re^{9/4}$, costo DNS $\propto Re^3$ | cubo in 3D ($9/4$) × passi temporali ($3/4$) = $Re^3$. |
+| $E(k)\propto\varepsilon^{2/3}k^{-5/3}$ | spettro inerziale: pendenza **−5/3** in log-log. |
+
+### LES (filtri e SGS)
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $\bar u(\mathbf x)=\int_\Omega u\,G(\mathbf x,r,\Delta)\,dr$ | filtraggio = convoluzione col filtro $G$; $\Delta=(\Delta x\Delta y\Delta z)^{1/3}$. |
+| $\tau_{ij}^{sgs}=\rho(\overline{u_iu_j}-\bar u_i\bar u_j)$ | stessa struttura del tensore di Reynolds, ma **dipende dalla griglia**. |
+| $\nu_{sgs}=(C_s\Delta)^2\,|\bar S|$, $|\bar S|=\sqrt{2\bar S_{ij}\bar S_{ij}}$ | **Smagorinsky** (modello, da ricordare). $C_s\approx0.1$–$0.2$. Dinamico: $C_s$ da identità di Germano $L_{ij}=T_{ij}-\widehat\tau_{ij}$. |
+
+### Parete
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $u^+=u/u_\tau$, $y^+=y/\ell_\tau$, $u_\tau=\sqrt{\tau_w/\rho}$, $\ell_\tau=\nu/u_\tau$ | scale viscose di parete. |
+| $u^+=y^+$ (sottostrato $y^+\lesssim5$); $u^+=\tfrac1\kappa\ln y^+ +B$ (log, $y^+\gtrsim30$) | $\kappa\approx0.41$, $B\approx5.2$. Memo: **lineare** vicino, **log** lontano. |
 
 </details>
