@@ -1134,12 +1134,20 @@ con $u^+_{\text{lam}}=y^+$ (legge lineare), $u^+_{\text{turb}}=\tfrac1\kappa\ln 
 
 > Parlare di piccolo e grande è una descrizione qualitativa; con le definizioni successive introdurremo la parte quantitativa.
 
+> ✅ **Conferma sulle "diverse scale" (con precisazione).** L'affermazione è corretta e va letta su **due piani**: (1) *spaziale/istantaneo* — in un dato istante il campo contiene **contemporaneamente** vortici grandi e piccoli (uno spettro di dimensioni, per come è costruito il moto); (2) *temporale/dinamico* — nel tempo i vortici grandi si **frammentano** progressivamente in vortici via via più piccoli, fino a essere **dissipati in calore** alla scala di Kolmogorov. Questo secondo processo è proprio la **cascata di energia** di Kolmogorov. I due piani coesistono: lo spettro istantaneo è la "fotografia", la cascata è il "film".
+
+> ✅ **Perché definire una scala sotto cui modellare (due ragioni, corrette).** (1) **Energetica:** la **maggior parte dell'energia** sta nei vortici **grandi** (l'ordine ~80% è indicativo, non un numero da memorizzare), che quindi dominano la soluzione → modellando le piccole scale si perde poco a livello fenomenologico (assumendo che energia ≈ rappresentatività, con le dovute cautele). (2) **Universalità:** scendendo di scala i vortici diventano sempre **meno legati alla casistica/geometria** e più **universali** — corpo tozzo e lastra piana hanno *grandi* vortici diversissimi ma *piccoli* vortici molto simili, fino alla scala di Kolmogorov, sotto la quale c'è solo **dissipazione termica** e l'origine dell'informazione è di fatto **indistinguibile** (una fluttuazione "termica" generica). Modellare ciò che è universale è molto più facile e robusto che modellare ciò che dipende dal caso specifico — e un ragionamento analogo, in forma più debole, vale anche a scale un po' più grandi.
+
 ### 2. Filtraggio spaziale vs. media temporale (RANS)
 
 - **RANS:** applica un operatore di media temporale (o di ensemble), eliminando tutte le fluttuazioni transitorie.
 - **LES:** applica un filtro spaziale (passa-basso). Le scale più grandi della dimensione del filtro vengono risolte nello spazio e nel tempo, mentre quelle inferiori (sottogriglia) vengono modellate.
 
 > ❓ **Perché nella LES il campo filtrato $\bar u(\mathbf x,t)$ dipende ancora dal tempo, mentre nella media di Reynolds $\bar u(\mathbf x)$ no?** Perché i due operatori sono **diversi**. La media di Reynolds **integra nel tempo** ($\frac1T\int_t^{t+T}\!\dots\,dt'$): "consuma" la variabile $t$ e per flusso stazionario restituisce un campo che dipende **solo da $\mathbf x$**. Il filtro LES è invece **puramente spaziale**: a **ogni istante** liscia il campo *nello spazio* (convoluzione in $r$), senza toccare il tempo. Quindi $\bar u(\mathbf x,t)$ resta un campo **istantaneo** (semplicemente "sfocato" sulle piccole scale) e **conserva la dipendenza temporale** → la LES risolve l'evoluzione nel tempo dei grandi vortici, la RANS no. È esattamente la stessa differenza tra RANS e URANS, ma portata all'estremo opposto: la LES è intrinsecamente **instazionaria**.
+
+> ❓ **E perché dipende ancora dallo *spazio* (correzione)?** La tua intuizione sul tempo è giusta; sullo spazio, però, la ragione **non** è che "ci sono regioni dove il filtro non è applicato" — il filtro si applica **ovunque**. La dipendenza spaziale resta perché il filtro è un'operazione **locale**: liscia il campo su un **piccolo intorno** di raggio $\Delta$ attorno a ciascun punto, **senza** integrare su tutto il dominio. Quindi punti $\mathbf x$ diversi ricevono valori filtrati diversi (media *locale*, non *globale*). È il contrario della **media spaziale d'insieme**, che integra su **tutto** $\Omega$ e per questo **perde** la dipendenza da $\mathbf x$. In sintesi: media temporale → perde $t$; media spaziale globale → perde $\mathbf x$; **filtro LES** (locale in spazio, a ogni istante) → **conserva sia $\mathbf x$ che $t$**.
+
+> ❓ **Cos'è fisicamente la "velocità filtrata"?** È la velocità **istantanea** del fluido a cui sono state **lisciate via** le piccole scale sotto $\Delta$: è ciò che "vedresti" osservando il flusso con risoluzione spaziale limitata a $\Delta$ — i grandi vortici ci sono tutti e si muovono nel tempo, i piccoli sono sfumati. Mentre la velocità **mediata** (RANS) è un campo *medio* nel tempo, la velocità **filtrata** (LES) è ancora *viva e instazionaria*, solo a risoluzione ridotta. Per questo, nel **bilancio di massa**, in RANS si può dire "$\bar u$ non dipende da $t$", in LES **no**: $\bar u_i(\mathbf x,t)$ dipende dal tempo eccome. L'equazione $\partial_i\bar u_i=0$ resta valida **a ogni istante** (il filtro commuta con la divergenza), ma su un campo **istantaneo**, non medio.
 
 ### 3. Operatore filtro $G(x, r, \Delta)$ — ampiezza e forma
 
@@ -1150,6 +1158,18 @@ $$\bar u (x,t) = \int_{\Omega} u (x,t) \ G(x,r,\Delta)\,dr$$
 > $x$ è il punto dove si vuole la soluzione filtrata — è la variabile di output, il punto del dominio dove stai calcolando. $r$ è la variabile di integrazione — scorre su tutto il dominio e raccoglie il contributo di tutti i punti vicini. $\Delta$ è l'ampiezza del filtro — determina quanto grande è il "vicinato" che influenza il punto. In pratica: il filtro dice "la velocità filtrata nel punto $x$ è una media pesata dei valori di $u$ in un intorno di $x$ di raggio $\Delta$". $x$ non è un parametro del filtro, è semplicemente la coordinata spaziale della variabile filtrata. Nelle simulazioni reali spesso $\Delta$ coincide con la dimensione della cella della mesh: $\Delta = (\Delta x\, \Delta y\, \Delta z)^{1/3}$.
 
 > 💡 Se il filtro $G$ è un Box Filter (una finestra quadrata di altezza $1/\Delta$ e larghezza $\Delta$), la convoluzione non fa altro che calcolare la media aritmetica dei valori di $\phi$ all'interno di quella finestra. L'effetto finale della convoluzione è quello di un **filtro passa-basso**: elimina (smussa) le variazioni repentine e le fluttuazioni ad alta frequenza spaziale (i piccoli vortici), lasciando intatta solo la macro-struttura del segnale (i grandi vortici risolti).
+
+> ❓ **Perché qui non c'è il denominatore (misura dell'insieme) come nella media temporale ($1/T$) o spaziale ($1/\Omega$)?** Perché la **normalizzazione è già dentro il nucleo $G$**: il filtro è costruito in modo che $\int_\Omega G\,dr=1$ (i pesi sommano a 1). La media temporale $\frac1T\int\!dt'$ ha il peso uniforme $1/T$ **esplicito**; nel filtro quel peso (uniforme per il top-hat di altezza $1/\Delta$, a campana per il gaussiano) è **incorporato in $G$**. Quindi non serve dividere per $\Delta$ o per il volume: ci pensa $G$.
+
+> 📋 **I tre "argomenti" di $G(x,r,\Delta)$ — tabella riassuntiva.**
+>
+> | Argomento | Cos'è | Ruolo |
+> | --- | --- | --- |
+> | $x$ | **coordinata di output**: il punto in cui voglio la grandezza filtrata | non è un vero "parametro" del filtro, è *dove* calcolo $\bar u(x)$; in punti diversi il valore filtrato è diverso |
+> | $r$ | **variabile di integrazione** (punto sorgente che scorre il dominio) | $G$ pesa il contributo del punto $r$; nei filtri **omogenei** $G$ dipende solo dalla **separazione** $x-r$ |
+> | $\Delta$ | **ampiezza del filtro** | dimensione del "vicinato" che influenza $x$; separa scale risolte ($>\Delta$) da modellate ($<\Delta$); in pratica $\Delta=(\Delta x\,\Delta y\,\Delta z)^{1/3}$ |
+>
+> Quindi $r$ è "la distanza tra cosa e cosa"? È la **posizione sorgente**; ciò che conta è la **separazione $x-r$** tra il punto dove calcoli ($x$) e il punto che contribuisce ($r$). $G$ dà peso **massimo** a $r\approx x$ e decrescente man mano che $r$ si allontana (entro $\sim\Delta$): l'integrale $\int u(r)\,G(x-r,\Delta)\,dr$ è una **media pesata** dei valori vicini.
 
 ### 4. Forme tipiche
 
@@ -1178,6 +1198,14 @@ $$\frac{\partial \bar{u}_i}{\partial t} + \frac{\partial (\bar{u}_i \bar{u}_j)}{
 $$\tau_{ij}^{sgs} = \rho(\overline{u_i u_j} - \bar{u}_i \bar{u}_j)= \underbrace{\frac{1}{3} \delta_{ij} \tau_{kk}^s}_{\text{Parte isotropa}} + \underbrace{\left( \tau_{ij}^s - \frac{1}{3} \delta_{ij} \tau_{kk}^s \right)}_{\text{Parte anisotropa}}$$
 
 > Questo termine rappresenta l'effetto delle scale non risolte su quelle risolte e deve essere modellato. Viene definito tensore di sottogriglia ma di fatto è un tensore degli sforzi che dipende dalla scelta della griglia.
+
+> ❓ **Perché qui si scrive $\tau_{kk}^s$ (e non $\tau_{ii}$ come nelle RANS)?** È **solo notazione**: $k$ e $i$ sono entrambi **indici muti** (ripetuti → sommati su $1,2,3$), quindi $\tau_{kk}=\tau_{ii}=$ **traccia** del tensore. Si cambia lettera per **igiene di indici**: nella formula $\tau_{ij}^s$ gli indici $i,j$ sono già **liberi**, quindi scrivere $\tau_{ii}$ riuserebbe $i$ creando ambiguità → si usa una lettera fresca ($k$). Nessuna differenza fisica.
+
+> ❓ **Perché le equazioni si scrivono in funzione dei valori medi/filtrati (barrati), e perché il termine SGS è scritto $\overline{u_iu_j}-\bar u_i\bar u_j$ e non come prodotto di fluttuazioni come in RANS?** La **logica comune** a RANS e LES: si scrivono le equazioni per il campo che effettivamente si calcola (il **medio** in RANS, il **filtrato** in LES), quindi si esprime tutto il possibile in funzione di esso; ciò che resta — la correlazione non lineare del convettivo $\overline{u_iu_j}-\bar u_i\bar u_j$ — è il termine da **modellare**. Questa forma "(filtro del prodotto) $-$ (prodotto dei filtri)" è la forma **generale**, valida per **entrambi**.
+>
+> La differenza nasce dall'**idempotenza**:
+> - In **RANS** l'operatore è idempotente ($\bar{\bar u}=\bar u$, $\overline{u'}=0$): allora $\overline{u_iu_j}-\bar u_i\bar u_j$ si **semplifica esattamente** in $\overline{u_i'u_j'}$ (prodotto di fluttuazioni). Per questo in RANS si scrive con le fluttuazioni — è una semplificazione *lecita lì*.
+> - In **LES** il filtro **non** è idempotente ($\bar{\bar u}\neq\bar u$, $\overline{u'}\neq0$): quindi $\overline{u_iu_j}-\bar u_i\bar u_j\neq\overline{u_i'u_j'}$. Decomponendo $u=\bar u+u'$ compaiono **tre** gruppi: **Leonard** $L_{ij}=\overline{\bar u_i\bar u_j}-\bar u_i\bar u_j$ (risolto-risolto), **cross** $C_{ij}=\overline{\bar u_i u_j'}+\overline{u_i'\bar u_j}$ (risolto-non risolto) e **Reynolds SGS** $R_{ij}=\overline{u_i'u_j'}$ (non risolto-non risolto). Non si può collassare al solo prodotto di fluttuazioni → si tiene la forma generale $\overline{u_iu_j}-\bar u_i\bar u_j$. **Questa è una differenza sostanziale** tra LES e RANS, oltre al diverso significato dell'operatore.
 
 <details>
 <summary><strong>Approfondimento (non richiesto) — Derivazione delle equazioni LES e confronto LES vs RANS</strong></summary>
@@ -1212,6 +1240,8 @@ Avendo già **ricavato le RANS in dettaglio**, le LES si ottengono "per analogia
 Sfrutta l'ipotesi di Boussinesq: l'effetto dei piccoli vortici è puramente dissipativo.
 
 Il tensore SGS viene modellato usando una viscosità turbolenta di sottogriglia $\nu_{sgs}$. La parte isotropa viene solitamente inglobata nella pressione filtrata modificata, mentre la parte anisotropa è proporzionale al tensore degli sforzi risolto $\bar{S}_{ij}$.
+
+> ❓ **Perché in LES si usa $\nu_{sgs}$ (cinematica) mentre nelle RANS Boussinesq si usa $\mu_T$ (dinamica)?** In parte **dimensionale**, in parte **convenzione**. *Dimensionale:* la formula di Smagorinsky $\nu_{sgs}=(C_s\Delta)^2|\bar S|$ ha **di per sé** le dimensioni di una viscosità **cinematica** ($[\text{m}^2/\text{s}]$ = lunghezza² × frequenza), quindi è naturale chiamarla $\nu$. *Convenzione:* la LES si scrive tipicamente per flusso **incompressibile** ($\rho=$ cost), dove si lavora comodamente con grandezze **cinematiche**; le RANS, spesso in forma **conservativa/compressibile** (pesata su $\rho$), usano la **dinamica** $\mu_T$. Non è una differenza concettuale: $\mu=\rho\nu$, e a $\rho$ costante le due si convertono subito. È quindi soprattutto la **forma delle equazioni** (incompressibile-cinematico vs compressibile-conservativo) a dettare il simbolo.
 
 L'ipotesi di Boussinesq modella il tensore di sottogriglia assumendo che si comporti esattamente come gli sforzi viscosi molecolari: si allinea ai gradienti di velocità e ha l'unico scopo di "succhiare" energia cinetica dalle scale grandi (risolte) e dissiparla verso le scale piccole (non risolte). Questo processo si chiama **forward scatter** (cascata di energia in avanti).
 
