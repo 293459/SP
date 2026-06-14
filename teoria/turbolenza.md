@@ -901,6 +901,8 @@ Si normalizza con le **scale viscose di parete**:
 
 $$u^+=\frac{u}{u_\tau},\qquad y^+=\frac{y}{\ell_\tau},\qquad u_\tau=\sqrt{\frac{\tau_w}{\rho}},\quad \ell_\tau=\frac{\nu}{u_\tau},\quad \tau_w=\mu\frac{\partial u}{\partial y}\Big|_{w}$$
 
+> ❓ **Perché $u_\tau$ dipende da $\tau_w$ e $\rho$, e qual è il nesso causa-effetto?** Per **ragioni dimensionali**: per ricavare una *velocità* da uno *sforzo* $\tau_w$ (unità Pa $=$ kg/(m·s²)) bisogna dividere per una densità (kg/m³) e fare la radice → $\sqrt{\tau_w/\rho}$ ha le dimensioni di m/s. La $\rho$ entra perché **quantità di moto $=\rho\times$velocità**: convertire un flusso di quantità di moto (lo sforzo) in una velocità richiede la densità. **Fisicamente** $u_\tau$ è la scala di velocità dei vortici di parete che trasportano la quantità di moto verso il muro. **Causa-effetto:** è un legame **mutuo/definitorio**, non a senso unico — una turbolenza di parete più intensa porta più quantità di moto al muro → $\tau_w$ più alto, e $u_\tau$ è *definita* da $\tau_w$. **"Ma $\tau_w$ è uno sforzo viscoso, non turbolento":** esatto, **proprio in $y=0$** $\tau_w=\mu\,\partial u/\partial y|_w$ è viscoso (la turbolenza si annulla per no-slip); ma quel gradiente è reso **ripido proprio dalla turbolenza** dello strato sovrastante. Quindi $\tau_w$, pur viscoso a parete, è l'**impronta** della turbolenza di tutto il BL e $u_\tau$ è a tutti gli effetti una **scala turbolenta** — proprio quella che rende **universale** il profilo $u^+(y^+)$. Non sono variabili scelte a caso.
+
 Il profilo $u^+(y^+)$ è **universale** e mostra **tre regioni**:
 
 | Regione | Intervallo | Legge |
@@ -915,6 +917,12 @@ Il profilo $u^+(y^+)$ è **universale** e mostra **tre regioni**:
 - Spalart-Allmaras: primo nodo con $y^+<5$;
 - modelli ad alto $Re$ con wall functions: prima cella nella regione logaritmica ($y^+\approx30\text{-}100$).
 
+> ❓ **Il profilo universale $u^+(y^+)$ vale anche in laminare? E cosa sono le "scale viscose corrette"?** Vale per quasi **tutti i flussi turbolenti** di parete (è una conseguenza della legge logaritmica, fatto **turbolento**), ma **non in laminare**: lì non esiste la regione logaritmica (manca la turbolenza che la genera), c'è solo il profilo viscoso e il collasso universale non si applica. Le "**scale viscose corrette**" sono proprio $u_\tau$ (scala di velocità) e $\ell_\tau=\nu/u_\tau$ (scala di lunghezza): la legge di parete è universale **solo** se si adimensionalizza con *queste* — sono le scale "naturali" della regione di parete. Con scale diverse il collasso sparisce.
+
+> ❓ **Perché solo il *primo* punto a $y^+<5$? Gli altri dove vanno?** È un requisito **minimo** sul nodo più vicino, ma **non basta da solo**: per *risolvere* davvero lo strato limite servono **molti** punti in tutto il BL (tipicamente $\gtrsim10$–$30$ celle in normale) con crescita graduale (basso *expansion ratio*). Il vincolo sul primo punto serve solo a far cadere la **prima cella nel sottostrato** (così $\tau_w$ è colto bene); gli altri **non** vanno "dove capita", devono infittire abbastanza da catturare la curvatura del profilo (sottostrato + buffer + log). Se metti il primo a $y^+<1$ ma poi sgrossi subito, ottieni comunque un BL **sotto-risolto**.
+>
+> **Come si correlano le grandezze di parete con quelle reali?** Per definizione $u=u^+\,u_\tau$ e $y=y^+\,\ell_\tau=y^+\,\nu/u_\tau$: le variabili "plus" sono le reali **riscalate** con $u_\tau$ e $\ell_\tau$. Quindi $u(y)$ e $u^+(y^+)$ sono **la stessa curva** a meno del cambio di scala: dove $u^+(y^+)$ è lineare ($y^+<5$) lo è anche $u(y)$, dove è logaritmica ($y^+>30$) lo è anche $u(y)$. Per "vedere un bel profilo" servono punti distribuiti su **tutte e tre** le regioni in $y^+$ (dal sottostrato $y^+\sim1$ fino a $y^+\sim$ qualche centinaio).
+
 **Procedura pratica:** si stima la dimensione della prima cella da correlazioni note (lastra piana) per ottenere il $y^+$ voluto, si applica al problema reale e si **verifica a posteriori** il $y^+$ effettivo, raffinando localmente se serve.
 
 </details>
@@ -923,6 +931,8 @@ Il profilo $u^+(y^+)$ è **universale** e mostra **tre regioni**:
 <summary><strong>Wall functions per RANS: a cosa servono e come funzionano</strong></summary>
 
 Quando la mesh **non** risolve il sottostrato viscoso, calcolare lo sforzo a parete con il rapporto incrementale $\tau_w\approx\mu\,u_p/\Delta y$ assume un profilo **lineare**, mentre nella prima cella il profilo è già **logaritmico** → la stima del flusso viscoso è sbagliata. Le **wall functions** correggono usando la legge di parete come "ponte".
+
+> ❓ **Se il BL è sotto-risolto a che servono le wall function? E se non so dove inizia il sottostrato, a che mi serve il suo andamento?** Servono **proprio perché** il BL è sotto-risolto: non risolvi il sottostrato con la griglia, ma lo **sostituisci** con la **legge di parete universale** per ricavare comunque $\tau_w$ dalla velocità della prima cella. Non devi "sapere dove inizia il sottostrato": l'andamento $u^+(y^+)$ è **universale in variabili di parete**, quindi basta calcolare il $y^+$ della prima cella e leggere quale relazione $u^+$–$y^+$ vale lì. In pratica: invece di mettere tante celle per *vedere* il profilo, ne metti **una sola** (lontana, in zona log) e usi la legge per ricostruire ciò che la griglia non risolve.
 
 ### Caso risolto vs sottorisolto
 
@@ -951,6 +961,18 @@ Le wall functions **non risolvono** lo strato limite: danno una chiusura empiric
 - $y^+<11$ → sottostrato/buffer: wall function **non affidabile**;
 - $y^+\approx30\text{-}100$ → zona log: **valida**;
 - $y^+>150$ → possibilmente fuori dallo strato limite: legge logaritmica **non applicabile**.
+
+> ❓ **Perché solo la regione logaritmica è "universale", e non sottostrato/buffer?** In realtà anche il **sottostrato** ha una legge universale ($u^+=y^+$). Il punto è che la **wall function** *è* la **legge logaritmica**, e quella vale **solo nel log**. Il sottostrato si descrive con un'altra legge ($u^+=y^+$), il **buffer non ha** una legge semplice/univoca (è una transizione). Quindi la frase significa: *la wall function (legge log) è applicabile universalmente solo se la 1ª cella cade nel log*. Una wall function **generica** (Kader) aggira il problema fondendo tutte le regioni in un'unica formula.
+
+> ❓ **Non c'è contraddizione? Volevamo la 1ª cella *nel sottostrato*, e ora diciamo che se $y^+<11$ la wall function non è affidabile. E non dovrebbero essere $y^\star$?** Due punti distinti.
+>
+> **1) Non è una contraddizione: sono due strategie *opposte*.**
+> - **Wall-resolved (low-Re):** metti **molte** celle nel BL, la 1ª a $y^+\lesssim1$ (sottostrato), e **non** usi wall function — **risolvi** il profilo. Qui "vicino a parete = bene".
+> - **Wall-modeled (wall function):** usi una mesh **grossolana** e metti **apposta** la 1ª cella nel **log** ($y^+\sim30\text{-}100$); la legge log fa da ponte sul sottostrato non risolto. Qui, se la 1ª cella cade nel sottostrato/buffer ($y^+<11$), la **legge log non vale lì** → non affidabile.
+>
+> Quindi la wall function (= legge log) è affidabile **nel log**, non nel sottostrato: l'intuizione "più vicino = meglio" vale per il caso *risolto*, non per le wall function. **Nessun refuso, due filosofie opposte.** Il valore $\approx11$ ($11.2$) è il $y^+$ dove la legge **lineare** e la **logaritmica** si **intersecano**: sotto, non si è ancora nel log (per questo non serve distinguere sottostrato da buffer — conta solo "sotto o sopra il log").
+>
+> **2) $y^+$ o $y^\star$?** Hai ragione che le wall function robuste (Launder-Spalding) usano $y^\star$ (con $k^{1/2}$). Ma **in equilibrio** a parete $C_\mu^{1/4}k^{1/2}\approx u_\tau$, quindi $y^\star\approx y^+$: per questo le soglie ($\sim11$, $30$–$100$, $>150$) si citano **indifferentemente** in $y^+$ o $y^\star$ — **non è un errore**. La distinzione conta dove l'equilibrio salta, cioè in **separazione** ($u_\tau\to0$ ma $k\neq0$): lì $y^+$ esplode e si **deve** usare $y^\star$. I valori "piccoli" ($y^+<1,5$) di prima e questi "grandi" ($30$–$100$) **non sono in conflitto**: sono regimi diversi (risolvere vs modellare).
 
 </details>
 
@@ -1009,6 +1031,14 @@ $$\Delta y_{1,\text{new}}\approx\Delta y_{1,\text{old}}\cdot\frac{y^+_{\text{tar
 | **Risolto** | sottostrato viscoso ($y^+\lesssim1$) | **lineare** ($u^+=y^+$) | $\tau_w=\mu(u_p-u_w)/\Delta y$ **accurato** |
 | **Sotto-risolto** | zona logaritmica ($y^+\sim30\text{-}100$) | il codice assume lineare, ma è **logaritmico** | gradiente **sbagliato** → serve **wall function** per correggere |
 
+![Caso risolto: la prima cella (centro P, altezza d dalla parete) cade nel sottostrato, dove il profilo di velocità è ~lineare](images/strato_limite_prima_cella_risolto.png)
+
+![Zoom sulla prima cella: il profilo reale (nero) è curvo; il codice approssima il gradiente a parete con la corda parete→P (retta), che differisce dalla vera tangente a parete](images/strato_limite_sottorisolto_chord_vs_tangente.png)
+
+> 🔎 **Dove sono presi i punti e perché escono quelle curve (immagini sopra).** Il punto **P** è il **centro della prima cella** (il nodo più vicino alla parete: lì "vive" la velocità discreta $u_P$), a distanza **$d$** dal muro. Per ricavare $\tau_w$ il codice ha bisogno del **gradiente di velocità a parete** $\partial u/\partial y|_w$, e lo approssima con il **rapporto incrementale** $(u_P-0)/d$, cioè la **pendenza della corda** che va dalla parete a P. La "curva" è semplicemente il **profilo di velocità** $u(y)$:
+> - **Caso risolto** (1ª immagine): P sta nel **sottostrato**, dove $u(y)$ è davvero **lineare** → la corda parete→P **coincide** con la vera tangente a parete → $\tau_w$ corretto.
+> - **Caso sotto-risolto** (2ª immagine, lo zoom): P sta nella zona **logaritmica**, dove $u(y)$ è **curvo**; la **corda** parete→P (retta) ha una pendenza **diversa** dalla **tangente** vera a parete → il rapporto incrementale dà un $\tau_w$ **sbagliato**. È esattamente la discrepanza che la **wall function** corregge, sostituendo l'assunzione lineare con la legge logaritmica.
+
 ![Mesh con infittimento nello strato limite rispetto al far field](images/mesh_elementi_boundary_layer_vs_far_field.jpg)
 
 **Commento.** Nel caso **risolto** il centro della prima cella cade dove il profilo è davvero lineare, quindi il rapporto incrementale stima bene lo sforzo a parete. Nel caso **sotto-risolto** la prima cella è già nella zona log: usare il rapporto incrementale (che presuppone linearità) sottostima/sovrastima il gradiente vero → la wall function rimette le cose a posto usando la legge logaritmica come ponte.
@@ -1021,6 +1051,10 @@ $$\Delta y_{1,\text{new}}\approx\Delta y_{1,\text{old}}\cdot\frac{y^+_{\text{tar
 <summary><strong>Il problema della separazione e le variabili "star" ($\star$)</strong></summary>
 
 **Perché la separazione è problematica?** Nel **punto di separazione** lo sforzo a parete si annulla, $\tau_w=0$. Questo deriva dal fatto che lì il **gradiente di velocità a parete è nullo**, $\partial u/\partial y|_w=0$: è il punto dove il flusso vicino a parete si **stacca** e inverte (a valle c'è ricircolo), e tra flusso diretto e inverso il gradiente a parete passa per zero.
+
+![Andamento dello sforzo a parete τ_w lungo x: positivo a monte, si annulla nel punto di separazione (τ_w=0), poi diventa negativo nella zona di ricircolo](images/separazione_tau_wall_nullo.png)
+
+> Il grafico mostra perché $\tau_w=0$ è un **attraversamento di zero** (non un minimo): a monte $\tau_w>0$ (flusso attaccato), nel punto di separazione $\tau_w=0$, a valle $\tau_w<0$ (flusso invertito). È proprio quel passaggio per zero a far esplodere $u_\tau$, $y^+$, $u^+$.
 
 **Effetto numerico e analitico.** Tutte le variabili di parete usano $u_\tau=\sqrt{\tau_w/\rho}$. Se $\tau_w=0$ allora $u_\tau=0$, quindi:
 
