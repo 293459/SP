@@ -31,7 +31,8 @@
 
 ## Parte I — Teoria
 
-### 1. Il problema fisico: il plume di un ugello nel vuoto
+<details>
+<summary><strong>1. Il problema fisico: il plume di un ugello nel vuoto</strong></summary>
 
 Un propulsore che scarica nel **vuoto** (spazio) produce un **getto (plume)** che si espande
 enormemente. Vicino all'ugello il gas è **denso** e vale il **continuo** (Navier–Stokes / CFD); man
@@ -52,9 +53,10 @@ Zone caratteristiche: **stagnation chamber** ($P_0,T_0$) → **isentropic core**
 pratico è doppio: la **backflow region** (gas che torna indietro) provoca **contaminazione delle
 superfici ottiche** del satellite e **problemi di spinta**.
 
----
+</details>
 
-### 2. Il numero di Knudsen e i regimi
+<details>
+<summary><strong>2. Il numero di Knudsen e i regimi</strong></summary>
 
 Il parametro che misura la **rarefazione** è il **numero di Knudsen**, rapporto tra il **libero
 cammino medio** $\lambda$ (distanza media tra due collisioni) e una **lunghezza caratteristica** $L$:
@@ -87,9 +89,10 @@ unico, identificando *dove* il continuo cessa di valere.
 > regime continuo a quello molecolare libero lungo il getto. Quindi $Kn$ varia sia perché **$\lambda$
 > aumenta** (densità che cala) sia perché **$L$ cambia** (gradienti): nel plume domina il primo.
 
----
+</details>
 
-### 3. Il metodo Monte Carlo / DSMC
+<details>
+<summary><strong>3. Il metodo Monte Carlo / DSMC</strong></summary>
 
 In regime rarefatto **non si simulano tutte le molecole reali** (troppe): si definisce una
 **particella numerica** che **rappresenta un gran numero di molecole reali** con caratteristiche
@@ -195,9 +198,10 @@ graph TD
 > e **distanza** del trasporto di quantità di moto; il loro bilancio *è* la viscosità, e il **modo** in
 > cui $\sigma$ varia con $g$ fissa la dipendenza $\mu(T)$.
 
----
+</details>
 
-### 4. Requisiti numerici del DSMC
+<details>
+<summary><strong>4. Requisiti numerici del DSMC</strong></summary>
 
 Perché la simulazione sia fisicamente corretta servono vincoli su **cella**, **passo temporale** e
 **numero di particelle**:
@@ -274,6 +278,8 @@ Perché la simulazione sia fisicamente corretta servono vincoli su **cella**, **
   > **particella numerica** (un campione con stato singolo, pesa $F_{num}$ molecole) → **media di cella**
   > (l'unica vera media, sulle particelle numeriche). La media *sulle molecole reali dentro una
   > particella* **non esiste**: la particella *è già* il campione.
+
+</details>
 
 ---
 

@@ -25,7 +25,8 @@
 
 ## 1. Metodo dei Volumi Finiti in 1D
 
-### Equazione conservativa
+<details>
+<summary><strong>Equazione conservativa</strong></summary>
 
 Si parte dalla forma differenziale conservativa:
 
@@ -41,14 +42,20 @@ Si integra su ogni cella $[x_{j-\frac{1}{2}}, x_{j+\frac{1}{2}}]$, ottenendo la 
 
 $$\frac{\partial}{\partial t}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx = -\left(f_{j+\frac12} - f_{j-\frac12}\right)$$
 
-### Variabile conservata media di cella
+</details>
+
+<details>
+<summary><strong>Variabile conservata media di cella</strong></summary>
 
 $$\boxed{U_j = \frac{1}{\Delta x}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx}$$
 
 > **Definizione:** $U_j$ è il valore *medio* di $u$ sull’intera cella $j$, non il valore puntuale al centro. Il FVM lavora con medie, le differenze finite con valori puntuali.
 > 
 
-### Schema centrato esplicito
+</details>
+
+<details>
+<summary><strong>Schema centrato esplicito</strong></summary>
 
 Con flussi alle facce come medie aritmetiche:
 
@@ -57,6 +64,8 @@ $$f_{j+\frac12} = \frac{1}{2}(f_j + f_{j+1}), \qquad f_{j-\frac12} = \frac{1}{2}
 $$\frac{U_j^{n+1}-U_j^n}{\Delta t} + \frac{f_{j+\frac12}^n - f_{j-\frac12}^n}{\Delta x} = 0$$
 
 **Risultato chiave — Equivalenza FD ↔ FVM in 1D:** In 1D con schema centrato le equazioni sono identiche. La differenza è nell’*interpretazione*: FD assume $U_j \approx u(x_j,t)$ (valore puntuale), FVM assume $U_j$ = media di cella. La distinzione diventa rilevante in 2D/3D su mesh non strutturate.
+
+</details>
 
 ---
 
@@ -81,7 +90,8 @@ In una mesh strutturata ogni cella è identificata da indici $(i,j)$. I vicini f
 
 La connettività deve essere memorizzata esplicitamente (maggiore memoria, massima flessibilità geometrica).
 
-### Triangolazione di Delaunay
+<details>
+<summary><strong>Triangolazione di Delaunay</strong></summary>
 
 > **Criterio:** La circonferenza circoscritta a ogni triangolo non deve contenere altri punti della discretizzazione.
 > 
@@ -89,11 +99,16 @@ La connettività deve essere memorizzata esplicitamente (maggiore memoria, massi
 - Duale del diagramma di Voronoi
 - Algoritmo globale — buona robustezza, ma difficoltà su geometrie concave
 
-### Metodo Frontale (Advancing Front)
+</details>
+
+<details>
+<summary><strong>Metodo Frontale (Advancing Front)</strong></summary>
 
 - Si parte dal contorno (il “fronte”) e si aggiungono celle avanzando verso l’interno
 - Costruzione locale → maggiore flessibilità su geometrie cave/concave
 - Possibile conflitto quando due fronti si incontrano da direzioni “sbagliate”
+
+</details>
 
 | Caratteristica | Delaunay | Frontale |
 | --- | --- | --- |
@@ -126,20 +141,27 @@ La connettività deve essere memorizzata esplicitamente (maggiore memoria, massi
 
 ## 5. Metodo di Godunov & Problema di Riemann
 
-### Idea centrale
+<details>
+<summary><strong>Idea centrale</strong></summary>
 
 Godunov assume soluzione **costante a tratti** (primo ordine). Ogni interfaccia $j+\frac12$ separa due stati costanti → problema di Riemann locale.
 
 > **Problema di Riemann:** PDE iperbolica con dato iniziale a gradino $u(x,0) = u_L$ se $x<0$, $u_R$ se $x>0$. La soluzione consiste di onde (rarefazione, contatto, urto). Esempio classico: **tubo di Sod**.
 > 
 
-### Schema di Godunov
+</details>
+
+<details>
+<summary><strong>Schema di Godunov</strong></summary>
 
 Si risolve il Riemann per ogni interfaccia, si ottiene $F_{j+\frac12}$, poi si avanza:
 
 $$U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x}\left[F_{j+\frac12} - F_{j-\frac12}\right]$$
 
-### CFL nel metodo di Godunov
+</details>
+
+<details>
+<summary><strong>CFL nel metodo di Godunov</strong></summary>
 
 La CFL ha interpretazione fisica diretta: $\Delta t$ deve essere abbastanza piccolo da garantire che le onde di due Riemann adiacenti **non si sovrappongano** durante il time step. Se si sovrappongono, il problema locale non è più valido.
 
@@ -147,11 +169,14 @@ $$\text{CFL} = \frac{\lambda_{max},\Delta t}{\Delta x} \leq 1$$
 
 ⚠ Risolvere il Riemann esatto per le equazioni di Eulero è iterativo e costoso → nella pratica si usano **solutori approssimati**: Lax-Friedrichs, Rusanov, Roe, HLLC.
 
+</details>
+
 ---
 
 ## 6. Flussi Numerici e Flux Splitting
 
-### Tassonomia
+<details>
+<summary><strong>Tassonomia</strong></summary>
 
 | Categoria | Metodi | Cosa si spezza |
 | --- | --- | --- |
@@ -159,15 +184,23 @@ $$\text{CFL} = \frac{\lambda_{max},\Delta t}{\Delta x} \leq 1$$
 | **Flux Vector Splitting (FVS)** | Steger-Warming, van Leer, AUSM+ | Il *vettore flusso* $F = F^+ + F^-$ |
 | **Centrati** | Lax-Friedrichs, Rusanov, Jameson | Media + dissipazione artificiale scalare |
 
-### Lax-Friedrichs / Rusanov
+</details>
+
+<details>
+<summary><strong>Lax-Friedrichs / Rusanov</strong></summary>
 
 $$F_{j+\frac12}^{LF} = \frac{1}{2}(F_j + F_{j+1}) - \frac{\lambda_{max}}{2}(U_{j+1} - U_j)$$
 
 Il termine $-\frac{\lambda_{max}}{2}\Delta U$ è dissipazione numerica scalare. Rusanov usa $\lambda_{max} = \max(|\lambda_j|,|\lambda_{j+1}|)$ — robusto ma molto diffusivo.
 
-### Jameson
+</details>
+
+<details>
+<summary><strong>Jameson</strong></summary>
 
 Dissipazione adattiva: 2° ordine vicino a discontinuità (cattura urti), 4° ordine altrove (meno diffusivo). Metodo centrato con dissipazione adattata localmente.
+
+</details>
 
 ---
 
@@ -175,23 +208,32 @@ Dissipazione adattiva: 2° ordine vicino a discontinuità (cattura urti), 4° or
 
 Solutore di Riemann approssimato. Linearizza il problema all’interfaccia usando la **media di Roe** $\bar{U}$.
 
-### Proprietà richieste
+<details>
+<summary><strong>Proprietà richieste</strong></summary>
 
 1. **Consistenza:** $\bar{A}(U_R - U_L) = F(U_R) - F(U_L)$
 2. **Diagonalizzabilità con autovalori reali** (sistema iperbolico)
 3. **Conservatività**
 
-### Media di Roe per le equazioni di Eulero
+</details>
+
+<details>
+<summary><strong>Media di Roe per le equazioni di Eulero</strong></summary>
 
 $$\bar{u} = \frac{\sqrt{\rho_L},u_L + \sqrt{\rho_R},u_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}, \qquad \bar{H} = \frac{\sqrt{\rho_L},H_L + \sqrt{\rho_R},H_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}$$
 
-### Flusso di Roe
+</details>
+
+<details>
+<summary><strong>Flusso di Roe</strong></summary>
 
 $$\overrightarrow{\delta F}_j = \frac{\bar{\lambda}_1 - |\bar{\lambda}_1|}{2},e^1,\delta w_j^1 + \frac{\bar{\lambda}_2 - |\bar{\lambda}_2|}{2},e^2,\delta w_j^2 + \frac{\bar{\lambda}_3 - |\bar{\lambda}_3|}{2},e^3,\delta w_j^3$$
 
 con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}} \in \mathbb{R}$.
 
 ⚠ **Entropy Fix:** Roe può produrre violazioni del 2° principio su urti sonici → si corregge con $|\lambda| \to \max(|\lambda|, \epsilon)$.
+
+</details>
 
 ---
 

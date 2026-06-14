@@ -6,10 +6,12 @@ dall'unione dei vecchi export Notion e delle sintesi in formato Q&A. Tutte le im
 
 ## Convenzioni
 
+- Ogni file è organizzato in **capitoli `## `** e ogni argomento è racchiuso in una **toggle list
+  collassabile** (`<details>` / `<summary>`): chiudendo il toggle il contenuto si compatta, così si
+  ha sempre la vista d'insieme dei vari punti e si apre solo ciò che interessa.
 - I **chiarimenti / dubbi** sono **integrati direttamente nella teoria** come note tra virgolette
   (`>` blockquote), così da non spezzare il filo del discorso.
-- Le sole sezioni di **simulazione d'esame / quiz / esercizi** restano **separate** (toggle
-  `<details>` o sezioni dedicate).
+- Le sezioni di **simulazione d'esame / quiz / esercizi** restano in **toggle dedicati**.
 - Le **formule** sono in LaTeX (`$...$` inline, `$$...$$` display); le immagini che erano solo
   formule sono state trascritte in LaTeX per alleggerire il progetto. Restano come immagini solo
   **diagrammi, grafici, whiteboard e screenshot** (con nomi descrittivi).

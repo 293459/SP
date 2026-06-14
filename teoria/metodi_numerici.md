@@ -1,5 +1,8 @@
 ## Glossario essenziale
 
+<details>
+<summary><strong>Glossario dei termini ricorrenti</strong></summary>
+
 > Questa pagina è **organizzativa** (dove collocare ciascun metodo): di seguito un glossario
 > dei termini ricorrenti.
 
@@ -17,9 +20,14 @@
 
 La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Schemes**.
 
+</details>
+
 ---
 
 ## Premessa — la suddivisione attuale del Notion
+
+<details>
+<summary><strong>La suddivisione attuale del Notion</strong></summary>
 
 | Pagina Notion | Cosa contiene (natura) |
 |---|---|
@@ -31,6 +39,8 @@ La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Sc
 | **Reacting Flows** | Combustione |
 
 La chiave per collocare un metodo è chiedersi: **discretizza il tempo o lo spazio?**
+
+</details>
 
 ---
 

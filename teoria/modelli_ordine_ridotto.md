@@ -32,7 +32,8 @@
 
 ## Parte I — Teoria
 
-### 1. Cos'è un ROM e a cosa serve
+<details>
+<summary><strong>1. Cos'è un ROM e a cosa serve</strong></summary>
 
 Un **Reduced Order Model** sostituisce un modello CFD ad alto costo (*full order model*) con un
 **surrogato** molto più rapido, capace di **prevedere campi e prestazioni** al variare dei
@@ -61,9 +62,12 @@ progetto di dettaglio) la RANS **non basta** e serve una **LES** o una **DNS**. 
 un'**eredità storica** di dati ad alta fedeltà che permette di **alleggerire la fase offline** (i dati
 sono già disponibili).
 
+</details>
+
 ---
 
-### 2. La POD come motore del training
+<details>
+<summary><strong>2. La POD come motore del training</strong></summary>
 
 La **POD (Proper Orthogonal Decomposition)** è la tecnica più usata per costruire la **base** del ROM.
 È l'analogo dei **modi propri di vibrazione** nelle strutture: si decompone la soluzione in **modi
@@ -80,6 +84,9 @@ tempo), ma complicherebbero l'esposizione.
 > dai **modi**) e i **parametri** $\bar\mu$ (catturati dai **coefficienti**); il **tempo** entrerebbe
 > solo in una POD *instazionaria*, come ulteriore variabile di campionamento (una collezione di campi a
 > istanti diversi), distinta dai parametri di design.
+
+<details>
+<summary><strong>Passo 1 — Database di snapshot</strong></summary>
 
 **Passo 1 — Database di snapshot.** Si generano $N_s$ soluzioni full-order al variare di $n$ parametri
 $\mu_i$ ($1\le i\le n$):
@@ -124,6 +131,11 @@ $$u_J(\bar{x}),\qquad 1\le J\le N_s \quad(\text{snapshot }J).$$
 > In sintesi: **vero+continuo** (la verità) → **vero+discreto** (gli snapshot) → **approssimato+continuo**
 > (il ROM).
 
+</details>
+
+<details>
+<summary><strong>Passo 2 — Ipotesi di decomposizione modale</strong></summary>
+
 **Passo 2 — Ipotesi di decomposizione modale.** Si assume che la soluzione si scriva come
 **combinazione lineare di $N$ modi** (con $N\le N_s$):
 $$u(\bar{x},\bar{\mu}) = \sum_{i=1}^{N} \tilde{a}_i(\bar{\mu})\,\phi_i(\bar{x}).$$
@@ -135,6 +147,11 @@ $$u(\bar{x},\bar{\mu}) = \sum_{i=1}^{N} \tilde{a}_i(\bar{\mu})\,\phi_i(\bar{x}).
 
 La separazione **spazio (modi) × parametri (coefficienti)** è il cuore del metodo: i modi si calcolano
 **una volta** (offline), i coefficienti si **interpolano** per ogni nuovo $\bar\mu$ (online).
+
+</details>
+
+<details>
+<summary><strong>Passo 3 — I modi come combinazione lineare degli snapshot</strong></summary>
 
 **Passo 3 — I modi come combinazione lineare degli snapshot.** Si propone di costruire i modi come
 combinazione lineare degli snapshot del database (metodo degli *snapshot* di Sirovich). Per definire
@@ -151,6 +168,11 @@ una somma pesata sui volumi). Serve perché "il modo più rappresentativo" e "or
 > problema. E il **senso fisico non si perde**: emerge **a posteriori** — i primi modi POD coincidono
 > spesso con strutture coerenti riconoscibili (campo medio, strutture dominanti). "Calcolati" non vuol
 > dire "arbitrari/numerici", ma **i migliori possibili rispetto ai dati**.
+
+</details>
+
+<details>
+<summary><strong>Passo 4 — Problema di ottimizzazione vincolato</strong></summary>
 
 **Passo 4 — Problema di ottimizzazione vincolato.** I modi POD sono quelli che **massimizzano la
 proiezione** degli snapshot sul modo, a parità di norma unitaria:
@@ -171,6 +193,11 @@ database. Il vincolo $\|\phi_i\|=1$ evita la soluzione banale (modo infinitament
 > prodotto modo×coefficiente non cambia, ma il problema diventa **ben posto**. Più che un "imbroglio
 > sull'energia", è una questione di **buona posizione** del problema di ottimo.
 
+</details>
+
+<details>
+<summary><strong>Passo 5 — Problema agli autovalori</strong></summary>
+
 **Passo 5 — Problema agli autovalori.** La soluzione del problema vincolato è un **problema agli
 autovalori** (sulla matrice di correlazione degli snapshot):
 - gli **autovettori** → i coefficienti che combinano gli snapshot → i **modi** $\phi_i$;
@@ -188,10 +215,20 @@ autovalori** (sulla matrice di correlazione degli snapshot):
 > dati. Massimizzare $\sum_k\langle u_k,\phi_i\rangle^2$ significa letteralmente **catturare più
 > energia possibile** con quel modo.
 
+</details>
+
+<details>
+<summary><strong>Passo 6 — Troncamento con il RIC</strong></summary>
+
 **Passo 6 — Troncamento con il RIC.** I modi sono potenzialmente **infiniti** (fino a $N_s$), ma ne
 bastano **pochi** (≈10) per rappresentare quasi tutta l'energia. Si tronca con il **Relative
 Information Content**:
 $$RIC(n) = \frac{\sum_{i=1}^{n}\lambda_i}{\sum_{i=1}^{N_s}\lambda_i},\qquad \text{si sceglie } n : RIC(n) > 0.99.$$
+
+</details>
+
+<details>
+<summary><strong>Passo 7 — Predizione online</strong></summary>
 
 **Passo 7 — Predizione online.** La soluzione ridotta è
 $$u(\bar{x},\bar{\mu}) = \sum_{i=1}^{n} \tilde{u}_i(\bar{\mu})\,\phi_i(\bar{x}),$$
@@ -199,9 +236,14 @@ con i **modi** $\phi_i$ presi dal database e i **coefficienti modali** $\tilde u
 funzione dei parametri di design (interpolazione **polinomiale**, **RBF**, **reti neurali NN**). Per
 ogni punto del database posso ricavare $\tilde u_i$ **proiettando** la soluzione sui modi.
 
+</details>
+
+</details>
+
 ---
 
-### 3. Lo spazio dei parametri e i suoi limiti
+<details>
+<summary><strong>3. Lo spazio dei parametri e i suoi limiti</strong></summary>
 
 I parametri $\mu_1,\mu_2,\dots$ definiscono uno **spazio di progetto discreto**: gli snapshot sono
 calcolati solo in **alcuni punti** (la "griglia" di campionamento). Per un design **nuovo** (un punto
@@ -257,6 +299,8 @@ non calcolato) si **interpola** la mappa $\bar\mu \to \tilde u_i$.
 - **Alternative all'interpolazione classica:** per la mappa parametri→coefficienti si possono usare
   metodi di **machine learning** — **random forest**, **reti neurali**, **Gaussian Process /
   kriging** — più adatti a relazioni non lineari rispetto a polinomi e spline.
+
+</details>
 
 ---
 

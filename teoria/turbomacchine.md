@@ -24,7 +24,8 @@
 
 ## Parte I — Teoria
 
-### 1. Il problema di base
+<details>
+<summary><strong>1. Il problema di base</strong></summary>
 
 In una turbomacchina reale **statore e rotore hanno un numero di pale diverso** ($Z_1 \neq Z_2$) e
 sono in **moto relativo**. Una simulazione CFD non può quasi mai contenere l'**intero anello (full
@@ -53,9 +54,12 @@ mette in evidenza le **scie** che lasciano le pale e il loro **attraversamento d
 cioè proprio l'**interazione instazionaria statore–rotore** che alcuni metodi conservano e altri
 distruggono.
 
+</details>
+
 ---
 
-### 2. Mixing plane (piano di miscelamento)
+<details>
+<summary><strong>2. Mixing plane (piano di miscelamento)</strong></summary>
 
 È il metodo a **bassa/media fedeltà** ma **stazionario** ed economico, usato in fase di
 **pre-progetto**. L'idea: all'interfaccia si fa una **media in direzione circonferenziale** delle
@@ -115,9 +119,12 @@ troncati sono le **armoniche superiori** $\hat U_n$ ($n\neq 0$), che sono esatta
 descrivono la **scia** e le **non-uniformità circonferenziali**. Buttarle via equivale a un
 miscelamento istantaneo e genera le **perdite di mixing numeriche**.
 
+</details>
+
 ---
 
-### Frozen rotor (cenno)
+<details>
+<summary><strong>Frozen rotor (cenno)</strong></summary>
 
 Citato nella tabella ma assente dagli appunti, per completezza: il **frozen rotor** è un metodo
 **stazionario** in cui statore e rotore vengono "**congelati**" in una **posizione relativa fissa** e
@@ -128,9 +135,12 @@ compromesso tra mixing plane (media, niente scia) e sliding mesh (instazionario 
 informazione del mixing plane, ma risultato dipendente dalla posizione scelta** e quindi non
 fisicamente rigoroso.
 
+</details>
+
 ---
 
-### 3. Sliding mesh (mesh scorrevole)
+<details>
+<summary><strong>3. Sliding mesh (mesh scorrevole)</strong></summary>
 
 È il metodo **instazionario ad alta fedeltà**: la mesh del rotore **scorre** rispetto a quella dello
 statore e all'interfaccia si **interpola** il flusso ad ogni passo temporale. Conserva la scia e
@@ -186,9 +196,12 @@ tutta l'**interazione instazionaria**.
    └───────────────────┘            └───────────────────┘
 ```
 
+</details>
+
 ---
 
-### 4. Condizioni corocroniche (Phase-Lagged Boundary Conditions)
+<details>
+<summary><strong>4. Condizioni corocroniche (Phase-Lagged Boundary Conditions)</strong></summary>
 
 Quando i passi sono diversi non si può usare una **semplice periodicità spaziale** su un solo canale,
 perché due canali adiacenti **non sono nella stessa fase** rispetto alla schiera opposta. La soluzione
@@ -244,9 +257,12 @@ $$\delta_t = \frac{\left|\dfrac{2\pi}{Z_1} - \dfrac{2\pi}{Z_2}\right|}{\left|\Om
    └─────────────┘    tempo di δt)   └─────────────┘
 ```
 
+</details>
+
 ---
 
-### 5. Metodo del tempo inclinato (Time-Inclining / Time-Tilting)
+<details>
+<summary><strong>5. Metodo del tempo inclinato (Time-Inclining / Time-Tilting)</strong></summary>
 
 È una **riformulazione** del problema instazionario periodico: invece di sfasare *a posteriori* le
 condizioni al contorno (come nel phase-lag), si **inclina l'asse temporale** lungo la direzione
@@ -286,6 +302,8 @@ sistema di coordinate.
   non sono iso-temporali), validità limitata a configurazioni con **rapporto di passo** ben definito.
   Resta una tecnica **prevalentemente teorica/accademica**, con **scarsa applicazione industriale**
   rispetto a mixing plane e sliding mesh.
+
+</details>
 
 ---
 

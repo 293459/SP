@@ -16,6 +16,8 @@
 
 ---
 
+## Paletta LS59
+
 <details>
 <summary><strong>Domanda 1 — È rilevante che ci siano valori di y⁺ differenti tra upper e lower surface della paletta?</strong></summary>
 
@@ -105,6 +107,8 @@ parte interessante e dipendono da **dove** si è preso lo snapshot. Nel report v
 dicitura "estratto sull'estradosso a $x/c = \dots$".
 
 </details>
+
+## Presa a doppia rampa (fisica del campo)
 
 <details>
 <summary><strong>Domanda 5 — Perché sulla presa a doppia rampa il y⁺ si richiede solo sulla superficie inferiore? È legato alla condizione di simmetria invece che di strato limite?</strong></summary>
@@ -326,6 +330,8 @@ la si richiama esplicitamente.)*
 
 </details>
 
+## Condizioni al contorno e convergenza
+
 <details>
 <summary><strong>Domanda 13 — Nella sezione 6.5 si dice che, essendo il Mach in ingresso supersonico, "si inseriscono tutte le caratteristiche da sinistra". Cosa significa? "Caratteristiche" = linee caratteristiche?</strong></summary>
 
@@ -382,6 +388,8 @@ subsonico la natura quasi-ellittica (onde in entrambi i versi) rallenta l'assest
 direzionalità** a determinare la convergenza più rapida nel caso supersonico.
 
 </details>
+
+## Confronto sperimentale / Eulero / Fluent
 
 <details>
 <summary><strong>Domanda 15 — Nel confronto sperimentale, l'assenza di valori sperimentali di pressione a parete vicino a parete è dovuta all'incapacità dell'apparato di fare sonde abbastanza piccole?</strong></summary>
@@ -556,6 +564,8 @@ report conviene esplicitare questa equivalenza e, volendo, aggiungere il campo d
 ricavandolo da $p$ e $\rho$.
 
 </details>
+
+## Teoria della convergenza (Richardson, GCI, CFL)
 
 <details>
 <summary><strong>Domanda 21 — Si usa una "norma L2 dell'entropia" particolare, non la norma 2 geometrica classica. Perché questa scelta? (Da spiegare e aggiungere nel capitolo teorico.)</strong></summary>
