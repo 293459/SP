@@ -875,6 +875,10 @@ Per Spalart-Allmaras: $\tilde\nu/\nu\approx3$ (flusso già turbolento all'ingres
 
 ## Trattamento a parete
 
+> 📌 **Perché il trattamento a parete merita un capitolo a parte? È solo comodità o serve davvero un approccio diverso?** Entrambe le cose, ma soprattutto **serve davvero**. Vicino alla parete la **fisica della turbolenza cambia** radicalmente: le fluttuazioni sono smorzate a zero dalla viscosità (no-slip), i gradienti sono enormi in uno strato **sottilissimo**, e i modelli a viscosità turbolenta — calibrati per turbolenza piena — **non valgono lì** senza accorgimenti ($k$-$\varepsilon$ richiede funzioni di smorzamento, $\varepsilon$ non ha un limite a parete pulito, ecc.). C'è poi un fortissimo driver di **costo**: risolvere lo strato limite richiede celle minuscole. Per questo si sceglie tra **risolvere** il sottostrato (mesh fine) o **bypassarlo** con le wall functions.
+>
+> **Come si lega tutto questo alla turbolenza?** Profondamente: il "linguaggio" di parete ($y^+$, $u^+$, legge logaritmica) **è** teoria della turbolenza — nasce dalla lunghezza di mixing di Prandtl (→ legge log, costante di von Kármán $\kappa$) e la legge log si ricava imponendo che lo **sforzo di Reynolds turbolento** bilanci lo sforzo a parete nella regione logaritmica. La velocità d'attrito $u_\tau$ è una **scala di velocità turbolenta**. Quindi le considerazioni a parete **sono parte integrante** della chiusura del modello di turbolenza nella regione più critica del dominio.
+
 <details>
 <summary><strong>Risoluzione a parete: variabili di parete y⁺, u⁺ e le tre regioni</strong></summary>
 
@@ -937,6 +941,110 @@ Le wall functions **non risolvono** lo strato limite: danno una chiusura empiric
 
 </details>
 
+<details>
+<summary><strong>Procedura operativa: dimensionare la mesh per un $y^+$ target ($u_\tau$, flowchart)</strong></summary>
+
+**Cos'è $u_\tau$ (velocità d'attrito) e la catena di dipendenze.** $u_\tau=\sqrt{\tau_w/\rho}$ è una **scala di velocità** costruita dallo sforzo a parete $\tau_w$ e dalla densità: rappresenta la "velocità" associata al flusso di quantità di moto verso la parete (è la scala di velocità della turbolenza di parete). Da essa discendono la lunghezza viscosa $\ell_\tau=\nu/u_\tau$ e quindi:
+
+$$y^+=\frac{y}{\ell_\tau}=\frac{y\,u_\tau}{\nu}$$
+
+dove $y$ è la distanza del **centro della prima cella** dalla parete.
+
+**Come la mesh influisce sul $y^+$.** Direttamente: $y^+\propto y$, cioè $y^+$ è proporzionale all'**altezza della prima cella** $\Delta y_1$. Mesh più fine in normale → $y^+$ più piccolo. Ma attenzione: $y^+$ dipende **anche** da $u_\tau$, che a sua volta dipende da $\tau_w$ — e $\tau_w$ è un **risultato** della simulazione, **non noto a priori**. Ecco la catena: $y^+ \leftarrow \ell_\tau \leftarrow u_\tau \leftarrow \tau_w$ (incognito) → il problema è intrinsecamente **iterativo**.
+
+**Perché non si calcola direttamente sulla geometria in esame?** Perché sarebbe un cane che si morde la coda: per conoscere $y^+$ serve $\tau_w$, che serve la soluzione, che serve la mesh, che serve un $y^+$. Si rompe il ciclo **stimando** $\tau_w$ da una **soluzione approssimata nota** (la lastra piana, con le sue correlazioni $C_f(Re)$), si costruisce una mesh ragionevole e si **verifica a posteriori** il $y^+$ effettivo sulla geometria reale. Si potrebbe iterare direttamente sulla geometria vera, ma è **più costoso** e di solito **non serve** conoscere $y^+$ con precisione: basta che cada nel range giusto del modello.
+
+```mermaid
+flowchart TD
+    A["Correlazione lastra piana:<br/>C_f = C_f(Re)"] --> B["tau_w = 0.5 rho U^2 C_f<br/>u_tau = sqrt(tau_w/rho)"]
+    B --> C["Δy_1 = y+_target * ν / u_tau<br/>(altezza 1a cella)"]
+    C --> D["Costruisco la mesh<br/>sulla geometria reale"]
+    D --> E["Eseguo la CFD"]
+    E --> F["Verifico y+ EFFETTIVO<br/>a posteriori"]
+    F --> G{"y+ nel range<br/>del modello?"}
+    G -->|si| H["OK: risultato valido"]
+    G -->|no| I["Δy_1,new = Δy_1 * (y+_target / y+_attuale)<br/>mappo la soluzione sulla nuova mesh (restart)"]
+    I --> E
+    style G fill:#ffb74d,color:#222,stroke:none
+    style H fill:#66bb6a,color:#fff,stroke:none
+```
+
+**Se a posteriori la mesh risulta troppo grossolana** (quale valore guardare? proprio il **$y^+$ della prima cella**: se volevi risolvere il sottostrato e trovi $y^+\gg1$, sei in zona buffer/log): **non si butta tutto**. La soluzione già ottenuta si **mappa/interpola** sulla mesh raffinata come **condizione iniziale (restart)**, così la convergenza è molto più rapida — non si riparte da zero.
+
+**Di quanto raffinare?** C'è un'indicazione **quantitativa**, non "a sentimento": poiché $y^+\propto\Delta y_1$ (a $u_\tau$ dato), per passare dal $y^+$ attuale al target basta scalare la prima cella del fattore
+
+$$\Delta y_{1,\text{new}}\approx\Delta y_{1,\text{old}}\cdot\frac{y^+_{\text{target}}}{y^+_{\text{attuale}}}$$
+
+(poiché $u_\tau$ cambia un po' con la nuova soluzione, possono servire 1–2 iterazioni di assestamento).
+
+</details>
+
+<details>
+<summary><strong>Perché ogni modello vuole un $y^+$ diverso (S-A $y^+<5$, $k$-$\omega$ $y^+<1$, $k$-$\varepsilon$ nessuna)</strong></summary>
+
+- **$k$-$\omega$ (e LES): $y^+\lesssim1$ — il più stringente.** Perché il $k$-$\omega$ ha un comportamento analitico pulito a parete ($\omega\sim1/y^2$) e si **integra fino alla parete**: lo si usa proprio per la sua **accuratezza nello strato limite e nella separazione**, e per sfruttarla bisogna **risolvere il sottostrato viscoso** con celle finissime ($y^+\sim1$). È il prezzo della sua fedeltà a parete (superiore anche al $k$-$\varepsilon$).
+- **Spalart-Allmaras: $y^+<5$ — meno stringente.** Il modello è più diffusivo/robusto e il suo comportamento a parete è catturato adeguatamente già con la prima cella nel sottostrato ma non necessariamente a $y^+\sim1$. **È un vantaggio pratico?** Sì: una mesh normale leggermente più grossolana → **meno celle, meno costo**. Ma riflette anche che S-A è **meno dettagliato** a parete: ottieni robustezza/economicità al prezzo di minore fedeltà fine. Quindi sì, puoi fare una mesh "più raffazzonata" in normale e ottenere comunque il risultato che quel modello sa dare.
+- **$k$-$\varepsilon$: il prof non cita una condizione perché ne ha una *opposta*, non perché manchi.** Il $k$-$\varepsilon$ **standard** è un modello ad **alto Reynolds** che **non** risolve il sottostrato: lavora **con le wall functions**, quindi la prima cella deve stare nella **regione logaritmica** ($y^+\approx30\text{-}100$), **non** a $y^+\sim1$. Non è una condizione "dimenticata" né "troppo blanda": è semplicemente una **strategia diversa** (bypassare il sottostrato invece di risolverlo). Esistono varianti *low-Re* del $k$-$\varepsilon$ che integrano a parete con funzioni di smorzamento e che allora richiedono $y^+\sim1$.
+
+</details>
+
+<details>
+<summary><strong>Strato limite risolto vs sotto-risolto — e perché non esiste il "sovra-risolto"</strong></summary>
+
+| Caso | Posizione 1ª cella | Profilo assunto | Conseguenza |
+| --- | --- | --- | --- |
+| **Risolto** | sottostrato viscoso ($y^+\lesssim1$) | **lineare** ($u^+=y^+$) | $\tau_w=\mu(u_p-u_w)/\Delta y$ **accurato** |
+| **Sotto-risolto** | zona logaritmica ($y^+\sim30\text{-}100$) | il codice assume lineare, ma è **logaritmico** | gradiente **sbagliato** → serve **wall function** per correggere |
+
+![Mesh con infittimento nello strato limite rispetto al far field](images/mesh_elementi_boundary_layer_vs_far_field.jpg)
+
+**Commento.** Nel caso **risolto** il centro della prima cella cade dove il profilo è davvero lineare, quindi il rapporto incrementale stima bene lo sforzo a parete. Nel caso **sotto-risolto** la prima cella è già nella zona log: usare il rapporto incrementale (che presuppone linearità) sottostima/sovrastima il gradiente vero → la wall function rimette le cose a posto usando la legge logaritmica come ponte.
+
+**Perché non esiste un caso "sovra-risolto" che vada *male*?** Perché raffinare **oltre** il necessario (es. $y^+=0.1$) significa solo mettere **più celle del dovuto** nel sottostrato: la fisica resta catturata **correttamente** (anzi meglio), il profilo lineare è comunque ben descritto e il modello si comporta bene. L'unico "danno" è lo **spreco di risorse computazionali** (più celle, più costo): non c'è alcuna penalità di accuratezza, quindi un BL sovra-risolto è **inutile ma non sbagliato**. (È l'analogo del raffinare una LES fino alla DNS: corretto, solo costoso.)
+
+</details>
+
+<details>
+<summary><strong>Il problema della separazione e le variabili "star" ($\star$)</strong></summary>
+
+**Perché la separazione è problematica?** Nel **punto di separazione** lo sforzo a parete si annulla, $\tau_w=0$. Questo deriva dal fatto che lì il **gradiente di velocità a parete è nullo**, $\partial u/\partial y|_w=0$: è il punto dove il flusso vicino a parete si **stacca** e inverte (a valle c'è ricircolo), e tra flusso diretto e inverso il gradiente a parete passa per zero.
+
+**Effetto numerico e analitico.** Tutte le variabili di parete usano $u_\tau=\sqrt{\tau_w/\rho}$. Se $\tau_w=0$ allora $u_\tau=0$, quindi:
+
+$$\ell_\tau=\frac{\nu}{u_\tau}\to\infty,\qquad y^+=\frac{y}{\ell_\tau}\to0,\qquad u^+=\frac{u}{u_\tau}\to\infty$$
+
+cioè le variabili "plus" diventano **singolari** (divisione per zero). La procedura delle wall functions, che divide per $u_\tau$, **si rompe proprio dove serve di più** (la separazione è spesso la regione di interesse).
+
+**Come si risolve — le variabili star.** Si usano variabili normalizzate che **non dipendono da $u_\tau$**, ma da una scala di velocità basata sull'energia cinetica turbolenta $k^{1/2}$ (che a parete **non** è nulla nemmeno in separazione). Nella formulazione di Launder-Spalding / Patankar-Spalding:
+
+$$u^\star=\frac{u\,C_\mu^{1/4}k^{1/2}}{\tau_w/\rho},\qquad y^\star=\frac{\rho\,C_\mu^{1/4}k^{1/2}\,y}{\mu}$$
+
+La scala di velocità è $u_k=C_\mu^{1/4}k^{1/2}$ al posto di $u_\tau$: poiché $k>0$ anche in separazione, $u^\star,y^\star$ **restano finiti**.
+
+**Vantaggi/svantaggi (e perché non di default).** *Vantaggi:* ben definite anche dove $\tau_w=0$ (separazione/riattacco), più **robuste**. *Svantaggi:* **dipendono da $k$**, quindi (i) richiedono un modello che fornisca $k$ — non si applicano a Spalart-Allmaras; (ii) ereditano l'**incertezza** del modello su $k$ vicino a parete; (iii) la calibrazione "universale" è meno pulita. **Perché non usarle sempre?** Perché dove il flusso è "normale" (attaccato, $\tau_w\neq0$) le variabili "plus" classiche sono **più semplici, più universali** (indipendenti dal modello di $k$) e meglio validate. Le star **barattano universalità per robustezza**: si usano dove servono (separazione), non ovunque.
+
+</details>
+
+<details>
+<summary><strong>Cos'è una wall function: generica vs specifica, e la formula di Kader</strong></summary>
+
+**Cos'è una wall function (introduzione).** È una **relazione empirico-analitica** (la legge di parete $u^+(y^+)$) usata come **chiusura/condizione al contorno** per **scavalcare** la regione di parete non risolta: dalla velocità $u_p$ della prima cella ricava lo **sforzo a parete** $\tau_w$ senza dover risolvere il sottostrato. In pratica "sostituisce" la fisica della parete con una legge nota.
+
+**Perché una wall function *generica*?** Perché la legge di parete è **a tratti** (sottostrato lineare, buffer, log): se la prima cella cade nel buffer, nessuna delle due leggi semplici vale, e lungo una parete reale il $y^+$ **varia**. Una wall function *generica* fornisce **un'unica formula continua** valida su **tutte** le regioni (sottostrato + buffer + log), così funziona **ovunque cada** la prima cella, senza il salto/ambiguità dello switch tra legge lineare e logaritmica.
+
+**Esistono wall function *specifiche*?** Sì: le *standard wall functions* (legge lineare + log separate, valide solo $y^+\sim30\text{-}100$), le *scalable*, le *non-equilibrium* (tengono conto del gradiente di pressione), e trattamenti per **scambio termico** o **rugosità**. "Specifica" = tarata per condizioni particolari.
+
+**La formula di Kader (forma esponenziale).** Una wall function generica classica:
+
+$$u^+=e^{\Gamma}\,u^+_{\text{lam}}+e^{1/\Gamma}\,u^+_{\text{turb}},\qquad \Gamma(y^+)=-\frac{a\,(y^+)^4}{1+b\,y^+}$$
+
+con $u^+_{\text{lam}}=y^+$ (legge lineare), $u^+_{\text{turb}}=\tfrac1\kappa\ln y^+ + B$ (legge log), e $a,b$ costanti empiriche.
+
+- **Perché la forma esponenziale?** Gli esponenziali agiscono come **interruttori morbidi (blending)**: per $y^+$ piccolo $\Gamma\to0$, quindi $e^{\Gamma}\to1$ (domina la legge **lineare**) e $e^{1/\Gamma}\to e^{-\infty}\to0$ (legge log spenta); per $y^+$ grande $\Gamma\to-\infty$, quindi $e^{\Gamma}\to0$ (lineare spenta) e $e^{1/\Gamma}\to1$ (domina la **log**). Si ottiene così una transizione **continua e monotòna** tra sottostrato e zona log attraverso il buffer, **senza switch netto**.
+- **Cos'è $\Gamma$?** È la **funzione di blending** $\Gamma(y^+)=-a(y^+)^4/(1+b\,y^+)$: decide quale legge "pesa" in funzione di $y^+$ (a parete $\Gamma\approx0$ → laminare; lontano $\Gamma\to-\infty$ → turbolento). Il termine $(y^+)^4$ rende la transizione **netta nel punto giusto** (il buffer layer), mentre il denominatore $1+b\,y^+$ la **tempera** evitando che diventi troppo brusca.
+
+</details>
+
 ## Benchmark, LES e modelli ibridi
 
 <details>
@@ -984,6 +1092,8 @@ Le wall functions **non risolvono** lo strato limite: danno una chiusura empiric
 - **RANS:** applica un operatore di media temporale (o di ensemble), eliminando tutte le fluttuazioni transitorie.
 - **LES:** applica un filtro spaziale (passa-basso). Le scale più grandi della dimensione del filtro vengono risolte nello spazio e nel tempo, mentre quelle inferiori (sottogriglia) vengono modellate.
 
+> ❓ **Perché nella LES il campo filtrato $\bar u(\mathbf x,t)$ dipende ancora dal tempo, mentre nella media di Reynolds $\bar u(\mathbf x)$ no?** Perché i due operatori sono **diversi**. La media di Reynolds **integra nel tempo** ($\frac1T\int_t^{t+T}\!\dots\,dt'$): "consuma" la variabile $t$ e per flusso stazionario restituisce un campo che dipende **solo da $\mathbf x$**. Il filtro LES è invece **puramente spaziale**: a **ogni istante** liscia il campo *nello spazio* (convoluzione in $r$), senza toccare il tempo. Quindi $\bar u(\mathbf x,t)$ resta un campo **istantaneo** (semplicemente "sfocato" sulle piccole scale) e **conserva la dipendenza temporale** → la LES risolve l'evoluzione nel tempo dei grandi vortici, la RANS no. È esattamente la stessa differenza tra RANS e URANS, ma portata all'estremo opposto: la LES è intrinsecamente **instazionaria**.
+
 ### 3. Operatore filtro $G(x, r, \Delta)$ — ampiezza e forma
 
 Una variabile filtrata $\bar{f}(x)$ è ottenuta per convoluzione con la funzione filtro $G$.
@@ -1001,6 +1111,8 @@ $$\bar u (x,t) = \int_{\Omega} u (x,t) \ G(x,r,\Delta)\,dr$$
 ![Confronto tra Top-hat filter e Gaussian filter (ampiezza Δ del filtro)](images/les_filtri_top_hat_vs_gaussian.jpg)
 
 > Nel caso di filtri non sharp (tipo quello Gaussiano) apparentemente non è chiaro come scegliere l'ampiezza $\Delta$.
+
+> ❓ **Top-hat, gaussiano, spettrale: questi esempi a cosa servono, e quale usiamo davvero?** Sono **esempi didattici** per capire *cos'è* un filtro (una media pesata) e che forme può avere: top-hat (media uniforme su un volume cubico), gaussiano (pesatura a campana), spettrale (taglio netto in Fourier). In pratica, però, nelle LES **non si applica un filtro esplicito**: si usa il **filtro implicito**, cioè è la **discretizzazione numerica stessa** a fare da filtro, con ampiezza $\Delta$ pari alla dimensione della cella. Hai ragione tu: nei codici a **volumi finiti** la media di cella equivale proprio a un **filtro box / top-hat** (media uniforme sul volume della cella). Quindi "il filtro che usiamo" è di fatto il top-hat implicito della mesh — gaussiano e spettrale restano strumenti concettuali/di analisi.
 
 ### 5. Richiami sulla convoluzione
 
@@ -1021,6 +1133,33 @@ $$\tau_{ij}^{sgs} = \rho(\overline{u_i u_j} - \bar{u}_i \bar{u}_j)= \underbrace{
 > Questo termine rappresenta l'effetto delle scale non risolte su quelle risolte e deve essere modellato. Viene definito tensore di sottogriglia ma di fatto è un tensore degli sforzi che dipende dalla scelta della griglia.
 
 <details>
+<summary><strong>Approfondimento (non richiesto) — Derivazione delle equazioni LES e confronto LES vs RANS</strong></summary>
+
+**Perché non abbiamo "ricavato" le equazioni LES?** Non perché siano più complesse: la procedura è **formalmente identica** a quella delle RANS. Si applica un **operatore di filtro spaziale** alle Navier-Stokes invece dell'operatore di media temporale; il filtro è lineare e (sotto le ipotesi usuali) commuta con le derivate, quindi i passaggi si ripetono uguali. L'unico termine nuovo è la correlazione non lineare del convettivo, il **tensore SGS** $\tau^s_{ij}=\overline{u_iu_j}-\bar u_i\bar u_j$, analogo esatto del tensore di Reynolds. Le equazioni filtrate incompressibili sono:
+
+$$\frac{\partial \bar u_i}{\partial x_i}=0,\qquad \frac{\partial \bar u_i}{\partial t}+\frac{\partial(\bar u_i\bar u_j)}{\partial x_j}=-\frac1\rho\frac{\partial\bar p}{\partial x_i}+\nu\nabla^2\bar u_i-\frac{\partial\tau^s_{ij}}{\partial x_j}$$
+
+Avendo già **ricavato le RANS in dettaglio**, le LES si ottengono "per analogia" e non si rifà la derivazione (di qui il tag *approfondimento non richiesto*). Due sottigliezze tecniche che le distinguono: il filtro **non è idempotente** in generale ($\bar{\bar u}\neq\bar u$, a differenza della media di Reynolds) e **non commuta perfettamente** con le derivate su griglie non uniformi — ma la struttura resta la stessa.
+
+**Confronto LES vs RANS** (come abbiamo fatto RANS vs URANS, usando le RANS come riferimento):
+
+| Aspetto | RANS | LES |
+| --- | --- | --- |
+| **Operatore** | media temporale / d'insieme | **filtro spaziale** (convoluzione) |
+| **Cosa risolve** | campo **medio** (stazionario) | campo **filtrato istantaneo** (instazionario) |
+| **Cosa modella** | **tutta** la turbolenza | **solo** le scale sotto-griglia (SGS) |
+| **Termine di chiusura** | sforzi di Reynolds $-\rho\overline{u_i'u_j'}$ | sforzi SGS $\tau^s_{ij}$ |
+| **Idempotenza dell'operatore** | sì ($\bar{\bar u}=\bar u$) | no, in generale |
+| **Dipendenza dalla griglia** | nessuna (il modello fissa tutto) | **esplicita**: $\Delta$ è il filtro |
+| **Errore di modello al raffinamento** | **strutturale**: non si annulla, converge alla soluzione RANS ($\neq$ NS) | **controllabile**: $\nu_t\to0$, converge alla **DNS** |
+| **Costo** | minimo | intermedio (molto alto a parete) |
+| **Instazionarietà** | persa (URANS la recupera in parte) | **intrinseca** |
+
+> 💡 Il punto chiave del confronto è l'ultima-ma-una riga: nelle **RANS** l'errore di modello è *strutturale* (raffinando la mesh convergi alla soluzione esatta delle *equazioni RANS*, non delle NS → modelli diversi danno risultati diversi anche con griglia finissima); nelle **LES** l'errore è *controllabile* (raffinando, il contributo SGS svanisce e tutti i modelli convergono alla stessa DNS).
+
+</details>
+
+<details>
 <summary><strong>Modello eddy viscosity</strong></summary>
 
 Sfrutta l'ipotesi di Boussinesq: l'effetto dei piccoli vortici è puramente dissipativo.
@@ -1035,6 +1174,31 @@ L'ipotesi di Boussinesq modella il tensore di sottogriglia assumendo che si comp
 
 1. **Modelli di similitudine di scala (es. modello di Bardina):** non calcolano una viscosità turbolenta ($\nu_{sgs}$). Invece, applicano un secondo filtro ai campi risolti per estrapolare direttamente l'intero tensore degli sforzi di sottogriglia $\tau_{ij}^{sgs}$. Questo permette al tensore di non essere allineato con la deformazione e autorizza esplicitamente il backscatter.
 2. **Modelli ibridi/misti:** sommano una parte dissipativa di Smagorinsky (per garantire stabilità numerica) a una parte di similitudine di scala (per catturare l'anisotropia e il backscatter).
+
+</details>
+
+<details>
+<summary><strong>Boussinesq (RANS) vs eddy-viscosity SGS / Smagorinsky (LES): confronto</strong></summary>
+
+**A livello teorico** i due modelli condividono la **stessa identica idea** — l'**ipotesi di eddy viscosity**: modellare lo sforzo non risolto come (viscosità turbolenta) × (tensore di deformazione). Cambia **a cosa** la si applica:
+
+- **RANS / Boussinesq:** modella lo sforzo di Reynolds, cioè l'effetto di **tutta** la turbolenza, usando la $\mu_T$ e il tensore di deformazione del campo **medio** $S_{ij}$. La $\mu_T$ è una proprietà del **flusso** (intensità di turbolenza) e si ottiene da un **modello di trasporto** ($k$-$\varepsilon$...).
+- **LES / Smagorinsky:** modella solo lo sforzo di **sotto-griglia**, cioè l'effetto delle **piccole scale non risolte**, usando la $\nu_{sgs}$ e il tensore di deformazione del campo **filtrato** $\bar S_{ij}$. La $\nu_{sgs}$ dipende dalla **scala di griglia** $\Delta$ ed è **algebrica e locale** (nessuna equazione di trasporto).
+
+**A livello pratico (formule), termine per termine:**
+
+| Termine | RANS — Boussinesq | LES — Smagorinsky (SGS) | Status |
+| --- | --- | --- | --- |
+| Sforzo modellato | $\tau^R_{ij}=-\rho\overline{u_i'u_j'}$ (tutta la turbolenza) | $\tau^s_{ij}=\rho(\overline{u_iu_j}-\bar u_i\bar u_j)$ (solo SGS) | **analogo**, oggetto diverso |
+| Forma | $2\mu_T S_{ij}-\tfrac23\rho k\,\delta_{ij}$ | $-2\rho\nu_{sgs}\bar S_{ij}+\tfrac13\delta_{ij}\tau^s_{kk}$ | **stessa struttura** |
+| Tensore di deformazione | $S_{ij}=\tfrac12(\partial_j\bar u_i+\partial_i\bar u_j)$ sul campo **medio** | $\bar S_{ij}=\tfrac12(\partial_j\bar u_i+\partial_i\bar u_j)$ sul campo **filtrato** | **stessa forma, grandezza diversa** (vedi sotto) |
+| Viscosità turbolenta | $\mu_T=C_\mu\rho\,k^2/\varepsilon$ (da **trasporto**) | $\nu_{sgs}=(C_S\Delta)^2|\bar S|$ (**algebrica**, dalla griglia) | **diverso** |
+| Scala di lunghezza | scala integrale (dal flusso) | $\Delta$ (dimensione cella) | **diverso** |
+| Parte isotropa | $-\tfrac23\rho k\,\delta_{ij}$ → pressione modificata | $\tfrac13\delta_{ij}\tau^s_{kk}$ → pressione filtrata modificata | **analogo** |
+| Backscatter | impossibile ($\mu_T>0$) | impossibile in Smagorinsky **statico**; possibile nel **dinamico** | quasi uguale |
+| Al raffinamento mesh | $\mu_T$ resta **finito** | $\nu_{sgs}\to0$ (→ DNS) | **diverso** |
+
+> ❓ **Perché in LES il tensore di deformazione è *filtrato* mentre in RANS è *medio*?** Perché l'incognita dei due metodi è diversa. In RANS l'incognita è il campo **medio**, quindi $S_{ij}$ si costruisce con la velocità **mediata** $\bar u$ (stazionaria). In LES l'incognita è il campo **filtrato** (istantaneo, liscio nello spazio), quindi $\bar S_{ij}$ si costruisce con la velocità **filtrata**: la definizione algebrica $\tfrac12(\partial_j u_i+\partial_i u_j)$ è **identica**, ma è applicata a una grandezza che **varia nel tempo** e contiene la deformazione istantanea dei grandi vortici risolti. È proprio questa deformazione filtrata, locale e istantanea, che pilota la dissipazione SGS punto per punto e istante per istante.
 
 </details>
 
@@ -1061,6 +1225,25 @@ In un flusso **puramente laminare** all'interno di uno strato limite non c'è tu
 <summary><strong>Modello dinamico (identità di Germano, doppio filtraggio)</strong></summary>
 
 **Procedura.** Risolve i problemi di Smagorinsky calcolando $C_s$ dinamicamente nello spazio e nel tempo. Si applica un **test filter** (di dimensione tipicamente $\widehat{\Delta} = 2\Delta$). Utilizzando l'identità di Germano, si sfrutta la banda di turbolenza risolta compresa tra i due filtri per calcolare il coefficiente corretto locale. Consente a $C_s$ di azzerarsi vicino ai muri e nei flussi laminari, permettendo anche il backscatter (se il modello non è limitato artificialmente).
+
+```mermaid
+flowchart TD
+    A["Campo risolto sulla griglia<br/>(filtro Δ)"] --> D["Modello SGS a scala Δ:<br/>tau_ij (Smagorinsky)"]
+    A --> B["Applico il TEST FILTER<br/>(scala 2Δ)"]
+    B --> C["Tensore di Leonard L_ij<br/>scale tra Δ e 2Δ<br/>(calcolabile dai dati risolti)"]
+    B --> E["Modello SGS a scala 2Δ:<br/>T_ij"]
+    C --> F["Identita di Germano<br/>L_ij = T_ij - tau_ij filtrato"]
+    D --> F
+    E --> F
+    F --> G["Ipotesi: stesso C_s alle due scale<br/>(similitudine) -> minimi quadrati (Lilly)"]
+    G --> H["C_s = C_s(x,t) locale<br/>ν_sgs = (C_s Δ)^2 |S_bar|"]
+    H --> I["C_s<0 ammesso -> backscatter<br/>ma clipping (C_s>=0) per stabilita"]
+    style F fill:#4fc3f7,color:#111,stroke:none
+    style H fill:#66bb6a,color:#fff,stroke:none
+    style I fill:#ffb74d,color:#222,stroke:none
+```
+
+![Modello dinamico (Germano): asse delle scale con filtro Δ e test filter 2Δ; regioni A (non risolta), B (banda intermedia), C (risolta); ipotesi Cs(B)=Cs(A)](images/modello_dinamico_les_germano.png)
 
 **L'identità di Germano** è la base del modello dinamico e mette in relazione gli sforzi di sottogriglia a due diversi livelli di filtraggio spaziale: il filtro della griglia ($\Delta$, indicato con la barra orizzontale $\bar{\cdot}$) e il filtro di test ($\widehat{\Delta}$, indicato con il cappelletto $\widehat{\cdot}$). L'identità principale si esprime come:
 
