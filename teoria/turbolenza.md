@@ -1414,20 +1414,38 @@ I modelli ibridi nascono per superare il costo computazionale proibitivo della L
 | **Seamless (Non-Zonali)** | **DDES / IDDES** *(Delayed / Improved DES)* | Evoluzione della DES. Introduce funzioni di shielding che forzano la RANS dentro tutto lo strato limite, a prescindere dalla mesh. | Risolve il problema del GIS; l'IDDES permette anche il wall-modeled LES (WMLES) se la mesh è finissima. | Taratura empirica delle funzioni di shielding complessa. | DDES, IDDES |
 | **Zonali** | **Embedded LES (ELES)** | Il dominio è diviso geometricamente a priori dall'utente in zone puramente RANS e zone puramente LES. | Massimo controllo fisico; si spende computazionalmente solo dove serve davvero. | Richiede la generazione di turbolenza sintetica fluttuante all'interfaccia RANS $\rightarrow$ LES. | ELES (in Fluent), HTLES |
 
-### Mappa dei modelli
+### Zonale vs non-zonale: quale conviene?
 
-**Modelli zonali**
+> ❓ **Che vantaggio dà un modello *zonale*? Chi me lo fa fare a studiare quali zone vanno in LES/RANS?** Il vantaggio è il **controllo esplicito**: decidi tu **esattamente** dove mettere la LES (costosa) e dove la RANS (economica), spendendo risorse **solo** dove la LES serve davvero ed evitando le **zone grigie** e le attivazioni premature dei modelli seamless (GIS/MSD). I **non-zonali** (DES) commutano **automaticamente** (mesh + distanza da parete): comodi, ma **senza** controllo fine sull'interfaccia e fragili su griglie ambigue.
+>
+> **I non-zonali mettono RANS solo sullo strato limite?** Sì, è l'uso tipico (RANS nel BL attaccato, LES nelle scie/distacchi). Ma la RANS conviene **ovunque il flusso sia "facile"**: BL attaccati, regioni **stazionarie**, **far field**, condotti di adduzione — dove non servono vortici risolti. La LES si riserva alle regioni **critiche** (scie separate, getti, miscelamento, fiamma).
+>
+> **Esempio pratico:** flusso attorno a un'**auto** → RANS sul muso e sui BL attaccati, **LES embedded solo nella scia** dietro; oppure un **combustore** → RANS nei condotti di adduzione, LES **solo nella zona di fiamma**. Così paghi la LES su una frazione piccola del dominio.
 
-- DES (Spalart 1997): criterio di switching su lunghezza scala
-- Problema MSD (Modelled Stress Depletion) in BL spessi
-- DDES: shielding function
-- IDDES: mismatch log-layer interno/esterno
+```mermaid
+flowchart LR
+    A["Muso + BL attaccati<br/>RANS (economico)"] -->|interfaccia:<br/>turbolenza sintetica| B["Scia separata dietro il corpo<br/>LES embedded (costoso)"]
+    style A fill:#4fc3f7,color:#111,stroke:none
+    style B fill:#ef5350,color:#fff,stroke:none
+```
 
-**Modelli non-zonali**
+### DDES vs IDDES e shielding function
 
-- VLES: funzione $F_R$ e rapporto $\Delta/\eta_K$
-- PANS: parametri $f_k$, $f_\varepsilon$
-- PITM: parametro $\eta_c$
+> ❓ **Che differenza c'è tra DDES e IDDES?**
+> - **DES (originale, 1997):** $\tilde d=\min(d,\,C_{DES}\Delta)$. Vicino a parete $\tilde d=d$ → RANS; lontano $\tilde d=C_{DES}\Delta$ → LES. **Problema:** con griglie fini/anisotrope a parete lo switch a LES scatta **dentro** il BL senza turbolenza risolta → **Modelled Stress Depletion (MSD)** e separazione indotta dalla griglia (**GIS**).
+> - **DDES (Delayed DES):** introduce la **shielding function** $f_d$ che "protegge" il BL forzando la **RANS in tutto lo strato limite a prescindere dalla mesh**. Risolve MSD/GIS. $\tilde d=d-f_d\max(0,\,d-C_{DES}\Delta)$.
+> - **IDDES (Improved DDES):** unisce il DDES con la **Wall-Modeled LES (WMLES)**. Quando la mesh è fine **e** c'è contenuto turbolento risolto vicino a parete, può funzionare come WMLES (RANS solo nel sottostrato, LES sopra); inoltre **corregge il *log-layer mismatch*** (LLM), cioè il salto del profilo logaritmico tra la zona interna RANS e quella esterna LES che affligge il DDES-WMLES (e che falsa l'attrito a parete). In pratica: **DDES** = scudo per il BL; **IDDES** = DDES **+** ramo WMLES **+** raccordo del log-layer.
+
+> ❓ **Cosa sono le funzioni di shielding?** Sono **sensori di strato limite**: "schermano" (proteggono) il BL dall'essere erroneamente trattato in modalità LES. La funzione $f_d$ riconosce se ci si trova **dentro** il boundary layer e in tal caso forza la **RANS**, indipendentemente da quanto è fine la griglia:
+>
+> $$f_d=1-\tanh\big[(8\,r_d)^3\big],\qquad r_d=\frac{\nu+\nu_t}{\kappa^2 d^2\sqrt{\partial_j u_i\,\partial_j u_i}},\qquad \kappa=0.41$$
+>
+> $r_d$ è grande dentro il BL (flusso fortemente shear-driven, dominato dalla viscosità a piccola distanza $d$) e piccolo lontano. Di conseguenza: **dentro il BL** $r_d$ grande → $f_d\to0$ → $\tilde d=d$ → **RANS** (BL schermato); **nella regione separata** $r_d$ piccolo → $f_d\to1$ → $\tilde d=\min(d,C_{DES}\Delta)$ → **LES**. La mappa di $f_d$ ($0$ a parete, $1$ fuori) è anche un comodo strumento diagnostico per *vedere* dove il modello opera in RANS e dove in LES.
+
+### Altri modelli (mappa rapida)
+
+**Zonali:** DES (Spalart 1997, switching su lunghezza scala) · problema **MSD** in BL spessi · **DDES** (shielding) · **IDDES** (log-layer mismatch + WMLES).
+**Non-zonali (bridging continui):** **VLES** (funzione $F_R$, rapporto $\Delta/\eta_K$) · **PANS** (parametri $f_k$, $f_\varepsilon$) · **PITM** (parametro $\eta_c$).
 
 </details>
 
