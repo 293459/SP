@@ -201,48 +201,33 @@ $$(1 - M^2)\,\phi_{xx} + \phi_{yy} = 0$$
 ## Modelli scalari e vettoriali
 
 <details>
-<summary><strong>Modelli:</strong></summary>
+<summary><strong>Scalare Lineare (advezione lineare): perché "scalare", e il significato di $a$</strong></summary>
 
-</details>
+$$\frac{\partial u}{\partial t} + a\,\frac{\partial u}{\partial x} = 0 \qquad\Longleftrightarrow\qquad \frac{\partial u}{\partial t} + \frac{\partial (a\,u)}{\partial x} = 0\quad(a=\text{cost})$$
 
-<details>
-<summary><strong>Scalare Lineare:</strong></summary>
+Modello-giocattolo fondamentale per studiare **stabilità e diffusione/dispersione numerica** degli schemi.
 
-Utilizzato principalmente per lo studio della stabilità e diffusione numerica.
+**Perché "scalare"?** Perché la variabile conservata $u$ è **una sola grandezza scalare** → c'è **una sola equazione**. Le due cose sono **collegate** (la tua intuizione è corretta): se la grandezza conservata fosse un **vettore** $\mathbf u$ avresti un **sistema** $\partial_t\mathbf u + A\,\partial_x\mathbf u=0$ (modello *vettoriale*, un'equazione per componente). Quindi "scalare ↔ una incognita / una equazione", "vettoriale ↔ vettore di incognite / sistema". L'aggettivo **"lineare"** è invece **indipendente**: riguarda il fatto che il **flusso** $f(u)=a\,u$ è lineare in $u$ (il coefficiente $a$ non dipende da $u$). Le quattro combinazioni esistono: scalare-lineare (advezione), scalare-non lineare (Burgers, $f=u^2/2$), vettoriale-lineare (acustica linearizzata), vettoriale-non lineare (Eulero).
+
+**Il coefficiente $a$ è una velocità di propagazione anche in forma conservativa, o solo con la derivata materiale?** È velocità di propagazione in **entrambe** le forme. Per una legge di conservazione scalare $u_t+f(u)_x=0$ la **velocità d'onda/caratteristica** è $f'(u)=\dfrac{df}{du}$, proprietà **intrinseca** dell'equazione. Per il flusso lineare $f=a\,u$ si ha $f'(u)=a$ (costante): quindi $a$ è la velocità di propagazione **sia** nella forma con derivata materiale $\frac{Du}{Dt}=0$ lungo $\frac{dx}{dt}=a$, **sia** in forma conservativa $\partial_t u+\partial_x(a\,u)=0$. Anzi, essendo $a$ costante, $\partial_x(a\,u)=a\,\partial_x u$: le due forme sono **identiche** e la soluzione $u(x,t)=u_0(x-at)$ è il profilo iniziale **traslato rigidamente** a velocità $a$. La derivata materiale **non** conferisce il significato ad $a$, lo rende solo **manifesto**.
+
+> ⚠️ La distinzione tra le due forme conta solo nel **non lineare**: con $f=u^2/2$ (Burgers) la velocità d'onda è $f'(u)=u$ (dipende da $u$ → urti), e la forma **conservativa** è quella fisicamente corretta per gli urti (dà la velocità giusta via Rankine-Hugoniot $s=[\![f]\!]/[\![u]\!]$), mentre quella advettiva vale solo per soluzioni regolari. La velocità d'onda locale resta però $f'(u)$ in entrambe.
 
 </details>
 
 <details>
 <summary><strong>Scalare Non Lineare (Burgers):</strong></summary>
 
-Fondamentale per studiare la formazione di discontinuità (urti).
+$$\frac{\partial u}{\partial t} + u\,\frac{\partial u}{\partial x} = 0 \qquad\Longleftrightarrow\qquad \frac{\partial u}{\partial t} + \frac{\partial}{\partial x}\Big(\frac{u^2}{2}\Big)=0$$
 
-</details>
-
-<details>
-<summary><strong>Scalare lineare</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Scalare non lineare (Burgers non viscosa)</strong></summary>
+Fondamentale per studiare la formazione di discontinuità (urti): velocità d'onda $f'(u)=u$ → le creste viaggiano più veloci dei ventri → ripidità del fronte → urto.
 
 </details>
 
 <details>
 <summary><strong>Vettoriale lineare</strong></summary>
 
-</details>
-
-<details>
-<summary><strong>Vettoriale Lineare:</strong></summary>
-
-Rappresenta sistemi di equazioni linearizzate (es. onde acustiche).
-
-</details>
-
-<details>
-<summary><strong>I varianti di Riemann, problema di Riemann , tubo di sod</strong></summary>
+Rappresenta sistemi di equazioni linearizzate (es. onde acustiche): $\partial_t\mathbf u+A\,\partial_x\mathbf u=0$, con $A$ matrice costante diagonalizzabile (autovalori = velocità d'onda).
 
 </details>
 
