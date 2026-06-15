@@ -1189,7 +1189,11 @@ $$(f * g)(x) = \int_{-\infty}^{+\infty} f(\xi)\,g(x-\xi)\,d\xi$$
 
 ### 6. Equazioni NS filtrate e tensore sottogriglia $\tau_{ij}^s$
 
-Filtrando le equazioni di Navier-Stokes emerge un termine non chiuso derivante dal termine convettivo non lineare: il **tensore degli sforzi di sottogriglia** (SGS stress tensor).
+Filtrando le equazioni di Navier-Stokes emerge un termine non chiuso derivante dal termine convettivo non lineare: il **tensore degli sforzi di sottogriglia** (SGS stress tensor). Insieme al momento, vale anche la **continuità filtrata**:
+
+$$\frac{\partial \bar u_i}{\partial x_i}=0$$
+
+> 📌 **La divergenza nulla del campo filtrato è una continuità, analoga a quella reale e RANS.** Per un flusso **incomprimibile** l'equazione di continuità $\partial_i u_i=0$ vale **sempre**; ciò che cambia è solo **a quale velocità** la si applica: al campo **reale** $u_i$ (NS originali), al campo **mediato** $\bar u_i$ (RANS) o al campo **filtrato** $\bar u_i$ (LES). Poiché il filtro (come la media) è lineare e commuta con la divergenza, da $\partial_i u_i=0$ segue subito $\partial_i\bar u_i=0$ — è la **stessa** equazione di continuità, scritta per la velocità filtrata. (È inoltre il motivo per cui, anche in LES, la parte di dilatazione $\partial_k\bar u_k$ è nulla.)
 
 $$\frac{\partial \bar{u}_i}{\partial t} + \frac{\partial (\bar{u}_i \bar{u}_j)}{\partial x_j} = -\frac{1}{\rho}\frac{\partial \bar{p}}{\partial x_i} + \nu\frac{\partial^2 \bar{u}_i}{\partial x_j \partial x_j} - \frac{\partial \tau_{ij}^{sgs}}{\partial x_j}$$
 
@@ -1277,16 +1281,43 @@ L'ipotesi di Boussinesq modella il tensore di sottogriglia assumendo che si comp
 
 > ❓ **Perché in LES il tensore di deformazione è *filtrato* mentre in RANS è *medio*?** Perché l'incognita dei due metodi è diversa. In RANS l'incognita è il campo **medio**, quindi $S_{ij}$ si costruisce con la velocità **mediata** $\bar u$ (stazionaria). In LES l'incognita è il campo **filtrato** (istantaneo, liscio nello spazio), quindi $\bar S_{ij}$ si costruisce con la velocità **filtrata**: la definizione algebrica $\tfrac12(\partial_j u_i+\partial_i u_j)$ è **identica**, ma è applicata a una grandezza che **varia nel tempo** e contiene la deformazione istantanea dei grandi vortici risolti. È proprio questa deformazione filtrata, locale e istantanea, che pilota la dissipazione SGS punto per punto e istante per istante.
 
+### La questione dei segni del termine isotropo (e i due/tre termini di Boussinesq)
+
+> ❓ **Perché il termine isotropo sembra *negativo* in Boussinesq e *positivo* in Smagorinsky? È una differenza concettuale o un problema di segni?** È **solo una diversa convenzione di segno nella *definizione* del tensore**, non una contraddizione fisica. Il termine isotropo è $\frac13\delta_{ij}\tau_{kk}$ in **entrambi** i casi; cambia il segno della **traccia** perché i due tensori sono definiti in modo opposto:
+>
+> | | RANS (Boussinesq) | LES (Smagorinsky) |
+> | --- | --- | --- |
+> | Definizione | $\tau^R_{ij}=\mathbf{-}\rho\overline{u_i'u_j'}$ (**con** il meno) | $\tau^s_{ij}=\mathbf{+}\rho(\overline{u_iu_j}-\bar u_i\bar u_j)$ (**senza** meno) |
+> | Traccia | $\tau^R_{kk}=-\rho\overline{u_k'u_k'}=-2\rho k\ (<0)$ | $\tau^s_{kk}=2\rho k_{sgs}\ (>0)$ |
+> | Parte isotropa $\frac13\delta_{ij}\tau_{kk}$ | $-\tfrac23\rho k\,\delta_{ij}$ | $+\tfrac23\rho k_{sgs}\,\delta_{ij}$ |
+> | Come compare nel momento | $+\,\partial_j\tau^R_{ij}$ | $-\,\partial_j\tau^s_{ij}$ |
+>
+> I due segni opposti **si compensano** col segno opposto con cui $\tau$ entra nell'equazione di quantità di moto: il risultato fisico è **identico**. E in ogni caso la parte isotropa viene **assorbita nella pressione modificata** ($\bar p^*=\bar p\pm\tfrac23\rho k$), quindi il suo segno è **irrilevante** per il moto (sposta solo la pressione). La parte **anisotropa** (eddy viscosity) è **dissipativa in entrambi**. Quindi: nessuna differenza concettuale, è bookkeeping.
+
+> ❓ **Boussinesq ha due (o tre) termini: uno simile a Smagorinsky, l'altro diverso. Quel termine "diverso" è solo del compressibile/Favre o c'è già nell'incompressibile?** La forma **generale (compressibile)** di Boussinesq ha **tre** pezzi:
+>
+> $$\tau^R_{ij}=\underbrace{2\mu_T\bar S_{ij}}_{\text{(a) deviatorico}}\underbrace{-\,\tfrac23\mu_T\frac{\partial\bar u_k}{\partial x_k}\delta_{ij}}_{\text{(b) dilatazione}}\underbrace{-\,\tfrac23\rho k\,\delta_{ij}}_{\text{(c) energia turbolenta}}$$
+>
+> - **(a)** $2\mu_T\bar S_{ij}$: il termine **anisotropo/deviatorico**, presente **sempre** → è l'analogo di Smagorinsky $-2\rho\nu_{sgs}\bar S_{ij}$.
+> - **(c)** $-\tfrac23\rho k\,\delta_{ij}$: la **pressione turbolenta** (isotropa), presente **sia in incompressibile sia in compressibile** → analoga alla parte isotropa SGS $\tfrac13\delta_{ij}\tau^s_{kk}$.
+> - **(b)** $-\tfrac23\mu_T(\partial_k\bar u_k)\delta_{ij}$: il termine di **dilatazione**, **nullo in incompressibile** ($\partial_k\bar u_k=0$) → compare **solo nel compressibile/Favre**. È questo il termine "diverso" che non trovi nell'incompressibile né nel confronto base con Smagorinsky.
+
 </details>
 
 <details>
 <summary><strong>Modello di Smagorinsky statico</strong></summary>
 
-È il modello base (uno dei più semplici e anche dei più usati). Calcola la viscosità di sottogriglia come
+È il modello base (uno dei più semplici e anche dei più usati). Modella la parte **anisotropa** del tensore di sottogriglia con un'eddy viscosity, e in forma **esplicita** completa si scrive:
 
-$$\nu_{sgs} = (C_s \Delta)^2 |\bar{S}|$$
+$$\boxed{\ \tau^s_{ij}-\tfrac13\delta_{ij}\tau^s_{kk}=-2\,\nu_{sgs}\,\bar S_{ij}=-2\,(C_s\Delta)^2\,|\bar S|\,\bar S_{ij}\ }$$
 
-> $\Delta$ è l'ampiezza del filtro che dipende dalla mesh scelta, $|\bar S|$ è il modulo del tensore delle velocità di deformazione e $C_s$ è la costante di Smagorinsky.
+$$\nu_{sgs} = (C_s \Delta)^2\, |\bar{S}|,\qquad \bar S_{ij}=\tfrac12\Big(\frac{\partial\bar u_i}{\partial x_j}+\frac{\partial\bar u_j}{\partial x_i}\Big),\qquad |\bar S|=\sqrt{2\,\bar S_{ij}\bar S_{ij}}$$
+
+> $\Delta$ è l'ampiezza del filtro (dipende dalla mesh), $\bar S_{ij}$ è il tensore della velocità di deformazione **filtrato**, $|\bar S|$ il suo **modulo**, e $C_s$ la costante di Smagorinsky ($\approx0.1$–$0.2$; $0.18$ per turbolenza omogenea isotropa).
+
+> ❓ **Cos'è il "modulo" $|\bar S|$? Non è una norma? Dimensionalmente cos'è, e perché definito così?** **Sì, è una norma** (di Frobenius) del tensore $\bar S_{ij}$, contratta su tutti gli indici: $|\bar S|=\sqrt{2\,\bar S_{ij}\bar S_{ij}}$. Serve perché $\nu_{sgs}$ è uno **scalare** ma $\bar S_{ij}$ è un **tensore**: per costruire una viscosità (scalare) dal tensore di deformazione occorre una **misura scalare** della sua intensità, indipendente dalla direzione → la norma. **Dimensionalmente** $\bar S_{ij}\sim[\text{velocità}/\text{lunghezza}]=[1/\text{s}]$, quindi $|\bar S|$ è una **frequenza / rateo di deformazione** $[\text{s}^{-1}]$ (così $\nu_{sgs}=(C_s\Delta)^2|\bar S|$ ha le dimensioni $[\text{m}^2/\text{s}]$ di una viscosità cinematica — torna). **Perché il fattore 2** sotto radice? È una **convenzione** scelta affinché, per un **taglio semplice** ($\partial u/\partial y=\dot\gamma$, con $\bar S_{12}=\bar S_{21}=\tfrac12\dot\gamma$), risulti esattamente $|\bar S|=\dot\gamma$: il modulo coincide così con il **rateo di taglio** fisico.
+
+> ❓ **A livello fisico, come fa $\bar S_{ij}$ a influenzare $\nu_{sgs}$? Cosa succede nel campo di moto?** $\nu_{sgs}\propto|\bar S|$: la viscosità di sottogriglia è grande **dove i grandi vortici risolti stanno deformando intensamente il fluido** (alto rateo di deformazione = forte stiramento/taglio degli elementi fluidi). Fisicamente, è proprio lo **stiramento da deformazione (vortex stretching)** il meccanismo che **trasferisce energia dalle scale grandi a quelle piccole** (alimenta la cascata): dove il campo risolto si deforma molto, sta versando molta energia verso le scale **non risolte**, quindi il modello SGS deve **dissiparne di più** → $\nu_{sgs}$ grande. Dove invece il campo risolto è "liscio" (basso $|\bar S|$), poca energia scende verso il sotto-griglia → $\nu_{sgs}$ piccola. In sintesi $|\bar S|$ è un **proxy locale e istantaneo dell'intensità della cascata**: lega quanto il campo risolto sta deformando il fluido a quanta dissipazione il modello deve fornire.
 
 Il coefficiente $C_s$ è **costante**. Questo non permette di tenere in considerazione il fatto che la turbolenza vari nello spazio (non è detto ad esempio che tutto lo strato limite sia turbolento, ma magari c'è una regione laminare che poi transisce al turbolento) e nel tempo (se il flusso è instazionario la velocità varia e quindi varia anche il Reynolds, ovvero lo stato di turbolenza).
 
