@@ -270,11 +270,11 @@ $$\rho\frac{\partial u_i}{\partial t} + \rho u_j \frac{\partial u_i}{\partial x_
 
 Si sostituisce $u_i = \bar{u}_i + u_i'$ e $p = \bar{p} + p'$ e si applica l'operatore di media. La derivazione completa, passo per passo, è nell'approfondimento *⭐ Dimostrazione completa* qui sotto.
 
-> ✅ **Equazione RANS — forma finale**
->
-> $$\rho\frac{\partial\bar{u}_i}{\partial t} + \rho\bar{u}_j\frac{\partial\bar{u}_i}{\partial x_j} = -\frac{\partial\bar{p}}{\partial x_i} + \frac{\partial}{\partial x_j}\underbrace{\left(\bar{\tau}_{ij} - \rho\overline{u_i'u_j'}\right)}_{\text{sforzo viscoso + sforzo di Reynolds}}$$
->
-> Il termine $-\rho\overline{u_i'u_j'}$ è il tensore di Reynolds: le fluttuazioni si comportano come uno sforzo aggiuntivo.
+**✅ Equazione RANS — forma finale**
+
+$$\rho\frac{\partial\bar{u}_i}{\partial t} + \rho\bar{u}_j\frac{\partial\bar{u}_i}{\partial x_j} = -\frac{\partial\bar{p}}{\partial x_i} + \frac{\partial}{\partial x_j}\underbrace{\left(\bar{\tau}_{ij} - \rho\overline{u_i'u_j'}\right)}_{\text{sforzo viscoso + sforzo di Reynolds}}$$
+
+Il termine $-\rho\overline{u_i'u_j'}$ è il tensore di Reynolds: le fluttuazioni si comportano come uno sforzo aggiuntivo.
 
 ### RANS vs URANS
 
@@ -543,8 +543,10 @@ dove $S_{ij} = \frac{1}{2}\left(\frac{\partial\bar{u}_i}{\partial x_j} + \frac{\
 | **$k$-$\omega$ SST** (Menter) | 2 equazioni diff. | Blending $k$-$\varepsilon$ e $k$-$\omega$ | Unisce i vantaggi di entrambi | Più complesso da calibrare |
 | **RSM** | 7 equazioni diff. | Trasporto per ogni $\overline{u_i'u_j'}$ | Nessuna ipotesi di isotropia | Costoso, difficile convergenza |
 
+</details>
+
 <details>
-<summary><strong>📐 Risposta alla domanda 2 — Perché costo DNS ∝ Re³?</strong></summary>
+<summary><strong>📐 Approfondimento — Perché il costo della DNS scala come Re³?</strong></summary>
 
 **Separazione di scale.** La scala più grande è $L$ (scala integrale), quella più piccola è $\eta$ (scala di Kolmogorov). Il rapporto tra le due scala come:
 
@@ -563,8 +565,6 @@ Il costo totale quindi scala come:
 $$\text{Costo} \propto N_{celle} \times N_{timestep} \propto Re^{9/4} \cdot Re^{3/4} = Re^3$$
 
 Nota: in letteratura si trovano esponenti leggermente diversi (es. $Re^{11/4}$) a seconda delle assunzioni, ma la stima $Re^3$ è quella comunemente usata a lezione.
-
-</details>
 
 </details>
 
@@ -608,6 +608,8 @@ flowchart TD
 <summary><strong>Quante equazioni servono per chiudere? Perché modelli a 0, 1, 2 equazioni — e mai 3</strong></summary>
 
 La domanda "quante equazioni mancano" ha **due risposte diverse** a seconda del quadro:
+
+> ⚠️ **Punto chiave: i modelli a 2 equazioni sono applicabili *solo dopo* aver fatto l'ipotesi di Boussinesq.** Senza Boussinesq il tensore di Reynolds ha **6 incognite indipendenti**: due equazioni di trasporto **non basterebbero**, ne servirebbero 6 (→ RSM). È proprio l'ipotesi di Boussinesq a **ridurre le 6 incognite** del tensore di Reynolds a poche grandezze — in pratica $k$ e $\mu_T$ (con $\mu_T=C_\mu\rho k^2/\varepsilon$) — rendendo **sufficienti** due equazioni di trasporto (es. $k$ ed $\varepsilon$). In altre parole: prima *modello* il tensore (Boussinesq → poche incognite), **poi** posso permettermi 2 equazioni. **Lo stesso schema vale in LES:** anche lì bisogna introdurre una **nuova ipotesi** (eddy viscosity di sotto-griglia, $\nu_{sgs}=(C_s\Delta)^2|\bar S|$) per **ridurre il numero di incognite** del tensore SGS e poterlo chiudere.
 
 **Quadro 1 — trasporto diretto degli sforzi (RSM).** Le componenti indipendenti del tensore sono **6**, quindi mancano **6** relazioni. Se le si fornisce con un'equazione di trasporto ciascuna si ottengono i modelli **RSM** (6 equazioni per gli sforzi + 1 per $\varepsilon$ = **7**). Qui sì che ci sono "più di due" equazioni — ma è una **famiglia diversa**, che *non* usa Boussinesq.
 
@@ -1211,6 +1213,8 @@ $$\tau_{ij}^{sgs} = \rho(\overline{u_i u_j} - \bar{u}_i \bar{u}_j)= \underbrace{
 > - In **RANS** l'operatore è idempotente ($\bar{\bar u}=\bar u$, $\overline{u'}=0$): allora $\overline{u_iu_j}-\bar u_i\bar u_j$ si **semplifica esattamente** in $\overline{u_i'u_j'}$ (prodotto di fluttuazioni). Per questo in RANS si scrive con le fluttuazioni — è una semplificazione *lecita lì*.
 > - In **LES** il filtro **non** è idempotente ($\bar{\bar u}\neq\bar u$, $\overline{u'}\neq0$): quindi $\overline{u_iu_j}-\bar u_i\bar u_j\neq\overline{u_i'u_j'}$. Decomponendo $u=\bar u+u'$ compaiono **tre** gruppi: **Leonard** $L_{ij}=\overline{\bar u_i\bar u_j}-\bar u_i\bar u_j$ (risolto-risolto), **cross** $C_{ij}=\overline{\bar u_i u_j'}+\overline{u_i'\bar u_j}$ (risolto-non risolto) e **Reynolds SGS** $R_{ij}=\overline{u_i'u_j'}$ (non risolto-non risolto). Non si può collassare al solo prodotto di fluttuazioni → si tiene la forma generale $\overline{u_iu_j}-\bar u_i\bar u_j$. **Questa è una differenza sostanziale** tra LES e RANS, oltre al diverso significato dell'operatore.
 
+</details>
+
 <details>
 <summary><strong>Approfondimento (non richiesto) — Derivazione delle equazioni LES e confronto LES vs RANS</strong></summary>
 
@@ -1294,13 +1298,13 @@ L'ipotesi di Boussinesq modella il tensore di sottogriglia assumendo che si comp
 >
 > I due segni opposti **si compensano** col segno opposto con cui $\tau$ entra nell'equazione di quantità di moto: il risultato fisico è **identico**. E in ogni caso la parte isotropa viene **assorbita nella pressione modificata** ($\bar p^*=\bar p\pm\tfrac23\rho k$), quindi il suo segno è **irrilevante** per il moto (sposta solo la pressione). La parte **anisotropa** (eddy viscosity) è **dissipativa in entrambi**. Quindi: nessuna differenza concettuale, è bookkeeping.
 
-> ❓ **Boussinesq ha due (o tre) termini: uno simile a Smagorinsky, l'altro diverso. Quel termine "diverso" è solo del compressibile/Favre o c'è già nell'incompressibile?** La forma **generale (compressibile)** di Boussinesq ha **tre** pezzi:
->
-> $$\tau^R_{ij}=\underbrace{2\mu_T\bar S_{ij}}_{\text{(a) deviatorico}}\underbrace{-\,\tfrac23\mu_T\frac{\partial\bar u_k}{\partial x_k}\delta_{ij}}_{\text{(b) dilatazione}}\underbrace{-\,\tfrac23\rho k\,\delta_{ij}}_{\text{(c) energia turbolenta}}$$
->
-> - **(a)** $2\mu_T\bar S_{ij}$: il termine **anisotropo/deviatorico**, presente **sempre** → è l'analogo di Smagorinsky $-2\rho\nu_{sgs}\bar S_{ij}$.
-> - **(c)** $-\tfrac23\rho k\,\delta_{ij}$: la **pressione turbolenta** (isotropa), presente **sia in incompressibile sia in compressibile** → analoga alla parte isotropa SGS $\tfrac13\delta_{ij}\tau^s_{kk}$.
-> - **(b)** $-\tfrac23\mu_T(\partial_k\bar u_k)\delta_{ij}$: il termine di **dilatazione**, **nullo in incompressibile** ($\partial_k\bar u_k=0$) → compare **solo nel compressibile/Favre**. È questo il termine "diverso" che non trovi nell'incompressibile né nel confronto base con Smagorinsky.
+**Boussinesq ha due (o tre) termini: uno simile a Smagorinsky, l'altro diverso. Quel termine "diverso" è solo del compressibile/Favre o c'è già nell'incompressibile?** La forma **generale (compressibile)** di Boussinesq ha **tre** pezzi:
+
+$$\tau^R_{ij}=\underbrace{2\mu_T\bar S_{ij}}_{\text{(a) deviatorico}}\underbrace{-\,\tfrac23\mu_T\frac{\partial\bar u_k}{\partial x_k}\delta_{ij}}_{\text{(b) dilatazione}}\underbrace{-\,\tfrac23\rho k\,\delta_{ij}}_{\text{(c) energia turbolenta}}$$
+
+- **(a)** $2\mu_T\bar S_{ij}$: il termine **anisotropo/deviatorico**, presente **sempre** → è l'analogo di Smagorinsky $-2\rho\nu_{sgs}\bar S_{ij}$.
+- **(c)** $-\tfrac23\rho k\,\delta_{ij}$: la **pressione turbolenta** (isotropa), presente **sia in incompressibile sia in compressibile** → analoga alla parte isotropa SGS $\tfrac13\delta_{ij}\tau^s_{kk}$.
+- **(b)** $-\tfrac23\mu_T(\partial_k\bar u_k)\delta_{ij}$: il termine di **dilatazione**, **nullo in incompressibile** ($\partial_k\bar u_k=0$) → compare **solo nel compressibile/Favre**. È questo il termine "diverso" che non trovi nell'incompressibile né nel confronto base con Smagorinsky.
 
 </details>
 
@@ -1371,6 +1375,20 @@ $$\tau_{ij} = \overline{u_i u_j} - \bar{u}_i \bar{u}_j \implies \widehat{\tau}_{
 
 $$T_{ij} = \widehat{\overline{u_i u_j}} - \widehat{\bar{u}}_i \widehat{\bar{u}}_j$$
 
+**❓ A che serve l'identità scritta così? Sembrano esserci *due* incognite ($T_{ij}$ e $\tau_{ij}$): come la risolvo?** Il punto chiave: **$L_{ij}$ è l'unica cosa che posso calcolare *esattamente*** dai campi già risolti (vive nella banda **nota** tra $\Delta$ e $2\Delta$), mentre $T_{ij}$ e $\tau_{ij}$ **non sono due incognite indipendenti**: li **modello entrambi** con la stessa forma di Smagorinsky e la **stessa** $C_s$ (è l'ipotesi di similitudine di scala). Sostituendo i due modelli
+
+$$\tau_{ij}^{aniso}=-2C_s^2\,\Delta^2\,|\bar S|\,\bar S_{ij},\qquad T_{ij}^{aniso}=-2C_s^2\,\widehat{\Delta}^2\,|\widehat{\bar S}|\,\widehat{\bar S}_{ij}$$
+
+nell'identità $L_{ij}=T_{ij}-\widehat{\tau}_{ij}$ resta **una sola incognita**, $C_s^2$:
+
+$$L_{ij}^{aniso}=-2C_s^2\,M_{ij},\qquad M_{ij}=\widehat{\Delta}^2\,|\widehat{\bar S}|\,\widehat{\bar S}_{ij}-\Delta^2\,\widehat{|\bar S|\,\bar S_{ij}}$$
+
+dove anche **$M_{ij}$ è calcolabile** dai campi risolti. Ora $L_{ij}=-2C_s^2 M_{ij}$ è un sistema **sovradeterminato** (6 equazioni, 1 incognita): lo si chiude ai **minimi quadrati** (Lilly), ottenendo il valore locale
+
+$$C_s^2=-\frac{1}{2}\,\frac{\langle L_{ij}M_{ij}\rangle}{\langle M_{kl}M_{kl}\rangle}$$
+
+**Perché scriverlo così, e non il tensore SGS in funzione d'altro?** Perché il tensore SGS "vero" vive **sotto** la griglia e **non è misurabile**; invece $L_{ij}$ (la turbolenza nella banda risolta $\Delta$–$2\Delta$) **è misurabile**. Assumendo che il modello si comporti uguale **appena sopra** e **appena sotto** la griglia (stessa $C_s$), $L_{ij}$ diventa il "campione noto" che **calibra** $C_s$ da usare sotto griglia. È una scelta **obbligata**: è l'unica informazione disponibile.
+
 **Perché due filtri e non uno solo?** Nel modello di Smagorinsky statico la costante $C_s$ è fissa per tutto il dominio. Ma la fisica della turbolenza cambia: vicino a una parete o in un flusso laminare la turbolenza scompare e $C_s$ dovrebbe idealmente annullarsi. Non potendo calcolare cosa succede sotto la griglia (perché non abbiamo informazioni fisiche sotto la dimensione $\Delta$), l'unica soluzione è **guardare cosa succede subito sopra la griglia**. Introducendo un secondo filtro più grande, chiamato **test filter** ($\widehat{\Delta}$), isoliamo una "banda" di vortici che sono **sia risolti dalla griglia, sia più piccoli del test filter**. Analizzando come l'energia fluisce in questa banda nota, possiamo estrapolare matematicamente il comportamento di $C_s$.
 
 **Il problema della griglia diversa: a cosa serve e come ci ricolleghiamo?** L'identità di Germano calcola un tensore (il tensore di Leonard, $L_{ij}$) che rappresenta lo stress turbolento dovuto esclusivamente ai vortici compresi tra la griglia $\Delta$ e il test filter $\widehat{\Delta}$.
@@ -1425,8 +1443,6 @@ Se invece raffini la mesh fino a quando $\Delta \approx \eta$, stai risolvendo n
 
 </details>
 
-</details>
-
 <details>
 <summary><strong>Classificazione modelli ibridi RANS-LES</strong></summary>
 
@@ -1462,16 +1478,17 @@ flowchart LR
 
 ### DDES vs IDDES e shielding function
 
-> ❓ **Che differenza c'è tra DDES e IDDES?**
-> - **DES (originale, 1997):** $\tilde d=\min(d,\,C_{DES}\Delta)$. Vicino a parete $\tilde d=d$ → RANS; lontano $\tilde d=C_{DES}\Delta$ → LES. **Problema:** con griglie fini/anisotrope a parete lo switch a LES scatta **dentro** il BL senza turbolenza risolta → **Modelled Stress Depletion (MSD)** e separazione indotta dalla griglia (**GIS**).
-> - **DDES (Delayed DES):** introduce la **shielding function** $f_d$ che "protegge" il BL forzando la **RANS in tutto lo strato limite a prescindere dalla mesh**. Risolve MSD/GIS. $\tilde d=d-f_d\max(0,\,d-C_{DES}\Delta)$.
-> - **IDDES (Improved DDES):** unisce il DDES con la **Wall-Modeled LES (WMLES)**. Quando la mesh è fine **e** c'è contenuto turbolento risolto vicino a parete, può funzionare come WMLES (RANS solo nel sottostrato, LES sopra); inoltre **corregge il *log-layer mismatch*** (LLM), cioè il salto del profilo logaritmico tra la zona interna RANS e quella esterna LES che affligge il DDES-WMLES (e che falsa l'attrito a parete). In pratica: **DDES** = scudo per il BL; **IDDES** = DDES **+** ramo WMLES **+** raccordo del log-layer.
+**Che differenza c'è tra DDES e IDDES?**
 
-> ❓ **Cosa sono le funzioni di shielding?** Sono **sensori di strato limite**: "schermano" (proteggono) il BL dall'essere erroneamente trattato in modalità LES. La funzione $f_d$ riconosce se ci si trova **dentro** il boundary layer e in tal caso forza la **RANS**, indipendentemente da quanto è fine la griglia:
->
-> $$f_d=1-\tanh\big[(8\,r_d)^3\big],\qquad r_d=\frac{\nu+\nu_t}{\kappa^2 d^2\sqrt{\partial_j u_i\,\partial_j u_i}},\qquad \kappa=0.41$$
->
-> $r_d$ è grande dentro il BL (flusso fortemente shear-driven, dominato dalla viscosità a piccola distanza $d$) e piccolo lontano. Di conseguenza: **dentro il BL** $r_d$ grande → $f_d\to0$ → $\tilde d=d$ → **RANS** (BL schermato); **nella regione separata** $r_d$ piccolo → $f_d\to1$ → $\tilde d=\min(d,C_{DES}\Delta)$ → **LES**. La mappa di $f_d$ ($0$ a parete, $1$ fuori) è anche un comodo strumento diagnostico per *vedere* dove il modello opera in RANS e dove in LES.
+- **DES (originale, 1997):** $\tilde d=\min(d,\,C_{DES}\Delta)$. Vicino a parete $\tilde d=d$ → RANS; lontano $\tilde d=C_{DES}\Delta$ → LES. **Problema:** con griglie fini/anisotrope a parete lo switch a LES scatta **dentro** il BL senza turbolenza risolta → **Modelled Stress Depletion (MSD)** e separazione indotta dalla griglia (**GIS**).
+- **DDES (Delayed DES):** introduce la **shielding function** $f_d$ che "protegge" il BL forzando la **RANS in tutto lo strato limite a prescindere dalla mesh**. Risolve MSD/GIS. La distanza modificata diventa $\tilde d=d-f_d\max(0,\,d-C_{DES}\Delta)$.
+- **IDDES (Improved DDES):** unisce il DDES con la **Wall-Modeled LES (WMLES)**. Quando la mesh è fine **e** c'è contenuto turbolento risolto vicino a parete, può funzionare come WMLES (RANS solo nel sottostrato, LES sopra); inoltre **corregge il *log-layer mismatch*** (LLM), cioè il salto del profilo logaritmico tra la zona interna RANS e quella esterna LES che affligge il DDES-WMLES (e che falsa l'attrito a parete). In pratica: **DDES** = scudo per il BL; **IDDES** = DDES **+** ramo WMLES **+** raccordo del log-layer.
+
+**Cosa sono le funzioni di shielding?** Sono **sensori di strato limite**: "schermano" (proteggono) il BL dall'essere erroneamente trattato in modalità LES. La funzione $f_d$ riconosce se ci si trova **dentro** il boundary layer e in tal caso forza la **RANS**, indipendentemente da quanto è fine la griglia:
+
+$$f_d=1-\tanh\big[(8\,r_d)^3\big],\qquad r_d=\frac{\nu+\nu_t}{\kappa^2 d^2\sqrt{\partial_j u_i\,\partial_j u_i}},\qquad \kappa=0.41$$
+
+$r_d$ è grande dentro il BL (flusso fortemente shear-driven, dominato dalla viscosità a piccola distanza $d$) e piccolo lontano. Di conseguenza: **dentro il BL** $r_d$ grande → $f_d\to0$ → $\tilde d=d$ → **RANS** (BL schermato); **nella regione separata** $r_d$ piccolo → $f_d\to1$ → $\tilde d=\min(d,C_{DES}\Delta)$ → **LES**. La mappa di $f_d$ ($0$ a parete, $1$ fuori) è anche un comodo strumento diagnostico per *vedere* dove il modello opera in RANS e dove in LES.
 
 ### Altri modelli (mappa rapida)
 
