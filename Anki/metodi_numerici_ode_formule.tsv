@@ -1,0 +1,26 @@
+Errore locale di troncamento	\( \tau(h) = y(t_{k+1}) - \tilde y_{k+1} = y(t_{k+1}) - y(t_k) - h\,f(t_k,y(t_k)) \)	FORMULE
+Soluzione numerica dal dato esatto	\( \tilde y_{k+1} = y(t_k) + h\,f(t_k, y(t_k)) \)	FORMULE
+Errore locale di discretizzazione	\( d(h) = \dfrac{\tau(h)}{h} \)	FORMULE
+Errore globale (decomposizione)	\[ e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1})-\tilde y_{k+1}\big)}_{\text{troncamento}} + \underbrace{\big(\tilde y_{k+1}-y_{k+1}\big)}_{\text{propagazione}} \]	FORMULE
+Consistenza	\( \lim_{h\to0} d(h) = 0 \)	FORMULE
+Ordine del metodo	\( d(h) = \mathcal{O}(h^p) \qquad (\text{Eulero: } p=1) \)	FORMULE
+0-stabilita	\( \lvert y_k-\hat y_k\rvert \le K\,\lvert y_0-\hat y_0\rvert, \quad \forall k\le \dfrac{b-a}{h} \)	FORMULE
+Assoluta stabilita	\( \lim_{k\to\infty} y_k = 0 \quad (\text{solo se } \mathrm{Re}(\lambda)<0) \)	FORMULE
+Teorema di Lax (convergenza)	\( \text{consistenza} + \text{0-stabilita} \;\Rightarrow\; \text{convergenza}, \quad \lim_{N\to\infty} y_N = y(t) \)	FORMULE
+Fattore di amplificazione	\( y_{k+1} = \mathcal{F}(h\lambda)\,y_k \;\Rightarrow\; y_{k+1} = \mathcal{F}(h\lambda)^{k+1}\,y_0 \)	FORMULE
+Regione di assoluta stabilita	\( R_a = \{\, h\lambda \in \mathbb{C} : \lvert \mathcal{F}(h\lambda)\rvert < 1 \,\} \)	FORMULE
+Stabilita per sistemi	\( y'(t)=Ay(t) \;\Rightarrow\; \mathrm{Re}(\lambda_i)<0 \ \ \forall i \)	FORMULE
+Eulero esplicito	\( y_{k+1} = y_k + h\,f(t_k,y_k), \qquad \mathcal{F}(h\lambda) = 1 + h\lambda \)	FORMULE
+Regione di stabilita Eulero esplicito	\( \lvert 1 + h\lambda \rvert < 1 \quad (\text{cerchio di centro } -1,\ \text{raggio } 1) \)	FORMULE
+Eulero implicito	\( y_{k+1} = y_k + h\,f(t_{k+1},y_{k+1}), \qquad \mathcal{F}(h\lambda) = \dfrac{1}{1-h\lambda} \)	FORMULE
+Regione di stabilita Eulero implicito	\( \left\lvert \dfrac{1}{1-h\lambda}\right\rvert < 1 \quad (\text{esterno del cerchio di centro } +1,\ \text{raggio } 1;\ \text{A-stabile}) \)	FORMULE
+Heun	\( y_{k+1} = y_k + \dfrac{h}{2}\big[f(t_k,y_k)+f(t_{k+1},\,y_k+h f(t_k,y_k))\big], \qquad \mathcal{F}(h\lambda)=1+h\lambda+\dfrac{(h\lambda)^2}{2} \)	FORMULE
+Trapezi (Crank-Nicolson)	\( y_{k+1} = y_k + \dfrac{h}{2}\big[f(t_k,y_k)+f(t_{k+1},y_{k+1})\big] \quad (p=2,\ \text{implicito}) \)	FORMULE
+Eulero modificato (punto medio)	\( y_{k+1} = y_k + h\,f\!\big(t_k+\tfrac{h}{2},\, y_k+\tfrac{h}{2}f(t_k,y_k)\big) \)	FORMULE
+Runge-Kutta esplicito (s stadi)	\( y_{k+1} = y_k + h\sum_{i=1}^{s} a_i\, f\!\big(t_k+b_i h,\ y_k + h\sum_{j=1}^{i-1} c_{ij} k_j\big) \)	FORMULE
+RK4 classico	\[ y_{k+1}=y_k+\dfrac{h}{6}(k_1+2k_2+2k_3+k_4),\quad \begin{aligned} k_1&=f(t_k,y_k)\\ k_2&=f(t_k+\tfrac h2, y_k+\tfrac h2 k_1)\\ k_3&=f(t_k+\tfrac h2, y_k+\tfrac h2 k_2)\\ k_4&=f(t_k+h, y_k+h k_3)\end{aligned} \]	FORMULE
+Tableau di Butcher (condizioni di consistenza)	\( \sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij} \quad \forall i=1,\dots,s \)	FORMULE
+Tableau di Butcher (struttura)	\( \begin{array}{c|c} \mathbf{c} & A \\ \hline & \mathbf{b}^{\mathsf T} \end{array} \quad (A\ \text{strett. triang. inf.} \Rightarrow \text{esplicito}) \)	FORMULE
+Grado di stiffness	\( \max_i \lvert \mathrm{Re}(\lambda_i)\rvert\, L \gg 1 \quad (\text{rapporto } \lambda_{\max}/\lambda_{\min}\ \text{molto grande}) \)	FORMULE
+Soluzione di un sistema (stiff)	\( y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m \)	FORMULE
+Condizione CFL	\( \mathrm{CFL} = \dfrac{c\,\Delta t}{\Delta x} \le 1 \quad \Rightarrow\quad \Delta t \le \dfrac{\Delta x}{c} \)	FORMULE

@@ -1,0 +1,18 @@
+Numero di Knudsen	\( Kn = \dfrac{\lambda}{L} \)	FORMULE
+Numero di Knudsen (definizione locale, coi gradienti)	\( Kn = \dfrac{\lambda}{Q/|\nabla Q|}, \qquad Q=T \Rightarrow L \sim \dfrac{T}{|\nabla T|} \)	FORMULE
+Libero cammino medio	\( \lambda = \dfrac{1}{\sqrt{2}\,n\,\sigma} \)	FORMULE
+Soglie dei regimi (Knudsen)	\( Kn < 10^{-2}\ \text{(continuo)}, \quad 10^{-2} < Kn < 1\ \text{(transizione)}, \quad Kn > 1\ \text{(molecolare libero)} \)	FORMULE
+Velocita media molecolare e tempo tra collisioni	\( \tau_c = \dfrac{\lambda}{\bar c} \)	FORMULE
+Frequenza di collisione	\( \nu_{coll} \propto n\,\sigma\,\bar c \)	FORMULE
+VHS: sezione d'urto (dipendenza dalla velocita relativa)	\( \sigma \propto g^{-2\nu} \)	FORMULE
+VHS: viscosita come diffusivita di quantita di moto	\( \mu \propto \rho\,\bar c\,\lambda \propto \dfrac{\sqrt{m k T}}{\sigma} \)	FORMULE
+VHS: scaling della viscosita con la temperatura	\( \mu \propto T^{\omega}, \qquad \text{HS}: \omega=\tfrac12;\quad \text{VHS (aria)}: \omega\approx 0.74 \)	FORMULE
+DSMC: free flight (moto disaccoppiato)	\( x^{n+1} = x^{n} + v^{n}\,\Delta t \)	FORMULE
+DSMC: vincolo di cella	\( \Delta x \le \lambda \)	FORMULE
+DSMC: vincolo di passo temporale	\( \Delta t \le \tau_c = \dfrac{\lambda}{\bar c} \)	FORMULE
+DSMC: vincolo tipo CFL	\( \Delta t \le \dfrac{\Delta x}{|v_{max}|} \)	FORMULE
+DSMC: numero di particelle per cella	\( N \approx 10\text{–}50 \ \text{particelle/cella} \)	FORMULE
+DSMC: peso numerico F_num (densita di cella)	\( \rho \propto \dfrac{F_{num}\,N_{cella}}{V} \qquad (F_{num}=\text{molecole reali per particella numerica}) \)	FORMULE
+DSMC: velocita macroscopica di cella	\( \bar u_{macro} = \dfrac{1}{N}\sum_p \bar v_p \)	FORMULE
+DSMC: temperatura di cella (varianza delle velocita)	\( T \propto \dfrac{1}{N}\sum_p \lvert \bar v_p - \bar u_{macro}\rvert^2 \)	FORMULE
+Angolo limite di espansione (Prandtl-Meyer)	\( \nu_{max}\approx 130^\circ \quad (M\to\infty,\ \gamma=1.4) \)	FORMULE

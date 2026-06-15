@@ -1,0 +1,70 @@
+Decomposizione di Reynolds	\( u_i(\mathbf{x},t)=\bar u_i(\mathbf{x})+u_i'(\mathbf{x},t),\quad \overline{u_i'}=0 \)	FORMULE
+Media temporale	\( \bar u_i(\mathbf{x})=\lim_{T\to\infty}\frac{1}{T}\int_t^{t+T} u_i(\mathbf{x},t')\,dt' \)	FORMULE
+Media spaziale (d'insieme)	\( \bar u(t)=\lim_{\Omega\to\infty}\frac{1}{\Omega}\int_\Omega u(\mathbf{x},t)\,d\Omega \)	FORMULE
+Media di Favre (compressibile)	\( \tilde u_i=\dfrac{\overline{\rho\,u_i}}{\bar\rho} \)	FORMULE
+Regola della media del prodotto	\( \overline{uv}=\bar u\,\bar v+\overline{u'v'} \)	FORMULE
+Covarianza (definizione statistica)	\( \mathrm{Cov}(X,Y)=E[(X-\bar X)(Y-\bar Y)]=E[XY]-E[X]\,E[Y] \)	FORMULE
+Proprieta dell'operatore di media	\[ \bar{\bar u}=\bar u,\quad \overline{u'}=0,\quad \overline{au+bv}=a\bar u+b\bar v,\quad \overline{\partial u/\partial x_i}=\partial\bar u/\partial x_i \]	FORMULE
+Media del quadrato di una fluttuazione sinusoidale	\( u'=A\sin(\omega t)\ \Rightarrow\ \overline{(u')^2}=\tfrac{A^2}{2}\neq 0 \)	FORMULE
+Equazione RANS incompressibile	\[ \rho\frac{\partial\bar u_i}{\partial t}+\rho\,\bar u_j\frac{\partial\bar u_i}{\partial x_j}=-\frac{\partial\bar p}{\partial x_i}+\frac{\partial}{\partial x_j}\big(\bar\tau_{ij}-\rho\,\overline{u_i'u_j'}\big) \]	FORMULE
+Sforzo viscoso (legge di Newton, indiciale)	\( \tau_{ij}=\mu\big(\partial_j u_i+\partial_i u_j\big) \)	FORMULE
+Continuita del campo medio e della fluttuazione	\( \partial_i\bar u_i=0,\qquad \partial_i u_i'=0 \)	FORMULE
+Tensore degli sforzi di Reynolds	\( \tau^R_{ij}=-\rho\,\overline{u_i'u_j'} \) (simmetrico, 6 incognite indipendenti)	FORMULE
+Energia cinetica turbolenta k	\( k=\tfrac12\,\overline{u_i'u_i'}=\tfrac12\big(\overline{u_1'^2}+\overline{u_2'^2}+\overline{u_3'^2}\big) \)	FORMULE
+k in funzione del tensore di Reynolds	\( k=-\dfrac{1}{2\rho}\,\mathrm{tr}(\mathbf{R}) \)	FORMULE
+Decomposizione isotropa/anisotropa di un tensore simmetrico	\[ T_{ij}=\underbrace{\tfrac13 T_{kk}\,\delta_{ij}}_{\text{isotropa}}+\underbrace{\big(T_{ij}-\tfrac13 T_{kk}\,\delta_{ij}\big)}_{\text{anisotropa}} \]	FORMULE
+Parti isotropa/anisotropa del tensore di Reynolds	\[ -\rho\overline{u_i'u_j'}=-\tfrac23\rho k\,\delta_{ij}+\big(-\rho\overline{u_i'u_j'}+\tfrac23\rho k\,\delta_{ij}\big) \]	FORMULE
+Ipotesi di Boussinesq	\( \tau^R_{ij}=-\rho\overline{u_i'u_j'}=2\mu_T S_{ij}-\tfrac23\rho k\,\delta_{ij} \)	FORMULE
+Boussinesq compressibile (tre termini)	\[ \tau^R_{ij}=2\mu_T\bar S_{ij}-\tfrac23\mu_T\frac{\partial\bar u_k}{\partial x_k}\delta_{ij}-\tfrac23\rho k\,\delta_{ij} \]	FORMULE
+Tensore velocita di deformazione (campo medio)	\( S_{ij}=\tfrac12\big(\dfrac{\partial\bar u_i}{\partial x_j}+\dfrac{\partial\bar u_j}{\partial x_i}\big) \)	FORMULE
+Pressione modificata (assorbe la parte isotropa)	\( \bar p^*=\bar p+\tfrac23\rho k \)	FORMULE
+Stima dimensionale della viscosita turbolenta	\( \mu_T\sim\rho\,u_t\,l_t \)	FORMULE
+Viscosita turbolenta (k-epsilon)	\( \mu_T=C_\mu\,\rho\,\dfrac{k^2}{\varepsilon},\quad C_\mu\approx0.09 \)	FORMULE
+Viscosita turbolenta (k-omega)	\( \mu_T=\dfrac{\bar\rho\,k}{\omega} \)	FORMULE
+Relazione omega-epsilon	\( \omega=\dfrac{\varepsilon}{k} \)	FORMULE
+Equazione di trasporto di k (k-epsilon)	\[ \frac{\partial(\bar\rho k)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i k)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\Big[\big(\mu+\tfrac{\mu_T}{\sigma_k}\big)\frac{\partial k}{\partial x_j}\Big]+G_k-\bar\rho\varepsilon+Y_M \]	FORMULE
+Equazione di trasporto di epsilon (k-epsilon)	\[ \frac{\partial(\bar\rho\varepsilon)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\varepsilon)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\Big[\big(\mu+\tfrac{\mu_T}{\sigma_\varepsilon}\big)\frac{\partial\varepsilon}{\partial x_j}\Big]+C_{1\varepsilon}\frac{\varepsilon}{k}G_k-C_{2\varepsilon}\bar\rho\frac{\varepsilon^2}{k} \]	FORMULE
+Produzione di k	\( G_k=\tau^F_{ij}\,\dfrac{\partial\tilde u_j}{\partial x_i} \)	FORMULE
+Dissipazione di dilatazione (comprimibilita)	\( Y_M=2\bar\rho\varepsilon M_t^2,\quad M_t=\dfrac{\sqrt{2k}}{a} \)	FORMULE
+Equazione di trasporto di k (k-omega)	\[ \frac{\partial(\bar\rho k)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i k)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\Big[\big(\mu+\tfrac{\mu_T}{\sigma_k}\big)\frac{\partial k}{\partial x_j}\Big]+G_k-\beta^*\bar\rho\,\omega k \]	FORMULE
+Equazione di trasporto di omega (k-omega)	\[ \frac{\partial(\bar\rho\omega)}{\partial t}+\frac{\partial(\bar\rho\tilde u_i\omega)}{\partial x_i}=\frac{\partial}{\partial x_j}\!\Big[\big(\mu+\tfrac{\mu_T}{\sigma_\omega}\big)\frac{\partial\omega}{\partial x_j}\Big]+\frac{\alpha\omega}{k}G_k-\beta\bar\rho\,\omega^2+\bar\rho\frac{\sigma_d}{\omega}\frac{\partial k}{\partial x_j}\frac{\partial\omega}{\partial x_j} \]	FORMULE
+SST: funzione di blending	\( F_1=1 \) a parete (k-omega), \( F_1=0 \) nel free-stream (k-epsilon); cross-diffusion attivata da \( 1-F_1 \)	FORMULE
+Spalart-Allmaras: equazione di trasporto di nu-tilde	\[ \frac{\partial\tilde\nu}{\partial t}+\bar u_j\frac{\partial\tilde\nu}{\partial x_j}=C_{b1}\tilde S\tilde\nu-C_{w1}f_w\Big(\frac{\tilde\nu}{d}\Big)^2+\frac{1}{\sigma_v}\Big[\partial_j\big((\nu+\tilde\nu)\partial_j\tilde\nu\big)+C_{b2}|\partial_j\tilde\nu|^2\Big] \]	FORMULE
+Spalart-Allmaras: viscosita turbolenta	\( \mu_t=\bar\rho\,\tilde\nu\,f_{v1},\qquad f_{v1}=\dfrac{\chi^3}{\chi^3+c_{v1}^3},\quad \chi=\dfrac{\tilde\nu}{\nu} \)	FORMULE
+RSM: equazione di trasporto degli sforzi	\[ \frac{\partial\overline{u_i'u_j'}}{\partial t}+\bar u_k\frac{\partial\overline{u_i'u_j'}}{\partial x_k}=P_{ij}+\Pi_{ij}-\varepsilon_{ij}+D_{ij} \]	FORMULE
+RSM: termine di produzione (esatto)	\( P_{ij}=-\big(\overline{u_i'u_k'}\,\partial_k\bar u_j+\overline{u_j'u_k'}\,\partial_k\bar u_i\big) \)	FORMULE
+Realizzabilita: componenti diagonali	\( \tau^R_{ii}=-\rho\,\overline{(u_i')^2}\le 0 \) (nessuna somma su i)	FORMULE
+Realizzabilita: disuguaglianza di Schwarz	\( \big(\overline{u_i'u_j'}\big)^2\le\overline{(u_i')^2}\,\overline{(u_j')^2} \)	FORMULE
+Coefficiente di correlazione	\( \rho_{uv}=\dfrac{\overline{u'v'}}{\sqrt{\overline{u'^2}}\,\sqrt{\overline{v'^2}}}\in[-1,+1] \)	FORMULE
+Scale di Kolmogorov	\[ \eta=\Big(\frac{\nu^3}{\varepsilon}\Big)^{1/4},\qquad \tau_\eta=\Big(\frac{\nu}{\varepsilon}\Big)^{1/2},\qquad u_\eta=(\nu\varepsilon)^{1/4} \]	FORMULE
+Separazione di scale (integrale/Kolmogorov)	\( \dfrac{L}{\eta}\propto Re_L^{3/4} \)	FORMULE
+Celle DNS in 3D	\( N_{celle}\propto\Big(\dfrac{L}{\eta}\Big)^3\propto Re_L^{9/4} \)	FORMULE
+Numero di passi temporali DNS	\( N_{timestep}\propto\dfrac{T_{conv}}{\tau_\eta}\propto Re_L^{1/2},\qquad \tau_\eta\propto Re^{-1/2} \)	FORMULE
+Costo computazionale DNS	\( \text{Costo}\propto N_{celle}\times N_{timestep}\propto Re^{9/4}\cdot Re^{3/4}=Re^3 \)	FORMULE
+Spettro inerziale di Kolmogorov	\( E(k)\propto\varepsilon^{2/3}k^{-5/3} \)	FORMULE
+Filtraggio LES (convoluzione)	\( \bar u(\mathbf{x},t)=\int_\Omega u(\mathbf{x},t)\,G(\mathbf{x},r,\Delta)\,dr,\qquad \int_\Omega G\,dr=1 \)	FORMULE
+Ampiezza del filtro LES	\( \Delta=(\Delta x\,\Delta y\,\Delta z)^{1/3} \)	FORMULE
+Convoluzione (definizione)	\( (f*g)(x)=\int_{-\infty}^{+\infty} f(\xi)\,g(x-\xi)\,d\xi \)	FORMULE
+Equazioni LES filtrate (incompressibili)	\[ \frac{\partial\bar u_i}{\partial x_i}=0,\qquad \frac{\partial\bar u_i}{\partial t}+\frac{\partial(\bar u_i\bar u_j)}{\partial x_j}=-\frac1\rho\frac{\partial\bar p}{\partial x_i}+\nu\nabla^2\bar u_i-\frac{\partial\tau^{sgs}_{ij}}{\partial x_j} \]	FORMULE
+Tensore degli sforzi SGS	\( \tau^{sgs}_{ij}=\rho\big(\overline{u_iu_j}-\bar u_i\bar u_j\big) \)	FORMULE
+Decomposizione del tensore SGS (Leonard/cross/Reynolds)	\( \tau^s_{ij}=L_{ij}+C_{ij}+R_{ij} \), con \( L_{ij}=\overline{\bar u_i\bar u_j}-\bar u_i\bar u_j \)	FORMULE
+Modello di Smagorinsky (parte anisotropa)	\( \tau^s_{ij}-\tfrac13\delta_{ij}\tau^s_{kk}=-2\,\nu_{sgs}\,\bar S_{ij}=-2(C_s\Delta)^2|\bar S|\,\bar S_{ij} \)	FORMULE
+Viscosita di sottogriglia (Smagorinsky)	\( \nu_{sgs}=(C_s\Delta)^2\,|\bar S|,\quad C_s\approx0.1\text{--}0.2 \)	FORMULE
+Tensore di deformazione filtrato e suo modulo	\( \bar S_{ij}=\tfrac12\big(\partial_j\bar u_i+\partial_i\bar u_j\big),\qquad |\bar S|=\sqrt{2\,\bar S_{ij}\bar S_{ij}} \)	FORMULE
+Identita di Germano	\( L_{ij}=T_{ij}-\widehat{\tau}_{ij} \)	FORMULE
+Tensore di Leonard (modello dinamico)	\( L_{ij}=\widehat{\bar u_i\bar u_j}-\widehat{\bar u}_i\widehat{\bar u}_j \)	FORMULE
+Sforzi SGS al test filter	\( T_{ij}=\widehat{\overline{u_iu_j}}-\widehat{\bar u}_i\widehat{\bar u}_j \)	FORMULE
+Modello dinamico: tensore M_ij	\( M_{ij}=\widehat{\Delta}^2\,|\widehat{\bar S}|\,\widehat{\bar S}_{ij}-\Delta^2\,\widehat{|\bar S|\,\bar S_{ij}} \)	FORMULE
+Coefficiente di Smagorinsky dinamico (Lilly, minimi quadrati)	\( C_s^2=-\dfrac12\,\dfrac{\langle L_{ij}M_{ij}\rangle}{\langle M_{kl}M_{kl}\rangle} \)	FORMULE
+Rapporto test filter / griglia	\( \widehat{\Delta}/\Delta=2 \)	FORMULE
+Variabili di parete	\( u^+=\dfrac{u}{u_\tau},\quad y^+=\dfrac{y}{\ell_\tau},\quad u_\tau=\sqrt{\dfrac{\tau_w}{\rho}},\quad \ell_\tau=\dfrac{\nu}{u_\tau},\quad \tau_w=\mu\dfrac{\partial u}{\partial y}\Big|_w \)	FORMULE
+Sottostrato viscoso (legge lineare)	\( u^+=y^+ \quad (y^+\lesssim5) \)	FORMULE
+Legge logaritmica di parete	\( u^+=\dfrac{1}{\kappa}\ln y^+ + B \quad (y^+\gtrsim30),\quad \kappa\approx0.41,\ B\approx5.2 \)	FORMULE
+Variabili star (separazione)	\( u^\star=\dfrac{u\,C_\mu^{1/4}k^{1/2}}{\tau_w/\rho},\qquad y^\star=\dfrac{\rho\,C_\mu^{1/4}k^{1/2}\,y}{\mu} \)	FORMULE
+Scala di velocita basata su k	\( u_k=C_\mu^{1/4}k^{1/2} \) (resta finita anche dove \( \tau_w=0 \))	FORMULE
+Dimensionamento prima cella per y+ target	\( y^+=\dfrac{y\,u_\tau}{\nu},\qquad \Delta y_{1,\text{new}}\approx\Delta y_{1,\text{old}}\cdot\dfrac{y^+_{\text{target}}}{y^+_{\text{attuale}}} \)	FORMULE
+Variabili di parete in separazione (singolarita)	\( \tau_w=0\Rightarrow u_\tau=0:\ \ell_\tau\to\infty,\ y^+\to0,\ u^+\to\infty \)	FORMULE
+Formula di Kader (wall function generica)	\( u^+=e^{\Gamma}u^+_{\text{lam}}+e^{1/\Gamma}u^+_{\text{turb}},\quad \Gamma=-\dfrac{a(y^+)^4}{1+b\,y^+} \)	FORMULE
+DES: lunghezza di scala	\( \tilde d=\min(d,\,C_{DES}\Delta) \)	FORMULE
+DDES: distanza modificata	\( \tilde d=d-f_d\,\max(0,\,d-C_{DES}\Delta) \)	FORMULE
+DDES: funzione di shielding	\[ f_d=1-\tanh\big[(8\,r_d)^3\big],\qquad r_d=\frac{\nu+\nu_t}{\kappa^2 d^2\sqrt{\partial_j u_i\,\partial_j u_i}},\qquad \kappa=0.41 \]	FORMULE

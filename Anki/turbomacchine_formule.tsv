@@ -1,0 +1,11 @@
+Passo angolare di un canale (pitch)	\( \text{pitch} = \dfrac{360^\circ}{Z} \) — es. \( 360/30 = 12^\circ \); piu pale, passo piu stretto.	FORMULE
+Settore periodico (sliding mesh)	\( \text{settore} = \dfrac{360^\circ}{\mathrm{MCD}(Z_1,Z_2)} \) — settore periodico minimo; MCD grande, settore piccolo, meno celle.	FORMULE
+Canali per settore	\( \dfrac{Z_1}{\mathrm{MCD}(Z_1,Z_2)}, \quad \dfrac{Z_2}{\mathrm{MCD}(Z_1,Z_2)} \) — numero di canali delle due schiere; coprono lo stesso angolo.	FORMULE
+Serie di Fourier circonferenziale all'interfaccia	\( U(r,\theta) = \displaystyle\sum_{n=-\infty}^{+\infty} \hat U_n(r)\, e^{\,in\theta} \) — \( n=0 \) valor medio, \( n\neq 0 \) scia e non-uniformita.	FORMULE
+Media circonferenziale del mixing plane	\( \bar U(r) = \dfrac{1}{\Delta\theta}\displaystyle\int_{\theta_1}^{\theta_2} U(r,\theta)\, d\theta = \hat U_0(r) \) — conserva solo l'armonica \( n=0 \), profilo dipendente solo da \( r \).	FORMULE
+Troncamento della scia (azzeramento armoniche)	\( \hat U_n(r) \xrightarrow{\;\text{mixing plane}\;} 0 \quad (n\neq 0) \) — azzerare le armoniche superiori equivale a miscelamento istantaneo, genera perdite di mixing numeriche.	FORMULE
+Periodicita spaziale (passi uguali)	\( U(x,r,\theta,t) = U\!\left(x,r,\theta - \tfrac{2\pi}{Z_2},\, t\right) \) — stesso campo a un passo di distanza, stesso istante.	FORMULE
+Periodicita corocronica / phase-lag (passi diversi)	\( U(x,r,\theta,t) = U\!\left(x,r,\theta - \tfrac{2\pi}{Z_2},\, t + \delta_t\right) \) — canale adiacente uguale ma a istante diverso; periodicita nel tempo.	FORMULE
+Time-lag / sfasamento corocronico	\( \delta_t = \dfrac{\left\lvert \tfrac{2\pi}{Z_1} - \tfrac{2\pi}{Z_2} \right\rvert}{\left\lvert \Omega_1 - \Omega_2 \right\rvert} \) — tempo per percorrere la differenza di passo alla velocita relativa; se \( Z_1=Z_2 \) allora \( \delta_t=0 \).	FORMULE
+Time-lag nel caso reale statore-rotore	\( \delta_t = \dfrac{\left\lvert \tfrac{2\pi}{Z_1} - \tfrac{2\pi}{Z_2} \right\rvert}{\Omega_{\text{rotore}}} \) — una schiera e ferma (\( \Omega=0 \)), quindi la velocita relativa coincide con \( \Omega_{\text{rotore}} \).	FORMULE
+Velocita relativa fra le schiere	\( \left\lvert \Omega_1 - \Omega_2 \right\rvert \) — velocita angolare relativa statore-rotore; nel riferimento relativo una schiera e ferma.	FORMULE

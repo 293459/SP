@@ -1556,3 +1556,34 @@ $r_d$ è grande dentro il BL (flusso fortemente shear-driven, dominato dalla vis
 | $u^+=y^+$ (sottostrato $y^+\lesssim5$); $u^+=\tfrac1\kappa\ln y^+ +B$ (log, $y^+\gtrsim30$) | $\kappa\approx0.41$, $B\approx5.2$. Memo: **lineare** vicino, **log** lontano. |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+| --- | --- |
+| Derivazione RANS incompressibili | NS incompressibili + decomposizione di Reynolds → $\rho\partial_t\bar u_i+\rho\bar u_j\partial_j\bar u_i=-\partial_i\bar p+\partial_j(\bar\tau_{ij}-\rho\overline{u_i'u_j'})$ |
+| Media della fluttuazione nulla | idempotenza + linearità → $\overline{u'}=\bar u-\bar{\bar u}=0$ |
+| Idempotenza dell'operatore di media | definizione di media temporale ($\bar u$ costante in $t'$) → $\bar{\bar u}=\bar u$ |
+| Linearità dell'operatore di media | linearità dell'integrale → $\overline{au+bv}=a\bar u+b\bar v$ |
+| Regola della media del prodotto | $\overline{(\bar u+u')(\bar v+v')}$ → $\overline{uv}=\bar u\bar v+\overline{u'v'}$ |
+| Annullamento di "fluttuazione × derivata di un medio" | $\partial_j\bar u_i$ esce dalla media (è già mediato) → $\overline{u_j'\partial_j\bar u_i}=0$ |
+| $k=-\mathrm{tr}(\mathbf R)/(2\rho)$ | $k=\tfrac12\overline{u_i'u_i'}$ e $\mathrm{tr}(\mathbf R)=-2\rho k$ → $k=-\tfrac{1}{2\rho}\mathrm{tr}(\mathbf R)$ |
+| Forma conservativa del termine turbolento (via continuità) | regola del prodotto + $\partial_j u_j'=0$ → $\overline{u_j'\partial_j u_i'}=\partial_j\overline{u_i'u_j'}$ |
+| Decomposizione isotropa/anisotropa del tensore di Reynolds | tensore simmetrico + traccia $-2\rho k$ → $-\tfrac23\rho k\,\delta_{ij}$ + parte deviatorica |
+| Viscosità $\mu_T$ del $k$-$\varepsilon$ (analisi dimensionale) | $\mu_T\sim\rho u_t l_t$ con $u_t\sim k^{1/2}$, $l_t\sim k^{3/2}/\varepsilon$ → $\mu_T=C_\mu\rho k^2/\varepsilon$ |
+| Equivalenza $\mu_T$ tra $k$-$\omega$ e $k$-$\varepsilon$ | $\omega=\varepsilon/k$ → $\mu_T=C_\mu\rho k^2/\varepsilon=\bar\rho k/\omega$ |
+| Identità di Germano → $C_s$ ai minimi quadrati | $L_{ij}=T_{ij}-\widehat\tau_{ij}$ + stesso $C_s$ → $C_s^2=-\tfrac12\langle L_{ij}M_{ij}\rangle/\langle M_{kl}M_{kl}\rangle$ |
+| Legge logaritmica di parete | $du/dy=u_\tau/(\kappa y)$ (sola scala $y$) → $u^+=\tfrac1\kappa\ln y^++B$ |
+| Sottostrato viscoso lineare | $\mu\,du/dy\approx\tau_w$ costante → $u^+=y^+$ |
+| Costo DNS $\propto Re^3$ | $L/\eta\propto Re^{3/4}$, $\tau_\eta\propto Re^{-1/2}$ → $N_{celle}Re^{9/4}\cdot N_t Re^{3/4}=Re^3$ |
+| Media di Favre → continuità senza correlazioni | $\tilde u_i=\overline{\rho u_i}/\bar\rho$ → $\partial_t\bar\rho+\partial_i(\bar\rho\tilde u_i)=0$ |
+| Realizzabilità (semidefinita positiva) | $R_{ij}$ matrice di covarianza → $\overline{(u_i')^2}\ge0$ e Cauchy-Schwarz $|\rho_{ij}|\le1$ |
+| Cross-diffusion del $k$-$\omega$ | eq. di $\varepsilon$ + $\omega=\varepsilon/k$ (regola della catena) → termine $\propto\nabla k\cdot\nabla\omega$ |
+| $|\bar S|=\dot\gamma$ (giustificazione del fattore 2) | taglio semplice $\bar S_{12}=\tfrac12\dot\gamma$ → $\sqrt{2\bar S_{ij}\bar S_{ij}}=\dot\gamma$ |
+
+</details>

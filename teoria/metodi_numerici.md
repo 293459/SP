@@ -175,3 +175,20 @@ centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
 
 </details>
 
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Perché l'upwind è stabile e il centrato no (advezione) | PDE $u_t+au_x=0$ + analisi di von Neumann → upwind $\lvert G\rvert\le1$ per $0\le\nu\le1$; centrato puro $\lvert G\rvert>1$ sempre (instabile incondizionatamente) |
+| Equazione modificata e diffusione numerica dell'upwind (Taylor) | Schema upwind + sviluppo di Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=\tfrac{a\Delta x}{2}(1-\nu)u_{xx}$, con $D_{num}\ge0$ |
+| Anti-diffusione del centrato (equazione modificata) | Schema centrato + Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=-\tfrac{a^2\Delta t}{2}u_{xx}$, con $D_{num}<0$ |
+| Condizione CFL dal dominio di dipendenza | Soluzione esatta $u_0(x-at)$ + stencil a 3 punti → dominio fisico $\subseteq$ numerico, $\tfrac{\lvert a\rvert\Delta t}{\Delta x}\le1$ |
+| Perché upwind=iperbolico e centrato=ellittico | Dominio di dipendenza (caratteristiche vs isotropia) → stencil asimmetrico a monte (iperbolica) vs simmetrico $1,-2,1$ (ellittica) |
+
+</details>
+

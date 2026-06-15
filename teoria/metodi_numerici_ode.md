@@ -1083,3 +1083,20 @@ Con base di Legendre ortogonalizzata, \(M\) diventa diagonale.
 | $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | il termine con $\lambda$ molto negativo decade subito ma vincola il passo (usa impliciti / ode15s) |
 
 </details>
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Ordine di Eulero esplicito | Sviluppo di Taylor di $y(t_{k+1})$ → $\tau(h)=\tfrac{h^2}{2}y''(\xi)=\mathcal O(h^2)$, quindi $d(h)=\mathcal O(h)\Rightarrow p=1$ |
+| Regione di assoluta stabilità di Eulero esplicito | Eq. test $y'=\lambda y$ → $y_k=(1+h\lambda)^k y_0$, $\mathcal F=1+h\lambda$, $\lvert 1+h\lambda\rvert<1$ (cerchio centro $-1$, raggio $1$) |
+| Regione di assoluta stabilità di Eulero implicito | Eq. test $y'=\lambda y$ → $\mathcal F=\tfrac{1}{1-h\lambda}$, $\lvert 1-h\lambda\rvert>1$ (esterno cerchio centro $+1$; A-stabile) |
+| Teorema di Lax | Decomposizione $e_{k+1}=$ troncamento $+$ propagazione → consistenza ($\tau\to0$) + 0-stabilità ($K$ limitato) $\Rightarrow$ $e_N=\mathcal O(h^p)\to0$ (convergenza) |
+| Condizione CFL | Dominio di dipendenza fisico $c\,\Delta t$ vs numerico $\Delta x$ → $c\,\Delta t\le\Delta x\Rightarrow \tfrac{c\,\Delta t}{\Delta x}\le1$ |
+| Ordine di Heun | Taylor dell'incremento $\tfrac h2[f_k+f(t_k+h,y_k+hf_k)]$ vs $y(t_{k+1})$ → match fino a $h^2$, $\tau=\mathcal O(h^3)\Rightarrow p=2$ |
+| Ordine di un metodo Runge-Kutta | Matching dei Taylor di $y(t_{k+1})$ e incremento RK → condizioni d'ordine sul tableau ($\sum a_i=1$, $\sum a_i b_i=\tfrac12$, …) $\Rightarrow$ $d=\mathcal O(h^p)$ |
+
+</details>

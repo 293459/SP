@@ -533,3 +533,21 @@ piccoli e **moltissime particelle** (≥30–50 per cella su tantissime celle): 
 | $\nu_{max}\approx130^\circ$ ($M\to\infty$, $\gamma=1.4$) | Angolo limite di **Prandtl–Meyer** (espansione, NON Rankine–Hugoniot). Oltre ⟹ **backflow** ⟹ serve DSMC. |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Derivazione dei limiti di validità del continuo da $Kn$ | $Kn=\lambda/L$ con $\lambda=1/(\sqrt2\,n\sigma)$ → soglie $10^{-2}$ e $1$ (continuo / transizione / molecolare libero) |
+| Perché nel plume $Kn$ cresce a valle ($\lambda$ come campo) | $\lambda\propto 1/n$ e crollo di densità nel vuoto → $\lambda$ esplode → $Kn$ sale al regime molecolare libero |
+| Scaling della viscosità del modello VHS | $\mu\propto\rho\,\bar c\,\lambda$ e $\sigma\propto g^{-2\nu}$ → $\mu\propto T^{\omega}$ con $\omega=\nu+\tfrac12$ (HS: $\tfrac12$; VHS aria: $\approx0.74$) |
+| Vincolo di cella DSMC | località delle collisioni sulla scala $\lambda$ → $\Delta x\le\lambda$ |
+| Vincolo di passo DSMC | disaccoppiamento moto/collisioni e $\tau_c=\lambda/\bar c$ → $\Delta t\le\tau_c$ (NTC, $\le\!\sim\!1$ collisione/particella/passo) |
+| Vincolo tipo CFL del DSMC | avanzamento cella per cella per non saltare l'ambiente collisionale → $\Delta t\le\Delta x/|v_{max}|$ |
+
+</details>

@@ -1239,3 +1239,20 @@ $\overline{\dot\omega}$. **Non premiscelate**: **mixture fraction** $Z$ (conserv
 | $S_L\propto\sqrt{D\,\dot\omega},\qquad \delta_L\propto\sqrt{D/\dot\omega}$ | thickening: $D\,\dot\omega$ invariato ⇒ **$S_L$ non cambia**, ma $\delta_L\to F\,\delta_L$ (spessore cresce, §6.3). |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Equazione di trasporto della mixture fraction come scalare conservato | $N_S-1$ eq. di specie ($\partial_t(\rho Y_i)+\nabla\cdot(\rho\mathbf u Y_i)=-\nabla\cdot\mathbf J_i+\dot\omega_i$) → combinazione $Z=\sum_i a_i Y_i$, sorgente nulla ($\sum_i a_i\dot\omega_i=0$) e $Le=1$ → $\partial_t(\rho Z)+\nabla\cdot(\rho\mathbf u Z)=\nabla\cdot(\rho D\nabla Z)$ |
+| Somma delle equazioni di specie → continuità globale | $\sum_i$ delle eq. di specie + vincoli $\sum_i Y_i=1$, $\sum_i\mathbf J_i=0$, $\sum_i\dot\omega_i=0$ → $\partial_t\rho+\nabla\cdot(\rho\mathbf u)=0$ |
+| Scaling del numero di Damköhler | processi mixing/chimica in serie + $\tau_c\approx\delta_L/S_L$, $\tau_t=k/\varepsilon$ → $\mathrm{Da}=\tau_t/\tau_c$ e classificazione dei regimi ($\mathrm{Da}\gg1$ mixing-limited, $\mathrm{Da}\ll1$ chemistry-limited) |
+| Derivazione del tasso di Arrhenius e della costante inversa | azione di massa + fattore di Boltzmann → $K_{f,j}=A_jT^{\beta_j}\exp(-E_{a,j}/RT)$; equilibrio dettagliato ($q_j=0$) + Gibbs → $K_{b,j}=K_{f,j}/K_{eq,j}(T)$ |
+| Scaling del Thickened Flame Model | $S_L\propto\sqrt{D\dot\omega}$, $\delta_L\propto\sqrt{D/\dot\omega}$ + trasformazioni $D\to FD$, $\dot\omega\to\dot\omega/F$ → $S_L$ invariato, $\delta_L\to F\delta_L$ |
+
+</details>

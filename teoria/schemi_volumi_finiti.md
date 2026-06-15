@@ -598,3 +598,22 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 | $|\lambda|\to\max(|\lambda|,\epsilon)$ | **entropy fix** (Harten-Hyman): viscosità artificiale solo sui **punti sonici** $|\lambda_k|<\epsilon$ → no urti espansivi non fisici. |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+| --- | --- |
+| Derivazione dello schema a volumi finiti | forma differenziale $\partial_t u+\partial_x f=0$ → integrazione sulla cella → $U_j^{n+1}=U_j^n-\frac{\Delta t}{\Delta x}(F_{j+1/2}-F_{j-1/2})$ |
+| Condizione di Rankine-Hugoniot | forma integrale attorno alla discontinuità → $s(u_R-u_L)=f(u_R)-f(u_L)$ |
+| Costruzione della media di Roe | consistenza $\bar A\,\Delta U=\Delta F$ + parametro $z=\sqrt\rho(1,u,H)^T$ → medie pesate su $\sqrt\rho$ |
+| Flusso di Godunov dal problema di Riemann | Riemann locale a ogni interfaccia → scomposizione del salto sulle 3 onde → $F_{j+1/2}=F_j+\overleftarrow{DF}_j=F_{j+1}-\overrightarrow{DF}_j$ |
+| Lax-Friedrichs = centrato + dissipazione | schema centrato instabile → aggiunta di $-\frac{\lambda_{max}}{2}\Delta U$ → flusso stabile |
+| Interpretazione fisica della CFL (Godunov) | onde da $j\pm1/2$ nel piano $x$-$t$ → non sovrapposizione in $\Delta t$ → $\frac{\lambda_{max}\Delta t}{\Delta x}\le1$ |
+| Necessità dell'entropy fix in Roe | linearizzazione $\bar A$ → urto espansivo non fisico su punto sonico → $|\lambda|\to\max(|\lambda|,\epsilon)$ |
+
+</details>

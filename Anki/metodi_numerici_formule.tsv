@@ -1,0 +1,12 @@
+Schema upwind (advezione, a>0)	\( u_i^{n+1} = u_i^n - \frac{a\,\Delta t}{\Delta x}\left(u_i^n - u_{i-1}^n\right), \qquad a>0 \)	FORMULE
+Schema upwind (advezione, a<0)	\( u_i^{n+1} = u_i^n - \frac{a\,\Delta t}{\Delta x}\left(u_{i+1}^n - u_i^n\right), \qquad a<0 \)	FORMULE
+Schema centrato in spazio (advezione)	\( u_i^{n+1} = u_i^n - \frac{a\,\Delta t}{2\,\Delta x}\left(u_{i+1}^n - u_{i-1}^n\right) \)	FORMULE
+Laplaciano centrato (Poisson/diffusione)	\( \frac{u_{i-1} - 2u_i + u_{i+1}}{\Delta x^2} = f_i \)	FORMULE
+Differenza centrata seconda (stencil 1,-2,1)	\( \left.\frac{\partial^2 u}{\partial x^2}\right|_i \approx \frac{u_{i-1} - 2u_i + u_{i+1}}{\Delta x^2} + O(\Delta x^2) \)	FORMULE
+Numero di Courant (CFL)	\( \nu = \frac{a\,\Delta t}{\Delta x} \)	FORMULE
+Condizione CFL (advezione esplicita)	\( \mathrm{CFL} = \frac{|a|\,\Delta t}{\Delta x} \le 1 \)	FORMULE
+Equazione modificata dell'upwind	\( u_t + a\,u_x = \frac{a\,\Delta x}{2}\left(1 - \nu\right) u_{xx} + O(\Delta x^2), \qquad \nu = \frac{a\Delta t}{\Delta x} \)	FORMULE
+Coefficiente di diffusione numerica (upwind)	\( D_{num} = \frac{a\,\Delta x}{2}\left(1 - \nu\right) = \frac{a\,\Delta x}{2}\left(1 - \frac{a\Delta t}{\Delta x}\right) \ge 0 \)	FORMULE
+Equazione modificata del centrato (anti-diffusione)	\( u_t + a\,u_x = -\frac{a^2 \Delta t}{2}\,u_{xx} + O(\Delta x^2) \)	FORMULE
+Coefficiente di diffusione numerica (centrato)	\( D_{num} = -\frac{a^2 \Delta t}{2} < 0 \quad \Rightarrow \text{ anti-diffusivo, instabile} \)	FORMULE
+Dominio di dipendenza numerico (CFL geometrico)	\( |a|\,\Delta t \le \Delta x \)	FORMULE

@@ -1,0 +1,33 @@
+Frazione di massa di una specie	\( Y_i = \dfrac{m_i}{m}, \qquad \sum_{i=1}^{N_S} Y_i = 1 \)	FORMULE
+Concentrazione molare di una specie	\( [X_s] = \dfrac{\rho_s}{M_s} \)	FORMULE
+Mixture fraction (equazione di trasporto, scalare conservato)	\[ \dfrac{\partial(\rho Z)}{\partial t} + \nabla\cdot(\rho\mathbf u\,Z) = \nabla\cdot(\rho D\nabla Z) \]	FORMULE
+Mixture fraction (definizione e fiamma diffusiva)	\( Z = 1 \text{ nel combustibile},\ Z = 0 \text{ nell'ossidante};\ \text{fiamma su } Z = Z_{st} \)	FORMULE
+Numero di Damkohler	\( \mathrm{Da} = \dfrac{\tau_t}{\tau_c} = \dfrac{\text{tempo di mescolamento}}{\text{tempo chimico}} \)	FORMULE
+Tempo di mixing turbolento	\( \tau_t = \dfrac{k}{\varepsilon} \)	FORMULE
+Tempo chimico	\( \tau_c \approx \dfrac{\delta_L}{S_L} \)	FORMULE
+Legge di Arrhenius (costante diretta)	\( K_{f,j} = A_j\, T^{\beta_j}\, \exp\!\left(-\dfrac{E_{a,j}}{R\,T}\right) \)	FORMULE
+Costante cinetica inversa (via equilibrio)	\( K_{b,j} = \dfrac{K_{f,j}}{K_{eq,j}(T)} \)	FORMULE
+Costante di equilibrio (termodinamica)	\( K_{eq,j}(T) = \exp\!\left(-\dfrac{\Delta G^\circ_j}{R\,T}\right), \qquad \Delta G^\circ_j = \Delta H^\circ_j - T\,\Delta S^\circ_j \)	FORMULE
+Equilibrio dettagliato (rapporto delle costanti)	\( \dfrac{K_{f,j}}{K_{b,j}} = \prod_s [X_s]^{\nu^P_{sj}-\nu^R_{sj}} \equiv K_{c,j}(T) \)	FORMULE
+Passaggio Keq - Kc	\( K_{c,j} = K_{eq,j}\,(R\,T)^{-\Delta n_j}, \qquad \Delta n_j = \sum_s(\nu^P_{sj}-\nu^R_{sj}) \)	FORMULE
+Equazione di trasporto delle specie	\[ \dfrac{\partial(\rho Y_i)}{\partial t} + \nabla\cdot(\rho\mathbf u\,Y_i) = -\nabla\cdot\mathbf J_i + \dot\omega_i \qquad i=1,\dots,N_S \]	FORMULE
+Flusso diffusivo di massa (legge di Fick)	\( \mathbf J_i = -\rho D_i\nabla Y_i, \qquad \sum_i \mathbf J_i = 0 \)	FORMULE
+Continuita globale (massa)	\( \dfrac{\partial\rho}{\partial t} + \nabla\cdot(\rho\mathbf u) = 0 \)	FORMULE
+Quantita di moto	\[ \dfrac{\partial(\rho\mathbf u)}{\partial t} + \nabla\cdot(\rho\mathbf u\otimes\mathbf u) = \nabla\cdot\boldsymbol\sigma, \qquad \boldsymbol\sigma = \boldsymbol\tau - p\,\mathbf I \]	FORMULE
+Equazione dell'energia totale	\[ \dfrac{\partial(\rho E)}{\partial t} + \nabla\cdot(\rho\mathbf u\,E) = \nabla\cdot(\boldsymbol\sigma\cdot\mathbf u) - \nabla\cdot\mathbf q_c - \nabla\cdot\mathbf q_m \]	FORMULE
+Flussi di calore conduttivo e diffusivo	\( \mathbf q_c = -\lambda\nabla T, \qquad \mathbf q_m = \sum_i h_i\,\mathbf J_i \)	FORMULE
+Energia totale specifica	\( E = \sum_{i=1}^{N_S} Y_i\, e_i + \tfrac12\,\mathbf u^2 \)	FORMULE
+Entalpia di specie (relazione con energia interna)	\( h_i = e_i + \dfrac{p}{\rho} \)	FORMULE
+Entalpia assoluta di specie (formazione + sensibile)	\( h_i = h^\circ_{f,i} + \int_{T_0}^{T} c_{p,i}(T')\,dT' \)	FORMULE
+Entalpia totale specifica	\( H = E + \dfrac{p}{\rho} \)	FORMULE
+Sorgente di calore (entalpia sensibile)	\( \dot Q = -\sum_i h^\circ_{f,i}\,\dot\omega_i \)	FORMULE
+Numero di Lewis	\( Le = \dfrac{\alpha}{D_i} \)	FORMULE
+Tasso di specie da rateo di reazione	\( \dot\omega_i = M_i \sum_{j=1}^{N_r} (\nu^P_{ij} - \nu^R_{ij})\, q_j \)	FORMULE
+Tasso di specie (formula completa)	\[ \dot\omega_i = \sum_{j=1}^{N_r}(\nu^P_{ij}-\nu^R_{ij})\left[ K_{f,j}\prod_{s=1}^{N_S}\Big(\dfrac{\rho_s}{M_s}\Big)^{\nu^R_{sj}} - K_{b,j}\prod_{s=1}^{N_S}\Big(\dfrac{\rho_s}{M_s}\Big)^{\nu^P_{sj}} \right] \]	FORMULE
+Rate of progress di una reazione	\( q_j = K_{f,j}\prod_s [X_s]^{\nu^R_{sj}} - K_{b,j}\prod_s [X_s]^{\nu^P_{sj}} \)	FORMULE
+Eddy Dissipation Model (rate medio)	\( \overline{\dot\omega}_c \approx C\,\dfrac{\bar\rho}{\tau_t}\,\tilde c\,(1-\tilde c), \qquad \tau_t = \dfrac{k}{\varepsilon} \)	FORMULE
+Finite-Rate / Eddy-Dissipation	\( \overline{\dot\omega} = \min\big(\dot\omega_{\text{finite-rate}},\ \dot\omega_{\text{EDM}}\big) \)	FORMULE
+Tasso medio via beta-PDF (convoluzione)	\( \widetilde{\dot\omega}_i = \int_0^1 \dot\omega_i(Z)\,\tilde P\big(Z;\tilde Z,\widetilde{Z''^2}\big)\,dZ \)	FORMULE
+Composizione media via beta-PDF	\( \tilde Y_i = \int_0^1 Y_i(Z)\,\tilde P(Z)\,dZ \)	FORMULE
+Thickened Flame Model (scaling)	\( D \to F\,D, \qquad \dot\omega \to \dfrac{\dot\omega}{F} \)	FORMULE
+Velocita e spessore di fiamma laminare (scaling)	\( S_L \propto \sqrt{D\,\dot\omega}, \qquad \delta_L \propto \sqrt{D/\dot\omega} \)	FORMULE

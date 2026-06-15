@@ -518,3 +518,19 @@ ovvero scegliere tra **costo basso/stazionario** e **fedeltà alta/instazionario
 | $\delta_t=\dfrac{\left\lvert\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right\rvert}{\Omega_{\text{rotore}}}$ | Caso reale statore–rotore: **una schiera è ferma** ($\Omega=0$), quindi la relativa = $\Omega_{\text{rotore}}$. |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Derivazione del time-lag (phase-lag) | Differenza di passo $\left\lvert\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right\rvert$ + velocità relativa $\lvert\Omega_1-\Omega_2\rvert$ → $\delta_t=\dfrac{\left\lvert\tfrac{2\pi}{Z_1}-\tfrac{2\pi}{Z_2}\right\rvert}{\lvert\Omega_1-\Omega_2\rvert}$ |
+| Perché passi diversi danno periodicità sfasata | Periodicità spaziale a istante fissato (passi uguali) → canali sfasati in fase → $U(\theta,t)=U(\theta-\tfrac{2\pi}{Z_2},\,t+\delta_t)$ |
+| Troncamento di Fourier nel mixing plane | Serie di Fourier $U=\sum\hat U_n e^{in\theta}$ + media in $\theta$ (ortogonalità) → $\bar U=\hat U_0$, armoniche $n\neq0$ azzerate → perdite di mixing numeriche |
+| Settore periodico minimo via MCD | Richiesta di numeri interi di canali per entrambe le schiere → settore $=\dfrac{360^\circ}{\mathrm{MCD}(Z_1,Z_2)}$ con $\tfrac{Z_1}{\mathrm{MCD}}:\tfrac{Z_2}{\mathrm{MCD}}$ canali |
+
+</details>

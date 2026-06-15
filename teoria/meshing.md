@@ -354,3 +354,17 @@ Soft/Hard (distingue quelli automatizzati dal pc da quelli definiti in modo rigo
 | $\det(J)\le 0$ → **volume negativo** | Jacobiano della trasformazione: $\le0$ = elemento che si rovescia / **overlap**. Sempre $>0$. |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details><summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Trasporto di Reynolds in forma ALE con velocità di griglia | Volume mobile $V(t)$ + legge di conservazione $\partial_t u+\nabla\cdot\vec F=0$ → $\dfrac{d}{dt}\int_{V(t)}u\,dV+\int_{S(t)}u(\vec v-\vec v_g)\cdot\vec n\,dS=0$ |
+| Limiti Euleriano e Lagrangiano dell'ALE | Termine convettivo ALE $u(\vec v-\vec v_g)\cdot\vec n$ → $\vec v_g=0$ (Euleriano, cella fissa) e $\vec v_g=\vec v$ (Lagrangiano, termine nullo) |
+| Mapping algebrico al piano computazionale | Interpolazione lineare $x=x_1+\eta(x_2-x_1)$ → $\eta=\dfrac{x-x_1}{x_2-x_1}\in[0,1]$ (verifica estremi $0,1$) |
+
+</details>

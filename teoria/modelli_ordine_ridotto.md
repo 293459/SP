@@ -484,3 +484,19 @@ autoencoder, manifold learning) al posto della POD pura.
 | $u(\bar{x},\bar{\mu})=\displaystyle\sum_{i=1}^{n}\tilde{u}_i(\bar{\mu})\,\phi_i(\bar{x})$ | **Predizione online**: modi $\phi_i$ dal database (offline), coefficienti $\tilde u_i$ **interpolati** nei parametri (polinomi, RBF, NN, GP). Per ogni punto del database $\tilde u_i$ si ricava **proiettando** sui modi (Passo 7). |
 
 </details>
+
+---
+
+## Dimostrazioni (lista)
+
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| **Ottimalità della base POD come problema agli autovalori** | Problema di ottimo vincolato $\max_{\phi}\sum_k\langle u_k,\phi\rangle^2$ s.t. $\|\phi\|^2=1$ → (Sirovich: $\phi=\sum_j a_j u_j$, Lagrangiana) → problema agli autovalori della matrice di correlazione $Ca=\lambda a$ (modi = autovettori, energia = autovalori). |
+| **Energia = traccia $C$ = somma autovalori** | Definizione $E_{tot}=\sum_k\|u_k\|^2$ → ($C_{kk}=\langle u_k,u_k\rangle$, diagonalizzazione $C=Q\Lambda Q^\top$, invarianza traccia) → $E_{tot}=\mathrm{tr}(C)=\sum_i\lambda_i$. |
+| **RIC come frazione cumulata di energia** | Energia del modo $=\lambda_i$ → (rapporto cumulato, errore $=1-RIC$) → criterio $RIC(n)=\frac{\sum_{i\le n}\lambda_i}{\sum_i\lambda_i}>0.99$. |
+| **Proiezione di Galerkin → sistema ridotto** | Ansatz $u_n=\sum_i\tilde u_i\phi_i$ con modi ortonormali → (ortogonalità di Galerkin $\langle u-u_n,\phi_j\rangle=0$) → coefficienti $\tilde u_j=\langle u,\phi_j\rangle$ e sistema ridotto a $n$ gradi di libertà. |
+
+</details>

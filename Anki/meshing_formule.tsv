@@ -1,0 +1,11 @@
+Bilancio ai volumi finiti (volume fisso)	\( V\,\frac{\partial U_j}{\partial t} = -\int_S \vec F\cdot\vec n\,dS \)	FORMULE
+Valor medio di cella	\( U_j = \frac{1}{V}\int_V u\,dV \)	FORMULE
+Forma ALE del trasporto (mesh mobile)	\[ \frac{d}{dt}\int_{V(t)} u\,dV + \int_{S(t)} \vec F(u)\cdot\vec n\,dS = 0 \]	FORMULE
+Velocita relativa fluido-griglia (ALE)	\( \vec v_{rel} = \vec v - \vec v_g \)	FORMULE
+Flusso convettivo ALE	\( \int_{S(t)} u\,(\vec v - \vec v_g)\cdot\vec n\,dS \)	FORMULE
+Limiti dell'ALE (Euleriano / Lagrangiano)	\( \vec v_g = 0 \Rightarrow \text{Euleriano}, \qquad \vec v_g = \vec v \Rightarrow \text{Lagrangiano} \)	FORMULE
+Mapping algebrico (coordinate computazionali)	\( \eta = \frac{x - x_1}{x_2 - x_1}, \qquad \xi = \frac{y - y_1}{y_2 - y_1} \quad (\in[0,1]) \)	FORMULE
+Aspect Ratio	\( \text{AR} = \frac{\text{lato maggiore}}{\text{lato minore}} \quad (\approx 1 \text{ ideale}) \)	FORMULE
+Skewness	\( \text{Skewness} = \sum \text{angoli interni} - \sum \text{angoli forma regolare} \quad (\approx 0 \text{ ideale}) \)	FORMULE
+Orthogonality	\( \text{Orthogonality} = 1 - (\text{scarto normale faccia vs allineamento centri}) \quad (\approx 1 \text{ ideale}) \)	FORMULE
+Jacobiano (volume negativo / overlap)	\( \det(J) \le 0 \Rightarrow \text{volume negativo (overlap)}; \quad \det(J) > 0 \text{ richiesto} \)	FORMULE
