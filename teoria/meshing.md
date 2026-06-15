@@ -359,7 +359,8 @@ Soft/Hard (distingue quelli automatizzati dal pc da quelli definiti in modo rigo
 
 ## Dimostrazioni (lista)
 
-<details><summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+<details>
+<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
 
 | Dimostrazione | Punto di partenza → arrivo |
 |---|---|
