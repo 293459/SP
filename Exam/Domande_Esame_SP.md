@@ -108,7 +108,7 @@
 <summary><strong>🟦 [T] Problema di Riemann e tubo d'urto di Sod: applicazione al calcolo dei flussi all'interfaccia tra celle (perché farlo, come si usa nel CFD, ODE risultante), metodi di risoluzione del problema di Riemann e metodo di Godunov</strong></summary>
 
 > 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`,
-> `teoria/fluidodinamica.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
+> `teoria/caratteristiche.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
 > all'interfaccia tra celle nasce un problema di Riemann locale, risolutori **esatti vs approssimati**
 > (Roe, HLL/HLLC), e il metodo di **Godunov**.
 
@@ -126,7 +126,7 @@
 <details>
 <summary><strong>🟦 [T] Equazioni di Eulero 2D, discretizzazione a volumi finiti (arrivare a $\mathrm{d}\mathbf{U}/\mathrm{d}t = \sum \text{flussi}$), panoramica degli schemi per i flussi convettivi e illustrare Jameson</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/fluidodinamica.md` (sistema di Eulero),
+> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (sistema di Eulero),
 > `teoria/schemi_volumi_finiti.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
 > teorema della divergenza → bilancio dei flussi sulle facce, semidiscretizzazione, poi rassegna
 > schemi e dettaglio **Jameson**.
@@ -214,7 +214,8 @@
 <details>
 <summary><strong>🟦 [T] Equazione di Burgers, collegandosi ai casi delle condizioni al contorno</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/fluidodinamica.md`, `teoria/metodi_numerici.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (modello di Burgers),
+> `teoria/caratteristiche.md` (condizioni al contorno via caratteristiche), `teoria/metodi_numerici.md`.
 > Attesi: Burgers come **modello scalare non lineare** (formazione di urti, onde di rarefazione,
 > condizione di entropia), e come si traducono le **condizioni al contorno** a seconda del segno
 > delle caratteristiche.
@@ -224,14 +225,14 @@
 <details>
 <summary><strong>🟦 [T] Equazione di Burgers</strong></summary>
 
-> 📌 *Risposta da compilare.* Variante "secca" della precedente. Riferimento: `teoria/fluidodinamica.md`.
+> 📌 *Risposta da compilare.* Variante "secca" della precedente. Riferimento: `teoria/bilancio.md`.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/fluidodinamica.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`.
 > Attesi: pistone che accelera in un condotto → **compressione progressiva** → coalescenza delle
 > onde di compressione in un **urto** (caratteristiche che convergono); caso speculare di espansione
 > con pistone che retrocede.
@@ -241,7 +242,7 @@
 <details>
 <summary><strong>🟦 [T] Tubo di Sod</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/fluidodinamica.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/caratteristiche.md`.
 > Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
 > espansione + contatto + urto, uso come **test di validazione** degli schemi.
 
@@ -250,7 +251,7 @@
 <details>
 <summary><strong>🟦 [T] Outlet subsonico (e in generale le condizioni al contorno in base al regime)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/fluidodinamica.md`, `teoria/report_QA.md`
+> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`, `teoria/report_QA.md`
 > (Domande 12–13). Attesi: numero di **caratteristiche entranti** = numero di condizioni da imporre;
 > in **outlet subsonico** una caratteristica rientra → si impone la **pressione statica** e si
 > estrapola il resto.

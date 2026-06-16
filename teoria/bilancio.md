@@ -1,4 +1,4 @@
-# Fluid dynamics
+# Leggi di conservazione e sistema di Eulero
 
 ## Nomenclatura essenziale
 
@@ -156,47 +156,10 @@ $$(1 - M^2)\,\phi_{xx} + \phi_{yy} = 0$$
 
 </details>
 
-## Equazioni di Eulero e metodo delle caratteristiche
-
-<details>
-<summary><strong>Equazioni di Eulero 1D (instazionario)</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Rappresentazione nello schema spazio-tempo</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Equazioni di compatibilità</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Equazioni iperboliche</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Linee caratteristiche:</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Definizione fisica</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Definizione matematica</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Propagazione discontinuità con Rankine-Hugoniot</strong></summary>
-
-</details>
+> 🔗 Il **metodo delle caratteristiche** (linee caratteristiche, equazioni di
+> compatibilità, invarianti di Riemann, Rankine–Hugoniot) è trattato nel file
+> dedicato [`caratteristiche.md`](caratteristiche.md), perché è il regime
+> tipicamente **supersonico/iperbolico**.
 
 ## Modelli scalari e vettoriali
 
@@ -283,8 +246,6 @@ Rappresenta sistemi di equazioni linearizzate (es. onde acustiche): $\partial_t\
 | --- | --- |
 | $\dfrac{\partial u}{\partial t} + u\,\dfrac{\partial u}{\partial x} = 0$ | **Burgers non viscosa**: caso scalare non lineare ($F(u)=u^2/2$). È l'analogo "giocattolo" di Eulero per studiare la formazione di urti. |
 
-> Le relazioni di **Rankine–Hugoniot** (salto monte↔valle attraverso l'urto) sono citate nel capitolo ma senza una formula esplicita sviluppata: ricordale come *condizioni di salto* coerenti con la forma conservativa $\partial_t U+\partial_x F=0$.
-
 </details>
 
 ---
@@ -299,8 +260,8 @@ Rappresenta sistemi di equazioni linearizzate (es. onde acustiche): $\partial_t\
 | Classificazione ellittico/parabolico/iperbolico dal discriminante | Da $A u_{xx}+B u_{xy}+C u_{yy}+\dots=0$ → equazione caratteristica $A\,(y')^2-B\,y'+C=0$ → segno di $\Delta=B^2-4AC$ ($\Delta<0$ ellittica, $\Delta=0$ parabolica, $\Delta>0$ iperbolica). |
 | Forma quasi-lineare dalla forma conservativa | Da $U_t+F(U)_x=0$ → chain rule $F_x=(\partial F/\partial U)U_x$ → $U_t+A(U)U_x=0$ con $A=\partial F/\partial U$. |
 | Autovalori del sistema di Eulero | Da $A(U)=\partial F/\partial U$ → polinomio caratteristico $\det(A-\lambda I)=0$ → $\lambda=\{u,\,u+c,\,u-c\}$ reali → iperbolicità ($A=L\Lambda L^{-1}$). |
-| Equazioni caratteristiche e di compatibilità | Da $U_t+A U_x=0$ con $A=L\Lambda L^{-1}$ → premoltiplico per $L^{-1}$ → lungo $dx/dt=\lambda_k$ la PDE diventa la ODE $dW_k/dt=0$ (invariante). |
-| Invarianti di Riemann (Eulero 1D) | Da $du\pm dp/(\rho c)=0$ lungo $dx/dt=u\pm c$ (isentropica, $c^2=\gamma p/\rho$) → $J^{\pm}=u\pm 2c/(\gamma-1)$ costanti. |
-| Rankine-Hugoniot dal bilancio integrale | Da $\frac{d}{dt}\int U\,dx+[F]=0$ con urto mobile a velocità $s$ → regola di Leibniz e limite sull'intervallo → $s[\![U]\!]=[\![F]\!]$. |
+
+> Le dimostrazioni su **caratteristiche/compatibilità, invarianti di Riemann e
+> Rankine–Hugoniot** sono nel file [`caratteristiche.md`](caratteristiche.md).
 
 </details>

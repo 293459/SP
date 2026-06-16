@@ -20,7 +20,8 @@ dall'unione dei vecchi export Notion e delle sintesi in formato Q&A. Tutte le im
 
 | File | Contenuto |
 |---|---|
-| `fluidodinamica.md` | Leggi di conservazione, problemi ellittici/iperbolici, sistema di Eulero |
+| `bilancio.md` | Leggi di conservazione, problemi ellittici/iperbolici, sistema di Eulero, modelli scalari/vettoriali |
+| `caratteristiche.md` | Metodo delle caratteristiche, linee caratteristiche, invarianti di Riemann, Rankine–Hugoniot (regime supersonico) |
 | `meshing.md` | Tipologie di mesh, generazione, metriche, ALE |
 | `schemi_volumi_finiti.md` | Metodo dei volumi finiti, Godunov/Riemann, flux splitting, Roe |
 | `metodi_numerici.md` | Collocazione dei metodi nel corso, upwind vs centrati (+ simulazione d'esame) |
