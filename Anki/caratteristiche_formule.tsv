@@ -1,0 +1,3 @@
+Rankine-Hugoniot (condizione di salto)	\( s\,[\![U]\!] = [\![F]\!] \iff s = \dfrac{[\![F]\!]}{[\![U]\!]} = \dfrac{F_R-F_L}{U_R-U_L} \)	FORMULE
+Rankine-Hugoniot per Burgers	\( s = \dfrac{[\![f]\!]}{[\![u]\!]} = \dfrac{u_R^2/2 - u_L^2/2}{u_R-u_L} = \dfrac{u_L+u_R}{2} \)	FORMULE
+Invarianti di Riemann (Eulero 1D, gas politropico)	\( J^{\pm} = u \pm \dfrac{2c}{\gamma-1}\ \ \text{costante lungo}\ \ \dfrac{dx}{dt}=u\pm c \)	FORMULE

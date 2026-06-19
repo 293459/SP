@@ -8,7 +8,4 @@ Classificazione tramite il discriminante	\( \Delta<0\ \Rightarrow\ \text{ellitti
 Equazione del potenziale linearizzato	\( (1-M^2)\,\phi_{xx} + \phi_{yy} = 0,\quad \Delta=-4(1-M^2) \)	FORMULE
 Autovalori della Jacobiana di Eulero 1D	\( A = L\,\Lambda\,L^{-1},\qquad \lambda = \{\,u,\ u+c,\ u-c\,\},\quad c=\sqrt{\gamma R T} \)	FORMULE
 Velocita d'onda (caratteristica) per legge scalare	\( u_t + f(u)_x = 0 \;\Rightarrow\; \dfrac{dx}{dt}=f'(u),\qquad f=a\,u\Rightarrow f'=a,\ \ f=\tfrac{u^2}{2}\Rightarrow f'=u \)	FORMULE
-Rankine-Hugoniot (condizione di salto)	\( s\,[\![U]\!] = [\![F]\!] \iff s = \dfrac{[\![F]\!]}{[\![U]\!]} = \dfrac{F_R-F_L}{U_R-U_L} \)	FORMULE
-Rankine-Hugoniot per Burgers	\( s = \dfrac{[\![f]\!]}{[\![u]\!]} = \dfrac{u_R^2/2 - u_L^2/2}{u_R-u_L} = \dfrac{u_L+u_R}{2} \)	FORMULE
-Invarianti di Riemann (Eulero 1D, gas politropico)	\( J^{\pm} = u \pm \dfrac{2c}{\gamma-1}\ \ \text{costante lungo}\ \ \dfrac{dx}{dt}=u\pm c \)	FORMULE
 Numero di Mach	\( M = \dfrac{u}{c},\quad M<1\ \text{subsonico},\ M>1\ \text{supersonico} \)	FORMULE
