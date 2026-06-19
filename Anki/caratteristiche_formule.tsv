@@ -1,3 +1,12 @@
 Rankine-Hugoniot (condizione di salto)	\( s\,[\![U]\!] = [\![F]\!] \iff s = \dfrac{[\![F]\!]}{[\![U]\!]} = \dfrac{F_R-F_L}{U_R-U_L} \)	FORMULE
 Rankine-Hugoniot per Burgers	\( s = \dfrac{[\![f]\!]}{[\![u]\!]} = \dfrac{u_R^2/2 - u_L^2/2}{u_R-u_L} = \dfrac{u_L+u_R}{2} \)	FORMULE
 Invarianti di Riemann (Eulero 1D, gas politropico)	\( J^{\pm} = u \pm \dfrac{2c}{\gamma-1}\ \ \text{costante lungo}\ \ \dfrac{dx}{dt}=u\pm c \)	FORMULE
+Advezione lineare: soluzione	\( u_t+a\,u_x=0 \;\Rightarrow\; u(x,t)=u_0(x-at) \) (profilo traslato a velocita' \(a\))	FORMULE
+Linea caratteristica (scalare/sistema)	\( \dfrac{dx}{dt}=a \) (scalare lin.); non lin. \( \dfrac{dx}{dt}=f'(u) \); sistema \( \dfrac{dx}{dt}=\lambda_k \)	FORMULE
+Velocita' d'onda dal flusso	\( a=\dfrac{\partial f}{\partial u}\) ; \( f=au \Rightarrow a=\) cost (lineare)	FORMULE
+Derivata materiale (1D)	\( \dfrac{Du}{Dt}=\dfrac{\partial u}{\partial t}+a\dfrac{\partial u}{\partial x}=0 \) lungo \( dx/dt=a \)	FORMULE
+Tempo di breaking (Burgers)	\( t_b=-\dfrac{1}{\min_\xi u_0'(\xi)} \) (serve \( u_0'<0 \), compressione)	FORMULE
+Rarefazione autosimile (Burgers)	\( u(x,t)=\dfrac{x}{t} \) nel ventaglio di espansione	FORMULE
+Autovalori di Eulero 1D	\( \lambda=\{\,u-a,\ u,\ u+a\,\} \) (acustiche \(u\pm a\) + entropia \(u\))	FORMULE
+Sistema 2x2 onda: autovalori e natura	\( \lambda=\pm a\sqrt{\theta}\) ; \( \theta=1\) iperbolico, \( \theta=-1\) ellittico	FORMULE
+Rankine-Hugoniot per Eulero (massa)	\( s\,[\![\rho]\!]=[\![\rho u]\!] \) (e q.moto \( s[\![\rho u]\!]=[\![p+\rho u^2]\!] \))	FORMULE

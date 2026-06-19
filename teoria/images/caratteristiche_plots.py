@@ -1,193 +1,287 @@
 #!/usr/bin/env python3
 """
-Genera le figure per il capitolo `teoria/caratteristiche.md`.
+Figure per teoria/caratteristiche.md  (capitolo "Linee caratteristiche").
 
-Concetto: advezione lineare scalare  u_t + a u_x = 0  (a = cost > 0).
-Soluzione esatta:  u(x,t) = u0(x - a t)  -> il profilo trasla rigidamente.
+Ridisegna in modo pulito (grafica vettoriale SVG per i 2D, PNG per i 3D) le
+figure che negli appunti erano fatte a mano, usando un DATO INIZIALE PERIODICO.
 
-Con dato iniziale a "tenda" (triangolo) u resta CONTINUA, ma le derivate
-parziali u_x e u_t sono COSTANTI A TRATTI e presentano un SALTO (discontinuita'
-debole) attraverso le linee caratteristiche  x = x0 + a t.  Vale ovunque la
-relazione di compatibilita'  u_t = -a u_x.
+Genera:
+  lc_scalare_lineare.svg      - advezione lineare: piano x-t (caratteristiche
+                                parallele, frecce del tempo, punti A,B, t1,x1)
+                                + piano x-u con snapshot a t=0 e t=t1
+  lc_condizioni_contorno.svg  - BC: casi a>0 e a<0, bordo entrante evidenziato
+  lc_derivate_2d.svg          - mappe (x,t) di u, du/dx, du/dt (costanti lungo le
+                                caratteristiche; du/dt = -a du/dx)
+  lc_derivate_3d.png          - superfici 3D di du/dx e du/dt
+  lc_burgers_urto.svg         - Burgers: caratteristiche che CONVERGONO -> urto
+                                + snapshot x-u che si irripidiscono
+  lc_burgers_espansione.svg   - Burgers: ventaglio di espansione + snapshot x-u
 
-Output (in teoria/images/):
-  - caratteristiche_derivate_3d.png   : due superfici 3D, u_x(x,t) e u_t(x,t)
-  - caratteristiche_2d_overview.png   : pannello 2D riassuntivo (mappe + profili)
+Uso:  python3 teoria/images/caratteristiche_plots.py
 """
 import os
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 
 OUT = os.path.dirname(os.path.abspath(__file__))
+plt.rcParams.update({"font.size": 11, "axes.grid": False})
 
-a = 1.0                       # velocita' di propagazione (a > 0)
-x0s = np.array([1.0, 2.0, 3.0])   # punti di rottura del profilo iniziale (-> caratteristiche)
+GREEN = "#2ca02c"
 
-def u0(xi):
-    """Dato iniziale a tenda: continuo, picco 1 in x=2, base [1,3]."""
-    return np.clip(1.0 - np.abs(xi - 2.0), 0.0, None)
+def time_arrow(ax, x=-0.6, y0=0.05, y1=0.9):
+    """Freccia verticale che indica la direzione del tempo crescente."""
+    ax.annotate("", xy=(x, y1), xytext=(x, y0),
+                xycoords=("data", "axes fraction"),
+                arrowprops=dict(arrowstyle="-|>", color="0.3", lw=1.6))
+    ax.text(x, 0.5 * (y0 + y1), "$t$ cresce", color="0.3", fontsize=9,
+            transform=ax.get_xaxis_transform(), va="center", ha="center",
+            rotation=90, backgroundcolor="white")
 
-def u0p(xi):
-    """Derivata del dato iniziale: costante a tratti, salta in x = 1,2,3."""
-    r = np.zeros_like(xi)
-    r[(xi > 1.0) & (xi < 2.0)] = 1.0
-    r[(xi > 2.0) & (xi < 3.0)] = -1.0
-    return r
+# ===========================================================================
+# 1) ADVEZIONE LINEARE: x-t (caratteristiche) + x-u (snapshot)
+# ===========================================================================
+a = 0.5
+k = 2 * np.pi / 4.0
+u0 = lambda xi: np.sin(k * xi)          # onda periodica
+xL, xR, Tmax = -1.0, 9.0, 6.0
+t1 = 4.0
+xA, xB = 0.0, 1.0                       # due punti notevoli sull'asse t=0
 
-# campo (x,t)
-x = np.linspace(-1.0, 7.0, 480)
-t = np.linspace(0.0, 3.5, 360)
-X, T = np.meshgrid(x, t)
-XI = X - a * T                # variabile caratteristica
-U   = u0(XI)
-UX  = u0p(XI)                 # du/dx (x,t)
-UT  = -a * UX                 # du/dt (x,t) = -a du/dx
+fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5.6))
 
-t1 = 2.0                      # istante di snapshot
+# --- pannello sinistro: piano x-t ---
+xx = np.linspace(xL, xR, 600)
+tt = np.linspace(0, Tmax, 400)
+XX, TT = np.meshgrid(xx, tt)
+U = u0(XX - a * TT)
+axL.imshow(U, origin="lower", extent=[xL, xR, 0, Tmax], aspect="auto",
+           cmap="coolwarm", alpha=0.45, vmin=-1, vmax=1)
+# famiglia di caratteristiche parallele (stessa pendenza = stessa velocita')
+for x0 in np.arange(xL, xR + 0.1, 1.0):
+    axL.plot([x0, x0 + a * Tmax], [0, Tmax], color=GREEN, lw=1.2, alpha=0.9)
+# caratteristiche per A e B evidenziate
+for x0, name, col in [(xA, "A", "tab:purple"), (xB, "B", "tab:orange")]:
+    axL.plot([x0, x0 + a * Tmax], [0, Tmax], color=col, lw=2.4)
+    axL.plot(x0, 0, "o", color=col, ms=8)
+    axL.text(x0 - 0.15, -0.45, name, color=col, fontsize=13, ha="center")
+    axL.plot(x0 + a * t1, t1, "o", color=col, ms=8)
+    axL.text(x0 + a * t1 + 0.15, t1 + 0.12, name + "'", color=col, fontsize=13)
+# linea t = t1 e stazione x = x1
+axL.axhline(t1, color="0.25", ls="--", lw=1.2)
+axL.text(xR - 0.1, t1 + 0.1, "$t_1$ (istante di osservazione)", color="0.25",
+         ha="right", fontsize=9)
+x1 = 6.0
+axL.axvline(x1, color="saddlebrown", ls=":", lw=1.6)
+axL.text(x1 + 0.1, Tmax - 0.4, "$x_1$ (stazione)", color="saddlebrown", fontsize=9)
+time_arrow(axL)
+axL.text(xL + 0.1, Tmax - 0.5, r"$a>0$: le caratteristiche $x=x_0+a\,t$"
+         "\n" r"sono PARALLELE (pendenza = $1/a$)", fontsize=9,
+         bbox=dict(fc="white", ec="0.7", alpha=0.85))
+axL.set_xlim(xL, xR); axL.set_ylim(-0.05, Tmax)
+axL.set_xlabel("x"); axL.set_ylabel("t")
+axL.set_title("(a) Piano spazio–tempo $(x,t)$")
 
-# ---------------------------------------------------------------------------
-# FIGURA 1 — superfici 3D di du/dx e du/dt
-# ---------------------------------------------------------------------------
-fig = plt.figure(figsize=(13, 5.4))
-for k, (Z, lab, cmap) in enumerate([
-        (UX, r"$\partial u/\partial x\,(x,t)$", "RdBu_r"),
-        (UT, r"$\partial u/\partial t\,(x,t)=-a\,\partial u/\partial x$", "PuOr_r")]):
-    ax = fig.add_subplot(1, 2, k + 1, projection="3d")
-    ax.plot_surface(X, T, Z, cmap=cmap, vmin=-1, vmax=1,
-                    linewidth=0, antialiased=True, rcount=160, ccount=160)
-    # tracce delle caratteristiche sulla superficie (in alto)
-    for xc in x0s:
-        tt = t.copy()
-        xx = xc + a * tt
-        ax.plot(xx, tt, np.full_like(tt, 1.15), color="k", lw=1.2, ls="--")
-    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_zlabel(lab)
-    ax.set_title(lab, fontsize=12)
-    ax.set_zlim(-1.2, 1.2)
-    ax.view_init(elev=22, azim=-60)
-fig.suptitle(r"Advezione lineare $u_t + a\,u_x = 0$  ($a={:.0f}>0$): le derivate sono "
-             r"costanti a tratti e saltano lungo le caratteristiche  $x = x_0 + a t$"
-             .format(a), fontsize=12)
+# --- pannello destro: piano x-u (snapshot) ---
+xs = np.linspace(xL, xR, 800)
+axR.plot(xs, u0(xs), color="tab:blue", lw=2.0, label="$u(x,0)$")
+axR.plot(xs, u0(xs - a * t1), color="tab:blue", lw=2.0, ls="--",
+         label="$u(x,t_1)=u_0(x-a\\,t_1)$")
+for x0, name, col in [(xA, "A", "tab:purple"), (xB, "B", "tab:orange")]:
+    axR.plot(x0, u0(x0), "o", color=col, ms=8)
+    axR.text(x0, u0(x0) + 0.08, name, color=col, ha="center", fontsize=13)
+    axR.plot(x0 + a * t1, u0(x0), "o", color=col, ms=8)
+    axR.text(x0 + a * t1, u0(x0) + 0.08, name + "'", color=col, ha="center", fontsize=13)
+    axR.annotate("", xy=(x0 + a * t1, u0(x0)), xytext=(x0, u0(x0)),
+                 arrowprops=dict(arrowstyle="-|>", color=col, lw=1.3, ls=":"))
+axR.text(0.5 * (xA + xA + a * t1), u0(xA) - 0.22, r"$\Delta x = a\,t_1$",
+         color="tab:purple", ha="center", fontsize=10)
+axR.axhline(0, color="0.7", lw=0.8)
+axR.set_xlim(xL, xR); axR.set_ylim(-1.5, 1.5)
+axR.set_xlabel("x"); axR.set_ylabel("u")
+axR.set_title("(b) Piano spazio–soluzione $(x,u)$: traslazione rigida")
+axR.legend(loc="lower right", fontsize=9)
+
+fig.suptitle(r"Advezione lineare $u_t+a\,u_x=0$: $u(x,t)=u_0(x-a t)$ — "
+             r"A e B si spostano nello SPAZIO di $a\,t_1$, stesso valore di $u$",
+             fontsize=12)
 fig.tight_layout(rect=(0, 0, 1, 0.95))
-f1 = os.path.join(OUT, "caratteristiche_derivate_3d.png")
-fig.savefig(f1, dpi=130)
+fig.savefig(os.path.join(OUT, "lc_scalare_lineare.svg"))
 plt.close(fig)
 
-# ---------------------------------------------------------------------------
-# FIGURA 2 — riassunto 2D: mappe (x,t) + profili agli istanti t=0 e t=t1
-# ---------------------------------------------------------------------------
-fig, axs = plt.subplots(2, 2, figsize=(13, 9))
-ext = [x.min(), x.max(), t.min(), t.max()]
-
-def add_chars(ax, label=False):
-    for i, xc in enumerate(x0s):
-        ax.plot(xc + a * t, t, "k--", lw=1.3)
-    ax.axhline(t1, color="0.3", lw=1.0, ls=":")
-    if label:
-        ax.text(x0s[-1] + a * t.max() + 0.05, t.max() - 0.2,
-                r"$x=x_0+a\,t$", fontsize=10, rotation=90, va="top")
-
-# (a) u(x,t)
-im0 = axs[0, 0].imshow(U, origin="lower", extent=ext, aspect="auto", cmap="viridis")
-add_chars(axs[0, 0], label=True)
-axs[0, 0].set_title(r"(a) $u(x,t)=u_0(x-a t)$  — continua")
-axs[0, 0].set_xlabel("x"); axs[0, 0].set_ylabel("t")
-fig.colorbar(im0, ax=axs[0, 0], shrink=0.85, label="u")
-
-# (b) du/dx
-im1 = axs[0, 1].imshow(UX, origin="lower", extent=ext, aspect="auto",
-                       cmap="RdBu_r", vmin=-1, vmax=1)
-add_chars(axs[0, 1])
-axs[0, 1].set_title(r"(b) $\partial u/\partial x$  — costante a tratti, salta sulle caratteristiche")
-axs[0, 1].set_xlabel("x"); axs[0, 1].set_ylabel("t")
-fig.colorbar(im1, ax=axs[0, 1], shrink=0.85, label=r"$\partial u/\partial x$")
-
-# (c) du/dt
-im2 = axs[1, 0].imshow(UT, origin="lower", extent=ext, aspect="auto",
-                       cmap="PuOr_r", vmin=-1, vmax=1)
-add_chars(axs[1, 0])
-axs[1, 0].set_title(r"(c) $\partial u/\partial t=-a\,\partial u/\partial x$")
-axs[1, 0].set_xlabel("x"); axs[1, 0].set_ylabel("t")
-fig.colorbar(im2, ax=axs[1, 0], shrink=0.85, label=r"$\partial u/\partial t$")
-
-# (d) profili a t=0 e t=t1
-ax = axs[1, 1]
-ax.plot(x, u0(x),            color="tab:blue",  lw=2.0, label=r"$u$  ($t=0$)")
-ax.plot(x, u0p(x),           color="tab:red",   lw=1.6, label=r"$\partial u/\partial x$  ($t=0$)")
-ax.plot(x, u0(x - a * t1),   color="tab:blue",  lw=2.0, ls="--",
-        label=r"$u$  ($t=t_1$)")
-ax.plot(x, u0p(x - a * t1),  color="tab:red",   lw=1.6, ls="--",
-        label=r"$\partial u/\partial x$  ($t=t_1$)")
-ax.plot(x, -a * u0p(x - a*t1), color="tab:orange", lw=1.6, ls=":",
-        label=r"$\partial u/\partial t$  ($t=t_1$)")
-for xc in x0s:
-    ax.axvline(xc, color="0.8", lw=0.8)
-    ax.axvline(xc + a * t1, color="0.8", lw=0.8, ls="--")
-ax.set_title(r"(d) Profili: tutto trasla di $a\,t_1$, i salti restano sulle caratteristiche")
-ax.set_xlabel("x"); ax.set_ylabel("valore")
-ax.legend(fontsize=8, ncol=2, loc="upper right")
-ax.set_ylim(-1.4, 1.4)
-
-fig.suptitle(r"$u_t + a\,u_x = 0$  ($a={:.0f}>0$): la discontinuita' delle derivate "
-             r"(discontinuita' debole) viaggia lungo le caratteristiche".format(a),
-             fontsize=13)
-fig.tight_layout(rect=(0, 0, 1, 0.96))
-f2 = os.path.join(OUT, "caratteristiche_2d_overview.png")
-fig.savefig(f2, dpi=130)
-plt.close(fig)
-
-# ---------------------------------------------------------------------------
-# FIGURA 3 — condizioni al contorno: caratteristiche entranti vs uscenti
-# ---------------------------------------------------------------------------
-fig, axs = plt.subplots(1, 2, figsize=(13, 5.2))
-L, Tb = 6.0, 4.0          # dominio [0,L] x [0,Tb]
+# ===========================================================================
+# 2) CONDIZIONI AL CONTORNO: a>0 e a<0
+# ===========================================================================
+fig, axs = plt.subplots(1, 2, figsize=(13, 5.4))
+L, Tb = 6.0, 4.0
 
 def bc_panel(ax, aa, title):
-    # bordo del dominio
-    ax.add_patch(plt.Rectangle((0, 0), L, Tb, fill=False, lw=1.5, ec="k"))
-    # famiglia di caratteristiche x = x0 + aa*t
-    tt = np.linspace(0, Tb, 50)
-    starts = np.arange(-Tb * abs(aa), L + Tb * abs(aa), 0.8)
-    for x0 in starts:
-        xx = x0 + aa * tt
+    ax.add_patch(plt.Rectangle((0, 0), L, Tb, fill=False, lw=1.6, ec="k"))
+    ttt = np.linspace(0, Tb, 40)
+    for x0 in np.arange(-Tb * abs(aa), L + Tb * abs(aa) + 0.1, 0.8):
+        xx = x0 + aa * ttt
         m = (xx >= 0) & (xx <= L)
         if m.sum() > 1:
-            ax.plot(xx[m], tt[m], color="tab:green", lw=1.4,
-                    alpha=0.9, zorder=1)
-            # freccia a meta' per indicare il verso di propagazione
-            i = m.nonzero()[0][len(m.nonzero()[0]) // 2]
-            ax.annotate("", xy=(xx[i] + 0.25 * aa, tt[i] + 0.25),
-                        xytext=(xx[i], tt[i]),
-                        arrowprops=dict(arrowstyle="-|>", color="tab:green", lw=1.2))
-    # bordo su cui imporre la BC (dove le caratteristiche ENTRANO)
+            ax.plot(xx[m], ttt[m], color=GREEN, lw=1.4)
+            i = np.where(m)[0][len(np.where(m)[0]) // 2]
+            ax.annotate("", xy=(xx[i] + 0.22 * aa, ttt[i] + 0.22),
+                        xytext=(xx[i], ttt[i]),
+                        arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.1))
     if aa > 0:
-        ax.plot([0, 0], [0, Tb], color="red", lw=4, zorder=3)
-        ax.text(0.15, Tb * 0.5, "BC qui\n$u(0,t)=g(t)$", color="red",
-                fontsize=11, va="center", ha="left", fontweight="bold")
-        ax.text(L - 0.1, Tb * 0.5, "niente BC\n(uscente)", color="0.35",
+        ax.plot([0, 0], [0, Tb], color="red", lw=5)
+        ax.text(0.2, Tb * 0.55, "BC qui\n$u(0,t)=g(t)$", color="red",
+                fontsize=11, va="center", fontweight="bold")
+        ax.text(L - 0.2, Tb * 0.5, "niente BC\n(uscente)", color="0.35",
                 fontsize=10, va="center", ha="right")
     else:
-        ax.plot([L, L], [0, Tb], color="red", lw=4, zorder=3)
-        ax.text(L - 0.15, Tb * 0.5, "BC qui\n$u(L,t)=g(t)$", color="red",
+        ax.plot([L, L], [0, Tb], color="red", lw=5)
+        ax.text(L - 0.2, Tb * 0.55, "BC qui\n$u(L,t)=g(t)$", color="red",
                 fontsize=11, va="center", ha="right", fontweight="bold")
-        ax.text(0.1, Tb * 0.5, "niente BC\n(uscente)", color="0.35",
-                fontsize=10, va="center", ha="left")
-    ax.set_xlim(-0.6, L + 0.6); ax.set_ylim(-0.4, Tb + 0.4)
-    ax.set_xlabel("x"); ax.set_ylabel("t")
-    ax.set_title(title, fontsize=12)
+        ax.text(0.2, Tb * 0.5, "niente BC\n(uscente)", color="0.35",
+                fontsize=10, va="center")
+    time_arrow(ax, x=-0.55, y0=0.05, y1=0.9)
+    ax.set_xlim(-0.7, L + 0.5); ax.set_ylim(-0.35, Tb + 0.35)
+    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_title(title)
 
-bc_panel(axs[0], +1.0, r"$a>0$: caratteristiche entrano da SINISTRA")
+bc_panel(axs[0], +1.0, r"$a>0$: caratteristiche entrano da SINISTRA (monte)")
 bc_panel(axs[1], -1.0, r"$a<0$: caratteristiche entrano da DESTRA")
-fig.suptitle(r"Condizioni al contorno per $u_t+a\,u_x=0$: si impone $u$ solo sul bordo "
-             r"dove le caratteristiche ENTRANO nel dominio", fontsize=12.5)
+fig.suptitle("Condizioni al contorno: si impone $u$ solo sul bordo dove le "
+             "caratteristiche ENTRANO nel dominio", fontsize=12)
 fig.tight_layout(rect=(0, 0, 1, 0.94))
-f3 = os.path.join(OUT, "caratteristiche_condizioni_contorno.png")
-fig.savefig(f3, dpi=130)
+fig.savefig(os.path.join(OUT, "lc_condizioni_contorno.svg"))
 plt.close(fig)
 
-print("scritti:")
-print(" ", f1)
-print(" ", f2)
-print(" ", f3)
+# ===========================================================================
+# 3) CAMPI DELLE DERIVATE (onda periodica)
+# ===========================================================================
+xx = np.linspace(xL, xR, 360); tt = np.linspace(0, Tmax, 300)
+XX, TT = np.meshgrid(xx, tt)
+XI = XX - a * TT
+U = np.sin(k * XI)
+UX = k * np.cos(k * XI)
+UT = -a * UX
+
+# --- 3D (PNG) ---
+fig = plt.figure(figsize=(13, 5.2))
+for j, (Z, lab, cmap) in enumerate([(UX, r"$\partial u/\partial x$", "RdBu_r"),
+                                    (UT, r"$\partial u/\partial t=-a\,\partial u/\partial x$", "PuOr_r")]):
+    ax = fig.add_subplot(1, 2, j + 1, projection="3d")
+    ax.plot_surface(XX, TT, Z, cmap=cmap, linewidth=0, antialiased=True,
+                    rcount=140, ccount=140)
+    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_zlabel(lab)
+    ax.set_title(lab); ax.view_init(elev=24, azim=-62)
+fig.suptitle("Le derivate sono COSTANTI lungo le caratteristiche (cresta/valle "
+             "traslate): ogni caratteristica trasporta un valore diverso", fontsize=11)
+fig.tight_layout(rect=(0, 0, 1, 0.94))
+fig.savefig(os.path.join(OUT, "lc_derivate_3d.png"), dpi=130)
+plt.close(fig)
+
+# --- 2D maps (SVG) ---
+fig, axs = plt.subplots(1, 3, figsize=(15, 4.6))
+ext = [xL, xR, 0, Tmax]
+for ax, Z, lab, cmap in [(axs[0], U, "$u$", "coolwarm"),
+                         (axs[1], UX, r"$\partial u/\partial x$", "RdBu_r"),
+                         (axs[2], UT, r"$\partial u/\partial t$", "PuOr_r")]:
+    vm = np.max(np.abs(Z))
+    im = ax.imshow(Z, origin="lower", extent=ext, aspect="auto", cmap=cmap,
+                   vmin=-vm, vmax=vm)
+    for x0 in np.arange(xL, xR + 0.1, 1.0):
+        ax.plot([x0, x0 + a * Tmax], [0, Tmax], color="k", lw=0.6, alpha=0.35)
+    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_title(lab)
+    fig.colorbar(im, ax=ax, shrink=0.85)
+fig.suptitle(r"Mappe $(x,t)$: iso-valori PARALLELI alle caratteristiche; "
+             r"$\partial u/\partial t=-a\,\partial u/\partial x$", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(os.path.join(OUT, "lc_derivate_2d.svg"))
+plt.close(fig)
+
+# ===========================================================================
+# 4) BURGERS: URTO (compressione)
+# ===========================================================================
+# dato iniziale: rampa DECRESCENTE da uL a uR (A=alto a sx, B=basso a dx)
+uLs, uRs = 1.0, 0.2
+def u0_shock(xi):
+    return np.where(xi < 0, uLs,
+           np.where(xi > 1, uRs, uLs + (uRs - uLs) * xi))
+s = 0.5 * (uLs + uRs)                  # velocita' urto (Rankine-Hugoniot)
+tb = 1.0 / (uLs - uRs)                 # tempo di breaking (rampa lunga 1)
+
+fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5.6))
+# x-t: caratteristiche x = xi + u0(xi) t (pendenza diversa -> convergono)
+for xi in np.arange(-1.5, 2.61, 0.2):
+    u = u0_shock(np.array([xi]))[0]
+    axL.plot([xi, xi + u * Tmax], [0, Tmax], color=GREEN, lw=1.1, alpha=0.9)
+# urto a partire dal breaking
+x_b = 0.5 + uLs * tb  # posizione approssimata di formazione
+axL.plot([0.5 + s * tb, 0.5 + s * Tmax], [tb, Tmax], color="red", lw=2.6,
+         label="urto  $dx/dt=s=(u_L+u_R)/2$")
+axL.plot(0.5 + s * tb, tb, "ko", ms=6)
+axL.text(0.5 + s * tb + 0.2, tb, "  formazione urto", fontsize=9)
+axL.text(-1.3, Tmax - 0.6, "A: $u=u_L$ (veloce)", color="0.2", fontsize=9)
+axL.text(2.0, 0.4, "B: $u=u_R$ (lento)", color="0.2", fontsize=9)
+time_arrow(axL, x=-1.9)
+for tlev in (0, tb, Tmax * 0.8):
+    axL.axhline(tlev, color="0.8", lw=0.6)
+axL.set_xlim(-2.0, 6.0); axL.set_ylim(-0.05, Tmax)
+axL.set_xlabel("x"); axL.set_ylabel("t")
+axL.set_title("(a) $x$–$t$: caratteristiche che CONVERGONO")
+axL.legend(loc="upper right", fontsize=9)
+# x-u snapshots
+for tt_s, c in [(0.0, "tab:blue"), (0.6 * tb, "tab:green"), (tb, "tab:red")]:
+    xi = np.linspace(-2, 3, 400)
+    xpos = xi + u0_shock(xi) * tt_s
+    axR.plot(xpos, u0_shock(xi), color=c, lw=2.0,
+             label=f"t = {tt_s:.2f}" + (" (breaking)" if abs(tt_s-tb)<1e-9 else ""))
+axR.set_xlim(-2, 4); axR.set_ylim(0, 1.2)
+axR.set_xlabel("x"); axR.set_ylabel("u")
+axR.set_title("(b) $x$–$u$: il fronte si irripidisce fino al salto")
+axR.legend(fontsize=9)
+fig.suptitle("Burgers — COMPRESSIONE: velocita' $f'(u)=u$ non costante → le "
+             "caratteristiche convergono e nasce l'urto", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(os.path.join(OUT, "lc_burgers_urto.svg"))
+plt.close(fig)
+
+# ===========================================================================
+# 5) BURGERS: ESPANSIONE (ventaglio)
+# ===========================================================================
+uLe, uRe = 0.0, 1.0                    # salto crescente -> rarefazione
+fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5.6))
+# x-t: sinistra verticali (u=0), destra pendenza 1 (u=1), ventaglio in mezzo
+for xi in np.arange(-2.0, -0.01, 0.3):
+    axL.plot([xi, xi], [0, Tmax], color=GREEN, lw=1.1)          # u=0 verticali
+for xi in np.arange(0.01, 2.01, 0.3):
+    axL.plot([xi, xi + uRe * Tmax], [0, Tmax], color=GREEN, lw=1.1)  # u=1
+for frac in np.linspace(0, 1, 7):                               # ventaglio
+    axL.plot([0, frac * uRe * Tmax], [0, Tmax], color="tab:orange", lw=1.0, ls="--")
+axL.text(-1.8, Tmax - 0.5, "$u=0$:\ncaratt. verticali", color="0.2", fontsize=9)
+axL.text(3.2, Tmax - 0.6, "$u=1$:\npendenza $1/u$", color="0.2", fontsize=9)
+axL.text(0.6, Tmax * 0.5, "ventaglio di\nespansione", color="tab:orange", fontsize=9)
+time_arrow(axL, x=-2.5)
+axL.set_xlim(-2.6, 6.0); axL.set_ylim(-0.05, Tmax)
+axL.set_xlabel("x"); axL.set_ylabel("t")
+axL.set_title("(a) $x$–$t$: caratteristiche che DIVERGONO (ventaglio)")
+# x-u snapshots: rarefazione u = x/t
+for tt_s, c in [(0.0, "tab:blue"), (2.0, "tab:green"), (4.0, "tab:red")]:
+    xs = np.linspace(-2, 6, 500)
+    if tt_s == 0:
+        uu = np.where(xs < 0, uLe, uRe)
+    else:
+        uu = np.clip(xs / tt_s, uLe, uRe)
+    axR.plot(xs, uu, color=c, lw=2.0, label=f"t = {tt_s:.0f}")
+axR.set_xlim(-2, 6); axR.set_ylim(-0.2, 1.3)
+axR.set_xlabel("x"); axR.set_ylabel("u")
+axR.set_title("(b) $x$–$u$: il salto si apre in rampa (rarefazione $u=x/t$)")
+axR.legend(fontsize=9)
+fig.suptitle("Burgers — ESPANSIONE: il salto crescente collassa subito in un "
+             "ventaglio di onde rarefatte", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(os.path.join(OUT, "lc_burgers_espansione.svg"))
+plt.close(fig)
+
+print("OK - figure generate in", OUT)
+for f in ["lc_scalare_lineare.svg", "lc_condizioni_contorno.svg",
+          "lc_derivate_2d.svg", "lc_derivate_3d.png",
+          "lc_burgers_urto.svg", "lc_burgers_espansione.svg"]:
+    print("  ", f)

@@ -1,11 +1,16 @@
 # Flashcards Anki — SP (Fluidodinamica Computazionale dei Sistemi Propulsivi)
 
-Mazzo di ripasso generato dai file di `teoria/`. **295 carte** (229 `FORMULE` + 66 `PROOF`).
+Mazzo di ripasso generato dai file di `teoria/`. **308 carte** (238 `FORMULE` + 70 `PROOF`).
 
 ## File
 
 - **`SP_flashcards.tsv`** — file unico da importare in Anki (tutte le carte).
 - `*_formule.tsv` / `*_proof.tsv` — sorgenti per capitolo (utili se vuoi importarne solo alcuni).
+- **`caratteristiche_aggiunte.tsv`** — *solo* le 13 carte nuove del capitolo caratteristiche
+  (9 `FORMULE` + 4 `PROOF`). Importa **questo** per aggiungerle senza rifare tutto: Anki fa il
+  match sul **primo campo**, quindi non duplica le esistenti. In alternativa puoi ri-importare
+  `SP_flashcards.tsv` (con "Update existing notes when first field matches"): aggiorna le esistenti
+  e aggiunge le nuove.
 
 ## Formato
 
