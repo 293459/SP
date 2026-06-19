@@ -19,7 +19,7 @@ Derivata materiale (1D)	\( \dfrac{Du}{Dt}=\dfrac{\partial u}{\partial t}+a\dfrac
 Tempo di breaking (Burgers)	\( t_b=-\dfrac{1}{\min_\xi u_0'(\xi)} \) (serve \( u_0'<0 \), compressione)	FORMULE caratteristiche
 Rarefazione autosimile (Burgers)	\( u(x,t)=\dfrac{x}{t} \) nel ventaglio di espansione	FORMULE caratteristiche
 Autovalori di Eulero 1D	\( \lambda=\{\,u-a,\ u,\ u+a\,\} \) (acustiche \(u\pm a\) + entropia \(u\))	FORMULE caratteristiche
-Sistema 2x2 onda: autovalori e natura	\( \lambda=\pm a\sqrt{\theta}\) ; \( \theta=1\) iperbolico, \( \theta=-1\) ellittico	FORMULE caratteristiche
+Sistema 2x2 onda: autovalori e natura	\( \lambda=\pm \alpha\sqrt{\varepsilon}\) ; \( \varepsilon=+1\) iperbolico, \( \varepsilon=-1\) ellittico	FORMULE caratteristiche
 Rankine-Hugoniot per Eulero (massa)	\( s\,[\![\rho]\!]=[\![\rho u]\!] \) (e q.moto \( s[\![\rho u]\!]=[\![p+\rho u^2]\!] \))	FORMULE caratteristiche
 Numero di Knudsen	\( Kn = \dfrac{\lambda}{L} \)	FORMULE flussi_rarefatti
 Numero di Knudsen (definizione locale, coi gradienti)	\( Kn = \dfrac{\lambda}{Q/|\nabla Q|}, \qquad Q=T \Rightarrow L \sim \dfrac{T}{|\nabla T|} \)	FORMULE flussi_rarefatti

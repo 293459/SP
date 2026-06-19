@@ -19,8 +19,14 @@
 |---|---|---|
 | $a$ | velocità di propagazione (scalare lineare) | $a=\partial f/\partial u$; per $f=au$ è costante |
 | $u$ | grandezza **trasportata** | non necessariamente una velocità |
-| $\lambda_k,\ \Lambda$ | autovalori / matrice diagonale | velocità d'onda; Eulero: $\{u-a,\ u,\ u+a\}$ |
-| $L^{-1},\ L$ | autovettori **sinistri** / inversa | $L^{-1}A L=\Lambda$ |
+| $U=(u,v,\dots)$ | **incognite** = componenti della **grandezza conservativa** | una legge di conservazione per componente |
+| $A$ | **matrice dei coefficienti** / Jacobiana del flusso | $U_t+A\,U_x=0$, $A=\partial F/\partial U$ |
+| $A'$ | matrice dei coefficienti in **variabili primitive** | Eulero con $V=(a,u,S)$: $V_t+A'V_x=0$ (stessa fisica di $A$, base diversa) |
+| $\lambda_k$ | **autovalori** di $A$ (velocità d'onda) | reali ⟺ iperbolico; Eulero $\{u-a,\ u,\ u+a\}$ |
+| $\boldsymbol{\ell}_k$ *(font grassetto)* | **autovettori sinistri** | $\boldsymbol{\ell}_k^{T}A=\lambda_k\boldsymbol{\ell}_k^{T}$; sono le **righe** di $L^{-1}$ |
+| $\Lambda$ | **matrice diagonale** degli autovalori | $\Lambda=L^{-1}A\,L=\mathrm{diag}(\lambda_k)$ |
+| $L^{-1},\ L$ | matrice degli **autovettori sinistri** / sua inversa | $W=L^{-1}U$ |
+| $\varepsilon,\ \alpha^2$ | **segno** $(\pm1)$ e **coefficiente** $(>0)$ del sistema 2×2 | $\lambda=\pm\alpha\sqrt{\varepsilon}$: $\varepsilon=+1$ iperb., $-1$ ellitt. |
 | $W=L^{-1}U$ | **variabili caratteristiche** | $dW_k=0$ lungo $dx/dt=\lambda_k$ |
 | $dx/dt=\lambda_k$ | **linea caratteristica** $k$-esima | curva nel piano $(x,t)$ |
 | $J^{\pm}=\frac{a}{\phi}\pm u$ | **invarianti di Riemann** (omoentropico) | $\phi=\gamma-1$ ... $W_1,W_3$ |
@@ -221,7 +227,7 @@ reali** $\iff$ esistono $n$ famiglie di caratteristiche reali.
 
 Quindi: le caratteristiche reali **sono** la proprietà che definisce l'iperbolicità — è una definizione,
 non una coincidenza. Nel caso **ellittico** gli autovalori sono complessi (es. il sistema $\lambda=\pm ia$
-con $\theta=-1$ della §3): **non** esistono linee caratteristiche reali, ogni punto influenza tutti gli
+con $\varepsilon=-1$ della §3): **non** esistono linee caratteristiche reali, ogni punto influenza tutti gli
 altri (dominio di dipendenza esteso). Nel caso **parabolico** c'è una sola famiglia (degenere). Dunque
 *non* puoi avere una "linea caratteristica reale propagativa" in un problema genuinamente ellittico: la
 loro esistenza è esattamente ciò che chiamiamo iperbolicità.
@@ -342,34 +348,173 @@ espansione del problema di Riemann, §7).
 
 ## 3. Sistema di due equazioni (equazione d'onda)
 
+Eliminata la non-linearità, si toglie ora un'altra semplificazione: si passa da una a **due**
+equazioni del 1° ordine (l'equazione delle onde scritta come sistema):
+
+$$\begin{cases}\partial_t u-\varepsilon\,\alpha^2\,\partial_x v=0\\[2pt] \partial_t v-\partial_x u=0\end{cases}
+\;\Longrightarrow\; \partial_t U+A\,\partial_x U=0,\quad
+U=\begin{pmatrix}u\\ v\end{pmatrix},\ A=\begin{pmatrix}0 & -\varepsilon\alpha^2\\ -1 & 0\end{pmatrix}.$$
+
+Equazione caratteristica: $\det(A-\lambda I)=\lambda^2-\varepsilon\alpha^2=0\Rightarrow
+\lambda=\pm\alpha\sqrt{\varepsilon}$.
+- $\varepsilon=+1$: $\lambda=\pm\alpha$ **reali** → **iperbolico** (due onde a $\pm\alpha$);
+- $\varepsilon=-1$: $\lambda=\pm i\,\alpha$ **immaginari** → **ellittico**.
+
 <details>
-<summary><strong>Sistema del 1° ordine, iperbolico vs ellittico</strong></summary>
+<summary><strong>🧩 [1] $u,v$ sono "incognite" ma anche le grandezze conservative</strong></summary>
 
-$$\begin{cases}\partial_t u-\theta a^2\,\partial_x v=0\\ \partial_t v-\partial_x u=0\end{cases}
-\Longrightarrow \partial_t U+A\,\partial_x U=0,\quad
-U=\begin{pmatrix}u\\ v\end{pmatrix},\ A=\begin{pmatrix}0 & -\theta a^2\\ -1 & 0\end{pmatrix}.$$
+$u$ e $v$ si chiamano **incognite** perché sono le funzioni da determinare ($U=(u,v)$ è il vettore
+delle incognite). Allo stesso tempo **sono** le **grandezze conservative** — più precisamente le
+**componenti** del vettore conservato $U$: ogni riga del sistema è una legge di conservazione per una
+componente, $\partial_t U_i+\partial_x F_i=0$. Quindi "incognita" e "grandezza conservativa" sono lo
+stesso oggetto visto da due lati: *incognita* perché va risolta, *conservativa* perché obbedisce a un
+bilancio in forma di divergenza. (Per Eulero le componenti sono $\rho,\ \rho u,\ \rho E$.)
 
-Il sistema è **accoppiato**. L'iperbolicità ⟺ $A$ diagonalizzabile con autovalori reali. Equazione
-caratteristica: $\det(A-\lambda I)=\lambda^2-\theta a^2=0\Rightarrow \lambda=\pm a\sqrt{\theta}$.
-- $\theta=1$: $\lambda=\pm a$ reali → **iperbolico**, due onde che viaggiano a $+a$ e $-a$.
-- $\theta=-1$: $\lambda=\pm i a$ immaginari → **ellittico**: niente propagazione a velocità finita, ogni
-  punto influenza tutti gli altri.
+</details>
+
+<details>
+<summary><strong>🧩 [2][4][5] Il coefficiente $\varepsilon\,\alpha^2$: due variabili, perché $\varepsilon=\pm1$, e le soluzioni complesse</strong></summary>
+
+**[2] Perché spezzare il coefficiente in $\varepsilon$ (segno) e $\alpha^2$ (modulo).** Si separa
+l'**informazione di segno** — che decide la *natura* della PDE — dal **modulo** — che fissa solo la
+*scala* della velocità. $\alpha^2>0$ **sempre**, perché è un quadrato (una velocità al quadrato,
+grandezza fisica intrinsecamente positiva); il segno lo porta tutto $\varepsilon$. Così l'autovalore
+$\lambda=\pm\alpha\sqrt{\varepsilon}$ esce con $\alpha$ = **velocità di propagazione** (modulo) e
+$\varepsilon$ che decide se è reale o immaginaria.
+
+**[4] Perché $\varepsilon\in\{+1,-1\}$ e non un valore qualsiasi (né la funzione segno).** $\varepsilon$
+è un **parametro di selezione del caso**, non una grandezza fisica continua: serve a **scegliere** tra i
+due archetipi ($+1$ iperbolico, $-1$ ellittico). Un generico $\varepsilon>0$ darebbe solo una velocità
+diversa, **riassorbibile in $\alpha$** → nessuna casistica nuova: conta **solo il segno**. La *funzione
+segno* non serve perché $\varepsilon$ non è il segno di una variabile da valutare: è una **costante**
+fissata a priori per dichiarare *quale* problema si sta studiando. La scelta $\pm1$ (e non un $\pm$
+generico) fa sì che gli autovalori vengano **esattamente** $\pm\alpha$, cioè la velocità di propagazione
+al netto del segno. Quindi: sì, serve **essenzialmente a distinguere iperbolico da ellittico**, e lo si
+sceglie così proprio per leggere $\alpha$ come velocità.
+
+**[5] Interpretazione delle soluzioni.**
+- $\varepsilon=+1$ → due autovalori **reali** $\pm\alpha$: sono le **due velocità** di propagazione (due
+  famiglie di caratteristiche / due onde, una verso destra e una verso sinistra). Il sistema ha due
+  incognite → due segnali.
+- $\varepsilon=-1$ → $\lambda=\pm i\alpha$ **complessi coniugati**: **nessuna** velocità di propagazione
+  reale, **nessuna** linea caratteristica reale → problema **ellittico** (tipo Laplace). L'informazione
+  non viaggia lungo direzioni privilegiate: ogni punto è legato a tutti gli altri (dominio di dipendenza
+  esteso). Matematicamente, autovalori complessi ⟺ $A$ **non** diagonalizzabile su $\mathbb{R}$ ⟺ non
+  riducibile a trasporti reali disaccoppiati.
+
+</details>
+
+<details>
+<summary><strong>🧩 [3] "Il sistema è accoppiato": significato logico e implicazioni fisiche</strong></summary>
+
+- **Logico:** $A$ ha **termini fuori diagonale non nulli**, quindi l'equazione per $u$ contiene $v$ (e
+  viceversa): non puoi determinare $u$ senza conoscere contemporaneamente $v$. Le due equazioni sono
+  **intrecciate** e vanno trattate **insieme** (risoluzione più complessa: non una alla volta).
+- **Conseguenza pratica:** è esattamente il motivo per cui serve la **diagonalizzazione** (§4): nelle
+  variabili caratteristiche $W$ il sistema si **disaccoppia** in equazioni scalari indipendenti.
+- **Fisica:** l'accoppiamento riflette che $u$ e $v$ descrivono **un unico fenomeno ondoso** (nell'eq.
+  delle onde sono legate a derivate della stessa quantità): l'onda "scambia" continuamente tra le due
+  componenti. Disaccoppiando, lo stesso fenomeno si legge come **due onde elementari** che viaggiano
+  **indipendenti** a $+\alpha$ e $-\alpha$.
 
 </details>
 
 ## 4. Variabili caratteristiche e diagonalizzazione
 
+Si definiscono gli **autovettori sinistri** $\boldsymbol{\ell}_k$ ($\boldsymbol{\ell}_k^{T}A=\lambda_k\boldsymbol{\ell}_k^{T}$),
+si mettono **per righe** in $L^{-1}$ e si premoltiplica il sistema per $L^{-1}$, inserendo $I=L\,L^{-1}$:
+
+$$L^{-1}U_t+L^{-1}A\,(L\,L^{-1})\,U_x=0\;\Longrightarrow\;L^{-1}U_t+\Lambda\,L^{-1}U_x=0
+\ \xrightarrow{\ W=L^{-1}U\ }\ \frac{\partial W_k}{\partial t}+\lambda_k\frac{\partial W_k}{\partial x}=0.$$
+
+Si ottengono **equazioni di trasporto indipendenti**: lungo $dx/dt=\lambda_k$ vale $dW_k=0$ (compatibilità).
+
 <details>
-<summary><strong>Autovettori sinistri, $W=L^{-1}U$, disaccoppiamento</strong></summary>
+<summary><strong>🧩 [8] Com'è fatta la matrice $L^{-1}$ degli autovettori</strong></summary>
 
-Si definiscono gli **autovettori sinistri** $\ell$: $\ell^T A=\lambda\,\ell^T$. Mettendoli per righe si
-costruisce $L^{-1}$. Premoltiplicando il sistema per $L^{-1}$ e usando $A=L\Lambda L^{-1}$:
+$L^{-1}$ ha per **righe** gli autovettori sinistri:
 
-$$L^{-1}U_t+\Lambda\,L^{-1}U_x=0\ \xrightarrow{\ W=L^{-1}U\ }\ \frac{\partial W_k}{\partial t}+\lambda_k\frac{\partial W_k}{\partial x}=0.$$
+$$L^{-1}=\begin{pmatrix}\boldsymbol{\ell}_1^{T}\\[2pt] \boldsymbol{\ell}_2^{T}\end{pmatrix}
+=\begin{pmatrix}\ell_{1,1} & \ell_{1,2}\\ \ell_{2,1} & \ell_{2,2}\end{pmatrix}.$$
 
-Si ottengono **equazioni di trasporto indipendenti**: l'iperbolicità è proprio la possibilità di
-scrivere il sistema come insieme di scalari disaccoppiati. Lungo $dx/dt=\lambda_k$ vale $dW_k=0$
-(compatibilità).
+Ogni $\boldsymbol{\ell}_k=(\ell_{k,1},\ell_{k,2},\dots)$ è **a sua volta un vettore** (riga);
+**impilando** questi vettori uno sopra l'altro si ottiene **per l'appunto una matrice** ($2\times2$ nel
+sistema a due equazioni, $3\times3$ per Eulero). Per costruzione $L^{-1}A=\Lambda L^{-1}$, cioè
+$L^{-1}A\,L=\Lambda$.
+
+</details>
+
+<details>
+<summary><strong>🧩 [6] Perché autovettori SINISTRI e non destri?</strong></summary>
+
+Nel sistema $U_t+A\,U_x=0$ la matrice $A$ moltiplica il vettore **da sinistra**. Per disaccoppiare devo
+"aggredire" $A$ da sinistra con qualcosa che la trasformi in un numero: gli autovettori **sinistri**
+soddisfano $\boldsymbol{\ell}_k^{T}A=\lambda_k\boldsymbol{\ell}_k^{T}$, quindi premoltiplicando
+l'equazione per $\boldsymbol{\ell}_k^{T}$:
+
+$$\boldsymbol{\ell}_k^{T}U_t+\underbrace{\boldsymbol{\ell}_k^{T}A}_{\lambda_k\boldsymbol{\ell}_k^{T}}U_x=0
+\;\Rightarrow\; \partial_t(\boldsymbol{\ell}_k^{T}U)+\lambda_k\,\partial_x(\boldsymbol{\ell}_k^{T}U)=0,$$
+
+cioè una scalare nella variabile caratteristica $W_k=\boldsymbol{\ell}_k^{T}U$. Gli autovettori
+**destri** ($A\,r_k=\lambda_k r_k$) moltiplicano a destra e servono invece a **ricostruire** $U=\sum_k
+W_k\,r_k$, non a proiettare. È legato alla **direzione in cui agisce $A$** (a sinistra del gradiente); ogni
+$\boldsymbol{\ell}_k$ è poi associato alla famiglia $\lambda_k$, quindi alla sua direzione/velocità di
+propagazione.
+
+</details>
+
+<details>
+<summary><strong>🧩 [9] Far comparire la matrice identità $I=LL^{-1}$ ("come moltiplicare per 1")</strong></summary>
+
+Nel termine $L^{-1}A\,U_x$ scriviamo $A=A\cdot I=A\,(L\,L^{-1})$: inserire $I=LL^{-1}$ **non cambia
+nulla**, esattamente come **moltiplicare per $1$** nel caso scalare. L'unica differenza è che il prodotto
+matriciale **non è commutativo**, quindi conta **dove** lo si inserisce: lo mettiamo nel punto comodo,
+
+$$L^{-1}A\,U_x=L^{-1}A\,(L\,L^{-1})\,U_x=\underbrace{(L^{-1}A\,L)}_{\Lambda}\,\underbrace{(L^{-1}U_x)}_{\partial_x W},$$
+
+facendo comparire la matrice diagonale $\Lambda=L^{-1}AL$ e la variabile $W=L^{-1}U$.
+
+</details>
+
+<details>
+<summary><strong>🧩 [11] Perché $\Lambda$ è diagonale</strong></summary>
+
+$\Lambda=L^{-1}AL$ è diagonale **per costruzione della diagonalizzazione**: mettendo gli autovettori
+(destri) per colonne in $L$, l'operazione $L^{-1}AL$ porta $A$ **nella base dei suoi autovettori**, dove
+agisce come semplice **riscalamento** lungo ciascun asse → sulla diagonale compaiono gli autovalori
+$\lambda_k$, zero altrove. È la definizione stessa di matrice **diagonalizzabile** (possibile perché gli
+autovalori sono reali e gli autovettori indipendenti = iperbolicità).
+
+</details>
+
+<details>
+<summary><strong>🧩 [12] Perché si possono introdurre le variabili caratteristiche, e a che serve</strong></summary>
+
+**Sì:** si può portare $L^{-1}$ dentro/fuori dalle derivate, $\partial_t(L^{-1}U)=L^{-1}\partial_t U$,
+**solo perché $L^{-1}$ (e $A$) non dipendono da $x,t$** — sono **costanti** (sistema lineare a
+coefficienti costanti). Se fosse $A=A(U)$ (non lineare) o $A(x,t)$, il passaggio non sarebbe esatto e
+comparirebbero termini extra (derivate di $L^{-1}$).
+
+**Vantaggio / logica:** si passa da un sistema **accoppiato** a $n$ equazioni scalari **indipendenti** di
+pura advezione $\partial_t W_k+\lambda_k\partial_x W_k=0$, ognuna risolubile **da sola** col metodo delle
+caratteristiche ($W_k$ costante lungo $dx/dt=\lambda_k$). In una frase: **trasformare un problema
+vettoriale difficile in tanti problemi scalari facili**.
+
+</details>
+
+<details>
+<summary><strong>🧩 [13] "Equazioni indipendenti": cosa significa fisicamente</strong></summary>
+
+L'indipendenza **matematica** delle equazioni equivale all'indipendenza **fisica** dei segnali: ogni
+variabile caratteristica $W_k$ è un'**onda che viaggia per conto suo** a velocità $\lambda_k$, **senza
+scambiare informazione** con le altre (segnali **disaccoppiati**: uno non influenza l'altro).
+
+La procedura (premoltiplicare per $L^{-1}$, inserire $I$, definire $W$) **serviva proprio a questo** —
+esibire le onde elementari indipendenti — ma centra **anche** altri obiettivi:
+1. **dimostrare l'iperbolicità** (riducibilità a trasporti reali ⟺ autovalori reali ⟺ diagonalizzabile);
+2. ottenere le **equazioni di compatibilità** $dW_k=0$ lungo le caratteristiche;
+3. produrre quantità (per Eulero gli **invarianti di Riemann**) costanti lungo le caratteristiche, comode
+   per risolvere problemi e imporre le condizioni al contorno.
 
 </details>
 
@@ -578,7 +723,7 @@ graph TD
 
     SCAL --> SL["Scalare LINEARE<br/>advezione: f = a*u<br/>vel. d'onda a = cost<br/>caratteristiche parallele"]
     SCAL --> SNL["Scalare NON lineare<br/>Burgers: f = u^2/2<br/>vel. d'onda f'(u) = u<br/>urti / espansioni"]
-    VETT --> VL["Vettoriale LINEARE<br/>eq. d'onda / acustica<br/>A costante, lambda = +/- a*sqrt(theta)"]
+    VETT --> VL["Vettoriale LINEARE<br/>eq. d'onda / acustica<br/>A costante, lambda = +/- alpha*sqrt(epsilon)"]
     VETT --> VNL["Vettoriale NON lineare<br/>Eulero: lambda = u, u+a, u-a<br/>urto + contatto + espansione"]
 
     SL -. "niente urti<br/>(non si irripidisce)" .-> NORH["RH dà s = a (banale)"]
@@ -628,7 +773,7 @@ graph TD
 | --- | --- |
 | $\partial_t W_k+\lambda_k\partial_x W_k=0,\ W=L^{-1}U$ | Diagonalizzazione: scalari **disaccoppiati**. |
 | $\lambda=\{u-a,\ u,\ u+a\}$ | Autovalori di Eulero 1D (acustiche + entropia). |
-| $\lambda=\pm a\sqrt\theta$ | Sistema 2×2: $\theta=1$ iperbolico, $\theta=-1$ ellittico. |
+| $\lambda=\pm \alpha\sqrt\varepsilon$ | Sistema 2×2: $\varepsilon=+1$ iperbolico, $\varepsilon=-1$ ellittico ($\alpha^2>0$). |
 | $J^{\mp}=\frac{a}{\phi}\mp u$ ($\phi=\gamma-1$) | **Invarianti di Riemann** (omoentropico), cost. lungo $u\mp a$. |
 | $s\,[\![\rho]\!]=[\![\rho u]\!]$, … (massa, q.moto, energia) | RH **componente per componente** per Eulero. |
 
