@@ -285,3 +285,48 @@ for f in ["lc_scalare_lineare.svg", "lc_condizioni_contorno.svg",
           "lc_derivate_2d.svg", "lc_derivate_3d.png",
           "lc_burgers_urto.svg", "lc_burgers_espansione.svg"]:
     print("  ", f)
+
+# ===========================================================================
+# 6) DOMINIO DI DIPENDENZA / INFLUENZA (Eulero): subsonico vs supersonico
+# ===========================================================================
+def dominio_panel(ax, l1, l2, l3, title, xP=0.0, tP=2.0, Tmax=4.0):
+    import matplotlib.patches as mpatches
+    def xof(l, t):
+        return xP + l * (t - tP)
+    # cono di INFLUENZA (futuro, verso l'alto): tra l1 e l3
+    fut = [(xP, tP), (xof(l1, Tmax), Tmax), (xof(l3, Tmax), Tmax)]
+    ax.add_patch(mpatches.Polygon(fut, closed=True, fc="#bce5b4", ec="none", zorder=0))
+    # cono di DIPENDENZA (passato, verso il basso)
+    pas = [(xP, tP), (xof(l1, 0), 0), (xof(l3, 0), 0)]
+    ax.add_patch(mpatches.Polygon(pas, closed=True, fc="#fff3b0", ec="none", zorder=0))
+    # le 3 caratteristiche
+    for l, name, sgn in [(l1, r"$\lambda_1=u-a$", l1), (l2, r"$\lambda_2=u$", l2),
+                         (l3, r"$\lambda_3=u+a$", l3)]:
+        ax.plot([xof(l, 0), xof(l, Tmax)], [0, Tmax], "k-", lw=1.8)
+        ax.text(xof(l, Tmax), Tmax + 0.08, name, ha="center", fontsize=9)
+    ax.plot(xP, tP, "ko", ms=8)
+    ax.text(xP - 0.15, tP, "P ", ha="right", va="center", fontsize=12)
+    ax.text(0.5 * (xof(l1, Tmax) + xof(l3, Tmax)), Tmax - 0.55, "influenza\n(futuro)",
+            color="#2f7d23", ha="center", fontsize=9, fontweight="bold")
+    ax.text(0.5 * (xof(l1, 0) + xof(l3, 0)), 0.5, "dipendenza\n(passato)",
+            color="#b8860b", ha="center", fontsize=9, fontweight="bold")
+    time_arrow(ax, x=ax_xmin_for(l1, l3, xP, tP, Tmax))
+    ax.set_xlim(min(xof(l1, 0), xof(l1, Tmax)) - 1.0,
+                max(xof(l3, Tmax), xof(l3, 0)) + 1.0)
+    ax.set_ylim(-0.15, Tmax + 0.5)
+    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_title(title)
+
+def ax_xmin_for(l1, l3, xP, tP, Tmax):
+    return min(xP + l1 * (0 - tP), xP + l1 * (Tmax - tP)) - 0.6
+
+fig, axs = plt.subplots(1, 2, figsize=(13, 5.6))
+dominio_panel(axs[0], -0.5, 0.5, 1.5,
+              r"SUBSONICO ($u=0.5,\ a=1$): $\lambda_1=u-a<0$ (verso sinistra)")
+dominio_panel(axs[1], 1.0, 2.0, 3.0,
+              r"SUPERSONICO ($u=2,\ a=1$): tutte $\lambda>0$ (cono inclinato a valle)")
+fig.suptitle("Dominio di dipendenza (giallo, passato) e di influenza (verde, futuro) di P. "
+             "Il segno di $\\lambda$ è la direzione in x, NON nel tempo", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(os.path.join(OUT, "lc_dominio_dipendenza_xt.svg"))
+plt.close(fig)
+print("   lc_dominio_dipendenza_xt.svg")

@@ -10,3 +10,4 @@ Rarefazione autosimile (Burgers)	\( u(x,t)=\dfrac{x}{t} \) nel ventaglio di espa
 Autovalori di Eulero 1D	\( \lambda=\{\,u-a,\ u,\ u+a\,\} \) (acustiche \(u\pm a\) + entropia \(u\))	FORMULE
 Sistema 2x2 onda: autovalori e natura	\( \lambda=\pm \alpha\sqrt{\varepsilon}\) ; \( \varepsilon=+1\) iperbolico, \( \varepsilon=-1\) ellittico	FORMULE
 Rankine-Hugoniot per Eulero (massa)	\( s\,[\![\rho]\!]=[\![\rho u]\!] \) (e q.moto \( s[\![\rho u]\!]=[\![p+\rho u^2]\!] \))	FORMULE
+Matrice A' di Eulero 1D (variabili primitive rho,u,p)	\( A'=\begin{pmatrix}u&\rho&0\\0&u&1/\rho\\0&\rho a^2&u\end{pmatrix},\quad \lambda=u,\ u\pm a \) — da ricordare per diagonalizzare	FORMULE

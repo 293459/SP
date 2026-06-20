@@ -124,6 +124,20 @@ durante il calcolo dei flussi e usate per l'aggiornamento esplicito:
 \end{Bmatrix}
 \]
 
+\paragraph{Variabili conservative vs primitive (scelta del solutore).}
+Il solutore \textbf{evolve nel tempo le variabili conservative} \texttt{ucons}
+($\rho E,\rho,\rho u,\rho v$) e ricava \emph{localmente} le primitive
+($u,v,a,P,T,S$) solo quando servono (calcolo dei flussi, condizioni al
+contorno). La scelta non è casuale: i metodi a volumi finiti integrano la
+forma \emph{di divergenza} $\partial_t U+\nabla\!\cdot F=0$, l'unica che
+garantisce automaticamente le corrette \textbf{relazioni di salto di
+Rankine--Hugoniot} attraverso gli urti (velocità d'onda corretta). Usare le
+primitive come incognite evolute (forma non conservativa) darebbe invece
+velocità d'urto sbagliate. Le primitive restano comode per leggere lo stato e
+per imporre le BC, ma il \emph{bilancio} viaggia sempre sulle conservative.
+Il legame teorico (forma conservativa $\Leftrightarrow$ corretti urti) è
+discusso in \texttt{teoria/caratteristiche.md} (sez.~5).
+
 \subsection{\texttt{tipo\_bordo} e \texttt{tipo\_entity}}
 
 \texttt{tipo\_bordo} rappresenta la topologia 1D di un bordo del dominio

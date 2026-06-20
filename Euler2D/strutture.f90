@@ -51,7 +51,10 @@ type tipo_elemento_solido
     real(4)::area                                    ! area dell'elemento
     real(4),dimension(2)::x0                         ! coordinate baricentro dell'elemento
     real(4),dimension(4)::ucons                      ! vettore delle grandezze conservative: rho*e,rho,rho*u,rho*v
-    real(4)::u,v,a,P,T,S                             !grandezze primitive
+                                                     ! APPROCCIO: si evolvono nel tempo le CONSERVATIVE (forma di divergenza
+                                                     ! d_t U + d_x F = 0 -> Rankine-Hugoniot corrette agli urti); le primitive
+                                                     ! sotto sono RICAVATE localmente per flussi e BC. Cfr. teoria/caratteristiche.md (sez.5)
+    real(4)::u,v,a,P,T,S                             !grandezze primitive (ricavate dalle conservative quando servono)
     real(4),dimension(4)::d_dt !vettore delle derivate temporali delle grandezze conservative
 end type tipo_elemento_solido
 ! ******************************************************************************************************
