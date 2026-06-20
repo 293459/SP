@@ -610,6 +610,123 @@ $$J^{\pm}=\frac{a}{\phi}\pm u=u\pm\frac{2a}{\gamma-1}=\text{cost lungo }\lambda_
 
 </details>
 
+<details>
+<summary><strong>Concetto [N1] — che tipi di onde sono, e quanti tipi esistono</strong></summary>
+
+Le tre famiglie di Eulero **non sono tre copie della stessa onda**, sono **fenomeni diversi**:
+- $\lambda_{1,3}=u\mp a$ → **onde acustiche** (pressione/suono): campi *genuinamente non lineari* → possono
+  diventare **urti** o **ventagli di rarefazione**;
+- $\lambda_2=u$ → **onda di entropia / contatto**: campo *linearmente degenere* → trasporta un salto di
+  densità/entropia a **pressione e velocità costanti** (non si irripidisce).
+
+**Autovalori coincidenti ≠ due onde identiche.** Possono essere onde **fisicamente diverse** che
+viaggiano alla **stessa** velocità: in 2D/3D, ad esempio, l'autovalore $u$ ha molteplicità perché vi
+"convivono" l'onda di **entropia** e quella di **vorticità/taglio**, distinte ma entrambe trasportate a
+$u$. La tua intuizione è corretta solo per onde **dello stesso tipo**: due onde identiche alla stessa
+velocità si **sovrappongono** (somma lineare) in una sola più intensa; la degenerazione nei *sistemi* è
+invece l'esistenza di **autodirezioni distinte** con lo stesso autovalore (modi diversi, stessa velocità).
+
+**Tipi di onde (in generale, per i fluidi):** acustiche (compressione/espansione, $u\pm a$), entropiche
+(contatto, $u$), vorticità/taglio ($u$, in 2D/3D). In magnetofluidodinamica se ne aggiungono altre
+(Alfvén, magnetosoniche). Per Eulero 1D le famiglie sono **3**.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N2] — tabella iperbolico/ellittico e caratteristiche entranti (sub vs super)</strong></summary>
+
+| Regime | Eq. **stazionarie** (vs $x$) | Eq. **non stazionarie** $(x,t)$ | Segni di $\lambda$ | Caratt. che **entrano** a un ingresso |
+|---|---|---|---|---|
+| **Subsonico** $M<1$ | **ellittico** (tipo misto) | **iperbolico** | $\lambda_1=u-a<0;\ \lambda_2=u>0;\ \lambda_3=u+a>0$ | **2** entrano ($\lambda_2,\lambda_3$), 1 risale dall'interno ($\lambda_1$) → **2 BC** |
+| **Supersonico** $M>1$ | **iperbolico** | **iperbolico** | tutti $>0$ | **3** entrano → **3 BC** |
+
+Nel **non stazionario** è **sempre iperbolico**: il regime cambia solo i **segni** (quindi quante
+caratteristiche entrano), non la natura. La "natura mista" (ellittico in subsonico) appartiene al problema
+**stazionario**. In subsonico $\lambda_1=u-a<0$ **non esce dal tempo**: rientra dall'**interno** del
+dominio (è l'informazione che risale la corrente).
+
+</details>
+
+<details>
+<summary><strong>Concetto [N3] — come leggere i coni: avanti nel tempo, "indietro" nello spazio</strong></summary>
+
+Nelle figure i coni ora hanno **frecce**: nere = direzione di lettura verso il **futuro** (alto), grigie =
+verso il **passato** (basso). Il punto chiave: **il tempo va sempre avanti**. $\lambda_1=u-a<0$ significa
+che quella **onda si propaga indietro nello spazio** (verso $x$ minori = **monte**), pur avanzando nel
+tempo. Quindi $P$ **dipende da** ciò che sta a monte/valle lungo le sue caratteristiche e **influenza**
+monte tramite $\lambda_1$: in subsonico un'onda acustica **risale la corrente** (per questo serve una BC al
+contorno di valle). Non c'è nessun viaggio nel passato: solo propagazione **spaziale** verso sinistra.
+
+</details>
+
+<details>
+<summary><strong>Approfondimento [N4] — perché passare al non stazionario conviene (e quanto costa)</strong></summary>
+
+Sì: anche se un problema **stazionario** è in genere più economico, davanti a un campo **misto**
+(sub+supersonico, es. urto staccato) conviene rendere tutto **non stazionario** e **marciare nel tempo**.
+Vantaggio: si evita di **dividere il dominio** e accoppiare un solutore ellittico (zone subsoniche) con uno
+iperbolico (zone supersoniche) — operazione complessa e fragile. Con il time-marching si usa **un solo**
+schema iperbolico ovunque.
+
+**Costo:** sì, c'è un sovrapprezzo: si aggiunge la **dimensione tempo** e si **itera** (in tempo fisico o
+*pseudo-tempo*) fino a $\partial_t U\to0$ → molte iterazioni per arrivare alla soluzione stazionaria. Si
+paga **robustezza e semplicità** con più iterazioni. È il motivo per cui in CFD compressibile il
+time-marching / *pseudo-transient continuation* è lo standard.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N5] — tabella: variabili conservative vs primitive vs caratteristiche</strong></summary>
+
+| Tipo | Variabili (Eulero 1D) | Forma | Pro / a cosa servono |
+|---|---|---|---|
+| **Conservative** | $U=(\rho,\ \rho u,\ \rho E)$ | divergenza $\partial_t U+\partial_x F=0$ | **urti corretti** (Rankine–Hugoniot); è ciò che si **evolve** numericamente |
+| **Primitive** | $V=(\rho,u,p)$ o $(a,u,S)$ | quasi-lineare $\partial_t V+A'\partial_x V=0$ | **intuitive**; comode per leggere lo stato, **imporre le BC**, diagonalizzare |
+| **Caratteristiche** | $W=L^{-1}V$ | disaccoppiata $\partial_t W_k+\lambda_k\partial_x W_k=0$ | ogni $W_k$ **costante lungo $\lambda_k$**; **invarianti di Riemann**, BC non riflettenti, analisi delle onde |
+
+Stessa fisica, tre "lenti": si **evolve** in conservative, si **analizza/impone** in primitive, si
+**capisce la propagazione** in caratteristiche.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N6] — perché le compatibilità chiedono che $W_k$ non vari</strong></summary>
+
+Non è un'ipotesi aggiuntiva: è **ciò che dice l'equazione** una volta diagonalizzata. Lungo la
+caratteristica $dx/dt=\lambda_k$ la PDE $\partial_t W_k+\lambda_k\partial_x W_k=0$ diventa la **ODE**
+$\dfrac{dW_k}{dt}=0$. Quindi $W_k$ è proprio la combinazione **compatibile** con la propagazione lungo
+quella curva: l'equazione **permette** che sopravviva solo se resta **costante**. "Equazione di
+compatibilità" = la relazione che deve valere **lungo** la caratteristica perché la soluzione sia coerente.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N7] — tabella dei 3 invarianti</strong></summary>
+
+| Famiglia | $\lambda$ | Variabile/invariante | Significato |
+|---|---|---|---|
+| 1 | $u-a$ | $J^{-}=u-\dfrac{2a}{\gamma-1}$ (omoentropico) | onda **acustica all'indietro** |
+| 2 | $u$ | $S$ (entropia) | **trasporto** entropia / superficie di **contatto** |
+| 3 | $u+a$ | $J^{+}=u+\dfrac{2a}{\gamma-1}$ (omoentropico) | onda **acustica in avanti** |
+
+Tre invarianti ($J^{+},\,J^{-},\,S$), uno per famiglia: noti due acustici da lati opposti si ricavano $u$ e
+$a$ in un punto; $S$ chiude la termodinamica.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N8] — gli invarianti di Riemann valgono solo nell'omoentropico?</strong></summary>
+
+Le **equazioni di compatibilità** $dW_i=0$ lungo $\lambda_i$ valgono **sempre**. Ma diventano gli
+**invarianti di Riemann semplici** $J^{\pm}=u\pm 2a/(\gamma-1)$ solo se l'**entropia è uniforme**
+(omoentropico): allora le relazioni acustiche si **disaccoppiano** dall'entropia e sono integrabili in una
+funzione costante lungo la caratteristica. Nel caso **non omoentropico** le relazioni acustiche contengono
+anche $dS$ (compaiono i *Generalized Riemann Invariants*): restano valide in forma **differenziale** ma
+**non** sono più i semplici $J^{\pm}$. In pratica: attraverso un **urto** l'entropia salta → di là si
+ridefiniscono $J^{\pm}$ con la nuova entropia.
+
+</details>
+
 ## 6. Metodo delle caratteristiche: il pistone
 
 <details>
@@ -645,6 +762,113 @@ conservato è $\rho$ e il flusso è $\rho u$. **Non** è speciale; RH vale **com
 | Energia | $\rho E$ | $u(p+\rho E)$ | $s[\![\rho E]\!]=[\![u(p+\rho E)]\!]$ |
 
 Le tre **insieme** legano monte/valle (Hugoniot). La massa è solo l'esempio più immediato.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N9] — le due figure del pistone danno informazioni diverse</strong></summary>
+
+Sì, sono complementari:
+- **1ª figura** (setup generale): traiettoria del pistone, onde $\lambda_3$ **emesse nel gas**, formazione
+  dell'**urto** (rosso) dove convergono, e un **punto generico $K$** (a destra) con le sue **tre** famiglie
+  $\lambda_1,\lambda_2,\lambda_3$ → mostra che *ogni* punto del gas ha 3 caratteristiche.
+- **2ª figura** (costruzione operativa): **come si calcola** lo stato in un punto $P$ vicino al pistone,
+  collegandolo con $\lambda_1,\lambda_3$ a punti **noti** (4, 5) e alla **zona gialla** delle condizioni
+  iniziali.
+
+Una è "qualitativa" (cosa succede), l'altra "quantitativa" (come si risolve).
+
+</details>
+
+<details>
+<summary><strong>Concetto [N10] — la legge di moto del pistone (linea nera) e perché questa</strong></summary>
+
+La **linea nera continua** è la **traiettoria del pistone** nel piano $(x,t)$; la sua **pendenza è la
+velocità** (è un grafico $x$–$t$). Quindi:
+- tratto **verticale** in basso → pistone **fermo** ($v=0$, posizione costante);
+- tratto **curvo** → **moto accelerato** (pendenza che cresce = velocità che aumenta);
+- tratto **rettilineo** → **velocità costante** (pendenza costante).
+
+**Perché questa legge?** Soprattutto per **semplicità** didattica, ma è anche **fisicamente
+rappresentativa**: un pistone che parte da fermo, accelera e poi va a regime. La **fase accelerata** è
+ciò che genera onde di compressione via via più veloci → **urto**. **Applicazioni:** tubi d'urto
+(*shock tube*), fase di compressione nei motori, transitori di valvole, avviamento di prese d'aria.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N11] — pistone al punto morto e a tenuta stagna</strong></summary>
+
+Si immagina il pistone che parte dal **punto morto** (estremità chiusa del tubo): solo così ha senso dire
+che **a sinistra del pistone non c'è gas** (vuoto). Inoltre si assume **tenuta stagna**: nessuna
+infiltrazione d'aria oltre il pistone. Il gas è tutto **a destra** e viene **compresso** man mano che il
+pistone avanza.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N12] — moto accelerato ⇒ pendenze diverse ⇒ urto (come Burgers)</strong></summary>
+
+Nella fase **accelerata** il pistone emette onde $\lambda_3=u+a$ a velocità **crescente** (il gas dietro è
+sempre più veloce e caldo). Caratteristiche con **inclinazioni diverse** → **convergono** → **urto**. È lo
+stesso meccanismo di **Burgers** (caratteristiche non parallele che collidono), solo che qui la velocità
+caratteristica è $u+a$ (acustica) invece di $u$.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N13] — invarianti di Riemann prima e dopo l'urto</strong></summary>
+
+**Prima** dell'urto la compressione è **isentropica/omoentropica** (regolare) → si possono usare gli
+**invarianti di Riemann** $J^{\pm}$ per propagare lo stato lungo le caratteristiche. **Attraverso** l'urto
+l'**entropia salta** (l'urto genera entropia) → di là il gas ha entropia **diversa** e non è più
+omoentropico con la regione di monte: **non** si possono trasportare $J^{\pm}$ attraverso l'urto. Si usa
+allora **Rankine–Hugoniot** per "saltare" l'urto, e si riprende con $J^{\pm}$ **nella nuova regione** (con
+la sua entropia).
+
+</details>
+
+<details>
+<summary><strong>Concetto [N14] — perché un punto $K$ "arbitrario"</strong></summary>
+
+È una scelta **fisica di generalità**, non solo grafica: si prende un punto **qualunque** del gas per far
+vedere che **in ogni** punto passano **tre** caratteristiche. La posizione (a destra, dove le linee non si
+sovrappongono) è scelta per **leggibilità**, ma il messaggio vale per tutti i punti.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N15] — perché dal pistone partono solo $\lambda_3$ (e il "vuoto" non propaga suono)</strong></summary>
+
+Dalla **faccia del pistone** le onde che entrano **nel gas** sono quelle **acustiche in avanti**
+$\lambda_3=u+a$: il pistone spinge → manda una compressione che corre **in avanti** nel gas. Per questo le
+linee dal pistone sono $\lambda_3$.
+- **A sinistra del pistone non c'è gas** (vuoto): **niente mezzo → niente suono**, quindi lì non esistono
+  onde. La faccia del pistone è il **bordo sinistro** del gas; le onde vivono **solo nel gas** (a destra).
+- $\lambda_1$ ($u-a$) e $\lambda_2$ ($u$) esistono **dentro** il gas (info che risale / percorso
+  particellare), ma non sono "emesse" dal pistone come la $\lambda_3$; seguiamo le $\lambda_3$ perché sono
+  le onde che il pistone **genera** e che formano l'urto.
+- Nel punto $K$, che è **interno al gas**, passano **tutte e 3** perché il mezzo supporta tutte le famiglie
+  (informazione che arriva da più direzioni).
+
+</details>
+
+<details>
+<summary><strong>Concetto [N16] — perché la zona delle condizioni iniziali è quella gialla</strong></summary>
+
+La **zona gialla** è il **gas indisturbato** davanti, **non ancora raggiunto** dalle perturbazioni del
+pistone (sta "sotto" le prime onde/l'urto). Conserva quindi lo **stato iniziale noto** (uniforme): da lì
+si leggono i **dati noti** per propagarli lungo le caratteristiche e chiudere i conti negli altri punti.
+
+</details>
+
+<details>
+<summary><strong>Concetto [N17] — le altre linee nella seconda figura del pistone</strong></summary>
+
+Sono la **costruzione caratteristica** per trovare lo stato in $P$: la $\lambda_1$ da $P$ scende a un punto
+**noto** (4) nella zona iniziale; la $\lambda_3$ collega $P$ al **pistone**; la $\lambda_2$ è il percorso
+**particellare**; i punti **4, 5** sono riferimenti nella zona iniziale usati per propagare gli invarianti
+($W_1(P)=W_1(4)$, ecc.). Le **tratteggiate** in alto a sinistra marcano solo la zona **senza gas**.
 
 </details>
 
@@ -693,6 +917,81 @@ all'interfaccia è positiva (il gas va da alta a bassa pressione).
 
 </details>
 
+<details>
+<summary><strong>Concetto [N18] — il problema di Riemann in generale, e cosa aggiunge Sod</strong></summary>
+
+![Problema di Riemann: soluzione autosimile, 3 onde dalla discontinuità iniziale](images/lc_riemann_generale.svg)
+
+**Problema di Riemann (generale):** un sistema **iperbolico** con dato iniziale fatto di **due stati
+costanti** $U_L,U_R$ separati da **una sola discontinuità** in $x=0$. La soluzione è **autosimile**
+(dipende solo da $x/t$) ed è composta da **un'onda per ogni famiglia** che parte dall'origine. Per Eulero
+(3 famiglie): una **1-onda** (acustica indietro: urto *o* rarefazione), una **2-onda** (contatto), una
+**3-onda** (acustica avanti: urto *o* rarefazione); fra di esse le regioni "star" $L^\*,R^\*$.
+
+**Tubo di Sod = un Riemann problem *specifico*, con ipotesi aggiuntive:**
+1. **stesso gas ideale** sui due lati (stesso $\gamma$);
+2. gas inizialmente **fermo** su entrambi i lati ($u_L=u_R=0$);
+3. valori scelti $(\rho_L,p_L)=(1,1)$, $(\rho_R,p_R)=(0.125,0.1)$ con $p_L>p_R$;
+4. 1D, non viscoso, senza forze di volume.
+
+Con queste ipotesi la soluzione è **esattamente** espansione (sx) + contatto + urto (dx). Il Riemann
+problem **generale** potrebbe invece dare **due urti**, **due rarefazioni**, o perfino il **vuoto**, a
+seconda degli stati. *(Distinguere i due evita di confonderli: Sod è un caso particolare.)*
+
+</details>
+
+<details>
+<summary><strong>Concetto [N19] — il "background matematico" che produce espansione+contatto+urto</strong></summary>
+
+È **lo stesso** Eulero 1D non stazionario (autovalori $u,u\pm a$): **non** serve un'altra equazione. Ciò
+che produce i tre tipi d'onda è la **natura di ciascun campo caratteristico** + il dato **discontinuo**:
+- campi **1 e 3** (acustici) **genuinamente non lineari** ($\nabla\lambda\!\cdot r\neq0$) → la loro onda è
+  un **urto** (compressione) **o** un **ventaglio di rarefazione** (espansione);
+- campo **2** (entropia) **linearmente degenere** ($\nabla\lambda\!\cdot r=0$) → **contatto** (né si
+  irripidisce né si apre).
+
+Quindi: **stesse equazioni + dato discontinuo + autosimilarità** → 3 onde; il **tipo** dipende da
+genuina-nonlinearità vs degenerazione lineare e dal **segno del salto**. Risolvere Sod = trovare la
+regione star imponendo $p^\*$ e $u^\*$ **uguali** ai due lati del contatto, poi collegare $L\!\to\!L^\*$
+(1-onda) e $R\!\to\!R^\*$ (3-onda).
+
+</details>
+
+<details>
+<summary><strong>Figura [N20] — profili di $\rho,\ p,\ u,\ T$ a $t=t_1$ (commentati)</strong></summary>
+
+![Profili di densità, pressione, velocità, temperatura nel tubo di Sod](images/lc_sod_profili.svg)
+
+Lettura (sx → dx: stato L, ventaglio, $L^\*$, contatto, $R^\*$, urto, stato R):
+- **Pressione $p$** e **velocità $u$**: **continue** attraverso il **contatto** (quindi lì **invisibile**);
+  variano dolcemente nel **ventaglio** e saltano solo all'**urto**. Mostrano **espansione + urto**.
+- **Densità $\rho$** e **temperatura $T$**: **saltano** sul **contatto** (visibile) **e** sull'urto, oltre
+  a variare nel ventaglio. Mostrano **tutte e tre** le strutture.
+- Perché $T$ "vede" il contatto: $T=p/(\rho R)$; sul contatto $p$ è continua ma $\rho$ salta → $T$ salta.
+
+**Pratica:** per **localizzare il contatto** si guarda la **densità/temperatura** (es. tecniche ottiche
+sulla densità), **non** la pressione.
+
+</details>
+
+<details>
+<summary><strong>Approfondimento [N21] — le caratteristiche partono da OGNI punto: come si gestisce</strong></summary>
+
+*(Approfondimento, molto utile.)* Finora un solo punto e una sola fenomenologia; in realtà il "ventaglio"
+di 3 caratteristiche parte da **ogni** punto → il piano $(x,t)$ è **coperto da tre famiglie** di
+caratteristiche (una rete):
+
+![Tre famiglie di caratteristiche che coprono il piano; ogni punto ha il suo ventaglio](images/lc_caratteristiche_ovunque.svg)
+
+Ogni punto è l'**intersezione** di una curva per famiglia; la soluzione si costruisce propagando gli
+invarianti lungo **tutte**. Analiticamente è **intrattabile** in generale (le curve si incurvano,
+interagiscono, formano urti). **In pratica si discretizza:** i metodi a **volumi finiti / Godunov**
+risolvono un **problema di Riemann locale a ogni interfaccia** tra celle, a ogni passo temporale — cioè
+"tengono conto di tutte e 3 le caratteristiche in ogni punto" **numericamente**. È così che il metodo
+delle caratteristiche **motiva** gli schemi **upwind/Godunov** (vedi `schemi_volumi_finiti.md`).
+
+</details>
+
 ## 8. Condizioni al contorno per Eulero 1D non stazionario
 
 <details>
@@ -701,6 +1000,33 @@ all'interfaccia è positiva (il gas va da alta a bassa pressione).
 **# condizioni da imporre su un bordo = # caratteristiche entranti** in quel bordo. In 1D le famiglie sono
 3 ($u-a,\ u,\ u+a$); il loro **segno** (regime sub/supersonico) decide quante entrano. È la logica delle
 **esercitazioni** quando si impongono pressione/velocità/temperatura ai contorni nei vari regimi.
+
+</details>
+
+<details>
+<summary><strong>Approfondimento [N22] — le condizioni al contorno in dettaglio (ricetta + tabella)</strong></summary>
+
+**Ricetta generale (vale per qualsiasi bordo e regime):**
+1. Sul bordo traccia le 3 caratteristiche e guarda i **segni** di $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$ (dipendono dal regime e dal verso del flusso).
+2. Conta quante **entrano** nel dominio (portano informazione da **fuori**): tante quante sono = **numero di BC da imporre**.
+3. Le caratteristiche **uscenti** portano informazione **dall'interno** → le grandezze corrispondenti si **estrapolano** dall'interno (compatibilità $W_k=W_k^{\text{interno}}$), **non** si impongono.
+4. BC imposte + compatibilità uscenti = sistema completo → si ricava lo **stato al bordo**.
+
+**Tabella riassuntiva** (flusso entrante con $u>0$):
+
+| Bordo / regime | $\lambda$ entranti | # BC | Cosa si **impone** (tipico) | Cosa si **estrapola** dall'interno |
+|---|---|---|---|---|
+| Ingresso **supersonico** | 3 (tutte) | **3** | $p_0,\ T_0,\ M$ (o $u,S$ + 1 termodinamica) | nulla |
+| Ingresso **subsonico** | 2 ($\lambda_2,\lambda_3$) | **2** | $p_0,\ T_0$ (o $S$ e $h_0$) | $W_1=\tfrac{a}{\phi}-u$ |
+| Uscita **supersonica** | 0 | **0** | nulla | tutto ($W_1,W_2,W_3$) |
+| Uscita **subsonica** | 1 ($\lambda_1$) | **1** | $p$ statica (riflettente) **o** $W_1$ (non riflettente) | $W_2,W_3$ |
+| **Parete** solida | — | $u_n=0$ | velocità normale nulla | resto via Riemann/RH |
+
+**Note pratiche:**
+- Le **due grandezze termodinamiche** imposte devono essere **indipendenti** (non $T$ e $a$ insieme: sono legate da $a^2=\gamma R T$).
+- **Riflettente vs non riflettente:** imporre la **pressione statica** a un'uscita subsonica è *riflettente* (le onde acustiche incidenti rimbalzano → disturbi artificiali); imporre l'**invariante entrante** $W_1$ è *non riflettente*. In LES si usano **strati assorbenti** per evitare riflessioni.
+- **Collegamento esercitazioni:** in pratica (es. turbomacchine) si impone **pressione/temperatura totali a monte** e **pressione statica a valle** (subsonico) — è esattamente il conteggio delle caratteristiche entranti.
+- **Numerica:** al bordo l'informazione "interna" arriva dalla **prima cella**; si risolve un piccolo problema di **Riemann/compatibilità** al contorno.
 
 </details>
 
@@ -848,5 +1174,12 @@ $A'$" (+ Dimostrazioni + flashcard); 3 → §5 "$A'$ non simmetrica"; 4 → §5 
 $u,u\pm a$"; 5 → §5 "autovalori coincidenti"; 6 → §5 "iperbolico anche in subsonico"; 7 → §5 figura
 dominio + "indietro nel tempo"; 8 → §5 "urto curvo staccato"; 9 → §5 "calcolo autovettori"; 10 → §5/§7
 "invarianti di Riemann + Sod"; 11 → riorganizzazione in toggle + legenda (questo).
+
+**Batch §5–§8 (tag [N1]–[N22]):** N1 tipi di onde · N2 tabella sub/super · N3 lettura coni (frecce) ·
+N4 costo non stazionario · N5 tabella conservative/primitive/caratteristiche · N6 perché compatibilità ·
+N7 tabella 3 invarianti · N8 omoentropico vs no → tutti in **§5**. N9–N17 (pistone: due figure, legge di
+moto, punto morto, urto, invarianti pre/post urto, punto $K$, onde $\lambda_3$, zona gialla, altre linee)
+→ **§6**. N18 Riemann generale vs Sod · N19 background matematico · N20 profili $\rho,p,u,T$ · N21
+caratteristiche da ogni punto → **§7**. N22 condizioni al contorno in dettaglio → **§8**.
 
 </details>

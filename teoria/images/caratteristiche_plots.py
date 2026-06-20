@@ -299,10 +299,12 @@ def dominio_panel(ax, l1, l2, l3, title, xP=0.0, tP=2.0, Tmax=4.0):
     # cono di DIPENDENZA (passato, verso il basso)
     pas = [(xP, tP), (xof(l1, 0), 0), (xof(l3, 0), 0)]
     ax.add_patch(mpatches.Polygon(pas, closed=True, fc="#fff3b0", ec="none", zorder=0))
-    # le 3 caratteristiche
-    for l, name, sgn in [(l1, r"$\lambda_1=u-a$", l1), (l2, r"$\lambda_2=u$", l2),
-                         (l3, r"$\lambda_3=u+a$", l3)]:
-        ax.plot([xof(l, 0), xof(l, Tmax)], [0, Tmax], "k-", lw=1.8)
+    # le 3 caratteristiche (con FRECCE: verso l'alto = futuro, verso il basso = passato)
+    for l, name in [(l1, r"$\lambda_1=u-a$"), (l2, r"$\lambda_2=u$"), (l3, r"$\lambda_3=u+a$")]:
+        ax.annotate("", xy=(xof(l, Tmax), Tmax), xytext=(xP, tP),
+                    arrowprops=dict(arrowstyle="-|>", color="k", lw=1.8))   # futuro
+        ax.annotate("", xy=(xof(l, 0), 0), xytext=(xP, tP),
+                    arrowprops=dict(arrowstyle="-|>", color="0.45", lw=1.4))  # passato
         ax.text(xof(l, Tmax), Tmax + 0.08, name, ha="center", fontsize=9)
     ax.plot(xP, tP, "ko", ms=8)
     ax.text(xP - 0.15, tP, "P ", ha="right", va="center", fontsize=12)
@@ -330,3 +332,105 @@ fig.tight_layout(rect=(0, 0, 1, 0.95))
 fig.savefig(os.path.join(OUT, "lc_dominio_dipendenza_xt.svg"))
 plt.close(fig)
 print("   lc_dominio_dipendenza_xt.svg")
+
+# ===========================================================================
+# 7) PROBLEMA DI RIEMANN GENERALE (schema x-t)
+# ===========================================================================
+fig, ax = plt.subplots(figsize=(8.5, 5.6))
+Tm = 4.0
+# rarefazione (1-famiglia) a sinistra: ventaglio
+for fr in np.linspace(0, 1, 6):
+    sl = -2.2 + fr * 1.4
+    ax.plot([0, sl * Tm], [0, Tm], color="tab:green", lw=1.0, ls="-")
+ax.plot([0, -2.2 * Tm / 4], [0, Tm], color="tab:green", lw=2.0)
+ax.plot([0, -0.8 * Tm / 4], [0, Tm], color="tab:green", lw=2.0)
+# contatto (2-famiglia)
+ax.plot([0, 0.6 * Tm / 2], [0, Tm], color="tab:orange", lw=2.2, ls="--")
+# urto (3-famiglia)
+ax.plot([0, 1.6 * Tm / 2], [0, Tm], color="red", lw=2.6)
+ax.plot(0, 0, "ko", ms=6)
+ax.text(-2.6, Tm - 0.3, "stato L", fontsize=11, fontweight="bold")
+ax.text(2.0, Tm - 0.3, "stato R", fontsize=11, fontweight="bold", ha="right")
+ax.text(-1.05, Tm - 0.7, "$L^{*}$", fontsize=11, color="0.3")
+ax.text(0.35, Tm - 0.7, "$R^{*}$", fontsize=11, color="0.3")
+ax.text(-1.7, 1.5, "rarefazione\n(1: $u-a$)", color="tab:green", fontsize=9, ha="center")
+ax.text(0.42, 2.6, "contatto\n(2: $u$)", color="#b8860b", fontsize=9, ha="center")
+ax.text(1.7, 1.6, "urto\n(3: $u+a$)", color="red", fontsize=9, ha="center")
+time_arrow(ax, x=-2.9)
+ax.text(0, -0.45, "discontinuità iniziale", ha="center", fontsize=9, color="0.3")
+ax.set_xlim(-3.0, 2.3); ax.set_ylim(-0.6, Tm + 0.2)
+ax.set_xlabel("x"); ax.set_ylabel("t")
+ax.set_title("Problema di Riemann (Eulero): soluzione AUTOSIMILE in $x/t$ — 3 onde dalla discontinuità")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "lc_riemann_generale.svg"))
+plt.close(fig)
+print("   lc_riemann_generale.svg")
+
+# ===========================================================================
+# 8) PROFILI DI SOD a t=t1: rho, u, p, T (qualitativi, struttura corretta)
+# ===========================================================================
+xH, xT, xC, xS = -0.6, -0.1, 0.25, 0.6        # head/tail espansione, contatto, urto
+xs = np.linspace(-1, 1, 1000)
+def sod_profile(L, s3, s4, R):
+    """L (sx), s3 (*L), s4 (*R), R (dx); rampa nel ventaglio xH..xT."""
+    y = np.empty_like(xs)
+    y[xs < xH] = L
+    fan = (xs >= xH) & (xs <= xT)
+    y[fan] = L + (s3 - L) * (xs[fan] - xH) / (xT - xH)
+    y[(xs > xT) & (xs <= xC)] = s3
+    y[(xs > xC) & (xs <= xS)] = s4
+    y[xs > xS] = R
+    return y
+rho = sod_profile(1.0, 0.42, 0.27, 0.125)
+p   = sod_profile(1.0, 0.30, 0.30, 0.10)      # p continua sul contatto (s3=s4)
+u   = sod_profile(0.0, 0.93, 0.93, 0.00)      # u continua sul contatto
+T   = p / rho                                  # T = p/(rho R), R=1 adim
+
+fig, axs = plt.subplots(2, 2, figsize=(13, 8))
+panels = [(axs[0,0], rho, r"$\rho$ (densità)", "tab:green", True),
+          (axs[0,1], p, "$p$ (pressione)", "tab:blue", False),
+          (axs[1,0], u, "$u$ (velocità)", "tab:purple", False),
+          (axs[1,1], T, "$T$ (temperatura)", "tab:red", True)]
+for ax, y, lab, c, shows_contact in panels:
+    ax.plot(xs, y, color=c, lw=2.2)
+    for xv, nm, st in [(xH, "", ":"), (xT, "", ":"), (xC, "contatto", "--"), (xS, "urto", "-")]:
+        ax.axvline(xv, color="0.7", lw=1.0, ls=st)
+    ax.axvspan(xH, xT, color="0.92")
+    ax.set_title(lab + ("   [mostra il contatto]" if shows_contact else "   [contatto INVISIBILE]"),
+                 fontsize=11)
+    ax.set_xlabel("x"); ax.set_ylabel(lab.split(" ")[0])
+    ax.text(xH-0.02, ax.get_ylim()[1]*0.9, "espansione", ha="right", fontsize=8, color="0.4")
+fig.suptitle("Tubo di Sod a $t=t_1$: $p,u$ continue sul contatto (invisibile); "
+             r"$\rho,T$ saltano (visibile). Tutte mostrano espansione e urto", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.96))
+fig.savefig(os.path.join(OUT, "lc_sod_profili.svg"))
+plt.close(fig)
+print("   lc_sod_profili.svg")
+
+# ===========================================================================
+# 9) CARATTERISTICHE DA OGNI PUNTO (campo completo)
+# ===========================================================================
+fig, ax = plt.subplots(figsize=(9, 5.6))
+uc, ac = 0.6, 1.0
+Lx, Ty = 6.0, 4.0
+for x0 in np.arange(-Ty*1.6, Lx + Ty*1.6, 0.7):
+    ax.plot([x0, x0 + (uc+ac)*Ty], [0, Ty], color="red", lw=0.7, alpha=0.6)      # u+a
+    ax.plot([x0, x0 + uc*Ty], [0, Ty], color="tab:orange", lw=0.7, alpha=0.6)    # u
+    ax.plot([x0, x0 + (uc-ac)*Ty], [0, Ty], color="tab:blue", lw=0.7, alpha=0.6) # u-a
+# evidenzio due punti con il loro "ventaglio" a 3
+for (xp, tp) in [(1.5, 1.5), (3.5, 2.5)]:
+    for l, c in [(uc+ac, "red"), (uc, "tab:orange"), (uc-ac, "tab:blue")]:
+        ax.plot([xp, xp + l*(Ty-tp)], [tp, Ty], c, lw=2.0)
+    ax.plot(xp, tp, "ko", ms=7)
+import matplotlib.lines as ml
+ax.legend([ml.Line2D([],[],color="red"), ml.Line2D([],[],color="tab:orange"),
+           ml.Line2D([],[],color="tab:blue")],
+          [r"$u+a$", r"$u$", r"$u-a$"], loc="upper left", fontsize=9)
+time_arrow(ax, x=-2.4)
+ax.set_xlim(-2.6, Lx+0.5); ax.set_ylim(-0.1, Ty+0.3)
+ax.set_xlabel("x"); ax.set_ylabel("t")
+ax.set_title("Da OGNI punto partono 3 caratteristiche: il piano è coperto da 3 famiglie")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "lc_caratteristiche_ovunque.svg"))
+plt.close(fig)
+print("   lc_caratteristiche_ovunque.svg")
