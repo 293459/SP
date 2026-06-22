@@ -75,6 +75,20 @@
     | Non strutturata | Delaunay |  |  |
     | Non strutturata | Frontale |  |  |
 
+**Flowchart — quale tipo di mesh scegliere:**
+
+```mermaid
+graph TD
+    A["Geometria del problema"] --> B{"geometria semplice/regolare?"}
+    B -->|"sì (canali, ali, box)"| C["STRUTTURATA (esaedri/quad)<br/>+ precisa, meno celle, allineata al flusso"]
+    B -->|"no (complessa, motori, valvole)"| D{"serve automazione totale?"}
+    D -->|"sì"| E["NON STRUTTURATA (tetra/poli)<br/>+ automatica, - diffusione numerica"]
+    D -->|"strato limite critico"| F["IBRIDA: prismi nel boundary layer<br/>+ tetra/poli nel far field"]
+    C --> G["Verifica QUALITA' (skewness, aspect ratio, ortogonalita')"]
+    E --> G
+    F --> G
+```
+
 </details>
 
 ## Discretizzazione ai volumi finiti
@@ -193,6 +207,8 @@ I nodi sono i punti in cui si calcolerà il risultato
 | **Jacobiano** | Valuta la distorsione geometrica di un elemento rispetto all'originale | \( \text{{Jacobiano}} = \text{{Determinante della matrice Jacobiana di trasformazione}} \) | Positivo per elementi non deformi |
 | **Density** | Numero di elementi per unità di area o volume | \( \text{{Density}} = \frac{{\text{{Numero totale di elementi}}}}{{\text{{Area o Volume}}}} \) | Dipende dalla complessità della geometria e dalla risoluzione richiesta |
 
+![Metriche di qualità della mesh: aspect ratio, skewness, ortogonalità (buono vs cattivo)](images/mesh_metriche_qualita.svg)
+
 </details>
 
 ## Scelte ed elementi commerciali
@@ -211,6 +227,21 @@ I nodi sono i punti in cui si calcolerà il risultato
 </details>
 
 ## Generazione e raffinamento della mesh
+
+**Flowchart — workflow di meshing (genera → valuta → correggi):**
+
+```mermaid
+graph TD
+    A["Geometria pulita (CAD)"] --> B["Scelgo tipo di mesh + dimensioni base"]
+    B --> C["GENERO la mesh (Delaunay / Advancing Front / strutturata)"]
+    C --> D["Aggiungo inflation (prismi) a parete + refinement locale dove servono gradienti"]
+    D --> E["Misuro le METRICHE (skewness, aspect ratio, ortogonalita', Jacobiano)"]
+    E --> F{"qualita' OK?"}
+    F -->|"no"| G["Correggo: smoothing, ri-raffinamento, pinch/weld, cambio elementi"]
+    G --> C
+    F -->|"sì"| H["Mesh independence study (raffino e controllo la soluzione)"]
+    H --> I["Mesh pronta per il solutore"]
+```
 
 <details>
 <summary><strong>Mesh Generation Techniques</strong></summary>
