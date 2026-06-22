@@ -104,6 +104,18 @@ $x=x_0+at$ la soluzione è **costante** → $u(x,t)=u_0(x-at)$. Estensioni:
 - multi-D: superfici caratteristiche da $\det(\phi_t I+\sum_d A_d\phi_{x_d})=0$ → **cono di Mach**; la
   riduzione esatta a ODE vale pulita solo in 1D.
 
+```mermaid
+graph TD
+    A["PDE da risolvere: u_t + a u_x = 0"] --> B["Scrivo du/dt lungo una curva x(t):<br/>du/dt = u_t + (dx/dt) u_x"]
+    B --> C["Confronto con la PDE: scelgo dx/dt = a"]
+    C --> D["La PDE diventa una ODE: du/dt = 0<br/>(u costante lungo la curva)"]
+    D --> E["Curva = LINEA CARATTERISTICA x = x0 + a t<br/>soluzione u(x,t)=u0(x-at)"]
+    E --> F{"caso?"}
+    F -->|"scalare non lineare"| G["dx/dt = f'(u)"]
+    F -->|"sistema 1D"| H["dx/dt = lambda_k (per famiglia)"]
+    F -->|"multi-D"| I["superfici: det(...)=0 -> cono di Mach (no ODE esatta)"]
+```
+
 </details>
 
 <details>
@@ -394,6 +406,17 @@ $$L^{-1}U_t+L^{-1}A(L L^{-1})U_x=0\Rightarrow L^{-1}U_t+\Lambda L^{-1}U_x=0
 \xrightarrow{W=L^{-1}U}\frac{\partial W_k}{\partial t}+\lambda_k\frac{\partial W_k}{\partial x}=0.$$
 
 Equazioni di trasporto **indipendenti**; lungo $dx/dt=\lambda_k$ vale $dW_k=0$ (compatibilità).
+
+```mermaid
+graph TD
+    A["Sistema accoppiato: U_t + A U_x = 0"] --> B["Autovalori reali di A -> lambda_k (iperbolico)"]
+    B --> C["Autovettori SINISTRI l_k: l_k^T A = lambda_k l_k^T"]
+    C --> D["Li metto per righe -> matrice L^-1"]
+    D --> E["Premoltiplico per L^-1 (inserisco I=L L^-1)"]
+    E --> F["Variabili caratteristiche W = L^-1 U"]
+    F --> G["n equazioni scalari DISACCOPPIATE:<br/>W_k,t + lambda_k W_k,x = 0"]
+    G --> H["Lungo dx/dt = lambda_k: dW_k = 0 (compatibilita')"]
+```
 
 </details>
 
@@ -1025,6 +1048,17 @@ due stati "star" $A^\*$ e $B^\*$ separati dalla **superficie di contatto**:
   ($p_{A^\*}=p_{B^\*}$, $u_{A^\*}=u_{B^\*}$), **densità/temperatura/entropia discontinue**; viaggia a $u$
   (2ª famiglia);
 - a destra: **onda d'urto** (collega $B$ a $B^\*$, RH).
+
+```mermaid
+graph TD
+    A["Dato: stati A (sx) e B (dx)"] --> B["Incognite: stato star (p*, u*) tra le due onde"]
+    B --> C["Contatto impone: p e u UGUALI ai due lati (p3=p4=p*, u3=u4=u*)"]
+    C --> D["1-onda (sx) collega A -> A*:<br/>se p*<pA espansione (J+ invariante), se p*>pA urto (RH)"]
+    C --> E["3-onda (dx) collega B -> B*:<br/>se p*<pB espansione, se p*>pB urto (RH)"]
+    D --> F["Cerco l'unico (p*, u*) che soddisfa ENTRAMBE -> eq. non lineare in p*"]
+    E --> F
+    F --> G["Trovo rho, T dei due star -> struttura completa (espansione|contatto|urto)"]
+```
 
 **Perché la pressione "non vede" il contatto.** La pressione è **continua** attraverso il contatto →
 nel profilo $p(x,t_1)$ compaiono **solo** espansione e urto; il contatto è **invisibile**. La **densità**
