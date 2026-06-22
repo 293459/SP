@@ -57,10 +57,25 @@
 <details>
 <summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md` §6 (toggle "simulazione d'esame").
 > Attesi: pistone che accelera in un condotto → **compressione progressiva** → coalescenza delle
 > onde di compressione in un **urto** (caratteristiche che convergono); caso speculare di espansione
 > con pistone che retrocede.
+>
+> **Considerazioni dalla simulazione d'esame:**
+> - **Zone:** a sinistra della faccia del pistone **no gas**, a destra **gas compresso**; la zona
+>   **indisturbata** è quella **sotto la prima caratteristica** (dall'origine).
+> - **Dal pistone** ha senso solo $\lambda_3=u+a$ (più veloce di $u_p$): $\lambda_1$ andrebbe nel vuoto,
+>   $\lambda_2$ resta sul pistone. (Vale solo per le caratteristiche che originano sul pistone.)
+> - **Pendenza** $dt/dx=1/\lambda$ (l'inverso della velocità); accelerando, le $\lambda_3$ diventano più
+>   veloci → meno inclinate → **convergono** → urto (poi **Rankine–Hugoniot**).
+> - **Procedura (invarianti di Riemann):** $W_1(5)=W_1(2)$ con $u_2$ = velocità del pistone (nota) → ricavo
+>   $a_2$; poi $W_3(2)=W_3(P)$ e $W_1(4)=W_1(P)$ → stato in $P$. **3 incognite ($a_2,u_P,a_P$), 3 equazioni
+>   → determinato.** La velocità del pistone è nota ovunque (legge di moto), ma $a_2$ **no** (il pistone
+>   impone solo la cinematica). $S$ ("$\delta$") costante (omoentropico) chiude la termodinamica.
+
+![Pistone: due stati (gas/no gas)](../teoria/images/piston_due_stati.svg)
+![Costruzione dello stato in P con le caratteristiche (frecce dal noto verso P)](../teoria/images/piston_costruzione_P.svg)
 
 </details>
 

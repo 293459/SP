@@ -1014,6 +1014,150 @@ che attraversa la zona non uniforme) si incurva. Quindi non è un'incongruenza: 
 
 </details>
 
+<details>
+<summary><strong>Figura — il pistone nei due stati (dove c'è gas e dove no)</strong></summary>
+
+![Pistone: condizione iniziale (gas a riposo) e intermedia (a sinistra no gas, a destra gas compresso)](images/piston_due_stati.svg)
+
+- **Condizione iniziale ($t_0$):** pistone fermo al **punto morto**; tutto il tubo è **gas a riposo**.
+- **Condizione intermedia ($t_1$):** il pistone è avanzato → **a sinistra** della sua faccia **non c'è gas**
+  (vuoto/corpo del pistone), **a destra** il gas è **compresso** (più denso vicino al pistone). È la stessa
+  informazione che nel piano $(x,t)$ diventa "zona vuota" (sopra-sinistra) e "zona di gas compresso".
+
+</details>
+
+<details>
+<summary><strong>Figura + Concetto — dal pistone solo $\lambda_3$ entra nel gas (e perché)</strong></summary>
+
+![Caratteristiche che originano sul pistone: lambda1 nel vuoto, lambda2 sul pistone, lambda3 nel gas](images/piston_caratteristiche_pistone.svg)
+
+Per le caratteristiche che **originano sulla faccia del pistone** (velocità $u_p$):
+- $\lambda_1=u-a < u_p$ → è **più lenta del pistone** → andrebbe **dietro** la faccia, cioè nel **vuoto**
+  (no gas) → **non** la consideriamo;
+- $\lambda_2=u = u_p$ → **resta sul pistone** (la faccia del pistone *è* un percorso particellare);
+- $\lambda_3=u+a > u_p$ → è **più veloce** → entra **in avanti nel gas** → è l'**unica utile** (e quelle
+  che, accelerando il pistone, **convergono** in un urto).
+
+> Attenzione: questo vale **solo** per le caratteristiche che **nascono sul pistone**. Da un **punto
+> generico del gas** passano regolarmente **tutte e tre** le famiglie (vedi il punto $K$).
+
+</details>
+
+<details>
+<summary><strong>Concetto — la zona indisturbata è sotto la prima caratteristica</strong></summary>
+
+La **zona delle condizioni iniziali** (gas **indisturbato**, stato noto) è la regione **sotto la prima
+caratteristica**, cioè quella che **parte dall'origine** $(x_0,t_0)$. Sotto di essa nessuna perturbazione
+del pistone è ancora arrivata → lo stato è quello **iniziale uniforme**. È da qui che si prendono i **punti
+noti** (es. 4, 5) per propagare gli invarianti.
+
+</details>
+
+<details>
+<summary><strong>Concetto — il percorso particellare $\lambda_2$ (perché è una "spezzata")</strong></summary>
+
+La $\lambda_2$ ($dx/dt=u$) è la **traiettoria di una particella** di fluido. Perché appare **spezzata/curva**?
+Perché la particella, partendo ferma ($u=0$ → tratto **verticale**), viene **accelerata** ogni volta che la
+attraversa un'onda di compressione: a ogni passaggio la sua velocità $u$ **aumenta** → la pendenza $1/u$
+**diminuisce** → la traiettoria **piega** (nei reticoli discreti appare a tratti, da cui "spezzata").
+**Significato:** non trasporta un'onda, è il **cammino materiale** lungo cui si conserva l'**entropia**
+($DS/Dt=0$); collega lo stato di una particella nel tempo.
+
+</details>
+
+<details>
+<summary><strong>Procedura + Figura — risolvere lo stato in $P$ con le caratteristiche</strong></summary>
+
+![Costruzione della soluzione in P con frecce: 5->2->P, 4->P, percorso particellare](images/piston_costruzione_P.svg)
+
+Le **frecce** indicano il **verso di percorrenza**: si parte sempre da uno **stato noto** e si "cammina"
+lungo una caratteristica fino al punto da determinare.
+
+```mermaid
+graph LR
+    N5["5 (NOTO)<br/>zona indisturbata"] -->|"lungo lambda1(5)"| P2["punto 2<br/>(sul pistone)"]
+    P2 -->|"lungo lambda3(2)"| PP["P"]
+    N4["4 (NOTO)<br/>zona indisturbata"] -->|"lungo lambda1(4)"| PP
+    PIS["pistone"] -->|"lungo lambda2 (particella)"| PP
+```
+
+**Spiegazione passo-passo:**
+1. Conosco lo stato in **5** (zona indisturbata). Lungo la sua $\lambda_1$ trasporto l'invariante fino al
+   **punto 2** (che sta sul pistone) → ricavo lo stato in 2.
+2. Dal **punto 2**, lungo la sua $\lambda_3$, arrivo a **P**.
+3. In parallelo, da **4** (noto) lungo $\lambda_1$ arrivo direttamente a **P**, e il **percorso
+   particellare** $\lambda_2$ porta a P l'entropia.
+4. Mettendo insieme le relazioni (sotto) si chiude lo stato in P.
+
+**"Ma come conosco l'inclinazione di $\lambda_1$ se ho supposto subsonico?"** Il regime **subsonico** mi dà
+il **segno** ($\lambda_1=u-a<0$ → la $\lambda_1$ "pende" verso monte/sinistra); la pendenza **esatta**
+$1/|\lambda_1|$ dipende dallo stato locale e **non serve saperla** in anticipo: non integro la traiettoria
+punto-per-punto, **uso l'invariante** $W_1$ che è **costante lungo $\lambda_1$** e collega i due stati in
+modo **algebrico**. La geometria precisa esce *dopo*, una volta noto lo stato.
+
+</details>
+
+<details>
+<summary><strong>Flowchart — chiudere il problema con gli invarianti di Riemann</strong></summary>
+
+Si **uguagliano gli invarianti** sullo **stesso** segmento di caratteristica (l'invariante non cambia):
+
+```mermaid
+graph TD
+    A["Stato noto in 5 (a5, u5, S)"] --> B["W1 costante lungo lambda1: W1(5)=W1(2)<br/>(a/phi - u)_5 = (a/phi - u)_2"]
+    B --> C["u2 = velocita' del PISTONE (nota) -> ricavo a2"]
+    C --> D["W3 costante lungo lambda3: W3(2)=W3(P)<br/>(a/phi + u)_2 = (a/phi + u)_P"]
+    A2["Stato noto in 4"] --> E["W1 costante lungo lambda1: W1(4)=W1(P)<br/>(a/phi - u)_4 = (a/phi - u)_P"]
+    D --> F["Sistema in (a_P, u_P)"]
+    E --> F
+    S["S costante (omoentropico) lungo lambda2"] --> F
+    F --> G["Stato in P risolto: a_P, u_P -> T,p,rho"]
+```
+
+</details>
+
+<details>
+<summary><strong>Tabella — noti vs incogniti: il sistema è determinato</strong></summary>
+
+| Grandezza | Stato | Nota / incognita | Da dove |
+|---|---|---|---|
+| $S$ (entropia, "$\delta$") | tutto il campo | **NOTA** | omoentropico: costante (no urti) |
+| $a_4,\ u_4$ | punto 4 | **NOTI** | zona indisturbata (dato iniziale) |
+| $a_5,\ u_5$ | punto 5 | **NOTI** | zona indisturbata |
+| $u_2$ | punto 2 (pistone) | **NOTA** | è la **velocità del pistone** (legge di moto $x_p(t)$) |
+| $a_2$ | punto 2 | **INCOGNITA** | da $W_1(5)=W_1(2)$ |
+| $u_P,\ a_P$ (o $\theta_P$) | punto $P$ | **INCOGNITE** | da $W_3(2)=W_3(P)$ e $W_1(4)=W_1(P)$ |
+
+**Conteggio:** 3 incognite ($a_2,\ u_P,\ a_P$) e **3 equazioni** ($W_1(5)=W_1(2)$, $W_3(2)=W_3(P)$,
+$W_1(4)=W_1(P)$) → **sistema determinato**. (P è un **punto generico** del gas, non il pistone.)
+
+</details>
+
+<details>
+<summary><strong>Concetto — perché $\delta$ (entropia) è costante, e cosa indica negli invarianti</strong></summary>
+
+"$\delta$" sulla lavagna è l'**entropia $S$**. È **costante** perché la compressione (prima dell'urto) è
+**omoentropica**: l'entropia è uniforme all'inizio e si **conserva** lungo i percorsi particellari
+($DS/Dt=0$), e **senza urti** non viene generata → $S$ è la stessa ovunque. Negli **invarianti di Riemann**
+è il **terzo** invariante ($W_2=S$ lungo $\lambda_2$): conoscerlo **chiude la termodinamica** (con $S$ noto,
+basta **una** grandezza termodinamica come $a$ per avere tutte le altre). È per questo che restano da
+trovare solo le coppie $(a,u)$ e bastano le **due** relazioni acustiche $W_1,W_3$.
+
+</details>
+
+<details>
+<summary><strong>Concetto — la velocità del pistone è nota ovunque, ma non $a_2$</strong></summary>
+
+Sottolineiamo una sottigliezza importante: la **velocità del pistone è nota lungo tutta la sua
+traiettoria**, perché basta leggere la sua **legge di moto** dal grafico $(x,t)$ (la pendenza della curva
+del pistone = velocità). Quindi $u_2$ (velocità nel punto 2, che sta sul pistone) è un **dato**.
+**Ma la velocità del suono $a_2$ in quel punto NON è nota a priori:** il pistone impone solo la
+**cinematica** ($u$, condizione meccanica di impermeabilità/contatto), **non** lo stato termodinamico. Per
+questo $a_2$ va **ricavata** propagando l'invariante $W_1$ dal punto noto 5. (In altri testi il punto 2 si
+chiama $A$: cambia la notazione, non la sostanza.)
+
+</details>
+
 ## 7. Problema di Riemann e tubo d'urto di Sod
 
 <details>
@@ -1164,6 +1308,29 @@ Lettura (sx → dx: stato L, ventaglio, $L^\*$, contatto, $R^\*$, urto, stato R)
 
 **Pratica:** per **localizzare il contatto** si guarda la **densità/temperatura** (es. tecniche ottiche
 sulla densità), **non** la pressione.
+
+</details>
+
+<details>
+<summary><strong>Concetto — gasdinamica "spaziale" vs grafico spazio–tempo: come cambia l'interpretazione</strong></summary>
+
+In gasdinamica si disegnano spesso i profili $p(x),\rho(x),u(x)$ a un **istante fisso** (grafici **puramente
+spaziali**): lì urto, contatto ed espansione appaiono come **caratteristiche a posizioni fisse** $x_1,\dots,x_4$.
+Nel piano **spazio–tempo** $(x,t)$ gli stessi fenomeni diventano **linee/regioni**:
+
+| Fenomeno | Nel profilo **spaziale** ($t$ fisso) | Nel piano **spazio–tempo** $(x,t)$ |
+|---|---|---|
+| **Urto** | un **salto** in un punto $x_4$ | una **linea** $x_4(t)$ (pendenza $1/s$) |
+| **Contatto** | un salto (in $\rho,T$) in $x_3$ | una **linea** $x_3(t)=u\,t$ |
+| **Espansione** | una **rampa** liscia tra $x_1$ e $x_2$ | un **ventaglio** (regione) tra due linee |
+| Stati costanti | tratti **piatti** | **regioni** (settori) |
+
+**Chiave (come da lavagna):** nel grafico spazio–tempo **tutti i punti si muovono**, cioè
+$x_1(t),x_2(t),x_3(t),x_4(t)$ sono **funzioni del tempo**; il profilo spaziale è una **"fotografia"**
+(taglio orizzontale $t=t_1$) di quel diagramma. Quindi: il piano $(x,t)$ mostra la **storia completa** (e la
+**velocità** di ogni struttura = $1/$pendenza); il profilo $x$ a $t_1$ è dove quelle linee **intersecano**
+la retta $t=t_1$. Un urto = "punto" nel profilo ⟺ "linea" in $(x,t)$; il ventaglio = "rampa" nel profilo ⟺
+"regione" in $(x,t)$.
 
 </details>
 
