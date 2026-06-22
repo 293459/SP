@@ -15,8 +15,7 @@ etichettato in modo esplicito (niente emoji da decifrare):
 - **Nomenclatura —** simboli.
 - **Codice/Esercitazioni —** collegamento al solutore `Euler2D` / writeup.
 
-I tag tra parentesi quadre tipo **[4]** rimandano alle domande poste nelle
-richieste; la mappa completa è nell'ultimo toggle.
+Ogni toggle ha un titolo **descrittivo**: apri quelli che ti interessano.
 
 </details>
 
@@ -30,7 +29,7 @@ eredita la forma quasi-lineare $\partial_t U + A\,\partial_x U = 0$, $A=L\Lambda
 
 Contenuti basati sul **Cap. 2 "Linee caratteristiche"** (appunti CFD, P. Pantò) +
 [`bilancio.md`](bilancio.md). Le figure a mano del capitolo sono state **ridisegnate
-in Python/SVG** (script [`images/caratteristiche_plots.py`](images/caratteristiche_plots.py));
+in Python/SVG**(script [`images/caratteristiche_plots.py`](images/caratteristiche_plots.py));
 quelle di pistone/Sod/BC di Eulero/parete sono estratte dal PDF.
 
 </details>
@@ -42,7 +41,7 @@ quelle di pistone/Sod/BC di Eulero/parete sono estratte dal PDF.
 |---|---|---|
 | $a$ | velocità di propagazione (scalare lineare) | $a=\partial f/\partial u$; per $f=au$ è costante |
 | $u$ | grandezza **trasportata** | non necessariamente una velocità |
-| $U=(u,v,\dots)$ | **incognite** = componenti della **grandezza conservativa** | una legge di conservazione per componente |
+| $U=(u,v,\dots)$ | **incognite**= componenti della **grandezza conservativa** | una legge di conservazione per componente |
 | $A$ | **matrice dei coefficienti** / Jacobiana del flusso | $U_t+A\,U_x=0$, $A=\partial F/\partial U$ |
 | $A'$ | matrice dei coefficienti in **variabili primitive** | Eulero con $V=(\rho,u,p)$ o $(a,u,S)$: $V_t+A'V_x=0$ (stessa fisica di $A$) |
 | $\lambda_k$ | **autovalori** di $A$ (velocità d'onda) | reali ⟺ iperbolico; Eulero $\{u-a,\ u,\ u+a\}$ |
@@ -57,6 +56,23 @@ quelle di pistone/Sod/BC di Eulero/parete sono estratte dal PDF.
 | $c,\ s=[\![f]\!]/[\![u]\!]$ | velocità dell'**urto** (Rankine–Hugoniot) | salto flusso / salto grandezza |
 | $[\![\cdot]\!]$ | **salto** monte ↔ valle | $[\![q]\!]=q_B-q_A$ |
 | $M=u/a$ | numero di **Mach** | $<1$ subsonico, $>1$ supersonico |
+
+</details>
+
+<details>
+<summary><strong>Convenzione dei grafici $(x,t)$ — leggere SEMPRE così (importante)</strong></summary>
+
+In tutti i diagrammi spazio–tempo del capitolo **$t$ è in ordinata** (verticale) e **$x$ in ascissa**
+(orizzontale). Una caratteristica $x=x_0+\lambda\,t$ ha quindi **pendenza**
+
+$$\frac{dt}{dx}=\frac{1}{\lambda}\quad(\text{l'INVERSO della velocità, non }\lambda).$$
+
+Conseguenze da tenere a mente sempre:
+- **più una linea è verticale → più è lenta** ($\lambda$ piccolo); più è **inclinata verso l'orizzontale
+  → più è veloce**($\lambda$ grande). La velocità è $\lambda=1/\text{pendenza}$.
+- **Ordine delle 3 caratteristiche di Eulero** (con $a>0$): $\lambda_1=u-a<\lambda_2=u<\lambda_3=u+a$.
+  Quindi $\lambda_3=u+a$ è la **più veloce**→ la **meno ripida** (più inclinata verso $x$); $\lambda_1=u-a$
+  è la più lenta → la più vicina alla verticale (e se $u<a$ "pende" verso sinistra, $\lambda_1<0$).
 
 </details>
 
@@ -76,14 +92,14 @@ una velocità**: è la grandezza trasportata; $a$ è la velocità di propagazion
 </details>
 
 <details>
-<summary><strong>Dimostrazione [16] — la linea caratteristica (scalare → sistema → multi-D)</strong></summary>
+<summary><strong>Dimostrazione — la linea caratteristica (scalare → sistema → multi-D)</strong></summary>
 
 Cerco una curva $x(t)$ lungo cui la PDE diventi una **ODE**. La derivata totale di $u$ lungo una curva è
 
 $$\frac{du}{dt}=\frac{\partial u}{\partial t}+\frac{dx}{dt}\,\frac{\partial u}{\partial x}.$$
 
 Confronto con $u_t+a\,u_x=0$: **scelgo** $\dfrac{dx}{dt}=a\Rightarrow\dfrac{du}{dt}=0$. Lungo la retta
-$x=x_0+at$ la soluzione è **costante** → $u(x,t)=u_0(x-at)$. Estensioni:
+$x=x_0+at$ la soluzione è **costante**→ $u(x,t)=u_0(x-at)$. Estensioni:
 - scalare non lineare $\dfrac{dx}{dt}=f'(u)$; sistema $\dfrac{dx}{dt}=\lambda_k$;
 - multi-D: superfici caratteristiche da $\det(\phi_t I+\sum_d A_d\phi_{x_d})=0$ → **cono di Mach**; la
   riduzione esatta a ODE vale pulita solo in 1D.
@@ -91,7 +107,7 @@ $x=x_0+at$ la soluzione è **costante** → $u(x,t)=u_0(x-at)$. Estensioni:
 </details>
 
 <details>
-<summary><strong>Concetto [2] — cosa significa "derivata materiale con velocità $a$"</strong></summary>
+<summary><strong>Concetto — cosa significa "derivata materiale con velocità $a$"</strong></summary>
 
 La derivata **materiale** non prende $a$ "come input": è la derivata temporale **vista da un osservatore
 che si muove col flusso**. In 1D, $\dfrac{Du}{Dt}=\partial_t u+a\,\partial_x u$. L'equazione scalare
@@ -101,7 +117,7 @@ $a$ non è arbitrario: è **la** velocità di propagazione che compare nell'equa
 </details>
 
 <details>
-<summary><strong>Concetto [3] — riferimento solidale al segnale (serve un termine $-a\,u_x$?)</strong></summary>
+<summary><strong>Concetto — riferimento solidale al segnale (serve un termine $-a\,u_x$?)</strong></summary>
 
 Cambio di variabili **galileiano**: $\xi=x-at,\ \tau=t$. Allora
 $\partial_t|_x=\partial_\tau-a\,\partial_\xi$, $\partial_x=\partial_\xi$. Sostituendo:
@@ -113,37 +129,62 @@ trasporto, non la 2ª legge di Newton). Fisicamente non cambia nulla: cambia il 
 </details>
 
 <details>
-<summary><strong>Figura — piano spazio–tempo [5][6][10][11][13]</strong></summary>
+<summary><strong>Figura — piano spazio–tempo </strong></summary>
 
 ![Advezione lineare: piano x-t con caratteristiche parallele, punti A,B e piano x-u con la traslazione rigida](images/lc_scalare_lineare.svg)
 
-- **[6]** Per $a$ costante le caratteristiche hanno la **stessa pendenza** $1/a$ → sono **parallele**.
-- **[5]** Le linee disegnate hanno lunghezza finita solo per comodità: a rigore sono **infinite**.
-- **[10]** La **freccia** verticale indica $t$ crescente: si legge dal basso (dato iniziale) verso l'alto.
-- **[11]** $t_1,x_1$ **non** sono i limiti del dominio: $t_1$ è un **istante di osservazione** (taglio
+- **** Per $a$ costante le caratteristiche hanno la **stessa pendenza** $1/a$ → sono **parallele**.
+- **** Le linee disegnate hanno lunghezza finita solo per comodità: a rigore sono **infinite**.
+- **** La **freccia** verticale indica $t$ crescente: si legge dal basso (dato iniziale) verso l'alto.
+- **** $t_1,x_1$ **non** sono i limiti del dominio: $t_1$ è un **istante di osservazione** (taglio
   orizzontale), $x_1$ una **stazione**. I limiti veri sono i lati del rettangolo.
-- **[13]** A e B sull'asse $t=0$ diventano A′,B′ a $t_1$; nel piano $(x,u)$ hanno lo **stesso valore di
+- **** A e B sull'asse $t=0$ diventano A′,B′ a $t_1$; nel piano $(x,u)$ hanno lo **stesso valore di
   $u$**, **spostato nello spazio** di $\Delta x=a t_1$. I punti non cambiano valore: si traslano.
 
 </details>
 
 <details>
-<summary><strong>Concetto [4] — interpretazione matematica e equazioni di compatibilità</strong></summary>
+<summary><strong>Concetto — interpretazione matematica e equazioni di compatibilità</strong></summary>
 
-*Una caratteristica è una curva lungo cui le derivate, pur potendo essere discontinue, restano ben
-definite.* Mettendo a sistema il **differenziale** $du=u_t\,dt+u_x\,dx$ e l'equazione di governo:
+**Definizione matematica:** *una caratteristica è una curva lungo cui le derivate, pur potendo essere
+discontinue, restano "ben definite".* Vediamo **da dove esce la matrice** e cosa rappresenta.
 
-$$\begin{pmatrix}1 & a\\ dt & dx\end{pmatrix}\begin{pmatrix}u_t\\ u_x\end{pmatrix}=\begin{pmatrix}0\\ du\end{pmatrix},$$
+Considero le **due** informazioni che ho su $u$ in un punto, viste come **due equazioni nelle incognite**
+$u_t$ e $u_x$ (le derivate parziali):
 
-con **Cramer** le derivate sono determinate **tranne** se $\det=dx-a\,dt=0$, cioè lungo $dx/dt=a$: lì le
-derivate possono "saltare". **$du=0$ (compatibilità)** non significa $\partial_t u=\partial_x u=0$
-singolarmente, ma che la **derivata direzionale** lungo la caratteristica è nulla → $u$ costante lungo di
-essa (per i sistemi: $dW_k=0$).
+1. l'**equazione di governo** (la PDE): $\quad 1\cdot u_t + a\cdot u_x = 0$;
+2. il **differenziale totale** di $u$ lungo un piccolo spostamento $(dx,dt)$, con variazione $du$:
+   $\quad dt\cdot u_t + dx\cdot u_x = du$.
+
+Le metto a sistema; la **matrice dei coefficienti** raccoglie i coefficienti di $u_t$ e $u_x$ nelle due
+righe (1ª riga = PDE, 2ª riga = differenziale):
+
+$$
+\underbrace{\begin{pmatrix} 1 & a \\ dt & dx \end{pmatrix}}_{\text{coeff. di }(u_t,\,u_x)}
+\begin{pmatrix} u_t \\ u_x \end{pmatrix}
+=
+\begin{pmatrix} 0 \\ du \end{pmatrix}.
+$$
+
+**Cosa rappresenta:** "dati la PDE e uno spostamento $(dx,dt)$ con la sua variazione $du$, riesco a
+**ricavare entrambe** le derivate $u_t,u_x$?". Con **Cramer** la risposta è **sì e in modo unico**, a meno
+che il **determinante** si annulli:
+
+$$\det = 1\cdot dx - a\cdot dt = 0 \;\Longleftrightarrow\; \frac{dx}{dt}=a.$$
+
+Cioè: **solo** quando lo spostamento è **lungo la caratteristica** ($dx/dt=a$) il sistema diventa
+**singolare** e le derivate **non** sono più determinate univocamente → **lì possono "saltare"** (essere
+discontinue). Questa è la definizione matematica di caratteristica.
+
+**E la compatibilità?** Quando il sistema è singolare, perché abbia comunque soluzione il termine noto deve
+essere "compatibile" → lungo la caratteristica si ottiene $du=0$. **$du=0$ NON significa** $u_t=u_x=0$
+singolarmente: significa che la **derivata direzionale** di $u$ **lungo** la caratteristica è nulla, cioè
+$u$ è **costante** lungo di essa (per i sistemi: $dW_k=0$).
 
 </details>
 
 <details>
-<summary><strong>Figura [15] — campi di $\partial u/\partial x$ e $\partial u/\partial t$ (onda periodica)</strong></summary>
+<summary><strong>Figura — campi di $\partial u/\partial x$ e $\partial u/\partial t$ (onda periodica)</strong></summary>
 
 ![Mappe (x,t) di u, du/dx, du/dt: iso-valori paralleli alle caratteristiche](images/lc_derivate_2d.svg)
 
@@ -157,26 +198,28 @@ derivate restano finite; la **discontinuità vera** appare quando le caratterist
 </details>
 
 <details>
-<summary><strong>Concetto [7][8][12][18] — condizioni al contorno (caso scalare)</strong></summary>
+<summary><strong>Concetto — condizioni al contorno (caso scalare)</strong></summary>
 
 ![Condizioni al contorno: a>0 BC a sinistra, a<0 BC a destra](images/lc_condizioni_contorno.svg)
 
 Per conoscere $u$ in un punto $P$ **risalgo** la sua caratteristica all'indietro:
-- se torno a $t=0$ **dentro** $[0,L]$ → valore dato dal **dato iniziale** (nessuna BC);
+- se torno a $t=0$ **dentro** $[0,L]$ → valore dato dal **dato iniziale** (nessuna BC). In pratica significa
+  finire sull'**asse orizzontale** $t=0$: è lì che vive il **dato iniziale**, e quell'asse **non** richiede
+  condizioni al contorno (le BC stanno sui **bordi verticali** $x=0$ e $x=L$);
 - se esco dal **bordo sinistro** ($x<0$) → valore fissato da quel bordo → **serve BC a sinistra**
   $u(0,t)=g(t)$.
 
 Il bordo **destro** non dà problemi: lì le caratteristiche **escono** (info dall'interno verso l'esterno),
 $u$ si ottiene incrociando la caratteristica → **nessuna BC**.
-- **[7]** $a>0$ → caratteristiche da sinistra a destra → BC a **sinistra**. $a<0$ → risalgono → BC a
+- **** $a>0$ → caratteristiche da sinistra a destra → BC a **sinistra**. $a<0$ → risalgono → BC a
   **destra**. Entrambi i segni hanno senso fisico ($a$ = direzione di propagazione).
-- **[12]** Regola generale: *# BC su un bordo = # caratteristiche **entranti***. Per Eulero decide quali
+- **** Regola generale: *# BC su un bordo = # caratteristiche **entranti***. Per Eulero decide quali
   grandezze (p/u/T) imporre nei vari regimi → §8 e `report_QA.md` (Domande 12–13).
 
 </details>
 
 <details>
-<summary><strong>Concetto [1] — perché si chiamano "iperboliche"? (e fuori dal caso iperbolico?)</strong></summary>
+<summary><strong>Concetto — perché si chiamano "iperboliche"? (e fuori dal caso iperbolico?)</strong></summary>
 
 La classificazione dipende dal numero di **caratteristiche reali**:
 
@@ -186,10 +229,18 @@ La classificazione dipende dal numero di **caratteristiche reali**:
 | Parabolica | una (degenere) | diffusiva |
 | Ellittica | nessuna (complesse) | nessuna direzione privilegiata |
 
-Per i sistemi 1° ordine: iperbolico ⟺ $A$ **diagonalizzabile con autovalori reali** ⟺ esistono $n$
+Per i sistemi 1° ordine: iperbolico ⟺ $A$ **diagonalizzabile con autovalori reali**⟺ esistono $n$
 famiglie di caratteristiche reali. Le caratteristiche reali **sono** la definizione di iperbolicità. Nel
 caso **ellittico** gli autovalori sono complessi → niente caratteristiche reali (dominio di dipendenza
 esteso). Quindi non puoi avere caratteristiche reali propagative in un problema genuinamente ellittico.
+
+**Le equazioni paraboliche (in due parole).** Sono il caso **limite/intermedio** ($\Delta=0$): **una sola**
+famiglia di caratteristiche reali (degenere). Descrivono i fenomeni **diffusivi**, il cui prototipo è
+l'**equazione del calore** $u_t=\nu\,u_{xx}$. Significato fisico: l'informazione si **diffonde** e si
+**liscia** (i gradienti si attenuano), con velocità di propagazione *formalmente infinita* (una
+perturbazione locale si "sente" subito ovunque, anche se in modo sempre più debole). In CFD la parte
+**viscosa/termica** di Navier–Stokes è di tipo parabolico, mentre la parte convettiva (Eulero) è
+iperbolica: per questo si trattano con tecniche diverse (e spesso separate).
 
 </details>
 
@@ -206,9 +257,9 @@ $$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrig
 </details>
 
 <details>
-<summary><strong>Concetto [20] — perché ora urti ed espansioni? Quali altri fenomeni?</strong></summary>
+<summary><strong>Concetto — perché ora urti ed espansioni? Quali altri fenomeni?</strong></summary>
 
-Velocità d'onda $f'(u)=u$ **dipende dalla soluzione** → caratteristiche con inclinazioni diverse, che
+Velocità d'onda $f'(u)=u$ **dipende dalla soluzione**→ caratteristiche con inclinazioni diverse, che
 possono **convergere** (urto) o **divergere** (espansione). Altri fenomeni da modello scalare non lineare:
 **traffico** (LWR: ingorghi = urti), **shallow water** (bore/risalto idraulico), gasdinamica (compressione
 → urto), trasporto di sedimenti, cromatografia, dinamica delle folle.
@@ -216,15 +267,22 @@ possono **convergere** (urto) o **divergere** (espansione). Altri fenomeni da mo
 </details>
 
 <details>
-<summary><strong>Figura [21][22] — compressione → urto: correlazione $x$–$t$ ↔ $x$–$u$</strong></summary>
+<summary><strong>Figura — compressione → urto: correlazione $x$–$t$ ↔ $x$–$u$</strong></summary>
 
 ![Burgers compressione: caratteristiche convergenti e snapshot x-u che si irripidiscono](images/lc_burgers_urto.svg)
 
-Regione $u=u_A$ (alto) più veloce → caratteristiche più inclinate; $u=u_B$ (basso) più lente; le veloci
-raggiungono le lente → **convergenza**. Nei profili $(x,u)$ il fronte si **irripidisce** fino al **salto**.
+Regione $u=u_A$ (alto) più veloce → caratteristiche più inclinate (verso l'orizzontale); $u=u_B$ (basso)
+più lente; le veloci raggiungono le lente → **convergenza**. Nei profili $(x,u)$ il fronte si
+**irripidisce** fino al **salto**.
 
-**[22] Matematica:** caratteristiche $x=\xi+u_0(\xi)t$; si incrociano a $t_b=-1/\min u_0'>0$ (serve
-$u_0'<0$). Oltre $t_b$ la soluzione classica sarebbe **multivalore** → si sostituisce con una
+> **Nota (avevi ragione):** nel grafico le caratteristiche **terminano sull'urto** (la linea rossa),
+> **non lo attraversano**. L'urto **non** è una caratteristica e **non** trasporta informazione lungo di
+> sé come le caratteristiche: è una **discontinuità** governata da **Rankine–Hugoniot**. Le caratteristiche
+> ci "entrano" (vengono **assorbite**: portano i due stati monte/valle che si fondono), ma di là dell'urto
+> non proseguono — oltre c'è un **unico** stato. (La figura è stata corretta in questo senso.)
+
+**Matematica:** caratteristiche $x=\xi+u_0(\xi)t$; si incrociano a $t_b=-1/\min u_0'>0$ (serve
+$u_0'<0$). Oltre $t_b$ la soluzione classica sarebbe **multivalore**→ si sostituisce con una
 **discontinuità** (urto) a velocità $s$ data da Rankine–Hugoniot + condizione di entropia.
 **Fisica:** fino al breaking ogni caratteristica porta la **propria** informazione; quando convergono, le
 informazioni **si fondono** in una sola (oltre l'urto un solo stato). Analogo: onde di compressione in gas
@@ -233,38 +291,38 @@ caldo che si accumulano in urto; auto che frenano e formano una coda.
 </details>
 
 <details>
-<summary><strong>Concetto [24][25][26][28] — Rankine–Hugoniot: logica, monte/valle, ruolo, media</strong></summary>
+<summary><strong>Concetto — Rankine–Hugoniot: logica, monte/valle, ruolo, media</strong></summary>
 
-**[26] Logica fisica:** bilancio **integrale** su un volumetto attorno alla discontinuità mobile (velocità
+**Logica fisica:** bilancio **integrale** su un volumetto attorno alla discontinuità mobile (velocità
 $s$): variazione del conservato = flusso netto → condizione di salto
 
 $$s\,[\![u]\!]=[\![f]\!]\;\Rightarrow\; s=\frac{[\![f]\!]}{[\![u]\!]}=\frac{f(u_B)-f(u_A)}{u_B-u_A}.$$
 
 La velocità del fronte è il **rapporto tra salto di flusso e salto del conservato**. Universale.
 
-**[26] Monte/valle:** rispetto al verso del fronte, lo stato da cui il fronte "avanza ricevendo" è
+**Monte/valle:** rispetto al verso del fronte, lo stato da cui il fronte "avanza ricevendo" è
 **monte**, l'altro **valle**. Per caratteristiche convergenti, due famiglie portano $u_A,u_B$: il lato da
 cui arriva l'informazione che alimenta il fronte è il monte.
 
-**[24] Che modello è:** RH è del caso scalare **non lineare** (Burgers) ma, essendo proprietà delle leggi
+**Che modello è:** RH è del caso scalare **non lineare** (Burgers) ma, essendo proprietà delle leggi
 di conservazione, **si estende ai sistemi** (Eulero): non è esclusiva del vettoriale.
 
-**[25] Differenza tra equazioni:** sul lineare $f=au$ darebbe $s=a$ (nessun urto). Su **Burgers**
+**Differenza tra equazioni:** sul lineare $f=au$ darebbe $s=a$ (nessun urto). Su **Burgers**
 ($f=u^2/2$): $s=\frac{u_B^2/2-u_A^2/2}{u_B-u_A}=\frac{u_A+u_B}{2}$. Applicarla allo scalare lineare è
 teoricamente interessante ma non spiega gli urti, quindi non lo trattiamo (servirebbe un altro modello non
 visto). RH–Burgers è una **dimostrazione da saper fare** (lista in fondo).
 
-**[28] Attenzione:** $s=(u_A+u_B)/2$ (media) vale **solo per Burgers**; in generale $s$ è un valore
+**Attenzione:** $s=(u_A+u_B)/2$ (media) vale **solo per Burgers**; in generale $s$ è un valore
 **intermedio**, non la media.
 
 </details>
 
 <details>
-<summary><strong>Figura [29] — espansione (rarefazione) in Burgers</strong></summary>
+<summary><strong>Figura — espansione (rarefazione) in Burgers</strong></summary>
 
 ![Burgers espansione: ventaglio di caratteristiche divergenti e snapshot x-u che si appiattiscono](images/lc_burgers_espansione.svg)
 
-Dato iniziale **crescente** → caratteristiche **divergono**: a sinistra ($u=0$) verticali, a destra
+Dato iniziale **crescente**→ caratteristiche **divergono**: a sinistra ($u=0$) verticali, a destra
 ($u=1$) pendenza $1/u$, in mezzo un **ventaglio**. Il salto **collassa subito** in onde rarefatte
 (soluzione autosimile $u=x/t$). Nei profili il salto si **apre** (opposto dell'urto). Idem nelle Eulero.
 
@@ -287,7 +345,7 @@ $\varepsilon=+1$ reali → **iperbolico**; $\varepsilon=-1$ immaginari → **ell
 </details>
 
 <details>
-<summary><strong>Concetto [Q1] — $u,v$ sono "incognite" ma anche le grandezze conservative</strong></summary>
+<summary><strong>Concetto — $u,v$ sono "incognite" ma anche le grandezze conservative</strong></summary>
 
 $u,v$ si chiamano **incognite** (da determinare, $U=(u,v)$) e **sono** le **componenti** del vettore
 conservato $U$: ogni riga è una legge di conservazione $\partial_t U_i+\partial_x F_i=0$. Stesso oggetto,
@@ -297,24 +355,24 @@ $\rho,\rho u,\rho E$.)
 </details>
 
 <details>
-<summary><strong>Concetto [Q2][Q4][Q5] — il coefficiente $\varepsilon\,\alpha^2$ e le soluzioni complesse</strong></summary>
+<summary><strong>Concetto — il coefficiente $\varepsilon\,\alpha^2$ e le soluzioni complesse</strong></summary>
 
-- **[Q2] Perché due variabili.** Si separa il **segno** $\varepsilon$ (che decide la natura della PDE) dal
+- **Perché due variabili.** Si separa il **segno** $\varepsilon$ (che decide la natura della PDE) dal
   **modulo** $\alpha^2$ (la scala della velocità). $\alpha^2>0$ **sempre** perché è un quadrato (velocità²);
   il segno lo porta $\varepsilon$. Così $\lambda=\pm\alpha\sqrt\varepsilon$ ha $\alpha$ = velocità.
-- **[Q4] Perché $\varepsilon=\pm1$ (non la funzione segno).** È un **parametro di selezione del caso**, non
+- **Perché $\varepsilon=\pm1$ (non la funzione segno).** È un **parametro di selezione del caso**, non
   una grandezza continua: un generico $\varepsilon>0$ sarebbe riassorbibile in $\alpha$ → conta solo il
   segno. La funzione segno non serve perché $\varepsilon$ non è il segno di una variabile, è una costante
   fissata a priori. Serve **a distinguere iperbolico da ellittico**, e $\pm1$ fa uscire $\lambda=\pm\alpha$.
-- **[Q5] Soluzioni.** $\varepsilon=+1$ → due autovalori reali $\pm\alpha$ = le **due velocità** (due onde,
-  destra/sinistra). $\varepsilon=-1$ → $\pm i\alpha$ **complessi** → nessuna velocità reale, nessuna
+- **Soluzioni.** $\varepsilon=+1$ → due autovalori reali $\pm\alpha$ = le **due velocità** (due onde,
+  destra/sinistra). $\varepsilon=-1$ → $\pm i\alpha$ **complessi**→ nessuna velocità reale, nessuna
   caratteristica reale → **ellittico** (info ovunque). Autovalori complessi ⟺ $A$ non diagonalizzabile su
   $\mathbb{R}$.
 
 </details>
 
 <details>
-<summary><strong>Concetto [Q3] — "sistema accoppiato": significato e implicazioni</strong></summary>
+<summary><strong>Concetto — "sistema accoppiato": significato e implicazioni</strong></summary>
 
 - **Logico:** $A$ ha termini **fuori diagonale** non nulli → l'equazione per $u$ contiene $v$ e viceversa:
   vanno trattate **insieme** (più complesso).
@@ -340,7 +398,7 @@ Equazioni di trasporto **indipendenti**; lungo $dx/dt=\lambda_k$ vale $dW_k=0$ (
 </details>
 
 <details>
-<summary><strong>Concetto [Q8] — com'è fatta $L^{-1}$</strong></summary>
+<summary><strong>Concetto — com'è fatta $L^{-1}$</strong></summary>
 
 $L^{-1}$ ha per **righe** gli autovettori sinistri:
 $L^{-1}=\begin{pmatrix}\boldsymbol{\ell}_1^{T}\\ \boldsymbol{\ell}_2^{T}\end{pmatrix}$. Ogni
@@ -350,7 +408,7 @@ ottiene **per l'appunto una matrice** ($2\times2$, o $3\times3$ per Eulero). Per
 </details>
 
 <details>
-<summary><strong>Concetto [Q6] — perché autovettori SINISTRI e non destri</strong></summary>
+<summary><strong>Concetto — perché autovettori SINISTRI e non destri</strong></summary>
 
 In $U_t+A\,U_x=0$ la $A$ moltiplica **da sinistra**. Gli autovettori **sinistri** soddisfano
 $\boldsymbol{\ell}_k^{T}A=\lambda_k\boldsymbol{\ell}_k^{T}$: premoltiplicando per $\boldsymbol{\ell}_k^{T}$,
@@ -362,16 +420,16 @@ $\boldsymbol{\ell}_k$ è poi associato a $\lambda_k$ (e alla sua direzione di pr
 </details>
 
 <details>
-<summary><strong>Concetto [Q9-mat] — far comparire $I=LL^{-1}$ ("come moltiplicare per 1")</strong></summary>
+<summary><strong>Concetto — far comparire $I=LL^{-1}$ ("come moltiplicare per 1")</strong></summary>
 
 $A=A\cdot I=A\,(LL^{-1})$: inserire $I$ **non cambia nulla**, come moltiplicare per $1$ nello scalare. Ma
-il prodotto matriciale **non è commutativo** → conta **dove** lo metti; lo si mette nel punto comodo:
+il prodotto matriciale **non è commutativo**→ conta **dove** lo metti; lo si mette nel punto comodo:
 $L^{-1}A\,U_x=\underbrace{(L^{-1}AL)}_{\Lambda}\underbrace{(L^{-1}U_x)}_{\partial_x W}$.
 
 </details>
 
 <details>
-<summary><strong>Concetto [Q11] — perché $\Lambda$ è diagonale</strong></summary>
+<summary><strong>Concetto — perché $\Lambda$ è diagonale</strong></summary>
 
 $\Lambda=L^{-1}AL$ è diagonale **per costruzione**: mettendo gli autovettori (destri) per colonne in $L$,
 l'operazione $L^{-1}AL$ porta $A$ **nella base dei suoi autovettori**, dove agisce come **riscalamento**
@@ -380,7 +438,7 @@ lungo ogni asse → sulla diagonale gli autovalori, zero altrove. È la definizi
 </details>
 
 <details>
-<summary><strong>Concetto [Q12] — perché si possono introdurre le variabili caratteristiche, e a che serve</strong></summary>
+<summary><strong>Concetto — perché si possono introdurre le variabili caratteristiche, e a che serve</strong></summary>
 
 Si può portare $L^{-1}$ dentro/fuori dalle derivate **solo perché $L^{-1},A$ non dipendono da $x,t$**
 (coefficienti **costanti**). Se $A=A(U)$ (non lineare) o $A(x,t)$ comparirebbero termini extra. **Vantaggio:**
@@ -390,9 +448,9 @@ risolubile col metodo delle caratteristiche. In breve: **problema vettoriale dif
 </details>
 
 <details>
-<summary><strong>Concetto [Q13] — "equazioni indipendenti": significato fisico</strong></summary>
+<summary><strong>Concetto — "equazioni indipendenti": significato fisico</strong></summary>
 
-Indipendenza **matematica** ⟺ indipendenza **fisica** dei segnali: ogni $W_k$ è un'**onda che viaggia per
+Indipendenza **matematica**⟺ indipendenza **fisica** dei segnali: ogni $W_k$ è un'**onda che viaggia per
 conto suo** a velocità $\lambda_k$, senza scambiare informazione con le altre (disaccoppiate). La procedura
 **serviva proprio a questo**, ma centra anche: (1) dimostrare l'**iperbolicità**; (2) ottenere le
 **compatibilità** $dW_k=0$; (3) produrre gli **invarianti di Riemann** (Eulero) costanti lungo le
@@ -416,7 +474,7 @@ tecniche riducono il problema a 1D nella direzione **normale** all'interfaccia.
 </details>
 
 <details>
-<summary><strong>Concetto [Q1] — variabili primitive vs conservative (teoria + codice)</strong></summary>
+<summary><strong>Concetto — variabili primitive vs conservative (teoria + codice)</strong></summary>
 
 Stesso sistema, due **scelte di incognite**:
 - **Conservative** $U=(\rho,\rho u,\rho E)$: forma di **divergenza** $\partial_t U+\partial_x F=0$. È la
@@ -436,7 +494,7 @@ per un solutore a volumi finiti con urti. (Commento aggiunto in `strutture.f90` 
 </details>
 
 <details>
-<summary><strong>Approfondimento [Q2] — come si ricava $A'$ (variabili primitive). DIMOSTRAZIONE</strong></summary>
+<summary><strong>Approfondimento — come si ricava $A'$ (variabili primitive). DIMOSTRAZIONE</strong></summary>
 
 *(Approfondimento, utile per capire come funziona la diagonalizzazione.)* Partendo dalla forma
 conservativa e passando alle primitive $V=(\rho,u,p)$ con la chain rule:
@@ -456,7 +514,7 @@ $$A'=\begin{pmatrix} u & \rho & 0\\[2pt] 0 & u & 1/\rho\\[2pt] 0 & \rho a^2 & u 
 </details>
 
 <details>
-<summary><strong>Concetto [Q3] — $A'$ non è simmetrica: ha un significato?</strong></summary>
+<summary><strong>Concetto — $A'$ non è simmetrica: ha un significato?</strong></summary>
 
 Sì, ma non è un problema. $A'$ **non è simmetrica** (es. $A'_{12}=\rho\neq A'_{21}=0$) perché è scritta in
 variabili **non conservative/non "entropiche"**. Conseguenze:
@@ -464,15 +522,15 @@ variabili **non conservative/non "entropiche"**. Conseguenze:
   entrambi (sinistri per proiettare in $W$, destri per ricostruire $U$);
 - gli autovettori **non sono ortogonali**.
 
-Per l'**iperbolicità** la simmetria **non serve**: bastano autovalori **reali** + insieme **completo** di
+Per l'**iperbolicità** la simmetria **non serve**: bastano autovalori **reali**+ insieme **completo** di
 autovettori (qui garantito da autovalori reali distinti). Esiste comunque una scelta di variabili
-(variabili di **entropia**/Roe) che **simmetrizza** Eulero: comoda in teoria (stime di energia), ma non
+(variabili di **entropia** /Roe) che **simmetrizza** Eulero: comoda in teoria (stime di energia), ma non
 necessaria. Quindi la non-simmetria è una proprietà della **base scelta**, non un ostacolo fisico.
 
 </details>
 
 <details>
-<summary><strong>Concetto [Q4] — "reali e distinti ⇒ iperbolico": basta? E il significato fisico</strong></summary>
+<summary><strong>Concetto — "reali e distinti ⇒ iperbolico": basta? E il significato fisico</strong></summary>
 
 **Matematica:** per la **classificazione** non servono i *valori*, basta che gli autovalori siano **reali**
 e che ci sia un **insieme completo di autovettori**. Autovalori **reali e distinti** garantiscono
@@ -487,7 +545,7 @@ problema di Riemann.
 </details>
 
 <details>
-<summary><strong>Concetto [Q5] — e se gli autovalori coincidessero?</strong></summary>
+<summary><strong>Concetto — e se gli autovalori coincidessero?</strong></summary>
 
 Dipende dagli **autovettori**:
 - se l'autovalore ripetuto ha ancora **abbastanza autovettori indipendenti** (matrice diagonalizzabile) →
@@ -504,7 +562,7 @@ posto perché resta diagonalizzabile (non strettamente iperbolico).
 </details>
 
 <details>
-<summary><strong>Concetto [Q6] — perché è iperbolico ANCHE in subsonico (non solo supersonico)</strong></summary>
+<summary><strong>Concetto — perché è iperbolico ANCHE in subsonico (non solo supersonico)</strong></summary>
 
 Il punto chiave è **stazionario vs non stazionario**.
 - Le equazioni di Eulero **stazionarie** (o l'eq. del potenziale) sono di **tipo misto** rispetto allo
@@ -521,7 +579,7 @@ con quello **non stazionario** (sempre iperbolico).
 </details>
 
 <details>
-<summary><strong>Figura [Q7] — dominio di dipendenza/influenza (sub/super) e la "linea che va indietro nel tempo"</strong></summary>
+<summary><strong>Figura — dominio di dipendenza/influenza (sub/super) e la "linea che va indietro nel tempo"</strong></summary>
 
 ![Dominio di dipendenza (giallo) e influenza (verde) di P, casi subsonico e supersonico](images/lc_dominio_dipendenza_xt.svg)
 
@@ -530,7 +588,7 @@ delimitato dalle due caratteristiche estreme tracciate **all'indietro**; il **do
 (verde, **futuro**) da quelle in avanti. Subsonico: $\lambda_1=u-a<0$ pende a sinistra. Supersonico:
 tutte $\lambda>0$ → il cono si **inclina a valle**.
 
-**[Q7] "Va indietro nel tempo"?** No: **nessuna caratteristica torna indietro nel tempo**. Ogni
+**"Va indietro nel tempo"?** No: **nessuna caratteristica torna indietro nel tempo**. Ogni
 caratteristica è una **retta intera** che passa per $P$ sia nel futuro sia nel passato; per il dominio di
 **dipendenza** la si percorre **all'indietro** ($t<t_P$) fino a dove il dato è noto. Il segno di
 $\lambda_1<0$ indica solo la **direzione spaziale** (verso sinistra, in $x$), **non** una direzione
@@ -541,15 +599,15 @@ della caratteristica — passata o futura — entra nel rispettivo cono.)
 </details>
 
 <details>
-<summary><strong>Approfondimento [Q8] — urto curvo staccato: zone sub+supersoniche insieme</strong></summary>
+<summary><strong>Approfondimento — urto curvo staccato: zone sub+supersoniche insieme</strong></summary>
 
 Davanti a un corpo tozzo c'è un **urto curvo staccato**: dietro di esso una **tasca subsonica**, altrove
 **supersonico**. Nel problema **stazionario** servirebbero metodi **ellittici** (tasca subsonica) e
-**iperbolici** (zone supersoniche) **insieme** → scomodo.
+**iperbolici** (zone supersoniche) **insieme**→ scomodo.
 
 **Cosa si fa:** si passa al problema **non stazionario** e si **marcia nel tempo** fino allo stato
-stazionario (*time-marching*). Come visto in **[Q6]**, le Eulero **non stazionarie in $(x,t)$ sono
-iperboliche ovunque** (autovalori $u,u\pm a$ reali per qualunque Mach). Quindi:
+stazionario (*time-marching*). Come visto in ****, le Eulero **non stazionarie in $(x,t)$ sono
+iperboliche ovunque**(autovalori $u,u\pm a$ reali per qualunque Mach). Quindi:
 1. aggiungo $\partial_t U$ → il sistema diventa **globalmente iperbolico**;
 2. uso **un solo** schema esplicito (time-marching) su tutto il dominio, sub e supersonico;
 3. a convergenza ($\partial_t U\to0$) recupero la soluzione stazionaria mista.
@@ -558,7 +616,7 @@ Non è un'incongruenza logica: il tipo (ellittico/iperbolico) dipende dall'**ope
 indipendenti**; cambiando da $(x)$ stazionario a $(x,t)$ non stazionario, l'operatore cambia e diventa
 iperbolico. Si "scioglie" il problema misto in uno **interamente trattabile** con metodi iperbolici.
 
-> Nota: se i tuoi appunti dicono "totalmente **ellittico**", è probabilmente un lapsus o si riferisce alla
+> Nota: se i tuoi appunti dicono "totalmente **ellittico** ", è probabilmente un lapsus o si riferisce alla
 > **tasca subsonica stazionaria**; la riformulazione **non stazionaria** in $(x,t)$ è **iperbolica**
 > ovunque — ed è proprio questo che risolve il problema. Se la lezione intendeva un'altra cosa, mandami la
 > frase esatta e riallineo.
@@ -566,14 +624,14 @@ iperbolico. Si "scioglie" il problema misto in uno **interamente trattabile** co
 </details>
 
 <details>
-<summary><strong>Approfondimento [Q9] — logica del calcolo degli autovettori (e perché ora sì)</strong></summary>
+<summary><strong>Approfondimento — logica del calcolo degli autovettori (e perché ora sì)</strong></summary>
 
 **Cosa stiamo facendo:** calcoliamo gli **autovettori sinistri** di $A'$ per costruire $L^{-1}$ e quindi le
 **variabili caratteristiche** $W=L^{-1}V$, cioè le combinazioni di $da,du,dS$ **conservate lungo ciascuna
-caratteristica** (le equazioni di compatibilità).
+caratteristica**(le equazioni di compatibilità).
 
 **Con che obiettivo:** non solo provare l'iperbolicità (quella basta da real+distinti), ma ottenere le
-**relazioni concrete** — gli **invarianti di Riemann** $a/\phi\pm u$ e l'entropia — che servono a
+**relazioni concrete**— gli **invarianti di Riemann** $a/\phi\pm u$ e l'entropia — che servono a
 **risolvere** problemi reali (pistone, condizioni al contorno).
 
 **Perché non prima:** nei casi scalari (§1–2) c'è **una sola** equazione, niente da disaccoppiare; nel
@@ -581,10 +639,15 @@ sistema 2×2 (§3) bastava mostrare la **diagonalizzabilità** (esistenza degli 
 **Eulero** invece servono le combinazioni **esplicite** trasportate lungo $u,u\pm a$ → si devono calcolare
 gli autovettori.
 
+> Nota d'esame: la **derivazione completa** per diagonalizzare Eulero (autovettori sinistri,
+> variabili caratteristiche, invarianti) **non risulta mai chiesta** tra le domande d'esame realmente
+> proposte (vedi `Exam/Domande_Esame_SP.md` §2: si chiedono Burgers, pistone, Sod, condizioni al
+> contorno — non la diagonalizzazione). Quindi questo passaggio è **skippabile** in fase di ripasso.
+
 </details>
 
 <details>
-<summary><strong>Concetto [Q4-fis] — autovalori $u-a,\ u,\ u+a$: significato fisico</strong></summary>
+<summary><strong>Concetto — autovalori $u-a,\ u,\ u+a$: significato fisico</strong></summary>
 
 In variabili $(a,u,S)$, $\det(A'-\lambda I)=0\Rightarrow(\lambda-u)(\lambda-u-a)(\lambda-u+a)=0$. Fisica:
 - $\lambda_2=u$: **trasporto delle particelle** (entropia/contatto);
@@ -594,7 +657,7 @@ In variabili $(a,u,S)$, $\det(A'-\lambda I)=0\Rightarrow(\lambda-u)(\lambda-u-a)
 </details>
 
 <details>
-<summary><strong>Concetto/Dimostrazione [Q9-Q10] — variabili caratteristiche di Eulero e omoentropico</strong></summary>
+<summary><strong>Concetto/Dimostrazione — variabili caratteristiche di Eulero e omoentropico</strong></summary>
 
 Risolvendo $\boldsymbol{\ell}^i A'=\lambda_i\boldsymbol{\ell}^i$ si ottengono i differenziali delle
 variabili caratteristiche $dW=L^{-1}dV$:
@@ -611,7 +674,7 @@ $$J^{\pm}=\frac{a}{\phi}\pm u=u\pm\frac{2a}{\gamma-1}=\text{cost lungo }\lambda_
 </details>
 
 <details>
-<summary><strong>Concetto [N1] — che tipi di onde sono, e quanti tipi esistono</strong></summary>
+<summary><strong>Concetto — che tipi di onde sono, e quanti tipi esistono</strong></summary>
 
 Le tre famiglie di Eulero **non sono tre copie della stessa onda**, sono **fenomeni diversi**:
 - $\lambda_{1,3}=u\mp a$ → **onde acustiche** (pressione/suono): campi *genuinamente non lineari* → possono
@@ -633,7 +696,7 @@ invece l'esistenza di **autodirezioni distinte** con lo stesso autovalore (modi 
 </details>
 
 <details>
-<summary><strong>Concetto [N2] — tabella iperbolico/ellittico e caratteristiche entranti (sub vs super)</strong></summary>
+<summary><strong>Concetto — tabella iperbolico/ellittico e caratteristiche entranti (sub vs super)</strong></summary>
 
 | Regime | Eq. **stazionarie** (vs $x$) | Eq. **non stazionarie** $(x,t)$ | Segni di $\lambda$ | Caratt. che **entrano** a un ingresso |
 |---|---|---|---|---|
@@ -648,7 +711,7 @@ dominio (è l'informazione che risale la corrente).
 </details>
 
 <details>
-<summary><strong>Concetto [N3] — come leggere i coni: avanti nel tempo, "indietro" nello spazio</strong></summary>
+<summary><strong>Concetto — come leggere i coni: avanti nel tempo, "indietro" nello spazio</strong></summary>
 
 Nelle figure i coni ora hanno **frecce**: nere = direzione di lettura verso il **futuro** (alto), grigie =
 verso il **passato** (basso). Il punto chiave: **il tempo va sempre avanti**. $\lambda_1=u-a<0$ significa
@@ -660,7 +723,7 @@ contorno di valle). Non c'è nessun viaggio nel passato: solo propagazione **spa
 </details>
 
 <details>
-<summary><strong>Approfondimento [N4] — perché passare al non stazionario conviene (e quanto costa)</strong></summary>
+<summary><strong>Approfondimento — perché passare al non stazionario conviene (e quanto costa)</strong></summary>
 
 Sì: anche se un problema **stazionario** è in genere più economico, davanti a un campo **misto**
 (sub+supersonico, es. urto staccato) conviene rendere tutto **non stazionario** e **marciare nel tempo**.
@@ -676,7 +739,7 @@ time-marching / *pseudo-transient continuation* è lo standard.
 </details>
 
 <details>
-<summary><strong>Concetto [N5] — tabella: variabili conservative vs primitive vs caratteristiche</strong></summary>
+<summary><strong>Concetto — tabella: variabili conservative vs primitive vs caratteristiche</strong></summary>
 
 | Tipo | Variabili (Eulero 1D) | Forma | Pro / a cosa servono |
 |---|---|---|---|
@@ -690,7 +753,7 @@ Stessa fisica, tre "lenti": si **evolve** in conservative, si **analizza/impone*
 </details>
 
 <details>
-<summary><strong>Concetto [N6] — perché le compatibilità chiedono che $W_k$ non vari</strong></summary>
+<summary><strong>Concetto — perché le compatibilità chiedono che $W_k$ non vari</strong></summary>
 
 Non è un'ipotesi aggiuntiva: è **ciò che dice l'equazione** una volta diagonalizzata. Lungo la
 caratteristica $dx/dt=\lambda_k$ la PDE $\partial_t W_k+\lambda_k\partial_x W_k=0$ diventa la **ODE**
@@ -701,7 +764,7 @@ compatibilità" = la relazione che deve valere **lungo** la caratteristica perch
 </details>
 
 <details>
-<summary><strong>Concetto [N7] — tabella dei 3 invarianti</strong></summary>
+<summary><strong>Concetto — tabella dei 3 invarianti</strong></summary>
 
 | Famiglia | $\lambda$ | Variabile/invariante | Significato |
 |---|---|---|---|
@@ -715,7 +778,7 @@ $a$ in un punto; $S$ chiude la termodinamica.
 </details>
 
 <details>
-<summary><strong>Concetto [N8] — gli invarianti di Riemann valgono solo nell'omoentropico?</strong></summary>
+<summary><strong>Concetto — gli invarianti di Riemann valgono solo nell'omoentropico?</strong></summary>
 
 Le **equazioni di compatibilità** $dW_i=0$ lungo $\lambda_i$ valgono **sempre**. Ma diventano gli
 **invarianti di Riemann semplici** $J^{\pm}=u\pm 2a/(\gamma-1)$ solo se l'**entropia è uniforme**
@@ -745,7 +808,7 @@ $W_1(P)=W_1(B)$, $W_3(P)=W_3(A)$.
 </details>
 
 <details>
-<summary><strong>Concetto [27] — Rankine–Hugoniot per Eulero: perché il flusso $\rho u$? E le altre</strong></summary>
+<summary><strong>Concetto — Rankine–Hugoniot per Eulero: perché il flusso $\rho u$? E le altre</strong></summary>
 
 RH per Eulero (massa e q. di moto):
 
@@ -766,7 +829,7 @@ Le tre **insieme** legano monte/valle (Hugoniot). La massa è solo l'esempio pi�
 </details>
 
 <details>
-<summary><strong>Concetto [N9] — le due figure del pistone danno informazioni diverse</strong></summary>
+<summary><strong>Concetto — le due figure del pistone danno informazioni diverse</strong></summary>
 
 Sì, sono complementari:
 - **1ª figura** (setup generale): traiettoria del pistone, onde $\lambda_3$ **emesse nel gas**, formazione
@@ -781,13 +844,18 @@ Una è "qualitativa" (cosa succede), l'altra "quantitativa" (come si risolve).
 </details>
 
 <details>
-<summary><strong>Concetto [N10] — la legge di moto del pistone (linea nera) e perché questa</strong></summary>
+<summary><strong>Concetto — la legge di moto del pistone (linea nera) e perché questa</strong></summary>
 
-La **linea nera continua** è la **traiettoria del pistone** nel piano $(x,t)$; la sua **pendenza è la
-velocità** (è un grafico $x$–$t$). Quindi:
-- tratto **verticale** in basso → pistone **fermo** ($v=0$, posizione costante);
-- tratto **curvo** → **moto accelerato** (pendenza che cresce = velocità che aumenta);
-- tratto **rettilineo** → **velocità costante** (pendenza costante).
+La **linea nera continua** è la **traiettoria del pistone** nel piano $(x,t)$. Attenzione alla
+convenzione: qui **$t$ è in ordinata e $x$ in ascissa**, quindi la **pendenza** della linea è
+$\dfrac{dt}{dx}=\dfrac{1}{v}$, cioè l'**inverso** della velocità (non la velocità!). Di conseguenza:
+- tratto **verticale** in basso → pendenza infinita → pistone **fermo** ($v=0$);
+- tratto **curvo**→ la linea si **inclina** progressivamente verso l'asse $x$ (pendenza che **diminuisce**)
+  → **velocità crescente**= **moto accelerato**;
+- tratto **rettilineo inclinato**→ pendenza costante → **velocità costante**.
+
+Regola da tenere a mente in **tutto** il capitolo: **più una caratteristica è verticale, più è lenta**;
+più è inclinata verso l'orizzontale, più è veloce ($v=1/\text{pendenza}$).
 
 **Perché questa legge?** Soprattutto per **semplicità** didattica, ma è anche **fisicamente
 rappresentativa**: un pistone che parte da fermo, accelera e poi va a regime. La **fase accelerata** è
@@ -797,7 +865,7 @@ ciò che genera onde di compressione via via più veloci → **urto**. **Applica
 </details>
 
 <details>
-<summary><strong>Concetto [N11] — pistone al punto morto e a tenuta stagna</strong></summary>
+<summary><strong>Concetto — pistone al punto morto e a tenuta stagna</strong></summary>
 
 Si immagina il pistone che parte dal **punto morto** (estremità chiusa del tubo): solo così ha senso dire
 che **a sinistra del pistone non c'è gas** (vuoto). Inoltre si assume **tenuta stagna**: nessuna
@@ -807,17 +875,17 @@ pistone avanza.
 </details>
 
 <details>
-<summary><strong>Concetto [N12] — moto accelerato ⇒ pendenze diverse ⇒ urto (come Burgers)</strong></summary>
+<summary><strong>Concetto — moto accelerato ⇒ pendenze diverse ⇒ urto (come Burgers)</strong></summary>
 
 Nella fase **accelerata** il pistone emette onde $\lambda_3=u+a$ a velocità **crescente** (il gas dietro è
-sempre più veloce e caldo). Caratteristiche con **inclinazioni diverse** → **convergono** → **urto**. È lo
+sempre più veloce e caldo). Caratteristiche con **inclinazioni diverse**→ **convergono**→ **urto**. È lo
 stesso meccanismo di **Burgers** (caratteristiche non parallele che collidono), solo che qui la velocità
 caratteristica è $u+a$ (acustica) invece di $u$.
 
 </details>
 
 <details>
-<summary><strong>Concetto [N13] — invarianti di Riemann prima e dopo l'urto</strong></summary>
+<summary><strong>Concetto — invarianti di Riemann prima e dopo l'urto</strong></summary>
 
 **Prima** dell'urto la compressione è **isentropica/omoentropica** (regolare) → si possono usare gli
 **invarianti di Riemann** $J^{\pm}$ per propagare lo stato lungo le caratteristiche. **Attraverso** l'urto
@@ -829,7 +897,7 @@ la sua entropia).
 </details>
 
 <details>
-<summary><strong>Concetto [N14] — perché un punto $K$ "arbitrario"</strong></summary>
+<summary><strong>Concetto — perché un punto $K$ "arbitrario"</strong></summary>
 
 È una scelta **fisica di generalità**, non solo grafica: si prende un punto **qualunque** del gas per far
 vedere che **in ogni** punto passano **tre** caratteristiche. La posizione (a destra, dove le linee non si
@@ -838,7 +906,7 @@ sovrappongono) è scelta per **leggibilità**, ma il messaggio vale per tutti i 
 </details>
 
 <details>
-<summary><strong>Concetto [N15] — perché dal pistone partono solo $\lambda_3$ (e il "vuoto" non propaga suono)</strong></summary>
+<summary><strong>Concetto — perché dal pistone partono solo $\lambda_3$ (e il "vuoto" non propaga suono)</strong></summary>
 
 Dalla **faccia del pistone** le onde che entrano **nel gas** sono quelle **acustiche in avanti**
 $\lambda_3=u+a$: il pistone spinge → manda una compressione che corre **in avanti** nel gas. Per questo le
@@ -854,7 +922,7 @@ linee dal pistone sono $\lambda_3$.
 </details>
 
 <details>
-<summary><strong>Concetto [N16] — perché la zona delle condizioni iniziali è quella gialla</strong></summary>
+<summary><strong>Concetto — perché la zona delle condizioni iniziali è quella gialla</strong></summary>
 
 La **zona gialla** è il **gas indisturbato** davanti, **non ancora raggiunto** dalle perturbazioni del
 pistone (sta "sotto" le prime onde/l'urto). Conserva quindi lo **stato iniziale noto** (uniforme): da lì
@@ -863,7 +931,7 @@ si leggono i **dati noti** per propagarli lungo le caratteristiche e chiudere i 
 </details>
 
 <details>
-<summary><strong>Concetto [N17] — le altre linee nella seconda figura del pistone</strong></summary>
+<summary><strong>Concetto — le altre linee nella seconda figura del pistone</strong></summary>
 
 Sono la **costruzione caratteristica** per trovare lo stato in $P$: la $\lambda_1$ da $P$ scende a un punto
 **noto** (4) nella zona iniziale; la $\lambda_3$ collega $P$ al **pistone**; la $\lambda_2$ è il percorso
@@ -875,7 +943,7 @@ Sono la **costruzione caratteristica** per trovare lo stato in $P$: la $\lambda_
 ## 7. Problema di Riemann e tubo d'urto di Sod
 
 <details>
-<summary><strong>Figura [21] — Sod: dato iniziale, struttura $x$–$t$ e profili</strong></summary>
+<summary><strong>Figura — Sod: dato iniziale, struttura $x$–$t$ e profili</strong></summary>
 
 Problema di Riemann = sistema iperbolico con dato iniziale **discontinuo** tra due stati costanti. Sod:
 $(\rho_A,p_A,u_A)=(1,1,0)$ e $(\rho_B,p_B,u_B)=(0.125,0.1,0)$.
@@ -883,7 +951,7 @@ $(\rho_A,p_A,u_A)=(1,1,0)$ e $(\rho_B,p_B,u_B)=(0.125,0.1,0)$.
 ![Dato iniziale di Sod: due stati costanti A e B](images/lc_sod_dato_iniziale.png)
 
 Rimossa la membrana: **fascio di espansione** (sinistra), **superficie di contatto** (centro), **onda
-d'urto** (destra).
+d'urto**(destra).
 
 ![Diagramma x-t di Sod: espansione, superficie di contatto, urto](images/lc_sod_xt.png)
 ![Profilo di pressione p(x,t1): solo espansione + urto](images/lc_sod_pressione.png)
@@ -892,7 +960,7 @@ d'urto** (destra).
 </details>
 
 <details>
-<summary><strong>Approfondimento [Q10] — invarianti di Riemann, struttura di Sod, casistiche</strong></summary>
+<summary><strong>Approfondimento — invarianti di Riemann, struttura di Sod, casistiche</strong></summary>
 
 **Invarianti di Riemann (omoentropico).** $J^{\pm}=u\pm 2a/(\gamma-1)$ costanti lungo $u\pm a$; l'entropia
 $S$ costante lungo $u$. Servono a "trasportare" lo stato lungo le caratteristiche e chiudere i problemi
@@ -918,7 +986,7 @@ all'interfaccia è positiva (il gas va da alta a bassa pressione).
 </details>
 
 <details>
-<summary><strong>Concetto [N18] — il problema di Riemann in generale, e cosa aggiunge Sod</strong></summary>
+<summary><strong>Concetto — il problema di Riemann in generale, e cosa aggiunge Sod</strong></summary>
 
 ![Problema di Riemann: soluzione autosimile, 3 onde dalla discontinuità iniziale](images/lc_riemann_generale.svg)
 
@@ -927,6 +995,11 @@ costanti** $U_L,U_R$ separati da **una sola discontinuità** in $x=0$. La soluzi
 (dipende solo da $x/t$) ed è composta da **un'onda per ogni famiglia** che parte dall'origine. Per Eulero
 (3 famiglie): una **1-onda** (acustica indietro: urto *o* rarefazione), una **2-onda** (contatto), una
 **3-onda** (acustica avanti: urto *o* rarefazione); fra di esse le regioni "star" $L^\*,R^\*$.
+
+> Nota: qui le onde **partono dall'origine** solo perché l'**unica discontinuità** del dato sta in $x=0$.
+> In un campo **regolare** le 3 caratteristiche partono invece da **ogni** punto (vedi il toggle
+> "le caratteristiche partono da OGNI punto"); il problema di Riemann è il "mattone" locale che i metodi
+> numerici risolvono a ogni interfaccia.
 
 **Tubo di Sod = un Riemann problem *specifico*, con ipotesi aggiuntive:**
 1. **stesso gas ideale** sui due lati (stesso $\gamma$);
@@ -941,16 +1014,16 @@ seconda degli stati. *(Distinguere i due evita di confonderli: Sod è un caso pa
 </details>
 
 <details>
-<summary><strong>Concetto [N19] — il "background matematico" che produce espansione+contatto+urto</strong></summary>
+<summary><strong>Concetto — il "background matematico" che produce espansione+contatto+urto</strong></summary>
 
 È **lo stesso** Eulero 1D non stazionario (autovalori $u,u\pm a$): **non** serve un'altra equazione. Ciò
-che produce i tre tipi d'onda è la **natura di ciascun campo caratteristico** + il dato **discontinuo**:
+che produce i tre tipi d'onda è la **natura di ciascun campo caratteristico**+ il dato **discontinuo**:
 - campi **1 e 3** (acustici) **genuinamente non lineari** ($\nabla\lambda\!\cdot r\neq0$) → la loro onda è
   un **urto** (compressione) **o** un **ventaglio di rarefazione** (espansione);
 - campo **2** (entropia) **linearmente degenere** ($\nabla\lambda\!\cdot r=0$) → **contatto** (né si
   irripidisce né si apre).
 
-Quindi: **stesse equazioni + dato discontinuo + autosimilarità** → 3 onde; il **tipo** dipende da
+Quindi: **stesse equazioni + dato discontinuo + autosimilarità**→ 3 onde; il **tipo** dipende da
 genuina-nonlinearità vs degenerazione lineare e dal **segno del salto**. Risolvere Sod = trovare la
 regione star imponendo $p^\*$ e $u^\*$ **uguali** ai due lati del contatto, poi collegare $L\!\to\!L^\*$
 (1-onda) e $R\!\to\!R^\*$ (3-onda).
@@ -958,7 +1031,7 @@ regione star imponendo $p^\*$ e $u^\*$ **uguali** ai due lati del contatto, poi 
 </details>
 
 <details>
-<summary><strong>Figura [N20] — profili di $\rho,\ p,\ u,\ T$ a $t=t_1$ (commentati)</strong></summary>
+<summary><strong>Figura — profili di $\rho,\ p,\ u,\ T$ a $t=t_1$ (commentati)</strong></summary>
 
 ![Profili di densità, pressione, velocità, temperatura nel tubo di Sod](images/lc_sod_profili.svg)
 
@@ -975,7 +1048,7 @@ sulla densità), **non** la pressione.
 </details>
 
 <details>
-<summary><strong>Approfondimento [N21] — le caratteristiche partono da OGNI punto: come si gestisce</strong></summary>
+<summary><strong>Approfondimento — le caratteristiche partono da OGNI punto: come si gestisce</strong></summary>
 
 *(Approfondimento, molto utile.)* Finora un solo punto e una sola fenomenologia; in realtà il "ventaglio"
 di 3 caratteristiche parte da **ogni** punto → il piano $(x,t)$ è **coperto da tre famiglie** di
@@ -995,21 +1068,51 @@ delle caratteristiche **motiva** gli schemi **upwind/Godunov** (vedi `schemi_vol
 ## 8. Condizioni al contorno per Eulero 1D non stazionario
 
 <details>
-<summary><strong>Inquadramento — la regola delle caratteristiche entranti [12]</strong></summary>
+<summary><strong>Inquadramento — la regola delle caratteristiche entranti </strong></summary>
 
 **# condizioni da imporre su un bordo = # caratteristiche entranti** in quel bordo. In 1D le famiglie sono
 3 ($u-a,\ u,\ u+a$); il loro **segno** (regime sub/supersonico) decide quante entrano. È la logica delle
 **esercitazioni** quando si impongono pressione/velocità/temperatura ai contorni nei vari regimi.
 
+**Perché proprio le *entranti*.** Una caratteristica **entrante** porta informazione **da fuori** il
+dominio: quel dato il calcolo non ce l'ha, quindi va **imposto** (è una BC). Una caratteristica **uscente**
+porta informazione **dall'interno** verso il bordo: quel valore lo **conosco già** risalendo la
+caratteristica fino alla prima cella interna → **non si impone, si estrapola** (compatibilità
+$W_k=W_k^{\text{interno}}$). Imporre una BC su una caratteristica uscente sarebbe **sovra-determinare** il
+problema (dato fisicamente incoerente, possibili riflessioni spurie).
+
 </details>
 
 <details>
-<summary><strong>Approfondimento [N22] — le condizioni al contorno in dettaglio (ricetta + tabella)</strong></summary>
+<summary><strong>Figura — le quattro casistiche a confronto (ingresso/uscita, sub/super)</strong></summary>
+
+![Le 4 casistiche delle condizioni al contorno di Eulero 1D: ingresso/uscita supersonico/subsonico](images/lc_bc_quattro_casi.svg)
+
+Stessa logica nei quattro casi (le caratteristiche **verdi entrano**→ richiedono BC; le **grigie escono**
+→ si estrapolano). Il caso $\lambda_1=u-a$ è il "discriminante": in **subsonico** $u<a\Rightarrow\lambda_1<0$.
+
+| | Bordo | $\lambda_1=u-a$ | $\lambda_2=u$ | $\lambda_3=u+a$ | Entranti | **# BC** |
+|---|---|---|---|---|---|---|
+| **A** Ingresso supersonico | sx | $+$ (entra) | $+$ | $+$ | 3 | **3** |
+| **B** Ingresso subsonico | sx | $-$ (**esce**) | $+$ | $+$ | 2 | **2** |
+| **C** Uscita supersonica | dx | $+$ (esce) | $+$ | $+$ | 0 | **0** |
+| **D** Uscita subsonica | dx | $-$ (**rientra**) | $+$ | $+$ | 1 | **1** |
+
+**Ingresso subsonico (B):** non si impone la $\lambda_1$ perché è **uscente** (a un ingresso a sinistra,
+$\lambda_1<0$ punta **fuori** dal dominio): la si **estrapola** risalendola dall'interno (porta $W_1$ dal
+campo verso il bordo). Si impongono invece le 2 entranti ($\lambda_2,\lambda_3$ → es. $p_0,T_0$).
+**Uscita subsonica (D):** specularmente, $\lambda_1<0$ **rientra** nel dominio dall'esterno → va **imposta**
+1 BC (es. pressione statica), le altre 2 si estrapolano.
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — le condizioni al contorno in dettaglio (ricetta + tabella)</strong></summary>
 
 **Ricetta generale (vale per qualsiasi bordo e regime):**
 1. Sul bordo traccia le 3 caratteristiche e guarda i **segni** di $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$ (dipendono dal regime e dal verso del flusso).
 2. Conta quante **entrano** nel dominio (portano informazione da **fuori**): tante quante sono = **numero di BC da imporre**.
-3. Le caratteristiche **uscenti** portano informazione **dall'interno** → le grandezze corrispondenti si **estrapolano** dall'interno (compatibilità $W_k=W_k^{\text{interno}}$), **non** si impongono.
+3. Le caratteristiche **uscenti** portano informazione **dall'interno**→ le grandezze corrispondenti si **estrapolano** dall'interno (compatibilità $W_k=W_k^{\text{interno}}$), **non** si impongono.
 4. BC imposte + compatibilità uscenti = sistema completo → si ricava lo **stato al bordo**.
 
 **Tabella riassuntiva** (flusso entrante con $u>0$):
@@ -1063,7 +1166,7 @@ artificiali; per evitarle si usano **strati assorbenti** (utile in LES).
 
 ![Ingresso subsonico: λ1 risale, λ2,λ3 entrano](images/lc_bc_ingresso_subsonico.png)
 
-$\lambda_3,\lambda_2>0$ entrano; $\lambda_1=u-a<0$ **risale** → **2** BC (tipicamente $T_0$ e $p_0$, o
+$\lambda_3,\lambda_2>0$ entrano; $\lambda_1=u-a<0$ **risale**→ **2** BC (tipicamente $T_0$ e $p_0$, o
 entropia + entalpia totale) con $W_1=a/\phi-u$ noto dall'interno. Si ricava $a$ (eq. 2° grado, radice
 positiva), poi $u,T,p,\rho$.
 
@@ -1084,7 +1187,7 @@ si usa l'invariante: $\{u=0,\ a/\phi+u=W_{3L},\ S=S_L\}$ → $a$, poi $T,p,\rho$
 ## 9. Modelli a confronto e ruolo delle Rankine–Hugoniot
 
 <details>
-<summary><strong>Figura [24] — mappa dei modelli (mermaid)</strong></summary>
+<summary><strong>Figura — mappa dei modelli (mermaid)</strong></summary>
 
 ```mermaid
 graph TD
@@ -1153,33 +1256,12 @@ modelli **con discontinuità** (scalare non lineare *e* sistemi). Sul lineare de
 | --- | --- |
 | Linea caratteristica (scalare → sistema → multi-D) | $\frac{du}{dt}=u_t+\frac{dx}{dt}u_x$ vs $u_t+au_x=0$ → $\frac{dx}{dt}=a$; $f'(u)$; $\lambda_k$; cono multi-D |
 | Linea caratteristica via differenziale + Cramer | $\det=dx-a\,dt=0\Rightarrow dx/dt=a$ |
-| **[25] Rankine–Hugoniot per Burgers** | $f=u^2/2\Rightarrow s=(u_A+u_B)/2$ |
+| **Rankine–Hugoniot per Burgers** | $f=u^2/2\Rightarrow s=(u_A+u_B)/2$ |
 | Rankine–Hugoniot dal bilancio integrale | $\frac{d}{dt}\int U+[\![F]\!]=0\Rightarrow s[\![U]\!]=[\![F]\!]$ |
 | Compatibilità (sistema) | $L^{-1}(U_t+AU_x)=0\Rightarrow dW_k/dt=0$ lungo $\lambda_k$ |
-| **[Q2] Matrice $A'$ di Eulero (primitive)** | da massa/q.moto/energia → $A'(\rho,u,p)$; $\det(A'-\lambda I)=0\Rightarrow\lambda=u,u\pm a$ |
+| **Matrice $A'$ di Eulero (primitive)** | da massa/q.moto/energia → $A'(\rho,u,p)$; $\det(A'-\lambda I)=0\Rightarrow\lambda=u,u\pm a$ |
 | Autovalori di Eulero 1D | $(\lambda-u)(\lambda-u-a)(\lambda-u+a)=0$ |
 | Invarianti di Riemann (omoentropico) | $dW_{1,3}=\frac{da}{\phi}\mp du=0\Rightarrow J^{\pm}=u\pm\frac{2a}{\gamma-1}$ |
 
 </details>
 
-<details>
-<summary><strong>Mappa — domande → sezioni (tracciabilità)</strong></summary>
-
-**Batch precedente (1–30):** 1 → §1 "iperboliche"; 2,3,4 → §1; 5,6,10,11,13 → §1 figura $(x,t)$;
-7,8,12,18 → §1 BC + §8; 9,23 → figure SVG + script; 15 → §1 derivate; 16 → §1 derivazione; 14,19 → onda
-periodica/PDF; 20,21,22,24,25,26,28,29 → §2; 27 → §6; 30 → flashcard.
-
-**Batch §5 (questo, 1–11):** 1 → §5 "primitive vs conservative" (+ codice/Latex); 2 → §5 "come si ricava
-$A'$" (+ Dimostrazioni + flashcard); 3 → §5 "$A'$ non simmetrica"; 4 → §5 "reali e distinti" + "autovalori
-$u,u\pm a$"; 5 → §5 "autovalori coincidenti"; 6 → §5 "iperbolico anche in subsonico"; 7 → §5 figura
-dominio + "indietro nel tempo"; 8 → §5 "urto curvo staccato"; 9 → §5 "calcolo autovettori"; 10 → §5/§7
-"invarianti di Riemann + Sod"; 11 → riorganizzazione in toggle + legenda (questo).
-
-**Batch §5–§8 (tag [N1]–[N22]):** N1 tipi di onde · N2 tabella sub/super · N3 lettura coni (frecce) ·
-N4 costo non stazionario · N5 tabella conservative/primitive/caratteristiche · N6 perché compatibilità ·
-N7 tabella 3 invarianti · N8 omoentropico vs no → tutti in **§5**. N9–N17 (pistone: due figure, legge di
-moto, punto morto, urto, invarianti pre/post urto, punto $K$, onde $\lambda_3$, zona gialla, altre linee)
-→ **§6**. N18 Riemann generale vs Sod · N19 background matematico · N20 profili $\rho,p,u,T$ · N21
-caratteristiche da ogni punto → **§7**. N22 condizioni al contorno in dettaglio → **§8**.
-
-</details>

@@ -31,7 +31,71 @@
 
 # 🟦 PARTE TEORICA (domande realmente proposte)
 
-## A) Volumi finiti: gradienti, ricostruzione, limitatori
+## 1) Leggi di conservazione e sistema di Eulero — `teoria/bilancio.md`
+
+<details>
+<summary><strong>🟦 [T] Equazione di Burgers, collegandosi ai casi delle condizioni al contorno</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (modello di Burgers),
+> `teoria/caratteristiche.md` (condizioni al contorno via caratteristiche), `teoria/metodi_numerici.md`.
+> Attesi: Burgers come **modello scalare non lineare** (formazione di urti, onde di rarefazione,
+> condizione di entropia), e come si traducono le **condizioni al contorno** a seconda del segno
+> delle caratteristiche.
+
+</details>
+
+
+<details>
+<summary><strong>🟦 [T] Equazione di Burgers</strong></summary>
+
+> 📌 *Risposta da compilare.* Variante "secca" della precedente. Riferimento: `teoria/bilancio.md`.
+
+</details>
+
+## 2) Linee caratteristiche: pistone, Sod, condizioni al contorno — `teoria/caratteristiche.md`
+
+<details>
+<summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`.
+> Attesi: pistone che accelera in un condotto → **compressione progressiva** → coalescenza delle
+> onde di compressione in un **urto** (caratteristiche che convergono); caso speculare di espansione
+> con pistone che retrocede.
+
+</details>
+
+
+<details>
+<summary><strong>🟦 [T] Tubo di Sod</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/caratteristiche.md`.
+> Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
+> espansione + contatto + urto, uso come **test di validazione** degli schemi.
+
+</details>
+
+
+<details>
+<summary><strong>🟦 [T] Outlet subsonico (e in generale le condizioni al contorno in base al regime)</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`, `teoria/report_QA.md`
+> (Domande 12–13). Attesi: numero di **caratteristiche entranti** = numero di condizioni da imporre.
+>
+> **Le 4 casistiche** (vedi figura `teoria/images/lc_bc_quattro_casi.svg`):
+>
+> | Caso | Bordo | Segni $\lambda_1,\lambda_2,\lambda_3$ | Entranti | **# BC** | Cosa si impone |
+> |---|---|---|---|---|---|
+> | **A** Ingresso supersonico | sx | $+,+,+$ | 3 | **3** | $p_0,T_0,M$ (o $u,S$+1 termo) |
+> | **B** Ingresso subsonico | sx | $-,+,+$ | 2 | **2** | $p_0,T_0$; $\lambda_1$ esce → si estrapola |
+> | **C** Uscita supersonica | dx | $+,+,+$ | 0 | **0** | nulla (tutto estrapolato) |
+> | **D** Uscita subsonica | dx | $-,+,+$ | 1 | **1** | $p$ statica (rifl.) o invariante $W_1$ (non rifl.) |
+>
+> Logica: le **entranti** portano info da fuori → si **impongono**; le **uscenti** portano info dall'interno → si **estrapolano** (risalendo la caratteristica). Dettaglio in `teoria/caratteristiche.md` §8.
+
+</details>
+
+## 3) Schemi a volumi finiti: gradienti, ricostruzione, limitatori — `teoria/schemi_volumi_finiti.md`
+
 
 <details>
 <summary><strong>🟦 [T] Calcolo del gradiente nelle celle (Gauss–Green e minimi quadrati pesati) e all'interfaccia per i termini diffusivi</strong></summary>
@@ -93,7 +157,8 @@
 
 </details>
 
-## B) Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione
+## 4) Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione — `teoria/schemi_volumi_finiti.md`
+
 
 <details>
 <summary><strong>🟦 [T] Metodo di Godunov</strong></summary>
@@ -151,7 +216,8 @@
 
 </details>
 
-## C) Proprietà dei metodi, errore di troncamento, stabilità, integrazione temporale
+## 5) Proprietà dei metodi, errore, stabilità, integrazione temporale — `teoria/metodi_numerici.md`, `teoria/metodi_numerici_ode.md`
+
 
 <details>
 <summary><strong>🟦 [T] Parlare delle proprietà dei metodi numerici</strong></summary>
@@ -209,56 +275,8 @@
 
 </details>
 
-## D) Equazioni e fisica del campo: Eulero, Burgers, Sod, pistone, condizioni al contorno
+## 6) Turbolenza — `teoria/turbolenza.md`
 
-<details>
-<summary><strong>🟦 [T] Equazione di Burgers, collegandosi ai casi delle condizioni al contorno</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (modello di Burgers),
-> `teoria/caratteristiche.md` (condizioni al contorno via caratteristiche), `teoria/metodi_numerici.md`.
-> Attesi: Burgers come **modello scalare non lineare** (formazione di urti, onde di rarefazione,
-> condizione di entropia), e come si traducono le **condizioni al contorno** a seconda del segno
-> delle caratteristiche.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Equazione di Burgers</strong></summary>
-
-> 📌 *Risposta da compilare.* Variante "secca" della precedente. Riferimento: `teoria/bilancio.md`.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`.
-> Attesi: pistone che accelera in un condotto → **compressione progressiva** → coalescenza delle
-> onde di compressione in un **urto** (caratteristiche che convergono); caso speculare di espansione
-> con pistone che retrocede.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Tubo di Sod</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/caratteristiche.md`.
-> Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
-> espansione + contatto + urto, uso come **test di validazione** degli schemi.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Outlet subsonico (e in generale le condizioni al contorno in base al regime)</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`, `teoria/report_QA.md`
-> (Domande 12–13). Attesi: numero di **caratteristiche entranti** = numero di condizioni da imporre;
-> in **outlet subsonico** una caratteristica rientra → si impone la **pressione statica** e si
-> estrapola il resto.
-
-</details>
-
-## E) Turbolenza
 
 <details>
 <summary><strong>🟦 [T] RANS</strong></summary>
@@ -279,7 +297,8 @@
 
 </details>
 
-## F) Turbomacchine
+## 7) Turbomacchine — `teoria/turbomacchine.md`
+
 
 <details>
 <summary><strong>🟦 [T] Metodi per valutare l'interazione statore–rotore</strong></summary>
@@ -291,7 +310,8 @@
 
 </details>
 
-## G) Modelli di ordine ridotto
+## 8) Modelli di ordine ridotto — `teoria/modelli_ordine_ridotto.md`
+
 
 <details>
 <summary><strong>🟦 [T] Modelli di ordine ridotto: POD</strong></summary>
@@ -302,7 +322,8 @@
 
 </details>
 
-## H) Flussi reagenti
+## 9) Flussi reagenti — `teoria/reacting_flows.md`
+
 
 <details>
 <summary><strong>🟦 [T] Come si affronta il problema dei flussi reagenti — senza scrivere equazioni</strong></summary>
@@ -314,7 +335,8 @@
 
 </details>
 
-## I) Ottimizzazione
+## 10) Ottimizzazione — (esercitazione; nessun capitolo di teoria dedicato)
+
 
 <details>
 <summary><strong>🟦 [T] Ottimizzazione di forma</strong></summary>

@@ -208,10 +208,16 @@ s = 0.5 * (uLs + uRs)                  # velocita' urto (Rankine-Hugoniot)
 tb = 1.0 / (uLs - uRs)                 # tempo di breaking (rampa lunga 1)
 
 fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5.6))
-# x-t: caratteristiche x = xi + u0(xi) t (pendenza diversa -> convergono)
+# x-t: caratteristiche x = xi + u0(xi) t (pendenza diversa -> convergono),
+#      CLIPPATE sull'urto (le caratteristiche TERMINANO sull'urto, non lo attraversano)
 for xi in np.arange(-1.5, 2.61, 0.2):
     u = u0_shock(np.array([xi]))[0]
-    axL.plot([xi, xi + u * Tmax], [0, Tmax], color=GREEN, lw=1.1, alpha=0.9)
+    if abs(u - s) > 1e-9:
+        t_hit = (0.5 - xi) / (u - s)          # intersezione con la retta d'urto x=0.5+s t
+    else:
+        t_hit = Tmax
+    t_end = Tmax if (t_hit <= 0 or t_hit > Tmax) else t_hit
+    axL.plot([xi, xi + u * t_end], [0, t_end], color=GREEN, lw=1.1, alpha=0.9)
 # urto a partire dal breaking
 x_b = 0.5 + uLs * tb  # posizione approssimata di formazione
 axL.plot([0.5 + s * tb, 0.5 + s * Tmax], [tb, Tmax], color="red", lw=2.6,
@@ -434,3 +440,50 @@ fig.tight_layout()
 fig.savefig(os.path.join(OUT, "lc_caratteristiche_ovunque.svg"))
 plt.close(fig)
 print("   lc_caratteristiche_ovunque.svg")
+
+# ===========================================================================
+# 10) LE 4 CASISTICHE DI CONDIZIONI AL CONTORNO (Eulero 1D)
+# ===========================================================================
+def bc_case(ax, lambdas, side, title, nbc):
+    """side='in' bordo a sinistra (dominio a destra); 'out' bordo a destra (dominio a sinistra)."""
+    Tb = 3.0
+    xb = 0.0
+    ax.axvline(xb, color="k", lw=3)                       # bordo
+    # dominio ombreggiato
+    if side == "in":
+        ax.axvspan(0, 4, color="0.96")
+    else:
+        ax.axvspan(-4, 0, color="0.96")
+    names = [r"$\lambda_1$", r"$\lambda_2$", r"$\lambda_3$"]
+    Larr = 2.6
+    n_in = 0
+    for lam, nm in zip(lambdas, names):
+        into = (lam > 0) if side == "in" else (lam < 0)   # entra nel dominio?
+        col = "tab:green" if into else "0.55"
+        nrm = (lam**2 + 1.0) ** 0.5                        # freccia a lunghezza fissa (conta la direzione)
+        ex, ey = xb + Larr * lam / nrm, Larr / nrm
+        ax.annotate("", xy=(ex, ey), xytext=(xb, 0),
+                    arrowprops=dict(arrowstyle="-|>", color=col, lw=2.4))
+        ax.text(ex + 0.12 * (1 if lam >= 0 else -1), ey + 0.05, nm, color=col,
+                fontsize=11, ha="center")
+        n_in += into
+    ax.plot(xb, 0, "ko", ms=6)
+    ax.text(0.5, 0.5, f"entranti: {n_in}\n→ {nbc} BC", transform=ax.transAxes,
+            fontsize=10, ha="center", fontweight="bold",
+            bbox=dict(fc="#fff3b0", ec="0.6"))
+    ax.set_xlim(-3.2, 3.2); ax.set_ylim(-0.2, Tb + 0.4)
+    ax.set_xlabel("x"); ax.set_ylabel("t"); ax.set_title(title, fontsize=11)
+
+fig, axs = plt.subplots(2, 2, figsize=(12, 9))
+sub = [-0.5, 0.5, 1.5]      # subsonico u=0.5, a=1
+sup = [1.0, 2.0, 3.0]       # supersonico u=2, a=1
+bc_case(axs[0,0], sup, "in",  "A) INGRESSO supersonico (tutte entrano)", 3)
+bc_case(axs[0,1], sub, "in",  "B) INGRESSO subsonico ($\\lambda_1$ esce)", 2)
+bc_case(axs[1,0], sup, "out", "C) USCITA supersonica (tutte escono)", 0)
+bc_case(axs[1,1], sub, "out", "D) USCITA subsonica ($\\lambda_1$ rientra)", 1)
+fig.suptitle(r"Condizioni al contorno per Eulero 1D: #BC = #caratteristiche ENTRANTI "
+             r"(verde). Pendenza $dt/dx=1/\lambda$", fontsize=12)
+fig.tight_layout(rect=(0, 0, 1, 0.96))
+fig.savefig(os.path.join(OUT, "lc_bc_quattro_casi.svg"))
+plt.close(fig)
+print("   lc_bc_quattro_casi.svg")
