@@ -97,6 +97,23 @@ $$
     - **Natura:** Iperbolica.
     - **Fisica:** L'informazione viaggia lungo le **Caratteristiche** (direzione limitata dal cono di Mach). Si usano schemi "marching" espliciti.
 
+**Flowchart — classificare una PDE del 2° ordine e scegliere lo schema:**
+
+```mermaid
+graph TD
+    A["PDE: A uxx + B uxy + C uyy + ... = 0"] --> B["Calcola il discriminante<br/>Delta = B^2 - 4AC"]
+    B --> C{"segno di Delta?"}
+    C -->|"Delta < 0"| E["ELLITTICA<br/>(es. subsonico, M<1)<br/>info ovunque -> schemi CENTRATI / solutore implicito globale"]
+    C -->|"Delta = 0"| P["PARABOLICA<br/>(diffusione, eq. del calore)<br/>schemi impliciti / marching nel tempo"]
+    C -->|"Delta > 0"| H["IPERBOLICA<br/>(es. supersonico, M>1)<br/>info sulle caratteristiche -> schemi UPWIND / marching espliciti"]
+    E --> R["Potenziale linearizzato: (1-M^2)phixx+phiyy=0 -> il segno di (1-M^2) decide"]
+    H --> R
+```
+
+> Mnemonica: **stesso discriminante delle coniche** ($B^2-4AC$): $<0$ ellisse, $=0$ parabola, $>0$ iperbole.
+
+![Classificazione della PDE comprimibile vs Mach (discriminante) e cono di Mach](images/bilancio_classificazione_mach.svg)
+
 ---
 
 ## 2. Il Sistema di Eulero e il Flux Vector Splitting (FVS)
@@ -125,6 +142,19 @@ A = L \Lambda L^{-1}
 $$
 
 Dove gli autovalori per Eulero sono: $\lambda = \{u, u+c, u-c\}$.
+
+**Flowchart — dal sistema di Eulero alla decomposizione in onde (FVS):**
+
+```mermaid
+graph TD
+    A["Eulero divergente: dU/dt + dF/dx = 0"] --> B["Jacobiana A = dF/dU<br/>(forma quasi-lineare dU/dt + A dU/dx = 0)"]
+    B --> C{"A diagonalizzabile<br/>con autovalori reali?"}
+    C -->|"sì"| D["IPERBOLICO: A = L Lambda L^-1<br/>lambda = u, u+c, u-c"]
+    C -->|"no"| X["non iperbolico (qui non accade per Eulero)"]
+    D --> E["Variabili caratteristiche W = L^-1 U<br/>-> onde disaccoppiate"]
+    E --> F["Flux Vector Splitting: separo i flussi per segno di lambda<br/>F = F+ (onde verso destra) + F- (verso sinistra)"]
+    F --> G["Schemi UPWIND: ogni onda 'da monte'"]
+```
 
 </details>
 
@@ -162,6 +192,28 @@ $$(1 - M^2)\,\phi_{xx} + \phi_{yy} = 0$$
 > tipicamente **supersonico/iperbolico**.
 
 ## Modelli scalari e vettoriali
+
+**Mappa dei 4 archetipi** (due assi indipendenti: *scalare/vettoriale* = 1 incognita o sistema;
+*lineare/non lineare* = il flusso dipende o no dalla soluzione):
+
+```mermaid
+graph TD
+    ROOT["Legge di conservazione<br/>dU/dt + dF/dx = 0"] --> SC{"scalare o vettoriale?"}
+    SC -->|"1 incognita"| S["SCALARE"]
+    SC -->|"sistema"| V["VETTORIALE"]
+    S --> SL["+ LINEARE -> ADVEZIONE<br/>f=a*u, vel. d'onda a = cost"]
+    S --> SN["+ NON lineare -> BURGERS<br/>f=u^2/2, vel. d'onda f'(u)=u -> urti"]
+    V --> VL["+ LINEARE -> ACUSTICA / eq. d'onda<br/>A costante"]
+    V --> VN["+ NON lineare -> EULERO<br/>A(U), lambda=u,u+-c -> urti/contatto/espansione"]
+```
+
+| | **Lineare** ($f$ non dipende da $u$) | **Non lineare** ($f$ dipende da $u$) |
+|---|---|---|
+| **Scalare** (1 eq.) | advezione $f=au$ | Burgers $f=u^2/2$ |
+| **Vettoriale** (sistema) | acustica linearizzata | **Eulero** |
+
+> Il dettaglio fisico (caratteristiche, urti, Rankine–Hugoniot) è in
+> [`caratteristiche.md`](caratteristiche.md).
 
 <details>
 <summary><strong>Scalare Lineare (advezione lineare): perché "scalare", e il significato di $a$</strong></summary>
