@@ -74,6 +74,23 @@ $$Kn = \frac{\lambda}{L}.$$
 | $10^{-2} < Kn < 1$ | **Transizione** | DSMC (o cinetico) |
 | $Kn > 1$ | **Molecolare libero** | Boltzmann / DSMC |
 
+**Flowchart — quale modello in base a $Kn$:**
+
+```mermaid
+graph TD
+    A["Calcola Kn = lambda / L (locale: L = Q/|grad Q|, usa grad T)"] --> B{"valore di Kn?"}
+    B -->|"Kn < 0.01"| C["CONTINUO<br/>Navier-Stokes / CFD (gradienti)"]
+    B -->|"0.01 < Kn < 0.1"| D["SCIVOLAMENTO (slip)<br/>NS con BC di slip/jump"]
+    B -->|"0.1 < Kn < 1"| E["TRANSIZIONE<br/>DSMC / metodi cinetici"]
+    B -->|"Kn > 1"| F["MOLECOLARE LIBERO<br/>Boltzmann / DSMC (poche collisioni)"]
+    C --> G["Kn e' un CAMPO: in un plume cresce a valle (densita' cala -> lambda sale)<br/>-> zone diverse, modelli diversi, da raccordare"]
+    D --> G
+    E --> G
+    F --> G
+```
+
+![Regimi di rarefazione sull'asse di Knudsen e modelli corrispondenti](images/rarefatti_knudsen_regimi.svg)
+
 **Problema della lunghezza caratteristica.** Quale $L$? Il **diametro dell'ugello**? La **dimensione
 del target**? Non è univoco. Si preferisce allora una **definizione locale basata sui gradienti**:
 $$Kn = \frac{\lambda}{\,Q/|\nabla Q|\,},$$
@@ -120,6 +137,20 @@ $$x^{n+1} = x^{n} + v^{n}\,\Delta t.$$
    ├───┼───┼───┤   si muovono,      │    ·   ·  │  DENTRO la cella
    │ ↘ │ · │ ↑ │   poi collidono    │  ·   ·    │  possono collidere
    └───┴───┴───┘   nella cella      └───────────┘
+```
+
+**Flowchart — il ciclo DSMC (un passo $\Delta t$):**
+
+```mermaid
+graph TD
+    A["Inizializza particelle numeriche (posizione, velocita')"] --> B["1. MOVE / free flight:<br/>x = x + v*dt (nessuna interazione)"]
+    B --> C["2. Applica le BC ai bordi (parete, inflow, outflow, vuoto)"]
+    C --> D["3. INDICIZZA le particelle nelle celle"]
+    D --> E["4. COLLISIONI: solo coppie DENTRO la stessa cella<br/>(selezione Monte Carlo, modello VHS/VSS)"]
+    E --> F["5. CAMPIONA le macro-grandezze (rho, u, T) per cella"]
+    F --> G{"convergenza / tempo finale?"}
+    G -->|"no"| B
+    G -->|"si'"| H["Medie statistiche finali"]
 ```
 
 **Modelli collisionali** (definiscono la sezione d'urto e quindi la probabilità di collisione):
