@@ -399,15 +399,26 @@ panels = [(axs[0,0], rho, r"$\rho$ (densità)", "tab:green", True),
           (axs[1,1], T, "$T$ (temperatura)", "tab:red", True)]
 for ax, y, lab, c, shows_contact in panels:
     ax.plot(xs, y, color=c, lw=2.2)
-    for xv, nm, st in [(xH, "", ":"), (xT, "", ":"), (xC, "contatto", "--"), (xS, "urto", "-")]:
+    for xv, st in [(xH, ":"), (xT, ":"), (xC, "--"), (xS, "-")]:
         ax.axvline(xv, color="0.7", lw=1.0, ls=st)
     ax.axvspan(xH, xT, color="0.92")
     ax.set_title(lab + ("   [mostra il contatto]" if shows_contact else "   [contatto INVISIBILE]"),
                  fontsize=11)
     ax.set_xlabel("x"); ax.set_ylabel(lab.split(" ")[0])
-    ax.text(xH-0.02, ax.get_ylim()[1]*0.9, "espansione", ha="right", fontsize=8, color="0.4")
-fig.suptitle("Tubo di Sod a $t=t_1$: $p,u$ continue sul contatto (invisibile); "
-             r"$\rho,T$ saltano (visibile). Tutte mostrano espansione e urto", fontsize=12)
+    # etichette di ZONA (centrate in ciascuna regione, in alto)
+    ytop = ax.get_ylim()[1]
+    zones = [(-0.85, "L"), (0.5*(xH+xT), "vent."), (0.5*(xT+xC), "$L^*$"),
+             (0.5*(xC+xS), "$R^*$"), (0.85, "R")]
+    for xz, zn in zones:
+        ax.text(xz, ytop*0.93 if ytop>0 else ytop*1.02, zn, ha="center",
+                fontsize=8.5, color="0.25",
+                bbox=dict(fc="white", ec="0.8", boxstyle="round,pad=0.15", alpha=0.85))
+    ax.annotate("contatto", xy=(xC, ax.get_ylim()[0]), xytext=(xC, ax.get_ylim()[0]),
+                ha="center", va="bottom", fontsize=7.5, color="#b8860b")
+    ax.annotate("urto", xy=(xS, ax.get_ylim()[0]), xytext=(xS, ax.get_ylim()[0]),
+                ha="center", va="bottom", fontsize=7.5, color="red")
+fig.suptitle("Tubo di Sod a $t=t_1$: zone L | ventaglio | $L^*$ | (contatto) | $R^*$ | (urto) | R. "
+             r"$p,u$ continue sul contatto; $\rho,T$ saltano", fontsize=11.5)
 fig.tight_layout(rect=(0, 0, 1, 0.96))
 fig.savefig(os.path.join(OUT, "lc_sod_profili.svg"))
 plt.close(fig)
@@ -487,3 +498,42 @@ fig.tight_layout(rect=(0, 0, 1, 0.96))
 fig.savefig(os.path.join(OUT, "lc_bc_quattro_casi.svg"))
 plt.close(fig)
 print("   lc_bc_quattro_casi.svg")
+
+# ===========================================================================
+# 11) PARETE SOLIDA (riflessione, u=0 alla parete)
+# ===========================================================================
+fig, ax = plt.subplots(figsize=(8.5, 5.6))
+xw, Tw = 3.0, 4.0
+# parete (destra), tratteggio "solido"
+ax.axvline(xw, color="k", lw=3)
+ax.fill_betweenx([0, Tw], xw, xw + 0.5, hatch="///", fc="0.85", ec="0.4")
+ax.text(xw + 0.12, Tw - 0.3, "PARETE", rotation=90, va="top", fontsize=10, color="0.3")
+u0, a0 = 0.8, 1.2
+# caratteristiche incidenti lambda3 = u+a (dal campo verso la parete)
+for x0 in [0.2, 1.0, 1.8]:
+    t_hit = (xw - x0) / (u0 + a0)
+    ax.plot([x0, xw], [0, t_hit], color="red", lw=1.6)
+# punto W dove la lambda2 (particella) raggiunge la parete e si "ferma"
+xW0 = 0.6
+tW = (xw - xW0) / u0
+ax.plot([xW0, xw], [0, tW], color="tab:orange", lw=2.4)          # lambda2 incidente (u)
+ax.plot([xw, xw], [tW, Tw], color="tab:orange", lw=2.4, ls="--") # lambda2 -> verticale (u=0)
+ax.plot(xw, tW, "ko", ms=7); ax.text(xw - 0.15, tW, "W ", ha="right", fontsize=11)
+# onda riflessa lambda1 = u-a (torna nel dominio, verso sinistra)
+ax.plot([xw, xw - (a0 - u0) * (Tw - tW) - 1.2], [tW, Tw], color="tab:blue", lw=2.2)
+# direzione del flusso
+ax.annotate("", xy=(1.2, 0.25), xytext=(0.2, 0.25),
+            arrowprops=dict(arrowstyle="-|>", color="green", lw=2))
+ax.text(0.7, 0.05, "flusso $u>0$ (verso la parete)", color="green", fontsize=9, ha="center")
+ax.text(0.2, Tw - 0.4, r"$\lambda_3=u+a$ incidenti", color="red", fontsize=9)
+ax.text(xw - 2.6, Tw - 0.4, r"$\lambda_1=u-a$ riflessa", color="tab:blue", fontsize=9)
+ax.text(xw - 0.05, (tW + Tw) / 2, r"$\lambda_2$: $u\to0$" "\n(verticale)", color="#b8860b",
+        fontsize=9, ha="right")
+time_arrow(ax, x=-0.5)
+ax.set_xlim(-0.6, xw + 0.6); ax.set_ylim(-0.05, Tw + 0.2)
+ax.set_xlabel("x"); ax.set_ylabel("t")
+ax.set_title("Parete solida: $u_n=0$ → onda riflessa; la $\\lambda_2$ diventa verticale (analogo al pistone)")
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "lc_parete_solida_py.svg"))
+plt.close(fig)
+print("   lc_parete_solida_py.svg")

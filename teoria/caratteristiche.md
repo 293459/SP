@@ -71,7 +71,7 @@ Conseguenze da tenere a mente sempre:
 - **più una linea è verticale → più è lenta** ($\lambda$ piccolo); più è **inclinata verso l'orizzontale
   → più è veloce**($\lambda$ grande). La velocità è $\lambda=1/\text{pendenza}$.
 - **Ordine delle 3 caratteristiche di Eulero** (con $a>0$): $\lambda_1=u-a<\lambda_2=u<\lambda_3=u+a$.
-  Quindi $\lambda_3=u+a$ è la **più veloce**→ la **meno ripida** (più inclinata verso $x$); $\lambda_1=u-a$
+  Quindi $\lambda_3=u+a$ è la **più veloce** → la **meno ripida** (più inclinata verso $x$); $\lambda_1=u-a$
   è la più lenta → la più vicina alla verticale (e se $u<a$ "pende" verso sinistra, $\lambda_1<0$).
 
 </details>
@@ -99,7 +99,7 @@ Cerco una curva $x(t)$ lungo cui la PDE diventi una **ODE**. La derivata totale 
 $$\frac{du}{dt}=\frac{\partial u}{\partial t}+\frac{dx}{dt}\,\frac{\partial u}{\partial x}.$$
 
 Confronto con $u_t+a\,u_x=0$: **scelgo** $\dfrac{dx}{dt}=a\Rightarrow\dfrac{du}{dt}=0$. Lungo la retta
-$x=x_0+at$ la soluzione è **costante**→ $u(x,t)=u_0(x-at)$. Estensioni:
+$x=x_0+at$ la soluzione è **costante** → $u(x,t)=u_0(x-at)$. Estensioni:
 - scalare non lineare $\dfrac{dx}{dt}=f'(u)$; sistema $\dfrac{dx}{dt}=\lambda_k$;
 - multi-D: superfici caratteristiche da $\det(\phi_t I+\sum_d A_d\phi_{x_d})=0$ → **cono di Mach**; la
   riduzione esatta a ODE vale pulita solo in 1D.
@@ -229,7 +229,7 @@ La classificazione dipende dal numero di **caratteristiche reali**:
 | Parabolica | una (degenere) | diffusiva |
 | Ellittica | nessuna (complesse) | nessuna direzione privilegiata |
 
-Per i sistemi 1° ordine: iperbolico ⟺ $A$ **diagonalizzabile con autovalori reali**⟺ esistono $n$
+Per i sistemi 1° ordine: iperbolico ⟺ $A$ **diagonalizzabile con autovalori reali** ⟺ esistono $n$
 famiglie di caratteristiche reali. Le caratteristiche reali **sono** la definizione di iperbolicità. Nel
 caso **ellittico** gli autovalori sono complessi → niente caratteristiche reali (dominio di dipendenza
 esteso). Quindi non puoi avere caratteristiche reali propagative in un problema genuinamente ellittico.
@@ -259,7 +259,7 @@ $$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrig
 <details>
 <summary><strong>Concetto — perché ora urti ed espansioni? Quali altri fenomeni?</strong></summary>
 
-Velocità d'onda $f'(u)=u$ **dipende dalla soluzione**→ caratteristiche con inclinazioni diverse, che
+Velocità d'onda $f'(u)=u$ **dipende dalla soluzione** → caratteristiche con inclinazioni diverse, che
 possono **convergere** (urto) o **divergere** (espansione). Altri fenomeni da modello scalare non lineare:
 **traffico** (LWR: ingorghi = urti), **shallow water** (bore/risalto idraulico), gasdinamica (compressione
 → urto), trasporto di sedimenti, cromatografia, dinamica delle folle.
@@ -282,7 +282,7 @@ più lente; le veloci raggiungono le lente → **convergenza**. Nei profili $(x,
 > non proseguono — oltre c'è un **unico** stato. (La figura è stata corretta in questo senso.)
 
 **Matematica:** caratteristiche $x=\xi+u_0(\xi)t$; si incrociano a $t_b=-1/\min u_0'>0$ (serve
-$u_0'<0$). Oltre $t_b$ la soluzione classica sarebbe **multivalore**→ si sostituisce con una
+$u_0'<0$). Oltre $t_b$ la soluzione classica sarebbe **multivalore** → si sostituisce con una
 **discontinuità** (urto) a velocità $s$ data da Rankine–Hugoniot + condizione di entropia.
 **Fisica:** fino al breaking ogni caratteristica porta la **propria** informazione; quando convergono, le
 informazioni **si fondono** in una sola (oltre l'urto un solo stato). Analogo: onde di compressione in gas
@@ -322,7 +322,7 @@ visto). RH–Burgers è una **dimostrazione da saper fare** (lista in fondo).
 
 ![Burgers espansione: ventaglio di caratteristiche divergenti e snapshot x-u che si appiattiscono](images/lc_burgers_espansione.svg)
 
-Dato iniziale **crescente**→ caratteristiche **divergono**: a sinistra ($u=0$) verticali, a destra
+Dato iniziale **crescente** → caratteristiche **divergono**: a sinistra ($u=0$) verticali, a destra
 ($u=1$) pendenza $1/u$, in mezzo un **ventaglio**. Il salto **collassa subito** in onde rarefatte
 (soluzione autosimile $u=x/t$). Nei profili il salto si **apre** (opposto dell'urto). Idem nelle Eulero.
 
@@ -365,7 +365,7 @@ $\rho,\rho u,\rho E$.)
   segno. La funzione segno non serve perché $\varepsilon$ non è il segno di una variabile, è una costante
   fissata a priori. Serve **a distinguere iperbolico da ellittico**, e $\pm1$ fa uscire $\lambda=\pm\alpha$.
 - **Soluzioni.** $\varepsilon=+1$ → due autovalori reali $\pm\alpha$ = le **due velocità** (due onde,
-  destra/sinistra). $\varepsilon=-1$ → $\pm i\alpha$ **complessi**→ nessuna velocità reale, nessuna
+  destra/sinistra). $\varepsilon=-1$ → $\pm i\alpha$ **complessi** → nessuna velocità reale, nessuna
   caratteristica reale → **ellittico** (info ovunque). Autovalori complessi ⟺ $A$ non diagonalizzabile su
   $\mathbb{R}$.
 
@@ -423,7 +423,7 @@ $\boldsymbol{\ell}_k$ è poi associato a $\lambda_k$ (e alla sua direzione di pr
 <summary><strong>Concetto — far comparire $I=LL^{-1}$ ("come moltiplicare per 1")</strong></summary>
 
 $A=A\cdot I=A\,(LL^{-1})$: inserire $I$ **non cambia nulla**, come moltiplicare per $1$ nello scalare. Ma
-il prodotto matriciale **non è commutativo**→ conta **dove** lo metti; lo si mette nel punto comodo:
+il prodotto matriciale **non è commutativo** → conta **dove** lo metti; lo si mette nel punto comodo:
 $L^{-1}A\,U_x=\underbrace{(L^{-1}AL)}_{\Lambda}\underbrace{(L^{-1}U_x)}_{\partial_x W}$.
 
 </details>
@@ -450,7 +450,7 @@ risolubile col metodo delle caratteristiche. In breve: **problema vettoriale dif
 <details>
 <summary><strong>Concetto — "equazioni indipendenti": significato fisico</strong></summary>
 
-Indipendenza **matematica**⟺ indipendenza **fisica** dei segnali: ogni $W_k$ è un'**onda che viaggia per
+Indipendenza **matematica** ⟺ indipendenza **fisica** dei segnali: ogni $W_k$ è un'**onda che viaggia per
 conto suo** a velocità $\lambda_k$, senza scambiare informazione con le altre (disaccoppiate). La procedura
 **serviva proprio a questo**, ma centra anche: (1) dimostrare l'**iperbolicità**; (2) ottenere le
 **compatibilità** $dW_k=0$; (3) produrre gli **invarianti di Riemann** (Eulero) costanti lungo le
@@ -603,7 +603,7 @@ della caratteristica — passata o futura — entra nel rispettivo cono.)
 
 Davanti a un corpo tozzo c'è un **urto curvo staccato**: dietro di esso una **tasca subsonica**, altrove
 **supersonico**. Nel problema **stazionario** servirebbero metodi **ellittici** (tasca subsonica) e
-**iperbolici** (zone supersoniche) **insieme**→ scomodo.
+**iperbolici** (zone supersoniche) **insieme** → scomodo.
 
 **Cosa si fa:** si passa al problema **non stazionario** e si **marcia nel tempo** fino allo stato
 stazionario (*time-marching*). Come visto in ****, le Eulero **non stazionarie in $(x,t)$ sono
@@ -631,7 +631,7 @@ iperbolico. Si "scioglie" il problema misto in uno **interamente trattabile** co
 caratteristica**(le equazioni di compatibilità).
 
 **Con che obiettivo:** non solo provare l'iperbolicità (quella basta da real+distinti), ma ottenere le
-**relazioni concrete**— gli **invarianti di Riemann** $a/\phi\pm u$ e l'entropia — che servono a
+**relazioni concrete** — gli **invarianti di Riemann** $a/\phi\pm u$ e l'entropia — che servono a
 **risolvere** problemi reali (pistone, condizioni al contorno).
 
 **Perché non prima:** nei casi scalari (§1–2) c'è **una sola** equazione, niente da disaccoppiare; nel
@@ -810,21 +810,31 @@ $W_1(P)=W_1(B)$, $W_3(P)=W_3(A)$.
 <details>
 <summary><strong>Concetto — Rankine–Hugoniot per Eulero: perché il flusso $\rho u$? E le altre</strong></summary>
 
-RH per Eulero (massa e q. di moto):
+**Si parte SEMPRE dalla formula generale** (vale per qualunque legge di conservazione): la velocità
+dell'urto è il **rapporto tra il salto del flusso e il salto della grandezza conservata**
 
-$$c=\frac{[\![\rho u]\!]}{[\![\rho]\!]}=\frac{\rho_2 u_2-\rho_1 u_1}{\rho_2-\rho_1},\qquad
-c=\frac{(p_2+\rho_2u_2^2)-(p_1+\rho_1u_1^2)}{\rho_2 u_2-\rho_1 u_1}.$$
+$$s=\frac{[\![F]\!]}{[\![U]\!]}.$$
 
-**Perché $\rho u$?** Perché l'esempio parte dalla **conservazione della massa** (la più semplice): lì il
-conservato è $\rho$ e il flusso è $\rho u$. **Non** è speciale; RH vale **componente per componente**:
+Poi si **specializza** scegliendo *quale* equazione di Eulero (massa, q. di moto, energia): ognuna ha la
+sua coppia $(U,F)$, quindi la stessa formula generale **si dirama**:
+
+```mermaid
+graph TD
+    G["FORMULA GENERALE<br/>s = salto(F) / salto(U)"] --> M["MASSA<br/>U=rho, F=rho*u<br/>s = salto(rho*u)/salto(rho)"]
+    G --> Q["QUANTITA' DI MOTO<br/>U=rho*u, F=p+rho*u^2<br/>s = salto(p+rho*u^2)/salto(rho*u)"]
+    G --> E["ENERGIA<br/>U=rho*E, F=u(p+rho*E)<br/>s = salto(u(p+rho*E))/salto(rho*E)"]
+```
 
 | Equazione | Conservato $U$ | Flusso $F$ | Salto RH |
 |---|---|---|---|
-| Massa | $\rho$ | $\rho u$ | $s[\![\rho]\!]=[\![\rho u]\!]$ |
-| Q. di moto | $\rho u$ | $p+\rho u^2$ | $s[\![\rho u]\!]=[\![p+\rho u^2]\!]$ |
-| Energia | $\rho E$ | $u(p+\rho E)$ | $s[\![\rho E]\!]=[\![u(p+\rho E)]\!]$ |
+| Massa | $\rho$ | $\rho u$ | $s\,[\![\rho]\!]=[\![\rho u]\!]$ |
+| Q. di moto | $\rho u$ | $p+\rho u^2$ | $s\,[\![\rho u]\!]=[\![p+\rho u^2]\!]$ |
+| Energia | $\rho E$ | $u(p+\rho E)$ | $s\,[\![\rho E]\!]=[\![u(p+\rho E)]\!]$ |
 
-Le tre **insieme** legano monte/valle (Hugoniot). La massa è solo l'esempio più immediato.
+**Perché negli appunti compare $\rho u$?** Perché l'esempio parte dalla **massa** (la più semplice): lì il
+conservato è $\rho$ e il flusso è $\rho u$. **Non** è speciale. Le tre condizioni **insieme** legano gli
+stati monte/valle (relazioni di Hugoniot): $s$ è **unico** (lo stesso urto), quindi i tre rapporti
+**devono coincidere** — è proprio questo che chiude lo stato dietro l'urto.
 
 </details>
 
@@ -850,9 +860,9 @@ La **linea nera continua** è la **traiettoria del pistone** nel piano $(x,t)$. 
 convenzione: qui **$t$ è in ordinata e $x$ in ascissa**, quindi la **pendenza** della linea è
 $\dfrac{dt}{dx}=\dfrac{1}{v}$, cioè l'**inverso** della velocità (non la velocità!). Di conseguenza:
 - tratto **verticale** in basso → pendenza infinita → pistone **fermo** ($v=0$);
-- tratto **curvo**→ la linea si **inclina** progressivamente verso l'asse $x$ (pendenza che **diminuisce**)
+- tratto **curvo** → la linea si **inclina** progressivamente verso l'asse $x$ (pendenza che **diminuisce**)
   → **velocità crescente**= **moto accelerato**;
-- tratto **rettilineo inclinato**→ pendenza costante → **velocità costante**.
+- tratto **rettilineo inclinato** → pendenza costante → **velocità costante**.
 
 Regola da tenere a mente in **tutto** il capitolo: **più una caratteristica è verticale, più è lenta**;
 più è inclinata verso l'orizzontale, più è veloce ($v=1/\text{pendenza}$).
@@ -878,21 +888,44 @@ pistone avanza.
 <summary><strong>Concetto — moto accelerato ⇒ pendenze diverse ⇒ urto (come Burgers)</strong></summary>
 
 Nella fase **accelerata** il pistone emette onde $\lambda_3=u+a$ a velocità **crescente** (il gas dietro è
-sempre più veloce e caldo). Caratteristiche con **inclinazioni diverse**→ **convergono**→ **urto**. È lo
+sempre più veloce e caldo). Caratteristiche con **inclinazioni diverse** → **convergono** → **urto**. È lo
 stesso meccanismo di **Burgers** (caratteristiche non parallele che collidono), solo che qui la velocità
 caratteristica è $u+a$ (acustica) invece di $u$.
 
 </details>
 
 <details>
-<summary><strong>Concetto — invarianti di Riemann prima e dopo l'urto</strong></summary>
+<summary><strong>Concetto — logica fondamentale: invarianti dove è liscio, RH attraverso l'urto, poi di nuovo invarianti</strong></summary>
 
-**Prima** dell'urto la compressione è **isentropica/omoentropica** (regolare) → si possono usare gli
-**invarianti di Riemann** $J^{\pm}$ per propagare lo stato lungo le caratteristiche. **Attraverso** l'urto
-l'**entropia salta** (l'urto genera entropia) → di là il gas ha entropia **diversa** e non è più
-omoentropico con la regione di monte: **non** si possono trasportare $J^{\pm}$ attraverso l'urto. Si usa
-allora **Rankine–Hugoniot** per "saltare" l'urto, e si riprende con $J^{\pm}$ **nella nuova regione** (con
-la sua entropia).
+È **la** logica chiave del metodo delle caratteristiche con urti:
+
+- **dove il campo è liscio** (regolare, isentropico) → si usano gli **invarianti di Riemann** $J^{\pm}$ per
+  trasportare lo stato lungo le caratteristiche;
+- **attraverso l'urto** l'**entropia salta** (l'urto **genera** entropia) → di là il gas non è più
+  omoentropico con monte: **non** si possono trasportare $J^{\pm}$ attraverso l'urto. Si usa
+  **Rankine–Hugoniot** per fare il **salto**;
+- **dopo l'urto**, nella nuova regione (con la sua entropia), si riprende con gli **invarianti** $J^{\pm}$.
+
+```mermaid
+graph LR
+    R1["Regione 1 (liscia)<br/>uso INVARIANTI di Riemann J+/J-"] --> SH{"incontro un URTO?"}
+    SH -->|"sì"| RH["uso RANKINE-HUGONIOT<br/>(salto: entropia cambia)"]
+    SH -->|"no"| R1
+    RH --> R2["Regione 2 (nuova entropia)<br/>riprendo con gli INVARIANTI"]
+    R2 --> SH
+```
+
+Schema visivo semplificato (chi si usa e dove):
+
+```
+x ──────────────────────────────────────────►
+  [ liscio: J+ , J- ]  ‖URTO‖  [ liscio: J+ , J- ]
+                         ▲
+                   qui: Rankine–Hugoniot
+```
+
+(Stessa logica nel **problema di Riemann/Sod**: invarianti nel ventaglio di espansione, RH attraverso
+l'urto, e il **contatto** separa due regioni lisce con entropie diverse.)
 
 </details>
 
@@ -940,6 +973,24 @@ Sono la **costruzione caratteristica** per trovare lo stato in $P$: la $\lambda_
 
 </details>
 
+<details>
+<summary><strong>Concetto — perché in $P$ la $\lambda_2$ "devia" e la $\lambda_1$ va dritta</strong></summary>
+
+Regola: **una caratteristica è una retta dove il campo che attraversa è uniforme; si incurva dove il campo
+varia.**
+- La **$\lambda_2$** è il **percorso della particella** ($dx/dt=u$): la particella entra nella regione
+  **compressa** dal pistone, dove la velocità $u$ **cresce** → la sua pendenza $1/u$ cambia → la linea si
+  **incurva** (la particella viene accelerata: "interagisce" con le onde di compressione).
+- La **$\lambda_1$** ($u-a$) in quel tratto risale verso la zona **indisturbata** (uniforme) del gas: lì
+  $u-a$ è (localmente) **costante** → la linea resta **dritta**.
+
+In generale, in una **onda semplice** (come la compressione del pistone) **una** famiglia porta la
+variazione e le caratteristiche dell'**altra** famiglia risultano **rette**; la particella (e l'acustica
+che attraversa la zona non uniforme) si incurva. Quindi non è un'incongruenza: la forma della linea
+**racconta** se il campo attraversato è uniforme o no.
+
+</details>
+
 ## 7. Problema di Riemann e tubo d'urto di Sod
 
 <details>
@@ -954,8 +1005,9 @@ Rimossa la membrana: **fascio di espansione** (sinistra), **superficie di contat
 d'urto**(destra).
 
 ![Diagramma x-t di Sod: espansione, superficie di contatto, urto](images/lc_sod_xt.png)
-![Profilo di pressione p(x,t1): solo espansione + urto](images/lc_sod_pressione.png)
-![Profilo di densità ρ(x,t1): espansione + salto di contatto + urto](images/lc_sod_densita.png)
+
+(I profili di pressione/densità — e anche velocità e temperatura — sono nella figura Python
+**commentata** poco sotto, "profili di $\rho,p,u,T$".)
 
 </details>
 
@@ -1001,32 +1053,66 @@ costanti** $U_L,U_R$ separati da **una sola discontinuità** in $x=0$. La soluzi
 > "le caratteristiche partono da OGNI punto"); il problema di Riemann è il "mattone" locale che i metodi
 > numerici risolvono a ogni interfaccia.
 
-**Tubo di Sod = un Riemann problem *specifico*, con ipotesi aggiuntive:**
-1. **stesso gas ideale** sui due lati (stesso $\gamma$);
-2. gas inizialmente **fermo** su entrambi i lati ($u_L=u_R=0$);
-3. valori scelti $(\rho_L,p_L)=(1,1)$, $(\rho_R,p_R)=(0.125,0.1)$ con $p_L>p_R$;
-4. 1D, non viscoso, senza forze di volume.
+**Tubo di Sod = un Riemann problem *specifico*.** Tabella comparativa delle **ipotesi**:
 
-Con queste ipotesi la soluzione è **esattamente** espansione (sx) + contatto + urto (dx). Il Riemann
-problem **generale** potrebbe invece dare **due urti**, **due rarefazioni**, o perfino il **vuoto**, a
-seconda degli stati. *(Distinguere i due evita di confonderli: Sod è un caso particolare.)*
+| Ipotesi | Riemann **generale** | Tubo di **Sod** |
+|---|---|---|
+| Tipo di dato iniziale | 2 stati costanti $U_L,U_R$ + 1 discontinuità | **idem** (è un Riemann problem) |
+| Gas | anche **diversi** sui due lati ($\gamma_L\neq\gamma_R$) | **stesso** gas ideale ($\gamma$ unico) |
+| Velocità iniziali | $u_L,u_R$ **qualsiasi** | **fermo**: $u_L=u_R=0$ |
+| Valori $\rho,p$ | **qualsiasi** | **scelti**: $(1,1)$ e $(0.125,0.1)$, $p_L>p_R$ |
+| Viscosità / forze | (di solito) non viscoso | non viscoso, senza forze di volume, 1D |
+| Soluzione risultante | **qualsiasi** combinazione (2 urti, 2 rarefazioni, urto+contatto+rarefazione, **vuoto**…) | **esattamente** espansione (sx) + contatto + **urto** (dx) |
+
+Quindi Sod è il caso particolare "didattico" del Riemann problem: stesse equazioni e struttura, ma con
+**ipotesi fissate** che producono **sempre** la stessa configurazione a 3 onde — utile come **test di
+validazione** riproducibile.
+
+</details>
+
+<details>
+<summary><strong>Concetto — quei valori di $p,\rho$ sono del problema di Riemann o solo di Sod? E perché proprio quelli?</strong></summary>
+
+- **Sono una scelta di Sod**, non del problema di Riemann generale. Il Riemann problem funziona con **due
+  stati qualsiasi**; il "tubo di Sod" **fissa** $(\rho_L,p_L)=(1,1)$ e $(\rho_R,p_R)=(0.125,0.1)$.
+- **Perché proprio quelli?** È il **benchmark storico** (Sod, 1978): rapporti moderati (pressione $10:1$,
+  densità $8:1$) che producono una struttura a **3 onde ben separate e tutte visibili** (espansione +
+  contatto + urto), né troppo deboli né troppo forti → **caso di prova ideale** per confrontare gli schemi
+  numerici. Non c'è nulla di fisicamente speciale: è una **convenzione** condivisa che rende i risultati
+  **riproducibili e confrontabili** tra codici diversi.
+- **Perché in forma "assoluta" e non relativa?** In realtà sono già **normalizzati**: si pone
+  $\rho_L=1,\ p_L=1$ come **riferimento** e si danno gli altri rispetto a quello. Le equazioni di Eulero
+  non viscose **non hanno una scala** intrinseca → la soluzione dipende **solo dai rapporti**
+  ($p_L/p_R$, $\rho_L/\rho_R$, $\gamma$). Fissare $\rho_L=p_L=1$ **è** quindi un modo di lavorare in
+  relativo: i numeri "assoluti" con riferimento unitario equivalgono a dare i rapporti.
 
 </details>
 
 <details>
 <summary><strong>Concetto — il "background matematico" che produce espansione+contatto+urto</strong></summary>
 
-È **lo stesso** Eulero 1D non stazionario (autovalori $u,u\pm a$): **non** serve un'altra equazione. Ciò
-che produce i tre tipi d'onda è la **natura di ciascun campo caratteristico**+ il dato **discontinuo**:
-- campi **1 e 3** (acustici) **genuinamente non lineari** ($\nabla\lambda\!\cdot r\neq0$) → la loro onda è
-  un **urto** (compressione) **o** un **ventaglio di rarefazione** (espansione);
-- campo **2** (entropia) **linearmente degenere** ($\nabla\lambda\!\cdot r=0$) → **contatto** (né si
-  irripidisce né si apre).
+Partiamo da una domanda semplice: **perché lo stesso sistema produce onde di tipo diverso?** Le equazioni
+sono **le stesse** (Eulero 1D, 3 famiglie $u-a,\ u,\ u+a$); il dato è **un solo salto**. Da quel salto
+**ogni famiglia genera un'onda**. Il **tipo** di onda dipende da **come la velocità di quella famiglia
+cambia attraverso l'onda**:
 
-Quindi: **stesse equazioni + dato discontinuo + autosimilarità**→ 3 onde; il **tipo** dipende da
-genuina-nonlinearità vs degenerazione lineare e dal **segno del salto**. Risolvere Sod = trovare la
-regione star imponendo $p^\*$ e $u^\*$ **uguali** ai due lati del contatto, poi collegare $L\!\to\!L^\*$
-(1-onda) e $R\!\to\!R^\*$ (3-onda).
+1. **Famiglie acustiche** ($u\pm a$): la loro velocità **dipende dalla soluzione** (come in Burgers, dove
+   $f'(u)=u$). Quindi un salto in queste famiglie si comporta come Burgers:
+   - se le caratteristiche **convergono** (compressione) → **urto**;
+   - se **divergono** (espansione) → **ventaglio di rarefazione**.
+   ("Genuinamente non lineare" significa proprio: la velocità **varia davvero** lungo l'onda.)
+2. **Famiglia dell'entropia** ($u$): la sua velocità **non cambia** attraverso l'onda (i due lati hanno la
+   **stessa** $u$). Allora il salto non si irripidisce né si apre: viene **solo trasportato** → **contatto**.
+   ("Linearmente degenere" = velocità **degenere/costante** attraverso quell'onda.)
+
+Quindi: **stesse equazioni + un salto + soluzione autosimile ($x/t$)** → **3 onde**, e il loro tipo è
+deciso da "la velocità varia (acustica → urto/ventaglio) oppure no (entropia → contatto)" e dal **segno
+del salto** (compressione vs espansione).
+
+**Come si "risolve" concretamente** (Sod): la $\lambda_2$ (contatto) impone $p$ e $u$ **uguali** ai suoi
+due lati ($p^\*,u^\*$). Si scrivono allora le due relazioni acustiche — la **1-onda** che collega lo stato
+$L$ allo star $L^\*$ e la **3-onda** che collega $R$ a $R^\*$ — e si trova l'unico $(p^\*,u^\*)$ che le
+soddisfa entrambe. Da lì densità/temperature dei due star, e la struttura è completa.
 
 </details>
 
@@ -1084,11 +1170,40 @@ problema (dato fisicamente incoerente, possibili riflessioni spurie).
 </details>
 
 <details>
+<summary><strong>Concetto — perché su una caratteristica USCENTE non si impone nulla (importante)</strong></summary>
+
+Mettiamo a posto la logica, perché è facile invertirla. Per conoscere il valore al **bordo** "risalgo" la
+caratteristica all'indietro nel tempo e guardo **da dove viene** l'informazione:
+
+- **Caratteristica USCENTE** (porta info **dall'interno verso il bordo**): risalendola **rientro nel
+  dominio**, dove la soluzione **la conosco** (l'ho appena calcolata). Quindi il valore al bordo è **già
+  determinato** dall'interno → lo **calcolo/estrapolo**, non c'è nulla da imporre. (L'invariante di Riemann
+  su quella linea è **calcolabile** proprio perché il campo a monte è noto.)
+- **Caratteristica ENTRANTE** (porta info **da fuori verso il dominio**): risalendola **esco dal dominio**,
+  dove **non so nulla** del campo (e che non ci interessa). Quell'informazione **manca** → la devo
+  **fornire** io: è la **BC**.
+
+Quindi la tua intuizione va **ribaltata**: è la **uscente** che si può ripercorrere all'indietro (verso
+l'interno noto), non l'entrante.
+
+**E se imponessi comunque una BC su una caratteristica uscente?** Sarebbe **sbagliato**, non solo inutile:
+- **sovra-determini** il problema → due valori in conflitto nello stesso punto (quello che produce
+  l'interno e quello che imponi tu) → problema **mal posto**;
+- fisicamente l'uscente deve essere **libera** di portare fuori ciò che il campo interno detta; "bloccarla"
+  con un valore fisso **riflette** l'informazione all'indietro → è esattamente il meccanismo delle **onde
+  acustiche spurie** (vedi il toggle sulla riflessione). Risultato: campo falsato, possibili instabilità.
+
+In sintesi: **entrante → manca l'info → impongo**; **uscente → l'info c'è (dall'interno) → estrapolo, e
+imporre sarebbe un errore.**
+
+</details>
+
+<details>
 <summary><strong>Figura — le quattro casistiche a confronto (ingresso/uscita, sub/super)</strong></summary>
 
 ![Le 4 casistiche delle condizioni al contorno di Eulero 1D: ingresso/uscita supersonico/subsonico](images/lc_bc_quattro_casi.svg)
 
-Stessa logica nei quattro casi (le caratteristiche **verdi entrano**→ richiedono BC; le **grigie escono**
+Stessa logica nei quattro casi (le caratteristiche **verdi entrano** → richiedono BC; le **grigie escono**
 → si estrapolano). Il caso $\lambda_1=u-a$ è il "discriminante": in **subsonico** $u<a\Rightarrow\lambda_1<0$.
 
 | | Bordo | $\lambda_1=u-a$ | $\lambda_2=u$ | $\lambda_3=u+a$ | Entranti | **# BC** |
@@ -1112,7 +1227,7 @@ campo verso il bordo). Si impongono invece le 2 entranti ($\lambda_2,\lambda_3$ 
 **Ricetta generale (vale per qualsiasi bordo e regime):**
 1. Sul bordo traccia le 3 caratteristiche e guarda i **segni** di $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$ (dipendono dal regime e dal verso del flusso).
 2. Conta quante **entrano** nel dominio (portano informazione da **fuori**): tante quante sono = **numero di BC da imporre**.
-3. Le caratteristiche **uscenti** portano informazione **dall'interno**→ le grandezze corrispondenti si **estrapolano** dall'interno (compatibilità $W_k=W_k^{\text{interno}}$), **non** si impongono.
+3. Le caratteristiche **uscenti** portano informazione **dall'interno** → le grandezze corrispondenti si **estrapolano** dall'interno (compatibilità $W_k=W_k^{\text{interno}}$), **non** si impongono.
 4. BC imposte + compatibilità uscenti = sistema completo → si ricava lo **stato al bordo**.
 
 **Tabella riassuntiva** (flusso entrante con $u>0$):
@@ -1134,53 +1249,162 @@ campo verso il bordo). Si impongono invece le 2 entranti ($\lambda_2,\lambda_3$ 
 </details>
 
 <details>
-<summary><strong>Figura — ingresso e uscita supersonici</strong></summary>
+<summary><strong>Concetto — cosa si impone in ciascuno dei 4 casi e perché</strong></summary>
 
-![Ingresso supersonico: 3 caratteristiche entranti](images/lc_bc_ingresso_supersonico.png)
-![Uscita supersonica: 3 caratteristiche uscenti](images/lc_bc_uscita_supersonica.png)
+Conosci il **numero** di BC; ecco **quali** e **perché** (figura sopra):
 
-- **Ingresso supersonico** ($u>a$): tutte e 3 $\lambda>0$ → entrano → **3 condizioni** (2 termodinamiche
-  indipendenti + 1 cinematica).
-- **Uscita supersonica:** tutte uscenti → **nessuna BC** (imporne darebbe risultati non fisici; eccezione:
-  un urto che risale).
-
-</details>
-
-<details>
-<summary><strong>Figura — uscita subsonica e riflessioni acustiche</strong></summary>
-
-![Uscita subsonica: λ1=u-a rientra](images/lc_bc_uscita_subsonica.png)
-
-In subsonico $\lambda_1=u-a<0$ → **una** caratteristica rientra → **1** BC: *non riflettente* (impongo
-l'invariante $W_1=a/\phi-u$) oppure *pressione statica* (comoda ma **riflettente**).
-
-![Analogia riflessione: corda fissata al muro](images/lc_riflessione_onda.png)
-
-Analogia corda fissata al muro → onda riflessa uguale e opposta. La pressione statica genera riflessioni
-artificiali; per evitarle si usano **strati assorbenti** (utile in LES).
+- **A. Ingresso supersonico (3 BC):** tutto entra → fisso lo **stato completo**: 2 grandezze termodinamiche
+  **indipendenti** + 1 cinematica (es. $p_0,T_0,M$, oppure $u,S$ + una termodinamica). Perché: nessuna
+  informazione arriva dall'interno, quindi devo dare *tutto* io.
+- **B. Ingresso subsonico (2 BC):** impongo **2 termodinamiche** (tipicamente $p_0,T_0$ → grandezze
+  ingegneristiche di monte); la cinematica $u$ **non** la impongo perché la "porta" la caratteristica
+  $\lambda_1$ che **risale** dall'interno (invariante $W_1$). Perché 2 termodinamiche: il sistema
+  termodinamico ha 2 gradi di libertà, e $u$ è già determinato da $W_1$.
+- **C. Uscita supersonica (0 BC):** tutto esce → lo stato di uscita è **determinato dall'interno**: non
+  impongo nulla (imporre falserebbe il campo).
+- **D. Uscita subsonica (1 BC):** $\lambda_1$ rientra → impongo **1** grandezza, di solito la **pressione
+  statica** $p$ (di valle); le altre 2 ($u,S$/entropia) le porta l'interno. Perché la pressione: è il
+  "segnale" che a valle si propaga a monte (acustica) e che fisicamente controlla lo scarico.
 
 </details>
 
 <details>
-<summary><strong>Figura — ingresso subsonico (caso più complesso)</strong></summary>
+<summary><strong>Concetto — se le BC sono poche, scelgo una termodinamica o la cinematica?</strong></summary>
 
-![Ingresso subsonico: λ1 risale, λ2,λ3 entrano](images/lc_bc_ingresso_subsonico.png)
-
-$\lambda_3,\lambda_2>0$ entrano; $\lambda_1=u-a<0$ **risale**→ **2** BC (tipicamente $T_0$ e $p_0$, o
-entropia + entalpia totale) con $W_1=a/\phi-u$ noto dall'interno. Si ricava $a$ (eq. 2° grado, radice
-positiva), poi $u,T,p,\rho$.
+La scelta **non è arbitraria**: la decide **quale caratteristica entra**.
+- Ogni caratteristica entrante porta **un** pezzo di informazione mancante. Le famiglie acustiche
+  ($\lambda_{1,3}=u\pm a$) sono legate a grandezze **termodinamiche+acustiche** (pressione/entalpia
+  totale); la famiglia $\lambda_2=u$ è legata all'**entropia/contatto** (termodinamica "di trasporto").
+- In **ingresso subsonico** entrano $\lambda_2,\lambda_3$ → si impongono **2 termodinamiche** ($T_0,p_0$):
+  $\lambda_3$ "vuole" un'informazione totale/acustica, $\lambda_2$ l'entropia. La **cinematica $u$** è
+  l'unica che **esce** (via $\lambda_1$) → non la si impone.
+- In generale: **impongo le grandezze associate alle caratteristiche entranti**; conto i gradi di libertà
+  (2 termodinamici + 1 cinematico) e tolgo quelli "coperti" dalle uscenti. Cambiare scelta (es. imporre $u$
+  invece di $p_0$) **sovra/sotto-determina** il problema o introduce **riflessioni**.
 
 </details>
 
 <details>
-<summary><strong>Figura — parete solida</strong></summary>
+<summary><strong>Concetto — uscita subsonica: la riflessione delle onde acustiche</strong></summary>
 
-![Parete solida: condizione di velocità normale nulla](images/lc_parete_solida.png)
+All'uscita subsonica rientra $\lambda_1$ → serve **1** BC. La scelta tra **pressione statica** e
+**invariante** decide se la simulazione è *riflettente* o no.
 
-Parete impermeabile → velocità normale nulla; analogo a un pistone: $\lambda_2$ verso la parete diventa
-**verticale** ($u=0$). Si genera **urto** (fluido verso la parete) o **espansione**. Nel limite isentropico
-si usa l'invariante: $\{u=0,\ a/\phi+u=W_{3L},\ S=S_L\}$ → $a$, poi $T,p,\rho$. Collega Eulero a
-**Navier–Stokes** (no-slip).
+**Analogia della corda fissata al muro:** così come la corda **non si può muovere** perché vincolata al
+muro, anche la **pressione**, se la **fisso** come BC al bordo, **non può variare**. Ma questo vincolo
+genera un'**onda acustica fittizia** (riflessa, uguale e opposta a quella incidente) che **falsa** la
+simulazione — modifica i livelli di pressione/rumore **sia all'interno sia al bordo**. Due rimedi:
+
+```mermaid
+graph TD
+    P["Uscita subsonica: 1 BC (lambda1 rientra)"] --> Q{"Quale BC impongo?"}
+    Q -->|"pressione statica p"| R["RIFLETTENTE: p fissata non varia -> onda acustica fittizia (come corda al muro)"]
+    Q -->|"invariante W1 entrante"| N["NON riflettente: nessuna onda spuria"]
+    R --> A1["Rimedio 1: simulazione di PROVA con p -> campo medio -> calcolo W1 -> RIFACCIO con W1"]
+    R --> A2["Rimedio 2: correggo con termini ad hoc / strati assorbenti (LES)"]
+```
+
+| Approccio | Come | Pro | Contro |
+|---|---|---|---|
+| **Pressione statica** | fisso $p$ di valle | semplice, robusto, valore fisico noto | **riflettente** → onde acustiche spurie |
+| **Invariante $W_1$** | impongo $W_1=a/\phi-u$ entrante | **non riflettente** | serve un valore di riferimento di $W_1$ |
+| **Prova + $W_1$** | 1ª run con $p$ → media → $W_1$ → 2ª run | non riflettente, parte da dato fisico | **doppia** simulazione |
+| **Strati assorbenti** | zona dissipativa al bordo | non riflettente, robusto in LES | costo extra, taratura |
+
+</details>
+
+<details>
+<summary><strong>Dimostrazione — ingresso subsonico: cosa si calcola e procedura (con derivazione)</strong></summary>
+
+**Cosa si vuole calcolare e perché:** all'ingresso subsonico **mancano** $u$ e una termodinamica perché
+$\lambda_1$ **risale** dall'interno; voglio ricavare lo **stato completo** al bordo $(u,a,T,p,\rho)$ usando
+le **2 BC** imposte ($T_0,p_0$ → entalpia totale $h_0$ ed entropia $S_i$) **più** l'invariante $W_1$ noto
+dall'interno. Procedura:
+
+```mermaid
+graph TD
+    A["Impongo a monte: T0, p0  (-> h0 = cp*T0, S = Si)"] --> B["Estrapolo dall'interno: W1 = a/phi - u  (lambda1 esce)"]
+    B --> C["Sistema 3 eq: u = a/phi - W1 ;  h0 = cp*T + u^2/2 ;  S = Si"]
+    C --> D["Sostituisco u e cp -> equazione di 2 grado in a"]
+    D --> E["Scelgo la radice positiva (limite u->0 deve dare a->a0)"]
+    E --> F["a -> T (a^2=gamma R T) -> p (isentropica con Si) -> rho (p=rho R T)"]
+```
+
+Derivazione (gas perfetto, $\phi=\tfrac{\gamma-1}{2}$, $c_p=\tfrac{\gamma R}{\gamma-1}$):
+
+$$u=\frac{a}{\phi}-W_1,\qquad h_0=c_pT+\tfrac12 u^2,\qquad a^2=\gamma R T\ \Rightarrow\ c_pT=\frac{a^2}{\gamma-1}.$$
+
+Sostituendo $u$ e $c_pT$ in $h_0$:
+
+$$\frac{a^2}{\gamma-1}+\frac12\left(\frac{a}{\phi}-W_1\right)^2=h_0
+\;\Longrightarrow\;\Big(\underbrace{\tfrac{1}{\gamma-1}+\tfrac{1}{2\phi^2}}_{\text{coeff. }a^2}\Big)a^2
+-\frac{W_1}{\phi}\,a+\Big(\tfrac12 W_1^2-h_0\Big)=0,$$
+
+equazione **di 2° grado in $a$**: si prende la **radice positiva** (l'unica fisica: per $u\to0$ deve dare
+$a\to a_0=\sqrt{(\gamma-1)h_0}$). Trovato $a$: $T=a^2/(\gamma R)$, poi $p$ dalla **isentropica**
+$p/p_0=(T/T_0)^{\gamma/(\gamma-1)}$ (entropia imposta), infine $\rho=p/(RT)$. Stato completo → flussi.
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — parete solida (caso a sé stante)</strong></summary>
+
+**È un caso a sé** (non un sotto-caso di ingresso/uscita): la parete **non è un bordo di flusso** ma un
+**vincolo geometrico** ($u_n=0$, impermeabilità). Però si **risolve come un pistone fermo** / un mezzo
+problema di Riemann contro un muro.
+
+![Parete solida (ridisegno Python): flusso verso la parete, lambda3 incidenti, lambda1 riflessa, lambda2 verticale](images/lc_parete_solida_py.svg)
+
+Lettura della figura:
+- **Direzione del flusso:** $u>0$ verso la parete (freccia verde).
+- **Caratteristiche:** $\lambda_3=u+a$ (rosse) **incidono** sulla parete; la $\lambda_2=u$ (arancio) porta
+  la particella verso il muro e, dovendo essere $u=0$ alla parete, **diventa verticale**; nasce una
+  $\lambda_1=u-a$ **riflessa** (blu) che rientra nel dominio. Quindi **3 famiglie**, ma una (la riflessa) è
+  *generata* dal vincolo.
+- **Isentropica o no:** se il fluido va **verso** la parete si forma un **urto** (entropia **cresce**, non
+  isentropico → Rankine–Hugoniot); se si **allontana**, un'**espansione** (isentropica, invarianti di
+  Riemann). Nel limite di urto **debole** (Mach relativo → 1) la generazione di entropia → 0 e si torna
+  isentropici.
+- **Legame col problema di Riemann:** è il Riemann problem "a specchio" (lo stato a destra è l'immagine
+  riflessa di quello a sinistra con $u\to-u$): la parete equivale a un piano di simmetria.
+
+Come si ricavano le grandezze (caso isentropico, urto debole):
+
+```mermaid
+graph TD
+    A["Vincolo: u = 0 alla parete"] --> B["Invariante W3 dallo stato a sinistra: a/phi + u = W3L"]
+    B --> C["Con u=0 -> a = phi * W3L"]
+    C --> D["T = (phi^2 W3L^2)/(gamma R)  (da a^2=gamma R T)"]
+    D --> E["p: isentropica p/pL = (T/TL)^(gamma/(gamma-1))  (S=SL)"]
+    E --> F["rho = p/(R T)"]
+```
+
+| Caso | Onda generata | Isentropico? | Metodo | Grandezze |
+|---|---|---|---|---|
+| Fluido **verso** la parete | **urto** | no (entropia ↑) | **Rankine–Hugoniot** con $u=0$ | $p,\rho$ post-urto |
+| Fluido **lontano** dalla parete | **espansione** | sì | **invarianti di Riemann** ($W_3$) | $a\to T\to p\to\rho$ |
+
+</details>
+
+<details>
+<summary><strong>Approfondimento — perché tutto questo serve anche per Navier–Stokes</strong></summary>
+
+L'approccio caratteristico **non è solo un caso particolare** (Eulero non viscoso): è la **prima fase**
+anche nei problemi più complessi. Le equazioni di **Navier–Stokes** si trattano con **operator splitting**:
+
+```mermaid
+graph LR
+    NS["Navier-Stokes"] --> C1["1) Parte CONVETTIVA = Eulero (iperbolica): flussi via caratteristiche / Riemann"]
+    NS --> C2["2) Parte DIFFUSIVA viscosa/termica (parabolica): gradienti"]
+    C1 --> S["3) Somma dei contributi -> flusso totale"]
+    C2 --> S
+    S --> BC["BC: parete -> pressione (convettivo) + sforzo viscoso con no-slip (diffusivo)"]
+```
+
+La parte convettiva è **identica** a quella vista (autovalori $u,u\pm a$, caratteristiche, BC per regime).
+La novità in Navier–Stokes è la BC di **parete**: oltre alla pressione (parte convettiva) si impone
+l'**aderenza** (no-slip, $u=0$) per lo sforzo viscoso. Quindi capire bene Eulero 1D è il **mattone** su cui
+si costruisce il caso generale.
 
 </details>
 
@@ -1265,3 +1489,30 @@ modelli **con discontinuità** (scalare non lineare *e* sistemi). Sul lineare de
 
 </details>
 
+
+## Archivio — figure originali (a mano)
+
+<details>
+<summary><strong>Archivio — figure a mano sostituite da versioni Python (conservate per riferimento)</strong></summary>
+
+Queste sono le figure **originali disegnate a mano** (dagli appunti) che nel testo principale sono state
+**sostituite** da versioni Python più pulite. Le tengo qui nel caso servano in futuro.
+
+**Condizioni al contorno (ora in `lc_bc_quattro_casi.svg`):**
+
+![Ingresso supersonico (a mano)](images/lc_bc_ingresso_supersonico.png)
+![Uscita supersonica (a mano)](images/lc_bc_uscita_supersonica.png)
+![Uscita subsonica (a mano)](images/lc_bc_uscita_subsonica.png)
+![Ingresso subsonico (a mano)](images/lc_bc_ingresso_subsonico.png)
+
+**Parete solida (ora in `lc_parete_solida_py.svg`):**
+
+![Parete solida (a mano)](images/lc_parete_solida.png)
+![Analogia della riflessione: corda fissata al muro (a mano)](images/lc_riflessione_onda.png)
+
+**Profili di Sod (ora in `lc_sod_profili.svg`, con anche $u$ e $T$):**
+
+![Profilo di pressione p(x,t1) (a mano)](images/lc_sod_pressione.png)
+![Profilo di densità ρ(x,t1) (a mano)](images/lc_sod_densita.png)
+
+</details>

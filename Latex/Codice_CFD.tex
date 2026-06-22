@@ -377,6 +377,28 @@ Le interfacce di bordo vengono trattate separatamente, applicando le
 condizioni al contorno appropriate (parete, inlet subsonico/supersonico,
 outlet subsonico/supersonico).
 
+\paragraph{Cosa e come imponiamo (scelta delle BC).}
+La scelta segue il \emph{conteggio delle caratteristiche entranti} (vedi
+\texttt{teoria/caratteristiche.md} \S8: \# BC $=$ \# caratteristiche entranti):
+\begin{itemize}
+  \item \textbf{Inlet subsonico:} entrano 2 caratteristiche ($\lambda_2,\lambda_3$)
+        $\Rightarrow$ imponiamo \textbf{2 grandezze termodinamiche totali},
+        $T^\circ_{\rm in}$ e $P^\circ_{\rm in}$ (file \texttt{inlet.txt}); la
+        velocità è ricavata dall'invariante $W_1$ che \emph{risale} dall'interno.
+  \item \textbf{Outlet subsonico:} entra 1 caratteristica ($\lambda_1=u-a<0$)
+        $\Rightarrow$ imponiamo \textbf{1 grandezza}, la \textbf{pressione statica}
+        $P_{\rm exit}$ (file \texttt{outlet.txt}); le altre due si estrapolano
+        dall'interno. È una BC \emph{riflettente} (semplice ma genera onde
+        acustiche spurie).
+  \item \textbf{Inlet/outlet supersonico:} rispettivamente 3 / 0 caratteristiche
+        entranti $\Rightarrow$ si impone tutto / nulla.
+  \item \textbf{Parete:} vincolo di impermeabilità $u_n=0$ (la pressione a parete
+        si ricava dallo stato interno).
+\end{itemize}
+Quindi i dati richiesti dal codice ($T^\circ,P^\circ$ all'inlet, $P$ all'outlet)
+non sono una scelta arbitraria: sono \emph{esattamente} le grandezze associate
+alle caratteristiche entranti nei due regimi subsonici.
+
 % ============================================================
 \section{Subroutine \texttt{integ\_time}}
 % ============================================================

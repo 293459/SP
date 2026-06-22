@@ -72,6 +72,8 @@
 > Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
 > espansione + contatto + urto, uso come **test di validazione** degli schemi.
 
+![Profili di Sod: rho, p, u, T (espansione + contatto + urto)](../teoria/images/lc_sod_profili.svg)
+
 </details>
 
 
@@ -91,6 +93,8 @@
 > | **D** Uscita subsonica | dx | $-,+,+$ | 1 | **1** | $p$ statica (rifl.) o invariante $W_1$ (non rifl.) |
 >
 > Logica: le **entranti** portano info da fuori → si **impongono**; le **uscenti** portano info dall'interno → si **estrapolano** (risalendo la caratteristica). Dettaglio in `teoria/caratteristiche.md` §8.
+
+![Le 4 casistiche delle condizioni al contorno (ingresso/uscita, sub/super)](../teoria/images/lc_bc_quattro_casi.svg)
 
 </details>
 
