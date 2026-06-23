@@ -22,10 +22,8 @@ dall'unione dei vecchi export Notion e delle sintesi in formato Q&A. Tutte le im
 |---|---|
 | `bilancio.md` | Leggi di conservazione, problemi ellittici/iperbolici, sistema di Eulero, modelli scalari/vettoriali |
 | `caratteristiche.md` | Metodo delle caratteristiche, linee caratteristiche, invarianti di Riemann, Rankine–Hugoniot (regime supersonico) |
+| `metodi_numerici.md` | **Tutti i metodi numerici** (file unificato): classificazione e proprietà generali (errori, stabilità, von Neumann, Lax, CFL), differenze finite, volumi finiti (Godunov/Riemann/flux splitting/Roe), elementi finiti (CG/DG), Lattice Boltzmann, SPH, Runge-Kutta/stiffness |
 | `meshing.md` | Tipologie di mesh, generazione, metriche, ALE |
-| `schemi_volumi_finiti.md` | Metodo dei volumi finiti, Godunov/Riemann, flux splitting, Roe |
-| `metodi_numerici.md` | Collocazione dei metodi nel corso, upwind vs centrati (+ simulazione d'esame) |
-| `metodi_numerici_ode.md` | Errori, consistenza/stabilità/convergenza, Runge-Kutta, stiffness, approfondimenti HPC/WENO/DG |
 | `turbolenza.md` | RANS/URANS, cascata di Kolmogorov, LES (filtri, SGS, Smagorinsky dinamico), DES/DDES |
 | `turbomacchine.md` | Interfaccia statore–rotore: mixing plane, sliding mesh, corocroniche, tempo inclinato (lez. 06-04) |
 | `modelli_ordine_ridotto.md` | ROM e POD: snapshot, modi, RIC, training offline/online (lez. 06-04) |

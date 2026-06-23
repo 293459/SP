@@ -1348,7 +1348,7 @@ invarianti lungo **tutte**. Analiticamente è **intrattabile** in generale (le c
 interagiscono, formano urti). **In pratica si discretizza:** i metodi a **volumi finiti / Godunov**
 risolvono un **problema di Riemann locale a ogni interfaccia** tra celle, a ogni passo temporale — cioè
 "tengono conto di tutte e 3 le caratteristiche in ogni punto" **numericamente**. È così che il metodo
-delle caratteristiche **motiva** gli schemi **upwind/Godunov** (vedi `schemi_volumi_finiti.md`).
+delle caratteristiche **motiva** gli schemi **upwind/Godunov** (vedi `metodi_numerici.md` (§3 volumi finiti)).
 
 </details>
 

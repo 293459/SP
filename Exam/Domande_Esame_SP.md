@@ -83,7 +83,7 @@
 <details>
 <summary><strong>🟦 [T] Tubo di Sod</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/caratteristiche.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`, `teoria/caratteristiche.md`.
 > Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
 > espansione + contatto + urto, uso come **test di validazione** degli schemi.
 
@@ -113,14 +113,16 @@
 
 </details>
 
-## 3) Schemi a volumi finiti: gradienti, ricostruzione, limitatori — `teoria/schemi_volumi_finiti.md`
+## 3) Metodi numerici (differenze, volumi, elementi finiti) — `teoria/metodi_numerici.md`
+
+### Volumi finiti: gradienti, ricostruzione, limitatori
 
 
 <details>
 <summary><strong>🟦 [T] Calcolo del gradiente nelle celle (Gauss–Green e minimi quadrati pesati) e all'interfaccia per i termini diffusivi</strong></summary>
 
 > 📌 *Risposta da compilare — verrà fornita la spiegazione dell'utente, da rifinire.*
-> Riferimento: `teoria/schemi_volumi_finiti.md` (ricostruzione e gradienti) e `teoria/meshing.md`.
+> Riferimento: `teoria/metodi_numerici.md` (ricostruzione e gradienti) e `teoria/meshing.md`.
 > Punti chiave attesi: gradiente di cella con il **teorema di Gauss–Green** (integrale di superficie
 > dei valori di faccia), **minimi quadrati pesati** (sistema sui vicini, peso $\propto 1/d$), e
 > il gradiente **all'interfaccia** necessario per i **flussi diffusivi** (media + correzione
@@ -131,7 +133,7 @@
 <details>
 <summary><strong>🟦 [T] Limitatori di pendenza per griglie strutturate e non strutturate</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: motivazione (monotonicità / TVD, evitare oscillazioni spurie a cavallo delle
 > discontinuità), limitatori classici (minmod, Van Leer, Barth–Jespersen / Venkatakrishnan per
 > mesh non strutturate), differenza nello **stencil** tra strutturato e non strutturato.
@@ -144,14 +146,14 @@
 > 📌 *Risposta da compilare.* Variante della precedente. Aggancio extra: come la **precisione di
 > macchina** (round-off) pone un **limite inferiore** all'errore raggiungibile e interagisce con
 > l'**ordine di accuratezza** (oltre un certo raffinamento l'errore di troncamento scende sotto il
-> round-off e non si guadagna più). Riferimento: `teoria/metodi_numerici_ode.md`.
+> round-off e non si guadagna più). Riferimento: `teoria/metodi_numerici.md`.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Calcolo dei gradienti: tutti e 3 i metodi (Green–Gauss, minimi quadrati, minimi quadrati pesati) con esempi</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: i **tre** approcci, vantaggi/limiti (Green–Gauss sensibile alla qualità mesh; minimi
 > quadrati più robusto su mesh distorte; pesatura per dare più importanza ai vicini vicini),
 > con esempio numerico/geometrico.
@@ -162,27 +164,27 @@
 <summary><strong>🟦 [T] Gradiente all'interfaccia e metodo dei minimi quadrati pesati</strong></summary>
 
 > 📌 *Risposta da compilare.* Sottocaso delle precedenti, focalizzato su **interfaccia** (flussi
-> diffusivi) + **WLSQ**. Riferimento: `teoria/schemi_volumi_finiti.md`.
+> diffusivi) + **WLSQ**. Riferimento: `teoria/metodi_numerici.md`.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Schemi di ordine superiore al primo nello spazio (intro generica) e calcolo della pendenza per griglie strutturate</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`, `teoria/metodi_numerici.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: dal **primo ordine** (Godunov) alla **ricostruzione MUSCL** (pendenza/slope), upwind vs
 > centrati, ruolo del limitatore; calcolo della **pendenza** su griglia strutturata (differenze su
 > stencil regolare).
 
 </details>
 
-## 4) Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione — `teoria/schemi_volumi_finiti.md`
+### Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione
 
 
 <details>
 <summary><strong>🟦 [T] Metodo di Godunov</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`
 > (Godunov/Riemann, flux splitting, Roe). Attesi: ricostruzione costante a tratti → **problema di
 > Riemann** a ogni interfaccia → flusso esatto/approssimato; primo ordine; legame con l'upwind.
 
@@ -191,7 +193,7 @@
 <details>
 <summary><strong>🟦 [T] Problema di Riemann e tubo d'urto di Sod: applicazione al calcolo dei flussi all'interfaccia tra celle (perché farlo, come si usa nel CFD, ODE risultante), metodi di risoluzione del problema di Riemann e metodo di Godunov</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`,
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`,
 > `teoria/caratteristiche.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
 > all'interfaccia tra celle nasce un problema di Riemann locale, risolutori **esatti vs approssimati**
 > (Roe, HLL/HLLC), e il metodo di **Godunov**.
@@ -201,7 +203,7 @@
 <details>
 <summary><strong>🟦 [T] Schemi di Lax(–Friedrichs) e Jameson–Schmidt–Turkel (JST)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/schemi_volumi_finiti.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: **Lax–Friedrichs** (centrato + dissipazione $\propto \lambda_{max}$), **JST** (centrato con
 > dissipazione artificiale del 2°/4° ordine commutata da sensore di pressione), pro/contro.
 
@@ -211,7 +213,7 @@
 <summary><strong>🟦 [T] Equazioni di Eulero 2D, discretizzazione a volumi finiti (arrivare a $\mathrm{d}\mathbf{U}/\mathrm{d}t = \sum \text{flussi}$), panoramica degli schemi per i flussi convettivi e illustrare Jameson</strong></summary>
 
 > 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (sistema di Eulero),
-> `teoria/schemi_volumi_finiti.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
+> `teoria/metodi_numerici.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
 > teorema della divergenza → bilancio dei flussi sulle facce, semidiscretizzazione, poi rassegna
 > schemi e dettaglio **Jameson**.
 
@@ -220,7 +222,7 @@
 <details>
 <summary><strong>🟦 [T] Metodi WENO e Discontinuous Galerkin (esempio 2D e formulazione variazionale)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md` (approfondimenti
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md` (approfondimenti
 > WENO/DG). Attesi: **WENO** (combinazione pesata di stencil, pesi non lineari per evitare gli
 > stencil che attraversano la discontinuità), **DG** (incognite = coefficienti modali per cella,
 > **formulazione debole/variazionale**, flussi numerici tra elementi), esempio 2D.
@@ -231,17 +233,17 @@
 <summary><strong>🟦 [T] WENO 5 e Galerkin Discontinuo</strong></summary>
 
 > 📌 *Risposta da compilare.* Variante della precedente, focus su **WENO di ordine 5** (3 sottostencil)
-> e DG. Riferimento: `teoria/metodi_numerici_ode.md`, immagine `weno5_stencil_sottogruppi.jpg`.
+> e DG. Riferimento: `teoria/metodi_numerici.md`, immagine `weno5_stencil_sottogruppi.jpg`.
 
 </details>
 
-## 5) Proprietà dei metodi, errore, stabilità, integrazione temporale — `teoria/metodi_numerici.md`, `teoria/metodi_numerici_ode.md`
+### Proprietà dei metodi, errore, stabilità, integrazione temporale
 
 
 <details>
 <summary><strong>🟦 [T] Parlare delle proprietà dei metodi numerici</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: **consistenza**, **stabilità**, **convergenza** e il teorema di **Lax** (consistenza +
 > stabilità ⟹ convergenza), oltre ad accuratezza/ordine, conservatività, monotonicità.
 
@@ -250,7 +252,7 @@
 <details>
 <summary><strong>🟦 [T] Dimostrare il senso fisico dell'errore locale di troncamento</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: sviluppo di **Taylor** dello schema → l'errore di troncamento equivale a termini
 > aggiuntivi nell'**equazione modificata** (diffusione/dispersione numerica): senso fisico =
 > il numero risolve un'equazione *diversa*, con dissipazione/dispersione spuria.
@@ -260,7 +262,7 @@
 <details>
 <summary><strong>🟦 [T] Stabilità (di uno schema numerico generico)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: analisi di **von Neumann**, **regione di assoluta stabilità**, CFL, stabilità
 > condizionata (espliciti) vs incondizionata (impliciti). Immagine
 > `regione_assoluta_stabilita_eulero_exp_imp.jpg`.
@@ -270,7 +272,7 @@
 <details>
 <summary><strong>🟦 [T] Integrazione temporale con metodi espliciti ed impliciti</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: Eulero esplicito vs implicito, Runge–Kutta, costo per passo vs ampiezza del $\Delta t$,
 > **stiffness**, A-stabilità.
 
@@ -279,7 +281,7 @@
 <details>
 <summary><strong>🟦 [T] Scrivere la formula dello schema numerico per il metodo esplicito e implicito</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici_ode.md`.
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
 > Attesi: $\mathbf{U}^{n+1} = \mathbf{U}^n + \Delta t\,\mathbf{R}(\mathbf{U}^n)$ (esplicito) vs
 > $\mathbf{U}^{n+1} = \mathbf{U}^n + \Delta t\,\mathbf{R}(\mathbf{U}^{n+1})$ (implicito), con la
 > linearizzazione/Jacobiano per l'implicito.
@@ -290,11 +292,11 @@
 <summary><strong>🟦 [T] Stabilità di uno schema numerico generico e poi per il metodo implicito</strong></summary>
 
 > 📌 *Risposta da compilare.* Variante combinata: parte generale + **stabilità del metodo implicito**
-> (A-stabilità, incondizionata). Riferimento: `teoria/metodi_numerici_ode.md`.
+> (A-stabilità, incondizionata). Riferimento: `teoria/metodi_numerici.md`.
 
 </details>
 
-## 6) Turbolenza — `teoria/turbolenza.md`
+## 4) Turbolenza — `teoria/turbolenza.md`
 
 
 <details>
@@ -316,7 +318,7 @@
 
 </details>
 
-## 7) Turbomacchine — `teoria/turbomacchine.md`
+## 5) Turbomacchine — `teoria/turbomacchine.md`
 
 
 <details>
@@ -329,7 +331,7 @@
 
 </details>
 
-## 8) Modelli di ordine ridotto — `teoria/modelli_ordine_ridotto.md`
+## 6) Modelli di ordine ridotto — `teoria/modelli_ordine_ridotto.md`
 
 
 <details>
@@ -341,7 +343,7 @@
 
 </details>
 
-## 9) Flussi reagenti — `teoria/reacting_flows.md`
+## 7) Flussi reagenti — `teoria/reacting_flows.md`
 
 
 <details>
@@ -354,7 +356,7 @@
 
 </details>
 
-## 10) Ottimizzazione — (esercitazione; nessun capitolo di teoria dedicato)
+## 8) Ottimizzazione — (esercitazione; nessun capitolo di teoria dedicato)
 
 
 <details>
