@@ -1281,6 +1281,66 @@ Da qui $u_j^{\,n+1}$ si ricava **esplicitamente** dai valori al passo $n$; la **
 
 </details>
 
+<details>
+<summary><strong>Esempi — gli schemi a confronto (stencil, equazioni, classificazione)</strong></summary>
+
+![Stencil degli schemi alle differenze finite: punti usati nel piano (x,t)](images/fd_schemi_stencil.svg)
+
+Tutti partono da $\dfrac{u_j^{n+1}-u_j^{n}}{\Delta t}$ per il tempo (avanti); cambia **come** si discretizza
+$a\,\partial_x u$ (quali punti, quale lato).
+
+**1) Upwind esplicito (FTBS)** — spazio *all'indietro* (da monte, per $a>0$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}=0.$$
+
+**2) Downwind esplicito** — spazio *in avanti* (lato sbagliato, per $a>0$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_j^{n}}{\Delta x}=0.$$
+
+**3) Centrato esplicito (FTCS)** — differenza centrata nello spazio:
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0
+\;\Rightarrow\; u_j^{n+1}=u_j^{n}-\frac{a\,\Delta t}{2\,\Delta x}\big(u_{j+1}^{n}-u_{j-1}^{n}\big)
+\;\Rightarrow\; u^{n+1}=f(u^{n}).$$
+
+**4) Centrato implicito** — la derivata spaziale è valutata al livello **nuovo** $n+1$:
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n+1}-u_{j-1}^{n+1}}{2\,\Delta x}=0
+\;\Rightarrow\; u^{n+1}=f(u^{n+1})\;\Rightarrow\;\text{si risolve un SISTEMA.}$$
+
+**5) Lax–Friedrichs (media)** — sostituisce $u_j^{n}$ con la **media** $\tfrac12(u_{j+1}^{n}+u_{j-1}^{n})$:
+$$\frac{u_j^{n+1}-\tfrac12\big(u_{j+1}^{n}+u_{j-1}^{n}\big)}{\Delta t}
++a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0.$$
+La media **aggiunge dissipazione numerica** → stabilizza il centrato (idea di base).
+
+**Come si contestualizzano** (rispetto alla *tabella di classificazione* della sezione 0):
+
+| Schema | Ordine spazio | Ordine tempo | Espl./Impl. | Stencil (punti) | Stabilità |
+|---|---|---|---|---|---|
+| **Upwind (FTBS)** | 1° | 1° | esplicito | 2: $\{j-1,j\}$ a $n$ | **stabile** se CFL $\le 1$ |
+| **Downwind** | 1° | 1° | esplicito | 2: $\{j,j+1\}$ a $n$ | **instabile** (sempre) |
+| **Centrato espl. (FTCS)** | 2° | 1° | esplicito | 3: $\{j-1,j,j+1\}$ a $n$ | **instabile** (incondizionatamente) |
+| **Centrato impl.** | 2° | 1° | **implicito** | 3 a $n{+}1$ + 1 a $n$ | **stabile** (incond.) ma serve risolvere un sistema |
+| **Lax–Friedrichs** | 1° | 1° | esplicito | 3: $\{j-1,j+1\}$ a $n$ | **stabile** se CFL $\le 1$ (diffusivo) |
+
+> 📌 **Commento importante sull'upwind (perché funziona, e il confronto col downwind).**
+> Per un flusso **supersonico** il problema è **iperbolico** (per Eulero 1D non stazionario lo è
+> **sempre**, anche in subsonico — *vedi `caratteristiche.md`*; quindi qui "ellittico" sarebbe un lapsus:
+> è **iperbolico**). In un problema iperbolico l'informazione viaggia **lungo le caratteristiche**, a
+> velocità finita e in una **direzione precisa**: il **dominio di dipendenza** del punto $u_j^{n+1}$ sta
+> **solo dal lato di monte**.
+> - L'**upwind** prende l'informazione **solo dal lato da cui arriva la caratteristica** (monte): usa
+>   esattamente i punti che possono **fisicamente influenzare** $u_j^{n+1}$, e **scarta** l'altro lato → è
+>   **coerente con la fisica** ed è **stabile** (sotto CFL $\le 1$).
+> - Il **downwind** prende l'informazione dal lato di **valle**, cioè da punti che (nel tempo $\Delta t$)
+>   **non possono ancora aver raggiunto** $u_j^{n+1}$: usa dati **fuori dal dominio di dipendenza** → è
+>   **non fisico** → l'analisi di von Neumann dà fattore di amplificazione $|G|>1$ → **instabile**.
+> - Il **centrato esplicito** usa **entrambi** i lati simmetricamente: per la pura advezione è
+>   **incondizionatamente instabile** ($|G|^2=1+(a\Delta t/\Delta x)^2\sin^2\theta>1$). Si stabilizza o
+>   passando all'**implicito** (centrato implicito) o **aggiungendo dissipazione** (Lax–Friedrichs).
+>
+> Morale: in iperbolico **prendere informazione solo dal lato "giusto" (le caratteristiche) non è solo più
+> fisico: è ciò che rende il metodo stabile**. Ignorare la direzionalità (downwind/centrato esplicito) la
+> distrugge.
+
+</details>
+
 
 ### Glossario essenziale
 
