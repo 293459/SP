@@ -24,6 +24,12 @@ sta una scelta toglie la confusione.
 | 5 | **Integrazione temporale** | esplicita vs implicita; n. di passi/stadi (Runge–Kutta, multistep) |
 | 6 | **Direzionalità / stencil** | upwind, downwind, centrato |
 | 7 | **Trattamento discontinuità** | con limitatori (TVD), alta risoluzione (WENO), o nessuno |
+| 8 | **Calcolo del flusso / dissipazione numerica** *(a parità di ordine!)* | come si valuta il flusso d'interfaccia (Godunov, flux splitting, Lax–Friedrichs…) → diversa **dissipazione/dispersione** |
+
+> ✅ La tua osservazione è **corretta** e merita un asse a sé (riga 8): **due metodi dello stesso ordine
+> spaziale** non sono equivalenti — differiscono per **come calcolano il flusso** e quindi per la
+> **dissipazione/dispersione numerica** (la *costante* dell'errore, non l'ordine). È il motivo per cui, a
+> pari "ordine 1", uno schema può "spalmare" molto di più una discontinuità di un altro.
 
 Una "ricetta" reale combina **una scelta per asse** (es. *volumi finiti + forma conservativa + upwind +
 2° ordine con limitatore + Runge–Kutta esplicito*).
@@ -111,6 +117,20 @@ Sono **principi di direzionalità** che esistono in **entrambi**:
 realizzata in due forme; su griglia uniforme per l'advezione lineare il **flusso upwind FV coincide** con lo
 schema **upwind FD**. Il *downwind* è instabile (l'analisi di von Neumann dà fattore di amplificazione $>1$).
 
+**E negli elementi finiti / altri metodi?** Il principio dell'upwinding **esiste anche lì**, perché è un
+principio **fisico** (rispettare la direzione di propagazione), non legato a una particolare discretizzazione:
+- **Elementi finiti continui (CG):** il Galerkin "puro" è **centrato** (e quindi instabile/oscillante per i
+  problemi convettivi dominanti); per stabilizzarlo si introduce l'upwinding con tecniche come
+  **SUPG** (*Streamline-Upwind Petrov–Galerkin*) o *artificial diffusion*.
+- **Discontinuous Galerkin (DG):** l'upwinding è **incorporato** nel **flusso numerico** alle facce (lo
+  stesso flusso upwind dei volumi finiti / problema di Riemann).
+- **Lattice Boltzmann:** non c'è un "upwind" esplicito, ma lo *streaming* propaga le distribuzioni lungo
+  direzioni discrete fissate → la direzionalità è già nella struttura del reticolo.
+
+In sintesi: **upwind/downwind/centrato** sono **trasversali** a tutti i metodi che discretizzano un termine
+convettivo; cambia solo *come* si realizza la direzionalità (stencil sbilanciato, flusso di interfaccia,
+termine di stabilizzazione).
+
 </details>
 
 <details>
@@ -162,8 +182,6 @@ graph TD
 </details>
 
 ## 1. Proprietà generali, errori, stabilità e integrazione temporale
-
-> Errori, consistenza, stabilità, convergenza, von Neumann, CFL e l'integrazione temporale (Runge–Kutta, stiffness): valgono per **tutti** i metodi. Provengono dal vecchio `metodi_numerici_ode`.
 
 ### Nomenclatura essenziale
 
@@ -647,99 +665,6 @@ $$
 <summary><strong>Problemi Stiff</strong></summary>
 
 *Problemi Stiff (PDF allegato Notion, non incluso nell'export)*
-
-</details>
-
-#### Implementazioni MATLAB (esercizi di codice)
-
-> Esercizi pratici di implementazione (in precedenza nella sezione "Quiz"): non sono domande da orale ma utili per esercitarsi a scrivere gli schemi.
-
-<details>
-<summary><strong>Eulero Esplicito (equazione)</strong></summary>
-
-```matlab
-f = @(t,y) -y^2 + 3*t ; h = 0.1; 
-t = 0:h:9 ; N = length(t); y = zeros(1,N) ; y(1)= 2*pi; 
-for i = 1:N-1
-  y(i+1) = y(i) + h * f(t(i),y(i)); 
-end 
-disp(y(end))
-```
-
-</details>
-
-<details>
-<summary><strong>Eulero Implicito (equazione)</strong></summary>
-
-![Quiz: Eulero implicito su problema di Cauchy, con derivazione manuale dell'iterazione](images/quiz_eulero_implicito_cauchy.jpg)
-
-```matlab
-t0 = 0 ; y0 = pi; tf = 10; h = 0.1 ; N = (tf -t0)/h ;
-for i = 1:N
-  y0 = y0/(1-h) - (h*(t0+h).^2)/(1-h);
-  t0 = t0 +h ; % aggiorno la variabile indipendente
-end
-% qui conveniva fare i calcoli a mano e poi implementare il risultato
-```
-
-</details>
-
-<details>
-<summary><strong>Eulero Esplicito (sistema)</strong></summary>
-
-![Quiz: Eulero esplicito su sistema (Domanda 6), con impostazione](images/quiz_eulero_esplicito_sistema.jpg)
-
-```matlab
-%% Quiz 2.6 (Eulero Esplicito ed Errore)
-clc; clear; close all
-t0 = 0; tf = 1;  N = 10^3; h = (tf-t0)/N; z = zeros(2,N) ; z(:,1) = [1,1]; t = linspace(t0,tf,N+1);
-y = @(x) 1/3*(exp(3*x)+2); y_true = y(tf); f = @(t,z) [z(2); 3* z(2)]; 
-for i = 1:N
-  z(:,i+1) = z(:,i) + h * f(t(i), z(:,i)); 
-end 
-err = abs(y_true-z(1,end)); 
-% fai attenzione agli indici, qui senza un'iterazione in più il risultato cambiava del 40% 
-% conviene costruire la griglia e salvarla in caso di errori
-```
-
-</details>
-
-<details>
-<summary><strong>Heun (equazione)</strong></summary>
-
-```matlab
-%% OPZIONE 1 (VERSIONE INLINE CORTA POCO LEGGIBILE)
-h = 0.01; t = 0:h:8; N = length(t); y = zeros(1,N); y(1) = 0;
-f = @(t,y) y^2 -5*t -2 ;
-for i = 1:N-1
-  y(i+1) = y(i) + h/2 *(f(t(i),y(i))+f(t(i+1),y(i)+h*f(t(i),y(i))));
-end
-disp(y(end))
-
-%% OPZIONE 2 (VERSIONE ESTESA CON RUNGE-KUTTA LEGGIBILE)
-f = @(t,y) -y + 5*t +2 ;  h = 0.15; 
-t = 0:h:6*h ; N = length(t); y = zeros(1,N) ; y(1)= 3; 
-for i = 1:N-1
-  k1 = f(t(i),y(i)); k2 = f(t(i)+h, y(i) +h*k1);  
-  y(i+1) = y(i) + (h/2)*(k1+k2)    ; 
-end 
-disp(y(end))
-```
-
-</details>
-
-<details>
-<summary><strong>ODE45 su sistema del secondo ordine</strong></summary>
-
-![Quiz: ODE45 su sistema del secondo ordine (Domanda 4), con impostazione](images/quiz_ode45_sistema.jpg)
-
-```matlab
-z0 = [pi; log(2)];
-f = @(t,z) [z(2); -z(1)^2]; 
-% ode è adattiva quindi non specifico il passo (ne il numero di intervalli)
-[T,Z] = ode45(f,t_range,z0); 
-soluzione = Z(end,1)
-```
 
 </details>
 
@@ -1268,7 +1193,94 @@ Con base di Legendre ortogonalizzata, \(M\) diventa diagonale.
 
 ## 2. Differenze finite
 
-> Formulazione e schemi (centrato, upwind/downwind, Lax–Friedrichs) + simulazione d'esame. Dal vecchio `metodi_numerici`.
+### Formulazione, dominio e discretizzazione
+
+<details>
+<summary><strong>Inquadramento — l'equazione di riferimento</strong></summary>
+
+Si usa l'**equazione scalare lineare** (advezione), il "modello-giocattolo" su cui si studiano tutti gli schemi:
+
+$$\frac{\partial u}{\partial t}+a\,\frac{\partial u}{\partial x}=0,\qquad
+u=\text{grandezza conservata generica},\quad a=\text{velocità del segnale}.$$
+
+Per risolverla **univocamente** servono delle **condizioni** (vedi sotto).
+
+</details>
+
+<details>
+<summary><strong>Figura + Concetto — dominio, dato iniziale e condizioni al contorno (DOVE stanno)</strong></summary>
+
+![Dominio (x,t): dato iniziale sul bordo basso, BC sul bordo sinistro](images/fd_dominio_bc.svg)
+
+Il dubbio "la BC si impone su tutto il tratto $x=0$ a $t$ variabile, o solo a $t=0$?" si scioglie guardando
+il **dominio** $[0,L]\times[0,T]$:
+- **Dato INIZIALE** $u(x,0)$ -> su **tutto il bordo inferiore** ($t=0$, **tutti gli $x$**).
+- **Condizione al CONTORNO** $u(0,t)$ -> su **tutto il bordo sinistro** ($x=0$, **tutti i $t$**), **non** solo
+  a $t=0$. (Per $a>0$ l'informazione **entra da sinistra**; il bordo destro $x=L$ e' **uscente** -> niente BC,
+  vedi `caratteristiche.md` §1.)
+
+Quindi sono **due** insiemi di dati su **due bordi diversi**: l'asse orizzontale (passato, $t=0$) e il bordo
+verticale sinistro (ingresso, $x=0$).
+
+```mermaid
+graph TD
+    EQ["u_t + a u_x = 0 (scalare lineare)"] --> NEED["Servono condizioni per risolvere univocamente"]
+    NEED --> IC["CONDIZIONE INIZIALE u(x, t=0)<br/>bordo INFERIORE: t=0, TUTTI gli x"]
+    NEED --> BC["CONDIZIONE AL CONTORNO u(x=0, t)<br/>bordo SINISTRO: x=0, TUTTI i t (a>0)"]
+    IC --> SOL["Soluzione nel dominio (x,t)"]
+    BC --> SOL
+    SOL --> OUTB["bordo DESTRO x=L: uscente -> nessuna BC (a>0)"]
+```
+
+</details>
+
+<details>
+<summary><strong>Figura + Concetto — discretizzazione spaziale e temporale ($\Delta x,\Delta t$ costanti)</strong></summary>
+
+![Discretizzazione dell'asse spaziale e di quello temporale](images/fd_discretizzazione.svg)
+
+$$\text{spazio: } x_j=j\,\Delta x=j\,\frac{L}{N}\ (j=0,\dots,N);\qquad
+\text{tempo: } t_n=n\,\Delta t=n\,\frac{T}{M}\ (n=0,\dots,M).$$
+
+```mermaid
+graph LR
+    D["Discretizzazione"] --> SX["SPAZIALE: x_j = j*dx = j*L/N, j=0..N"]
+    D --> TX["TEMPORALE: t_n = n*dt = n*T/M, n=0..M"]
+    SX --> NOTE["dx, dt COSTANTI (uniformi); N (spazio) e M (tempo) possono DIFFERIRE"]
+    TX --> NOTE
+```
+
+- **Perche' $\Delta x,\Delta t$ costanti?** Per **semplicita'** e per rendere immediate l'analisi di
+  consistenza (sviluppi di Taylor) e di stabilita' (von Neumann), che si scrivono pulite su **griglia
+  uniforme**. **Alternative** (se servono): griglie **non uniformi/stretchate** (per risolvere strati limite
+  o zone con forti gradienti) e passo temporale **adattivo** $\Delta t=\Delta t(t)$ (per seguire transitori);
+  costano in complessita' (gli sviluppi e la CFL vanno riscritti localmente).
+- **Perche' $N$ (spazio) e $M$ (tempo) possono/devono differire?** Sono **due discretizzazioni indipendenti**:
+  $\Delta x$ lo fissa l'**accuratezza spaziale** desiderata, mentre $\Delta t$ e' **vincolato dalla stabilita'**
+  (condizione **CFL** $\mathrm{CFL}=a\,\Delta t/\Delta x\le 1$ per l'esplicito). Quindi tipicamente, scelto
+  $\Delta x$, il $\Delta t$ e' **imposto** dalla CFL -> in generale $M\neq N$. E' **bene** che siano slegati:
+  cosi' si raffina lo spazio per l'accuratezza senza essere costretti a un $\Delta t$ uguale, e si sceglie
+  $\Delta t$ solo in base alla stabilita' (o lo si rende implicito per scioglierne il vincolo).
+
+</details>
+
+<details>
+<summary><strong>Schema — dalla derivata al sistema discreto (upwind esplicito)</strong></summary>
+
+Sostituendo le derivate con i **rapporti incrementali** ($\Delta x,\Delta t$ costanti):
+
+$$\frac{\partial u}{\partial t}\approx\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}\quad(\text{avanti nel tempo}),
+\qquad \frac{\partial u}{\partial x}\approx\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}\quad(\text{upwind, }a>0),$$
+
+si ottiene lo **schema upwind esplicito** (FTBS, *Forward-Time Backward-Space*):
+
+$$\boxed{\;\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}+a\,\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}=0\;}$$
+
+Da qui $u_j^{\,n+1}$ si ricava **esplicitamente** dai valori al passo $n$; la **scelta backward** in spazio
+(da monte) e' l'**upwind** corretto per $a>0$ ed e' cio' che rende lo schema stabile sotto CFL $\le 1$.
+
+</details>
+
 
 ### Glossario essenziale
 
@@ -1465,8 +1477,6 @@ centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
 </details>
 
 ## 3. Volumi finiti e schemi per i flussi
-
-> Metodo dei volumi finiti, Godunov/Riemann, flux splitting (FVS/FDS), Roe. Dal vecchio `schemi_volumi_finiti`.
 
 ### Nomenclatura essenziale
 
@@ -2086,7 +2096,4 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 
 </details>
 
-## 4. Elementi finiti, Lattice Boltzmann, SPH
-
-Le idee di **elementi finiti (continui/DG)**, **Lattice Boltzmann** e **SPH** sono inquadrate nella sezione 0 (classificazione e tabella pro/contro); il **Discontinuous Galerkin** e gli schemi ad **alta risoluzione (WENO)** sono approfonditi nella sezione 1 (approfondimenti teorici).
 
