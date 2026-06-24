@@ -208,6 +208,104 @@ graph TD
 
 ---
 
+### Quadro d'insieme: soluzioni, errori, proprietà
+
+> Tre toggle riassuntivi (sotto, le sezioni di dettaglio). L'ordine logico delle proprietà è
+> **consistenza → stabilità → convergenza** (vedi il toggle "Proprietà").
+
+<details>
+<summary><strong>Soluzioni — quali "soluzioni" sono in gioco</strong></summary>
+
+```mermaid
+graph TD
+    P["Problema: u_t + a u_x = 0  + condizioni"] --> EX["soluzione ESATTA  y(t_k)<br/>(spesso NON nota analiticamente)"]
+    P --> NU["soluzione NUMERICA  y_k<br/>(quella che CALCOLIAMO)"]
+    P --> RE["numerica SE partissi dall'esatta al passo precedente:<br/>y-cappello_(k+1) = UN passo da y(t_k)"]
+```
+
+- **Condizione iniziale o "finale"?** Dipende da **come si imposta** il problema: si può **marciare in
+  avanti** dalla condizione iniziale, oppure **all'indietro** dalla condizione finale. Più in generale si
+  parla di **condizione al contorno**.
+- **Sulla condizione al contorno non ha senso chiedersi "qual è la soluzione numerica":** lì **non la
+  calcoliamo**, la **fissiamo noi** → per noi quel valore **è** la soluzione **esatta**.
+- **C'è un punto in cui le due numeriche coincidono:** la **prima iterazione**. Si parte dall'unica cosa
+  nota — le **condizioni al contorno**, che (per il punto precedente) **sono** la soluzione esatta — quindi
+  lì la numerica è **priva di errore di propagazione**: è esattamente "la numerica se fossimo partiti
+  dall'esatta".
+
+</details>
+
+<details>
+<summary><strong>Errori — troncamento (locale), propagazione, globale</strong></summary>
+
+![Interpretazione degli errori: globale = troncamento (locale) + propagazione](images/errori_interpretazione.svg)
+
+```mermaid
+graph TD
+    TR["errore di TRONCAMENTO (locale)<br/>≈ errore di DISCRETIZZAZIONE<br/>(troncamento / dim. caratteristica della mesh)"] --> GL["errore GLOBALE<br/>= troncamento + propagazione"]
+    PR["errore di PROPAGAZIONE<br/>(anche partendo dall'esatta, il metodo<br/>approssimato al passo dopo devia)"] --> GL
+```
+
+- **Tre errori.** **Troncamento** (≈ **discretizzazione**: è il troncamento diviso una **dimensione
+  caratteristica** della mesh) · **propagazione** · **globale** (= **somma** dei due).
+- **Propagazione:** anche se al passo $k$ **partissi dalla soluzione esatta**, dato che il metodo è
+  **approssimato**, al passo $k+1$ otterresti comunque una soluzione **diversa** dall'esatta.
+- **Perché "errore *locale* di troncamento"?** Nei metodi alle **differenze finite** lo sviluppo di **Taylor**
+  ha termini di grado più alto che vengono **troncati** (eliminati): l'**equazione discretizzata** è quindi
+  **diversa** da quella originale → è un **errore intrinseco del modello** (l'equazione che risolviamo non è
+  quella esatta). L'idea è **generale** (estendibile agli altri metodi), ma qui si vede subito.
+- **[punto chiave] Inserendo la soluzione ESATTA nell'equazione DISCRETIZZATA non ottengo zero.** L'esatta
+  annulla **solo** l'equazione **originale**, non altre (come la discretizzata). Per l'upwind esplicito,
+  sostituendo $u_{ex}$ e sviluppando con Taylor:
+
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}\bigg|_{u_{ex}}
+=\underbrace{(u_t+a\,u_x)}_{=0}\;+\;\frac{\Delta t}{2}\,u_{tt}-a\,\frac{\Delta x}{2}\,u_{xx}+\dots
+=E_{\text{tronc}}\neq 0.$$
+
+  I termini extra sono l'**equazione modificata** che il metodo risolve **davvero** (diffusione/dispersione
+  numerica): **senso fisico** → il numero risolve **un'equazione diversa**. Per $\Delta t,\Delta x\to0$,
+  $E_{\text{tronc}}\to0$ (→ **consistenza**, vedi sotto).
+- **Norma per misurare l'errore (esercitazioni):** nelle **esercitazioni** si valuta l'errore delle
+  simulazioni **principalmente con la norma $L_2$**.
+
+</details>
+
+<details>
+<summary><strong>Proprietà — consistenza → stabilità → convergenza (ordine "intuitivo")</strong></summary>
+
+```mermaid
+graph LR
+    CO["CONSISTENZA<br/>dt→0 ⇒ E_troncamento→0"] --> CV["CONVERGENZA<br/>dt→0 ⇒ E_globale→0"]
+    ST["STABILITA'<br/>dt→0 ⇒ E_propagazione→0"] --> CV
+    CV -. "teorema di Lax" .-> LX["consistenza + stabilita' ⟺ convergenza<br/>(problema lineare ben posto)"]
+```
+
+**Perché questo ordine (e non convergenza per prima)?** La convergenza è la proprietà per cui, raffinando
+($\Delta t\to0$), l'**errore globale** tende a **zero**. Ma l'errore globale **si scompone** in
+troncamento + propagazione:
+- la **consistenza** garantisce $E_{\text{troncamento}}\to0$;
+- la **stabilità** garantisce $E_{\text{propagazione}}\to0$;
+- se **entrambi** vanno a zero, la loro **somma** (= errore globale) va a zero → **convergenza**.
+
+Quindi è più intuitivo costruire prima i due "mattoni" (consistenza, stabilità) e poi dedurne la
+convergenza — esattamente il **teorema di equivalenza di Lax**: *consistenza + stabilità ⟺ convergenza*
+(per problemi lineari ben posti). Mappa: **(a)** consistenza ↔ troncamento/discretizzazione; **(b)**
+stabilità ↔ propagazione; **(c)** convergenza ↔ globale.
+
+**Altre proprietà (per completezza):**
+- **Ordine di convergenza:** la **potenza** $p$ con cui l'errore va a zero, $E\sim O(\Delta x^{p})$ (es. 1°,
+  2° ordine). Dice *quanto in fretta* converge.
+- **Monotonicità:** lo schema **non crea nuovi massimi/minimi** (niente oscillazioni spurie vicino alle
+  discontinuità) — legata alla proprietà **TVD**.
+- **Conservatività:** il **flusso** che esce da una cella **entra** nell'adiacente → la grandezza si
+  **conserva** globalmente (massa, q. di moto, energia). Essenziale per gli **urti** (velocità d'urto
+  corretta, Rankine–Hugoniot).
+
+> *(Monotonicità e conservatività potrebbero non essere state trattate a lezione, ma vale la pena
+> conoscerle: completano il quadro delle proprietà.)*
+
+</details>
+
 ### Tipologie di errore
 
 <details>
@@ -264,7 +362,10 @@ $$e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1}) - \tilde y_{k+1}\
 <details>
 <summary><strong>Interpretazione grafica degli errori</strong></summary>
 
-![Interpretazione grafica degli errori: contributo di propagazione vs troncamento](images/errori_interpretazione_grafica.jpg)
+![Interpretazione grafica degli errori: troncamento (locale) + propagazione = globale](images/errori_interpretazione.svg)
+
+*(Figura Python aggiornata; vedi anche il toggle "Errori" nel quadro d'insieme. La vecchia immagine a mano
+`errori_interpretazione_grafica.jpg` resta in `images/` come archivio.)*
 
 </details>
 
