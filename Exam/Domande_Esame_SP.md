@@ -243,19 +243,47 @@
 <details>
 <summary><strong>🟦 [T] Parlare delle proprietà dei metodi numerici</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: **consistenza**, **stabilità**, **convergenza** e il teorema di **Lax** (consistenza +
-> stabilità ⟹ convergenza), oltre ad accuratezza/ordine, conservatività, monotonicità.
+Riferimento: `teoria/metodi_numerici.md` §1 (toggle "Proprietà"). Risposta:
+
+Le tre proprietà fondamentali, nell'ordine **logico** consistenza → stabilità → convergenza (non
+viceversa), perché la convergenza si **deduce** dalle altre due:
+- **Consistenza:** raffinando ($\Delta t\to0$), l'**errore di troncamento** (≈ discretizzazione) → 0; cioè
+  l'equazione discretizzata tende a quella esatta.
+- **Stabilità:** raffinando, l'**errore di propagazione** → 0; gli errori non si amplificano nel tempo.
+- **Convergenza:** raffinando, l'**errore globale** → 0. Ma $E_{\text{globale}}=E_{\text{troncamento}}+E_{\text{propagazione}}$:
+  se entrambi → 0, anche la somma → 0.
+- **Teorema di equivalenza di Lax** (problema lineare ben posto): **consistenza + stabilità ⟺ convergenza**.
+
+Mappa: (a) consistenza ↔ troncamento · (b) stabilità ↔ propagazione · (c) convergenza ↔ globale.
+
+**Per completezza** (proprietà aggiuntive):
+- **Ordine di convergenza:** la potenza $p$ con cui l'errore va a zero, $E\sim O(\Delta x^{p})$ (1°, 2°…).
+- **Monotonicità:** lo schema non crea **nuovi massimi/minimi** (niente oscillazioni spurie) — legata al TVD.
+- **Conservatività:** il flusso che esce da una cella entra nell'adiacente → la grandezza si **conserva**
+  globalmente; essenziale per gli **urti** (velocità d'urto corretta via Rankine–Hugoniot).
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Dimostrare il senso fisico dell'errore locale di troncamento</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: sviluppo di **Taylor** dello schema → l'errore di troncamento equivale a termini
-> aggiuntivi nell'**equazione modificata** (diffusione/dispersione numerica): senso fisico =
-> il numero risolve un'equazione *diversa*, con dissipazione/dispersione spuria.
+Riferimento: `teoria/metodi_numerici.md` §1 (toggle "Errori"). Risposta:
+
+**Idea:** equazioni diverse hanno soluzioni diverse. La soluzione **esatta** annulla l'equazione
+**originale** $u_t+a\,u_x=0$, **ma non** l'equazione **discretizzata**: inserendo $u_{ex}$ nella discreta si
+ottiene proprio l'**errore di troncamento** (≠ 0).
+
+**Esempio (upwind esplicito), via Taylor.** Sostituendo $u_{ex}$ e sviluppando in serie:
+
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}\bigg|_{u_{ex}}
+=\underbrace{(u_t+a\,u_x)}_{=\,0}\;+\;\frac{\Delta t}{2}\,u_{tt}-a\,\frac{\Delta x}{2}\,u_{xx}+\dots
+=E_{\text{tronc}}\neq 0.$$
+
+**Senso fisico:** i termini residui (i gradi alti del Taylor, **troncati** nello schema → da cui il nome)
+sono l'**equazione modificata** che il metodo risolve *davvero*: contengono **diffusione/dispersione
+numerica**. Quindi il calcolo non risolve l'equazione esatta ma **un'equazione diversa**, con dissipazione/
+dispersione spurie. Per $\Delta t,\Delta x\to0$ questi termini → 0 ⇒ **consistenza**. L'idea (l'esatta non
+annulla l'equazione approssimata) è **generale**, non solo delle differenze finite.
 
 </details>
 
