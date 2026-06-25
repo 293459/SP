@@ -496,6 +496,156 @@ ovvero se l'errore globale $e_N\to 0$. Il metodo è convergente in $[a,b]$ se lo
 
 </details>
 
+### Analisi di stabilità di von Neumann
+
+> La **stabilità** valuta l'errore di **propagazione**: uno schema è stabile se gli errori **non
+> crescono** illimitatamente passo dopo passo. L'analisi di von Neumann lo verifica decomponendo l'errore
+> in **modi di Fourier** e misurando il **fattore di amplificazione** $G$.
+
+<details>
+<summary><strong>Dimostrazione — von Neumann per l'upwind esplicito (con figura)</strong></summary>
+
+**Procedura:** ① scelgo il metodo, ② scrivo l'equazione discretizzata, ③ inserisco un modo d'errore e
+ricavo $G$.
+
+Upwind esplicito ($a>0$), con $\nu=\dfrac{a\,\Delta t}{\Delta x}$ (numero di Courant):
+$$u_j^{n+1}=u_j^{n}-\nu\,(u_j^{n}-u_{j-1}^{n}).$$
+
+Inserisco un **modo di Fourier dell'errore** $\,e_j^{n}=E^{n}\,e^{\,i\beta x_j}$ ($x_j=j\,\Delta x$): la
+parte **spaziale** è $e^{i\beta x}$, quella **temporale** è l'ampiezza $E^{n}$. Sostituendo e dividendo per
+$E^{n}e^{i\beta j\Delta x}$:
+
+$$G=\frac{E^{n+1}}{E^{n}}=1-\nu\big(1-e^{-i\beta\Delta x}\big)=(1-\nu)+\nu\,e^{-i\theta},\qquad \theta=\beta\Delta x.$$
+
+Nel piano complesso $G(\theta)$ descrive un **cerchio** di **centro** $(1-\nu,\,0)$ e **raggio** $\nu$.
+La **stabilità** richiede $|G|\le1$ per **ogni** modo $\theta$ ⟺ il cerchio sta dentro il **cerchio unitario**:
+
+![Fattore di amplificazione dell'upwind esplicito: cerchio (1-nu)+nu e^{-i theta} vs cerchio unitario](images/vonneumann_upwind.svg)
+
+- $\nu<1$: cerchio **interno** → **stabile**;
+- $\nu=1$: cerchio = cerchio unitario → $|G|=1$, **neutro** (limite);
+- $\nu>1$: cerchio **esce** → $|G|>1$ per qualche $\theta$ → **instabile**.
+
+**Conclusione:** l'upwind esplicito è **condizionatamente stabile** sotto la condizione **CFL**
+$\;\nu=\dfrac{a\,\Delta t}{\Delta x}\le1$.
+
+</details>
+
+<details>
+<summary><strong>Concetto [1] — perché solo l'esponenziale SPAZIALE (e non anche temporale)?</strong></summary>
+
+È una **separazione di variabili**. L'errore si decompone in **modi di Fourier nello spazio**
+($e^{i\beta x}$) perché la griglia è uniforme e qualunque errore è **sovrapposizione** di modi spaziali.
+La dipendenza dal **tempo** **non** si impone: è proprio ciò che vogliamo **trovare**. Si scrive
+
+$$e_j^{n}=E^{n}\,e^{i\beta x_j}=G^{\,n}\,e^{i\beta x_j},$$
+
+cioè a ogni passo lo **stesso** modo spaziale viene moltiplicato per il **fattore di amplificazione** $G$
+(l'incognita). Mettere un $e^{i\omega t}$ significherebbe **presupporre** il comportamento temporale; invece
+si lascia che sia lo **schema** a dirci $G$. In breve: **spazio = base di Fourier nota** (decomposizione),
+**tempo = ampiezza $E^{n}=G^{n}E^0$** (la crescita $G$ è ciò che si calcola).
+
+</details>
+
+<details>
+<summary><strong>Concetto [2] — perché si chiama analisi "lineare"?</strong></summary>
+
+Sì, è un'analisi **lineare**, per due motivi legati:
+- si applica a **schemi lineari** (PDE lineare a **coefficienti costanti**, tipo $u_t+a u_x=0$);
+- si fonda sulla **sovrapposizione** dei modi di Fourier — valida **solo** se i modi evolvono in modo
+  **indipendente** (l'uno non influenza l'altro), cioè se il problema è **lineare**. Ogni modo è amplificato
+  per conto suo da $G(\beta)$; lo schema è stabile se **nessun** modo cresce.
+
+Per problemi **non lineari** la von Neumann si usa come **linearizzazione locale** (si "congelano" i
+coefficienti). Quindi "lineare" = sfrutta **linearità/sovrapposizione**.
+
+</details>
+
+<details>
+<summary><strong>Concetto [4] — perché $|e^{i\beta x}|=1$ (la ragione matematica)</strong></summary>
+
+Sì, è esattamente la forma **polare** di un numero complesso: $z=r\,e^{i\varphi}$, dove $r$ è il **modulo**
+(l'ampiezza) e $e^{i\varphi}$ è la **fase**, che ha **modulo unitario** ($|e^{i\varphi}|=\sqrt{\cos^2+\sin^2}=1$).
+Nel modo $E^{n}e^{i\beta x}$ il fattore spaziale $e^{i\beta x}$ è una **pura fase/oscillazione**: $|\cdot|=1$,
+**non** cambia l'ampiezza → **tutta** l'ampiezza (e la sua crescita) sta in $E^{n}$. Per questo, dividendo per
+il modo, resta $G=E^{n+1}/E^{n}$ e la stabilità si legge sul **modulo** $|G|\le1$: conta l'**ampiezza** di
+$G$, non la sua fase.
+
+</details>
+
+<details>
+<summary><strong>Concetto [5] — $|G|\le1$: solo von Neumann o proprietà generale della stabilità?</strong></summary>
+
+Il vincolo $|G|\le1$ è la **forma** (in von Neumann) di un principio **generale**: *un metodo stabile non
+amplifica gli errori* nel marciare. Il principio generale (**Lax–Richtmyer**) è che le **potenze**
+dell'operatore di avanzamento sono **uniformemente limitate**, $\lVert C^{\,n}\rVert\le K$. Le sue
+incarnazioni:
+
+| Forma dell'analisi | Condizione di stabilità |
+|---|---|
+| **von Neumann (Fourier)** | $|G(\beta)|\le1$ per **ogni** modo (o $\le 1+O(\Delta t)$ se l'esatta cresce) |
+| **Matriciale** | raggio spettrale $\rho(A)\le1$ ($+O(\Delta t)$) |
+| **Energia / Lax–Richtmyer** | $\lVert C^{\,n}\rVert\le K$ (crescita limitata) |
+
+Quindi: **stabilità (generale) = crescita limitata degli errori** ⟺ in von Neumann **$|G|\le1$ su tutti i
+modi**. Non è un'invenzione della sola von Neumann: è la sua **traduzione di Fourier**.
+
+</details>
+
+<details>
+<summary><strong>Concetto [7] — il Taylor non è sull'errore globale: è sul troncamento (consistenza)</strong></summary>
+
+Hai ragione a sentire una stonatura: lo **sviluppo di Taylor** **non** riguarda la **stabilità** né
+l'**errore globale**. Sono **tre analisi distinte** per **tre errori distinti**:
+
+| Proprietà | Errore | Strumento |
+|---|---|---|
+| **Consistenza** | troncamento (locale) | **TAYLOR** (inserisco l'esatta nello schema) |
+| **Stabilità** | **propagazione** | **FOURIER / von Neumann** (inserisco un modo d'errore) |
+| **Convergenza** | **globale** | **Lax** (consistenza + stabilità) |
+
+Quindi il Taylor produce l'**errore di troncamento** (lato **consistenza** / equazione modificata), **non**
+l'errore globale e **non** la stabilità. L'errore **globale** non si "sviluppa con Taylor": è la **somma**
+troncamento + propagazione, e va a zero per il **teorema di Lax**. Probabilmente negli appunti i due
+sviluppi (Taylor per il troncamento, Fourier per la propagazione) erano vicini e si sono confusi.
+
+</details>
+
+<details>
+<summary><strong>Mappa [3] — quali analisi di stabilità esistono</strong></summary>
+
+La von Neumann è **una delle principali** (la più usata sui casi lineari a coefficienti costanti su griglia
+uniforme), **non** l'unica:
+
+```mermaid
+graph TD
+    STAB["Analisi di STABILITA'"] --> VN["von Neumann (Fourier)<br/>schemi LINEARI, coeff. costanti, griglia uniforme<br/>(la piu' usata)"]
+    STAB --> MAT["Metodo MATRICIALE<br/>autovalori della matrice di iterazione<br/>(gestisce le condizioni al contorno)"]
+    STAB --> EN["Metodo dell'ENERGIA<br/>stime a priori, anche NON lineari"]
+    STAB --> CFL["CFL / equazione modificata<br/>(necessaria/euristica)"]
+    VN -. "quadro generale" .-> LR["Lax-Richtmyer: potenze dell'operatore limitate"]
+    MAT -. "quadro generale" .-> LR
+```
+
+</details>
+
+<details>
+<summary><strong>Mappa [6] — schemi analizzati e risultati di stabilità</strong></summary>
+
+```mermaid
+graph TD
+    A["von Neumann sugli schemi per u_t + a u_x = 0"] --> UP["Upwind esplicito<br/>CONDIZIONATAMENTE stabile: CFL nu<=1"]
+    A --> DW["Downwind esplicito<br/>INCONDIZIONATAMENTE instabile"]
+    A --> CE["Centrato esplicito (FTCS)<br/>INCONDIZIONATAMENTE instabile"]
+    A --> CI["Centrato implicito<br/>INCONDIZIONATAMENTE stabile (ma risolve un sistema)"]
+    A --> LF["Lax-Friedrichs<br/>CONDIZIONATAMENTE stabile: CFL nu<=1 (diffusivo)"]
+```
+
+> Le **dimostrazioni** dei singoli schemi (centrato esplicito/implicito) le caricherai tu: appena arrivano
+> le converto in LaTeX/markdown e le inserisco qui sotto (o, se troppo onerose, le linko come PDF).
+
+</details>
+
 ### Passi, espliciti-impliciti, stadi e stencil
 
 <details>

@@ -316,12 +316,42 @@ annulla l'equazione approssimata) è **generale**, non solo delle differenze fin
 </details>
 
 <details>
-<summary><strong>🟦 [T] Stabilità (di uno schema numerico generico)</strong></summary>
+<summary><strong>🟦 [T] Stabilità di uno schema numerico — (a) UPWIND ESPLICITO</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: analisi di **von Neumann**, **regione di assoluta stabilità**, CFL, stabilità
-> condizionata (espliciti) vs incondizionata (impliciti). Immagine
-> `regione_assoluta_stabilita_eulero_exp_imp.jpg`.
+> All'esame "la stabilità di uno schema generico" → **studiali tutti e tre** (upwind esplicito, centrato
+> esplicito, centrato implicito): qui sono **tre domande separate** così sei pronto a qualsiasi richiesta.
+
+Riferimento: `teoria/metodi_numerici.md` §1 (toggle "von Neumann — upwind esplicito"). Risposta:
+
+Analisi di **von Neumann**: inserisco un modo d'errore $e_j^n=E^n e^{i\beta x_j}$ nello schema upwind
+$u_j^{n+1}=u_j^n-\nu(u_j^n-u_{j-1}^n)$, $\nu=a\Delta t/\Delta x$. Ricavo il **fattore di amplificazione**
+
+$$G=\frac{E^{n+1}}{E^n}=(1-\nu)+\nu\,e^{-i\theta},\qquad \theta=\beta\Delta x,$$
+
+un **cerchio** di centro $(1-\nu,0)$ e raggio $\nu$. Stabilità $\iff |G|\le1\ \forall\theta\iff$ il cerchio
+sta nel cerchio unitario $\iff \boxed{\nu\le1}$ (**CFL**). → **condizionatamente stabile**
+($\nu<1$ stabile, $\nu=1$ neutro, $\nu>1$ instabile). Vedi figura `teoria/images/vonneumann_upwind.svg`.
+
+![Cerchio di amplificazione dell'upwind esplicito vs cerchio unitario](../teoria/images/vonneumann_upwind.svg)
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Stabilità di uno schema numerico — (b) CENTRATO ESPLICITO (FTCS)</strong></summary>
+
+> 📌 *Dimostrazione in arrivo (la fornisci tu come PDF → la converto in LaTeX/markdown qui).*
+> **Risultato atteso:** $G=1-i\,\nu\sin\theta$ → $|G|^2=1+\nu^2\sin^2\theta>1$ → **incondizionatamente
+> instabile** (per la pura advezione). Riferimento: `teoria/metodi_numerici.md` §1–§2.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Stabilità di uno schema numerico — (c) CENTRATO IMPLICITO</strong></summary>
+
+> 📌 *Dimostrazione in arrivo (la fornisci tu come PDF → la converto in LaTeX/markdown qui).*
+> **Risultato atteso:** $G=\dfrac{1}{1+i\,\nu\sin\theta}$ → $|G|=\dfrac{1}{\sqrt{1+\nu^2\sin^2\theta}}\le1$
+> sempre → **incondizionatamente stabile** (al prezzo di risolvere un **sistema** ad ogni passo).
+> Riferimento: `teoria/metodi_numerici.md` §1.
 
 </details>
 
