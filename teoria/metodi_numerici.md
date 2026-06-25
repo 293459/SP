@@ -646,6 +646,112 @@ graph TD
 
 </details>
 
+### Condizione CFL, termini diffusivi ed esempi
+
+<details>
+<summary><strong>Concetto — la condizione CFL (dominio di dipendenza)</strong></summary>
+
+> **Definizione (da ricordare):** *il dominio di influenza fisico deve essere contenuto nel dominio di
+> influenza numerico.* (Forma classica equivalente: il **dominio di dipendenza fisico** del punto deve
+> essere **contenuto** in quello **numerico** — lo stencil.)
+
+In formula (scalare): $\;\mathrm{CFL}=\dfrac{a\,\Delta t}{\Delta x}\le1$.
+
+**[interpretazione] Cosa va storto se CFL > 1.** In un passo $\Delta t$ il segnale fisico percorre
+$a\,\Delta t$. Se $a\,\Delta t>\Delta x$ (CFL > 1), il segnale percorre **più di una cella**: il **dominio di
+dipendenza fisico** del nuovo punto si estende **oltre lo stencil numerico** → lo schema **non contiene
+tutta l'informazione fisica** che dovrebbe influenzare quel punto. Va letto **al contrario** del "non può
+pescarla": è la **cella** a **non avere** dentro l'informazione necessaria → il metodo non può riprodurre
+la fisica → **instabilità**.
+
+**[perché su $\Delta t$ e non su $\Delta x$]** La velocità $a$ è **fisica** (non modificabile) e $\Delta x$
+lo fissi per l'**accuratezza**: l'unico "pomello" libero per soddisfare la CFL è il **passo temporale**.
+Quindi: *il $\Delta t$ deve essere abbastanza piccolo da non far "uscire" il fenomeno fisico dalla cella
+numerica in un passo* ($a\,\Delta t\le\Delta x$). (La tua interpretazione è corretta.)
+
+**[denominatore = $\lambda_{\max}$]** Per i **sistemi** (Eulero) la velocità che conta è la **massima**
+velocità d'onda, $\lambda_{\max}=|u|+a$ (la caratteristica più veloce): $\;\dfrac{(|u|+a)\,\Delta t}{\Delta x}\le1$.
+È **esattamente** ciò che si fa nelle **esercitazioni**: in `Euler2D/compute_dt.f90` il $\Delta t$ di ogni
+cella è calcolato da $\lambda_{\max}$ locale (poi si prende il minimo). **Importante**: questo ragionamento
+vale per Eulero proprio perché lì $\lambda_{\max}=|u|+a$.
+
+**[necessaria, non sufficiente]** La CFL è un criterio che **avverte** di possibili violazioni del principio
+di dipendenza fisica, **ma non garantisce di per sé la stabilità**: è **necessaria**, non **sufficiente**
+(es. il centrato esplicito rispetta un limite tipo-CFL ma è comunque instabile).
+
+</details>
+
+<details>
+<summary><strong>Concetto [punto importante] — il teorema di Lax richiede metodi LINEARI?</strong></summary>
+
+**Sì, la linearità è un'ipotesi del teorema.** Un metodo è **lineare** quando la regola di aggiornamento è
+**fissa**, **indipendente** dai valori della soluzione (nessun `if`/limitatore che cambia lo schema in base
+all'evoluzione); se invece include condizioni che modificano la discretizzazione (es. limitatori,
+shock-capturing con `if`), il metodo è **non lineare**.
+
+Il **teorema di equivalenza di Lax** (*consistenza + stabilità ⟺ convergenza*) si dimostra usando la
+**limitatezza delle potenze** dell'**operatore lineare** di avanzamento (sovrapposizione): vale per
+**problemi lineari ben posti** con **schemi lineari**. Per i metodi **non lineari** non si applica
+direttamente → servono altri strumenti (**TVD**, condizioni di **entropia**). Ecco perché la precisazione
+"metodo lineare" accompagna sempre l'enunciato di Lax.
+
+</details>
+
+<details>
+<summary><strong>Concetto [punto 2] — "consistente raffinando la griglia": e il $\Delta t$?</strong></summary>
+
+La consistenza si valuta per $\Delta t,\Delta x\to0$. "Raffinare la **griglia**" sembra solo $\Delta x\to0$,
+ma negli schemi **espliciti** $\Delta t$ è **legato** a $\Delta x$ dalla **CFL** (es. $\nu=a\Delta t/\Delta x$
+**fisso**): allora $\Delta t=\nu\,\Delta x/a\to0$ **insieme** a $\Delta x$. Quindi raffinando a **CFL fissa**
+le due cose sono **correlate** e $\Delta t\to0$ "gratis". (La tua intuizione è giusta: è la CFL a legarle.)
+
+</details>
+
+<details>
+<summary><strong>Concetto [punto 7] — stabilità: termine convettivo vs diffusivo</strong></summary>
+
+I due termini portano vincoli di stabilità **diversi** (dalla tua schema):
+
+| | Termine **CONVETTIVO** | Termine **DIFFUSIVO** |
+|---|---|---|
+| Equazione | $a\,\dfrac{\partial u}{\partial x}=a\,\nabla u$ (gradiente) | $\alpha\,\dfrac{\partial^2 u}{\partial x^2}=\alpha\,\nabla^2 u$ (laplaciano) |
+| Numero di stabilità | $\mathrm{CFL}=\dfrac{a\,\Delta t}{\Delta x}$ | $d=\dfrac{\alpha\,\Delta t}{\Delta x^2}$ |
+| Vincolo (esplicito) | $\dfrac{a\,\Delta t}{\Delta x}\le1$ | $\dfrac{\alpha\,\Delta t}{\Delta x^2}\le\dfrac12$ |
+| Vincolo su $\Delta t$ | $\Delta t\lesssim \dfrac{\Delta x}{a}$ (**lineare** in $\Delta x$) | $\Delta t\lesssim \dfrac{\Delta x^2}{2\alpha}$ (**quadratico** in $\Delta x$) |
+
+**Differenza chiave:** il vincolo **diffusivo** scala con $\Delta x^2$ → **molto più restrittivo** man mano
+che si raffina ($\Delta x\to0$): dimezzare $\Delta x$ **quadruplica** il numero di passi richiesti (contro
+il **raddoppio** del convettivo). Per questo i termini **diffusivi** si trattano spesso in **implicito**
+(per liberarsi del vincolo $\Delta t\sim\Delta x^2$).
+
+</details>
+
+<details>
+<summary><strong>ESEMPI — tutti gli esempi pratici, uno per uno</strong></summary>
+
+Dopo i toggle di teoria, ecco la **mappa di tutti gli esempi** svolti (e dove sono trattati nel file):
+
+```mermaid
+graph TD
+    E["ESEMPI pratici"] --> SN["SCHEMI NUMERICI (§2)<br/>upwind / downwind / centrato espl. / centrato impl. / Lax-Friedrichs"]
+    E --> ST["STABILITA' (von Neumann)<br/>upwind esplicito (cond. stabile)<br/>centrato esplicito (instabile)<br/>centrato implicito (incond. stabile)<br/>centrato esplicito + termine diffusivo"]
+    E --> TR["SIGNIFICATO FISICO errore locale di troncamento<br/>upwind esplicito · centrato esplicito · Lax-Friedrichs"]
+    E --> CF["CONDIZIONE CFL<br/>Eulero 1D non stazionario (lambda_max = |u|+a)"]
+```
+
+- **Schemi numerici** → §2, toggle *"Esempi — gli schemi a confronto"* (stencil + equazioni + classificazione).
+- **Stabilità (von Neumann)** → sopra, toggle *"Dimostrazione — von Neumann per l'upwind esplicito"* e
+  *"Mappa — schemi analizzati e risultati"*; centrato esplicito/implicito: vedi le domande d'esame divise
+  in tre (dimostrazioni in arrivo); il **centrato esplicito + diffusivo** rientra nel toggle
+  *"convettivo vs diffusivo"* qui sopra.
+- **Significato fisico dell'errore di troncamento** → toggle *"Errori"* (equazione modificata via Taylor):
+  l'**upwind** dà un troncamento **diffusivo** (dissipazione), il **centrato/Lax-Friedrichs** un mix
+  diffusione/dispersione.
+- **CFL** → toggle *"Condizione CFL"* qui sopra, applicata a **Eulero 1D non stazionario** con
+  $\lambda_{\max}=|u|+a$ (come nell'esercitazione `Euler2D`).
+
+</details>
+
 ### Passi, espliciti-impliciti, stadi e stencil
 
 <details>
