@@ -143,128 +143,6 @@
 
 ## 3) Metodi numerici (differenze, volumi, elementi finiti) — `teoria/metodi_numerici.md`
 
-### Volumi finiti: gradienti, ricostruzione, limitatori
-
-
-<details>
-<summary><strong>🟦 [T] Calcolo del gradiente nelle celle (Gauss–Green e minimi quadrati pesati) e all'interfaccia per i termini diffusivi</strong></summary>
-
-> 📌 *Risposta da compilare — verrà fornita la spiegazione dell'utente, da rifinire.*
-> Riferimento: `teoria/metodi_numerici.md` (ricostruzione e gradienti) e `teoria/meshing.md`.
-> Punti chiave attesi: gradiente di cella con il **teorema di Gauss–Green** (integrale di superficie
-> dei valori di faccia), **minimi quadrati pesati** (sistema sui vicini, peso $\propto 1/d$), e
-> il gradiente **all'interfaccia** necessario per i **flussi diffusivi** (media + correzione
-> di non-ortogonalità).
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Limitatori di pendenza per griglie strutturate e non strutturate</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: motivazione (monotonicità / TVD, evitare oscillazioni spurie a cavallo delle
-> discontinuità), limitatori classici (minmod, Van Leer, Barth–Jespersen / Venkatakrishnan per
-> mesh non strutturate), differenza nello **stencil** tra strutturato e non strutturato.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Limitatori per mesh strutturate e non, spiegando la precisione di macchina in termini di ordine di accuratezza</strong></summary>
-
-> 📌 *Risposta da compilare.* Variante della precedente. Aggancio extra: come la **precisione di
-> macchina** (round-off) pone un **limite inferiore** all'errore raggiungibile e interagisce con
-> l'**ordine di accuratezza** (oltre un certo raffinamento l'errore di troncamento scende sotto il
-> round-off e non si guadagna più). Riferimento: `teoria/metodi_numerici.md`.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Calcolo dei gradienti: tutti e 3 i metodi (Green–Gauss, minimi quadrati, minimi quadrati pesati) con esempi</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: i **tre** approcci, vantaggi/limiti (Green–Gauss sensibile alla qualità mesh; minimi
-> quadrati più robusto su mesh distorte; pesatura per dare più importanza ai vicini vicini),
-> con esempio numerico/geometrico.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Gradiente all'interfaccia e metodo dei minimi quadrati pesati</strong></summary>
-
-> 📌 *Risposta da compilare.* Sottocaso delle precedenti, focalizzato su **interfaccia** (flussi
-> diffusivi) + **WLSQ**. Riferimento: `teoria/metodi_numerici.md`.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Schemi di ordine superiore al primo nello spazio (intro generica) e calcolo della pendenza per griglie strutturate</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: dal **primo ordine** (Godunov) alla **ricostruzione MUSCL** (pendenza/slope), upwind vs
-> centrati, ruolo del limitatore; calcolo della **pendenza** su griglia strutturata (differenze su
-> stencil regolare).
-
-</details>
-
-### Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione
-
-
-<details>
-<summary><strong>🟦 [T] Metodo di Godunov</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`
-> (Godunov/Riemann, flux splitting, Roe). Attesi: ricostruzione costante a tratti → **problema di
-> Riemann** a ogni interfaccia → flusso esatto/approssimato; primo ordine; legame con l'upwind.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Problema di Riemann e tubo d'urto di Sod: applicazione al calcolo dei flussi all'interfaccia tra celle (perché farlo, come si usa nel CFD, ODE risultante), metodi di risoluzione del problema di Riemann e metodo di Godunov</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`,
-> `teoria/caratteristiche.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
-> all'interfaccia tra celle nasce un problema di Riemann locale, risolutori **esatti vs approssimati**
-> (Roe, HLL/HLLC), e il metodo di **Godunov**.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Schemi di Lax(–Friedrichs) e Jameson–Schmidt–Turkel (JST)</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: **Lax–Friedrichs** (centrato + dissipazione $\propto \lambda_{max}$), **JST** (centrato con
-> dissipazione artificiale del 2°/4° ordine commutata da sensore di pressione), pro/contro.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Equazioni di Eulero 2D, discretizzazione a volumi finiti (arrivare a $\mathrm{d}\mathbf{U}/\mathrm{d}t = \sum \text{flussi}$), panoramica degli schemi per i flussi convettivi e illustrare Jameson</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (sistema di Eulero),
-> `teoria/metodi_numerici.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
-> teorema della divergenza → bilancio dei flussi sulle facce, semidiscretizzazione, poi rassegna
-> schemi e dettaglio **Jameson**.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] Metodi WENO e Discontinuous Galerkin (esempio 2D e formulazione variazionale)</strong></summary>
-
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md` (approfondimenti
-> WENO/DG). Attesi: **WENO** (combinazione pesata di stencil, pesi non lineari per evitare gli
-> stencil che attraversano la discontinuità), **DG** (incognite = coefficienti modali per cella,
-> **formulazione debole/variazionale**, flussi numerici tra elementi), esempio 2D.
-
-</details>
-
-<details>
-<summary><strong>🟦 [T] WENO 5 e Galerkin Discontinuo</strong></summary>
-
-> 📌 *Risposta da compilare.* Variante della precedente, focus su **WENO di ordine 5** (3 sottostencil)
-> e DG. Riferimento: `teoria/metodi_numerici.md`, immagine `weno5_stencil_sottogruppi.jpg`.
-
-</details>
-
 ### Proprietà dei metodi, errore, stabilità, integrazione temporale
 
 
@@ -379,6 +257,152 @@ sta nel cerchio unitario $\iff \boxed{\nu\le1}$ (**CFL**). → **condizionatamen
 
 > 📌 *Risposta da compilare.* Variante combinata: parte generale + **stabilità del metodo implicito**
 > (A-stabilità, incondizionata). Riferimento: `teoria/metodi_numerici.md`.
+
+</details>
+
+### Volumi finiti: gradienti, ricostruzione, limitatori
+
+
+<details>
+<summary><strong>🟦 [T] Calcolo del gradiente nelle celle (Gauss–Green e minimi quadrati pesati) e all'interfaccia per i termini diffusivi</strong></summary>
+
+> 📌 *Risposta da compilare — verrà fornita la spiegazione dell'utente, da rifinire.*
+> Riferimento: `teoria/metodi_numerici.md` (ricostruzione e gradienti) e `teoria/meshing.md`.
+> Punti chiave attesi: gradiente di cella con il **teorema di Gauss–Green** (integrale di superficie
+> dei valori di faccia), **minimi quadrati pesati** (sistema sui vicini, peso $\propto 1/d$), e
+> il gradiente **all'interfaccia** necessario per i **flussi diffusivi** (media + correzione
+> di non-ortogonalità).
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Limitatori di pendenza per griglie strutturate e non strutturate</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
+> Attesi: motivazione (monotonicità / TVD, evitare oscillazioni spurie a cavallo delle
+> discontinuità), limitatori classici (minmod, Van Leer, Barth–Jespersen / Venkatakrishnan per
+> mesh non strutturate), differenza nello **stencil** tra strutturato e non strutturato.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Limitatori per mesh strutturate e non, spiegando la precisione di macchina in termini di ordine di accuratezza</strong></summary>
+
+> 📌 *Risposta da compilare.* Variante della precedente. Aggancio extra: come la **precisione di
+> macchina** (round-off) pone un **limite inferiore** all'errore raggiungibile e interagisce con
+> l'**ordine di accuratezza** (oltre un certo raffinamento l'errore di troncamento scende sotto il
+> round-off e non si guadagna più). Riferimento: `teoria/metodi_numerici.md`.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Calcolo dei gradienti: tutti e 3 i metodi (Green–Gauss, minimi quadrati, minimi quadrati pesati) con esempi</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
+> Attesi: i **tre** approcci, vantaggi/limiti (Green–Gauss sensibile alla qualità mesh; minimi
+> quadrati più robusto su mesh distorte; pesatura per dare più importanza ai vicini vicini),
+> con esempio numerico/geometrico.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Gradiente all'interfaccia e metodo dei minimi quadrati pesati</strong></summary>
+
+> 📌 *Risposta da compilare.* Sottocaso delle precedenti, focalizzato su **interfaccia** (flussi
+> diffusivi) + **WLSQ**. Riferimento: `teoria/metodi_numerici.md`.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Schemi di ordine superiore al primo nello spazio (intro generica) e calcolo della pendenza per griglie strutturate</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
+> Attesi: dal **primo ordine** (Godunov) alla **ricostruzione MUSCL** (pendenza/slope), upwind vs
+> centrati, ruolo del limitatore; calcolo della **pendenza** su griglia strutturata (differenze su
+> stencil regolare).
+
+</details>
+
+### Schemi per i flussi convettivi: Riemann, Godunov, alta risoluzione
+
+
+<details>
+<summary><strong>🟦 [T] Flusso di Roe (simulazione d'esame)</strong></summary>
+
+Riferimento: `teoria/metodi_numerici.md` §3 (toggle "Metodo di Roe"). Risposta:
+
+**Idea di base:** **linearizzare** le equazioni di conservazione iperboliche. Da $\partial_t U+\partial_x F=0$,
+introdotta la Jacobiana $A=\partial F/\partial U$, si sostituisce una matrice **costante** $\bar A$
+all'interfaccia. $\bar A$ deve soddisfare **tre condizioni**: (1) $\Delta F=\bar A\,\Delta U$ (consistenza
+sul salto/conservazione), (2) **diagonalizzabile** con autovalori **reali** (iperbolicità), (3)
+$\bar A\to A(U)$ quando $U_j\to U_{j+1}$ (consistenza nel liscio). Si soddisfano con le **medie di Roe**
+(pesate con $\sqrt\rho$): $\bar\rho=\sqrt{\rho_j\rho_{j+1}}$, $\bar u$, $\bar h$.
+
+**Variabili:** conservative $U=(\rho,\rho u,\rho E)$ e **caratteristiche** $W=L^{-1}U$ ($\lambda=\{u-a,u,u+a\}$),
+con $dU=L\,dW$. **Flux difference splitting:** $\Delta F=\bar A\,\Delta U=L\Lambda\,\Delta W$, separato per
+segno con $\tfrac{\lambda_k\pm|\lambda_k|}{2}$. **Flusso numerico:**
+$$F_{j+1/2}=\tfrac12\big(F_j+F_{j+1}\big)-\tfrac12\sum_k|\lambda_k|\,\ell_k\,\Delta W_k
+=\tfrac12(F_j+F_{j+1})-\tfrac12|\bar A|\,\Delta U.$$
+
+**Entropy fix:** quando un autovalore **cambia segno** ($|\lambda_k|\to0$, rarefazione **transonica**), Roe
+genera un'**espansione non fisica** → si addolcisce $|\lambda_k|$ vicino a zero (Harten). Pro: accurato,
+economico, nitido sugli urti. Contro: richiede l'entropy fix.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Metodo di Godunov</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`
+> (Godunov/Riemann, flux splitting, Roe). Attesi: ricostruzione costante a tratti → **problema di
+> Riemann** a ogni interfaccia → flusso esatto/approssimato; primo ordine; legame con l'upwind.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Problema di Riemann e tubo d'urto di Sod: applicazione al calcolo dei flussi all'interfaccia tra celle (perché farlo, come si usa nel CFD, ODE risultante), metodi di risoluzione del problema di Riemann e metodo di Godunov</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`,
+> `teoria/caratteristiche.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
+> all'interfaccia tra celle nasce un problema di Riemann locale, risolutori **esatti vs approssimati**
+> (Roe, HLL/HLLC), e il metodo di **Godunov**.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Schemi di Lax(–Friedrichs) e Jameson–Schmidt–Turkel (JST)</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
+> Attesi: **Lax–Friedrichs** (centrato + dissipazione $\propto \lambda_{max}$), **JST** (centrato con
+> dissipazione artificiale del 2°/4° ordine commutata da sensore di pressione), pro/contro.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Equazioni di Eulero 2D, discretizzazione a volumi finiti (arrivare a $\mathrm{d}\mathbf{U}/\mathrm{d}t = \sum \text{flussi}$), panoramica degli schemi per i flussi convettivi e illustrare Jameson</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (sistema di Eulero),
+> `teoria/metodi_numerici.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
+> teorema della divergenza → bilancio dei flussi sulle facce, semidiscretizzazione, poi rassegna
+> schemi e dettaglio **Jameson**.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Metodi WENO e Discontinuous Galerkin (esempio 2D e formulazione variazionale)</strong></summary>
+
+> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md` (approfondimenti
+> WENO/DG). Attesi: **WENO** (combinazione pesata di stencil, pesi non lineari per evitare gli
+> stencil che attraversano la discontinuità), **DG** (incognite = coefficienti modali per cella,
+> **formulazione debole/variazionale**, flussi numerici tra elementi), esempio 2D.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] WENO 5 e Galerkin Discontinuo</strong></summary>
+
+> 📌 *Risposta da compilare.* Variante della precedente, focus su **WENO di ordine 5** (3 sottostencil)
+> e DG. Riferimento: `teoria/metodi_numerici.md`, immagine `weno5_stencil_sottogruppi.jpg`.
 
 </details>
 

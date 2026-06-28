@@ -271,6 +271,31 @@ $$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}\big
 </details>
 
 <details>
+<summary><strong>Significato FISICO dell'errore locale di troncamento (diffusione numerica)</strong></summary>
+
+Il **significato numerico** (l'esatta non annulla l'equazione discretizzata) lo abbiamo visto sopra. Il
+**significato FISICO** è ancora più interessante: l'errore di troncamento è dominato da una **derivata
+spaziale di 2° ordine** (un **laplaciano**), cioè un **termine puramente diffusivo**. I termini diffusivi
+**smussano le oscillazioni** della soluzione → **migliorano la stabilità** (ma "spalmano" la soluzione).
+
+**Upwind esplicito.** Lo sviluppo dava $E_{\text{tronc}}=\tfrac{\Delta t}{2}u_{tt}-a\tfrac{\Delta x}{2}u_{xx}$.
+Usando l'equazione ($u_t=-a\,u_x\Rightarrow u_{tt}=a^2 u_{xx}$) per esprimere il tempo in funzione dello spazio:
+
+$$E_{\text{tronc}}=\frac{a^2\Delta t}{2}u_{xx}-\frac{a\,\Delta x}{2}u_{xx}
+=-\frac{a\,\Delta x}{2}\,(1-\nu)\,u_{xx},\qquad \nu=\frac{a\,\Delta t}{\Delta x}.$$
+
+Quindi lo schema risolve in realtà l'**equazione modificata**
+$$u_t+a\,u_x=\underbrace{\frac{a\,\Delta x}{2}(1-\nu)}_{\text{viscosità numerica }\varepsilon}\,u_{xx},$$
+una **equazione di diffusione** con **viscosità numerica** $\varepsilon$:
+- $\nu<1$ (CFL ok) → $\varepsilon>0$: **diffusione vera** → smussa, **stabilizza**;
+- $\nu>1$ → $\varepsilon<0$: **anti-diffusione** → amplifica le oscillazioni → **instabilità**.
+
+È il legame **bello** tra troncamento (diffusione), **CFL** e stabilità. Inoltre $\varepsilon\propto\Delta x$:
+**infittendo la griglia la diffusione numerica diminuisce** (la soluzione è meno "spalmata").
+
+</details>
+
+<details>
 <summary><strong>Proprietà — consistenza → stabilità → convergenza (ordine "intuitivo")</strong></summary>
 
 ```mermaid
@@ -1725,26 +1750,6 @@ La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Sc
 
 ---
 
-### Premessa — la suddivisione attuale del Notion
-
-<details>
-<summary><strong>La suddivisione attuale del Notion</strong></summary>
-
-| Pagina Notion | Cosa contiene (natura) |
-|---|---|
-| **Fluid dynamics** | Equazioni di governo, caratteristiche, natura iperbolica/ellittica |
-| **Numerical Methods (ODE)** | Integrazione **nel tempo**: errori, stabilità, espliciti/impliciti, stadi/passi/stencil |
-| **Finite Volumes Schemes** | Discretizzazione **nello spazio**: volumi finiti, Godunov, flux splitting, Roe |
-| **Meshing** | Generazione e qualità della griglia |
-| **Turbolence** | RANS/LES/DNS |
-| **Reacting Flows** | Combustione |
-
-La chiave per collocare un metodo è chiedersi: **discretizza il tempo o lo spazio?**
-
-</details>
-
----
-
 ### Simulazione domande d'esame
 
 <details>
@@ -1894,6 +1899,122 @@ centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
 </details>
 
 ## 3. Volumi finiti e schemi per i flussi
+
+### Tassonomia, Godunov, Roe (domande)
+
+<details>
+<summary><strong>Tassonomia dei metodi ai volumi finiti + tabella comparativa (idea, pro, contro)</strong></summary>
+
+```mermaid
+graph TD
+    MN["METODI ai VOLUMI FINITI"] --> UP["UPWIND"]
+    MN --> CE["CENTRATI"]
+    MN --> OE["ORDINE ELEVATO (spazio)"]
+    UP --> FDS["Flux DIFFERENCE splitting"]
+    UP --> FVS["Flux VECTOR splitting"]
+    FDS --> G1["1. Godunov: Riemann esatto (costante a tratti)"]
+    FDS --> G2["2. Osher-Engquist-Pandolfi: Riemann semplificato (ventaglio anziche' urto)"]
+    FDS --> G3["3. Roe: linearizza il sistema (A-bar)"]
+    FVS --> G4["4. Van Leer: split del flusso vettoriale in sinistro e destro"]
+    FVS --> G5["5. AUSM: split vettore convettivo + pressione"]
+    CE --> G6["6. Lax-Friedrichs GLOBALE: media tra celle con dx,dt"]
+    CE --> G7["7. Lax-Friedrichs LOCALE / Rusanov: media con lambda_max"]
+    CE --> G8["8. Jameson-Schmidt-Turkel (JST): media + viscosita' artificiale"]
+    CE --> G9["9. Centrato puro: integrazione diretta nel tempo"]
+    OE --> G10["10. WENO: stencil multipli, pesi per evitare oscillazioni spurie"]
+    OE --> G11["11. Discontinuous Galerkin: piu' gradi di liberta', la media di cella diventa un polinomio"]
+```
+
+| # | Metodo | Categoria | Idea di base | Pro | Contro |
+|---|---|---|---|---|---|
+| 1 | **Godunov** | FDS | risolve il **Riemann esatto** all'interfaccia (dato costante a tratti) | esatto, robusto, fisicamente fondato | costoso (Riemann esatto a ogni faccia) |
+| 2 | **Osher–Engquist–Pandolfi** | FDS | **Riemann semplificato**: ventaglio di compressione **anziché** urto | liscio, differenziabile, niente entropy fix | integrali complessi |
+| 3 | **Roe** | FDS | **linearizza** il sistema con $\bar A$ costante | accurato, economico, nitido sugli urti | **espansioni non fisiche** → serve **entropy fix** |
+| 4 | **Van Leer** | FVS | **split** del flusso **vettoriale** in parte sinistra/destra ($F^+\!,F^-$) | semplice, robusto, differenziabile | **diffusivo** sui contatti |
+| 5 | **AUSM** | FVS | **split** del vettore **convettivo** + **pressione** | nitido sui contatti, robusto | varianti/taratura |
+| 6 | **Lax–Friedrichs globale** | centrato | media tra celle con $\Delta x,\Delta t$ globali | semplice | **molto diffusivo** |
+| 7 | **Lax–Friedrichs locale / Rusanov** | centrato | media con $\lambda_{\max}$ **locale** | robusto, economico | diffusivo |
+| 8 | **Jameson–Schmidt–Turkel (JST)** | centrato | media + **viscosità artificiale** (2°/4° ordine) | efficiente, molto usato in industria | taratura dei coefficienti |
+| 9 | **Centrato puro** | centrato | integrazione **diretta** nel tempo (no dissipazione) | semplicissimo | **instabile** per i convettivi |
+| 10 | **WENO** | alto ordine | più sotto-stencil + **pesi** per evitare oscillazioni | alto ordine **e** cattura urti | costoso |
+| 11 | **Discontinuous Galerkin** | alto ordine | più **gradi di libertà**: la media di cella diventa un **polinomio** | alto ordine + conservazione + upwind | costoso, complesso |
+
+</details>
+
+<details>
+<summary><strong>Concetto [27][28] — Godunov: perché è interessante fisicamente, e il Mach unitario nella rarefazione</strong></summary>
+
+- **[27] Perché fisicamente interessante.** Il flusso all'interfaccia non è una media arbitraria: viene
+  dalla **soluzione (esatta) del problema di Riemann locale**, cioè dalla **vera struttura d'onda** delle
+  equazioni (urto / contatto / rarefazione). Lo schema è quindi costruito sulla **fisica reale** di come
+  evolve una discontinuità, non su un'interpolazione.
+- **[28] Perché $M=1$ quando l'espansione è a cavallo dell'asse $t$.** Il flusso si legge in $x/t=0$ (asse
+  verticale del tempo). Se un **ventaglio di rarefazione** della famiglia $u\mp a$ **attraversa** $x/t=0$
+  (rarefazione **transonica**: un'estremità con velocità d'onda $<0$, l'altra $>0$), allora in $x/t=0$ la
+  velocità d'onda è **nulla**: $u\mp a=0\Rightarrow u=\pm a\Rightarrow M=u/a=1$. È il **punto sonico**
+  interno al ventaglio: lì la caratteristica è **stazionaria**, da cui $M=1$ (caso delicato, richiede cura).
+
+</details>
+
+<details>
+<summary><strong>Metodo di Roe — procedura, variabili, e domande [29][30][31][32][33]</strong></summary>
+
+**Idea di base:** **linearizzare** le equazioni di conservazione (iperboliche). Da $\partial_t U+\partial_x F=0$,
+con $A=\partial F/\partial U$ (Jacobiana), si passa a $\partial_t U+\bar A\,\partial_x U=0$ con $\bar A$
+**costante** all'interfaccia.
+
+```mermaid
+graph LR
+    A["IDEA: linearizzo (iperbolico)<br/>dU/dt + A dU/dx = 0"] --> B["CONDIZIONI su A-bar:<br/>1) dF = A-bar dU<br/>2) diagonalizzabile, autovalori reali<br/>3) A-bar -> A(U) se U_j ~ U_(j+1)"]
+    B --> C["MEDIE DI ROE (pesi sqrt(rho)):<br/>rho-bar=sqrt(rho_j rho_(j+1)), u-bar, h-bar"]
+    C --> D["VARIABILI: conservative U vs caratteristiche W,<br/>dU = L dW (L = autovettori destri)"]
+    D --> E["FLUX DIFFERENCE SPLITTING:<br/>dF = A-bar dU = L Lambda dW; split (lambda +/- |lambda|)/2"]
+    E --> F["Flusso numerico:<br/>F = 1/2(F_L+F_R) - 1/2 sum |lambda_k| l_k dW_k"]
+    F --> G["ENTROPY FIX dove |lambda_k| -> 0 (rarefazione transonica)"]
+```
+
+- **[31] Perché $\bar A\to A(U_j)$ se $U_j\sim U_{j+1}$?** È la **condizione di consistenza** della matrice di
+  Roe. Quando i due stati **coincidono** (regione liscia), la linearizzazione deve **ridursi** alla Jacobiana
+  **esatta** $A(U)$, altrimenti lo schema risolverebbe un'equazione **diversa** nel liscio (non consistente).
+  Attenzione al tuo dubbio: a coincidere è il **salto** $\Delta F\to0$ (e $\Delta U\to0$), **non** il flusso
+  $F$; la Jacobiana $A=\partial F/\partial U$ (le **velocità d'onda**) **non** è nulla → $\bar A\to A(U)$
+  garantisce le **velocità d'onda corrette** nel liscio = consistenza.
+- **[29] Perché la matrice degli autovettori moltiplica le variabili *caratteristiche* e non le conservative?**
+  Perché $U=L\,W$ ($dU=L\,dW$): gli **autovettori (destri)** di $\bar A$ formano una **base**, e le $W$ sono le
+  **coordinate** (le "**intensità d'onda**") dello stato conservativo in quella base. È un **cambio di base**
+  (matematica) con significato **fisico**: ogni colonna di $L$ è **un'onda**, ogni $W_k$ la sua **ampiezza**.
+  Si opera su $W$ (onde disaccoppiate) e si torna a $U$ con $L$.
+- **[30] Dove serve l'entropy fix?** Nello **split per segno** $\dfrac{\lambda_k\pm|\lambda_k|}{2}$: quando un
+  autovalore **cambia segno** attraverso l'interfaccia ($|\lambda_k|\to0$, caso **transonico**), Roe — che
+  tratta la rarefazione come un **singolo salto** — produce un'**onda d'espansione non fisica** (expansion
+  shock, viola l'entropia). Si "ripara" addolcendo $|\lambda_k|$ vicino a zero (**entropy fix** di Harten).
+- **[32] I due set di variabili (espliciti):**
+  - **Conservative:** $U=(\rho,\ \rho u,\ \rho E)^{T}$.
+  - **Caratteristiche:** $W=L^{-1}U$, con autovalori $\lambda=\{u-a,\ u,\ u+a\}$; gli incrementi $\Delta W_k$
+    sono le **intensità delle onde**.
+- **[33]** La **simulazione d'esame sul flusso di Roe** è nel file esami (sez. 3, "Schemi per i flussi"); qui
+  sopra c'è la **procedura esatta** (mermaid) e i concetti teorici.
+
+</details>
+
+<details>
+<summary><strong>Concetto [25][26] — generazione mesh: metodo iperbolico vs advancing front</strong></summary>
+
+- **[25] Perché i metodi "iperbolici" si ispirano alla propagazione ondosa.** Generano la griglia
+  **strutturata** **risolvendo un sistema di PDE iperboliche** marciate **verso l'esterno** dalla superficie
+  del corpo: le linee di griglia avanzano come un **fronte d'onda** che si propaga lungo le **caratteristiche**.
+  L'ispirazione è sia nell'**equazione** (iperbolica, marciata come un'evoluzione) sia nella **logica**
+  (marciare un fronte strato dopo strato) → ottima **ortogonalità** vicino alla parete.
+- **[26] Differenza concreta con l'advancing front.** Non solo strutturata vs non strutturata:
+  - **Advancing front** (non strutturata): "inietta" elementi (triangoli/tetraedri) **uno alla volta**,
+    avanzando un **fronte** locale finché si chiude → costruzione **elemento per elemento**, segue bene la
+    geometria ma può "incartarsi" dove i fronti si scontrano;
+  - **Iperbolico** (strutturata): marcia un **intero strato** (una linea coordinata) alla volta **risolvendo
+    le PDE** → griglia **strutturata** $(i,j)$.
+  In breve: **elemento-per-elemento locale** (advancing front) vs **strato-per-strato marciato via PDE**
+  (iperbolico).
+
+</details>
 
 ### Nomenclatura essenziale
 
