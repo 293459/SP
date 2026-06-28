@@ -1010,6 +1010,33 @@ $$\sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij}\quad \forall\, i=1,
 ### Problemi numerici
 
 <details>
+<summary><strong>Quadro d'insieme dei problemi numerici (mermaid + tabella)</strong></summary>
+
+```mermaid
+graph TD
+    P["PROBLEMI NUMERICI"] --> D["DIFFUSIONE numerica<br/>(derivata 2a: laplaciano)"]
+    P --> DI["DISPERSIONE numerica<br/>(derivata 3a)"]
+    P --> EX["URTI di ESPANSIONE / entropia<br/>(rarefazione transonica)"]
+    P --> CA["CARBUNCOLO<br/>(instabilita' su urti forti allineati)"]
+    P --> ST["STIFFNESS<br/>(scale temporali molto diverse)"]
+    D --> DS["sintomo: SMUSSA gli urti (troppo viscoso)"]
+    DI --> DD["sintomo: OSCILLAZIONI (wiggles) vicino agli urti"]
+    EX --> ES["sintomo: espansione non fisica (entropy-violating)"]
+    CA --> CS["sintomo: 'protuberanza' davanti all'urto staccato"]
+    ST --> SS["sintomo: passo esplicito minuscolo per stabilita'"]
+```
+
+| Problema | Causa (termine/derivata) | Sintomo | Rimedio tipico |
+|---|---|---|---|
+| **Diffusione** numerica | derivata **2ª** (laplaciano) nell'eq. modificata | urti/gradienti **smussati** | meno dissipazione, ordine più alto |
+| **Dispersione** numerica | derivata **3ª** | **oscillazioni** (wiggles) sui gradienti | limitatori (TVD), filtri |
+| **Urti di espansione** / entropia | rarefazione **transonica** ($\lambda\to0$) | espansione **non fisica** | **entropy fix** (Harten) |
+| **Carbuncolo** | instabilità su **urto forte allineato** alla griglia | protuberanza spuria davanti all'urto | flussi più diffusivi/ibridi, perturbare la griglia |
+| **Stiffness** | scale temporali **molto diverse** | $\Delta t$ esplicito **minuscolo** | metodi **impliciti** |
+
+</details>
+
+<details>
 <summary><strong>Stiffness</strong></summary>
 
 <aside>
