@@ -255,7 +255,8 @@ graph TD
 </details>
 
 
-### Quadro d'insieme: soluzioni, errori, proprietà
+<details>
+<summary><strong>Quadro d'insieme: soluzioni, errori, proprietà</strong></summary>
 
 > Tre toggle riassuntivi (sotto, le sezioni di dettaglio). L'ordine logico delle proprietà è
 > **consistenza → stabilità → convergenza** (vedi il toggle "Proprietà").
@@ -378,8 +379,10 @@ stabilità ↔ propagazione; **(c)** convergenza ↔ globale.
 
 </details>
 
+</details>
 
-### Tipologie di errore
+<details>
+<summary><strong>Tipologie di errore</strong></summary>
 
 <details>
 <summary><strong>Nomenclatura</strong></summary>
@@ -442,8 +445,10 @@ $$e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1}) - \tilde y_{k+1}\
 
 </details>
 
+</details>
 
-### Consistenza, 0-stabilità, assoluta stabilità e convergenza
+<details>
+<summary><strong>Consistenza, 0-stabilità, assoluta stabilità e convergenza</strong></summary>
 
 <details>
 <summary><strong>Consistenza e ordine di consistenza</strong></summary>
@@ -570,8 +575,10 @@ ovvero se l'errore globale $e_N\to 0$. Il metodo è convergente in $[a,b]$ se lo
 
 </details>
 
+</details>
 
-### Analisi di stabilità di von Neumann
+<details>
+<summary><strong>Analisi di stabilità di von Neumann</strong></summary>
 
 > La **stabilità** valuta l'errore di **propagazione**: uno schema è stabile se gli errori **non
 > crescono** illimitatamente passo dopo passo. L'analisi di von Neumann lo verifica decomponendo l'errore
@@ -721,8 +728,10 @@ graph TD
 
 </details>
 
+</details>
 
-### Condizione CFL, termini diffusivi ed esempi
+<details>
+<summary><strong>Condizione CFL, termini diffusivi ed esempi</strong></summary>
 
 <details>
 <summary><strong>Concetto — la condizione CFL (dominio di dipendenza)</strong></summary>
@@ -828,8 +837,10 @@ graph TD
 
 </details>
 
+</details>
 
-### Passi, espliciti-impliciti, stadi e stencil
+<details>
+<summary><strong>Passi, espliciti-impliciti, stadi e stencil</strong></summary>
 
 <details>
 <summary><strong>Metodi one-step e multi-step</strong></summary>
@@ -921,8 +932,10 @@ Per applicare un metodo implicito serve risolvere un sistema lineare. Lo si può
 
 </details>
 
+</details>
 
-### Metodi di discretizzazione spaziale
+<details>
+<summary><strong>Metodi di discretizzazione spaziale</strong></summary>
 
 <details>
 <summary><strong>Modelli</strong></summary>
@@ -950,8 +963,10 @@ I metodi utilizzati per trasformare le equazioni differenziali in sistemi algebr
 
 </details>
 
+</details>
 
-### Metodi di Runge-Kutta
+<details>
+<summary><strong>Metodi di Runge-Kutta</strong></summary>
 
 <details>
 <summary><strong>Descrizione</strong></summary>
@@ -1006,8 +1021,10 @@ $$\sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij}\quad \forall\, i=1,
 
 </details>
 
+</details>
 
-### Problemi numerici
+<details>
+<summary><strong>Problemi numerici</strong></summary>
 
 <details>
 <summary><strong>Quadro d'insieme dei problemi numerici (mermaid + tabella)</strong></summary>
@@ -1083,12 +1100,12 @@ $$
 
 </details>
 
-
----
+</details>
 
 ## Differenze finite
 
-### Formulazione, dominio e discretizzazione
+<details>
+<summary><strong>Formulazione, dominio e discretizzazione</strong></summary>
 
 <details>
 <summary><strong>Inquadramento — l'equazione di riferimento</strong></summary>
@@ -1236,8 +1253,10 @@ La media **aggiunge dissipazione numerica** → stabilizza il centrato (idea di 
 
 </details>
 
+</details>
 
-### Simulazione domande d'esame
+<details>
+<summary><strong>Simulazione domande d'esame</strong></summary>
 
 <details>
 <summary><strong>Domanda 7 — Il blocco "metodi impliciti ed espliciti, WENO, Discontinuous Galerkin, ecc.": dove andrebbe inserito a livello logico nella suddivisione del Notion?</strong></summary>
@@ -1350,14 +1369,12 @@ centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
 
 </details>
 
----
-
-
----
+</details>
 
 ## Volumi finiti e schemi per i flussi
 
-### Tassonomia, Godunov, Roe (domande)
+<details>
+<summary><strong>Tassonomia, Godunov, Roe (domande)</strong></summary>
 
 <details>
 <summary><strong>Tassonomia dei metodi ai volumi finiti + tabella comparativa (idea, pro, contro)</strong></summary>
@@ -1473,8 +1490,10 @@ graph LR
 
 </details>
 
+</details>
 
-### 1. Metodo dei Volumi Finiti in 1D
+<details>
+<summary><strong>1. Metodo dei Volumi Finiti in 1D</strong></summary>
 
 <details>
 <summary><strong>Equazione conservativa</strong></summary>
@@ -1518,10 +1537,10 @@ $$\frac{U_j^{n+1}-U_j^n}{\Delta t} + \frac{f_{j+\frac12}^n - f_{j-\frac12}^n}{\D
 
 </details>
 
----
+</details>
 
-
-### 2. Mesh Strutturate: Generazione
+<details>
+<summary><strong>2. Mesh Strutturate: Generazione</strong></summary>
 
 In una mesh strutturata ogni cella è identificata da indici $(i,j)$. I vicini fisici sono vicini in memoria — grande vantaggio computazionale (~20 contatori per cella, vs ~100 per non strutturata).
 
@@ -1536,10 +1555,10 @@ In una mesh strutturata ogni cella è identificata da indici $(i,j)$. I vicini f
 
 ⚠ **Rischio metodo algebrico:** Non si controlla la direzione delle pareti → le linee di griglia non sono perpendicolari alla superficie → errori di discretizzazione nascosti legati allo skewness.
 
----
+</details>
 
-
-### 3. Mesh Non Strutturate
+<details>
+<summary><strong>3. Mesh Non Strutturate</strong></summary>
 
 La connettività deve essere memorizzata esplicitamente (maggiore memoria, massima flessibilità geometrica).
 
@@ -1570,10 +1589,10 @@ La connettività deve essere memorizzata esplicitamente (maggiore memoria, massi
 | Qualità vicino parete | Media | Buona |
 | Robustezza | Alta | Media |
 
----
+</details>
 
-
-### 4. Celle Centrate vs Nodi Centrati
+<details>
+<summary><strong>4. Celle Centrate vs Nodi Centrati</strong></summary>
 
 |  | Celle Centrate (Fluent) | Nodi Centrati (CFX) |
 | --- | --- | --- |
@@ -1591,10 +1610,10 @@ La connettività deve essere memorizzata esplicitamente (maggiore memoria, massi
 > multi-blocco** (TurboGrid). I codici a **nodi centrati** (CFX) sono spesso preferiti su geometrie
 > complesse, quelli a **celle centrate** (Fluent) sui casi più semplici.
 
----
+</details>
 
-
-### 5. Metodo di Godunov & Problema di Riemann
+<details>
+<summary><strong>5. Metodo di Godunov & Problema di Riemann</strong></summary>
 
 <details>
 <summary><strong>Idea centrale</strong></summary>
@@ -1626,10 +1645,10 @@ $$\text{CFL} = \frac{\lambda_{max},\Delta t}{\Delta x} \leq 1$$
 
 </details>
 
----
+</details>
 
-
-### 6. Flussi Numerici e Flux Splitting
+<details>
+<summary><strong>6. Flussi Numerici e Flux Splitting</strong></summary>
 
 <details>
 <summary><strong>Tassonomia</strong></summary>
@@ -1658,10 +1677,10 @@ Dissipazione adattiva: 2° ordine vicino a discontinuità (cattura urti), 4° or
 
 </details>
 
----
+</details>
 
-
-### 7. Schema di Roe
+<details>
+<summary><strong>7. Schema di Roe</strong></summary>
 
 Solutore di Riemann approssimato. Linearizza il problema all’interfaccia usando la **media di Roe** $\bar{U}$.
 
@@ -1692,10 +1711,7 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 
 </details>
 
----
-
-
----
+</details>
 
 ## Approfondimenti (esercizi, HPC, WENO, FE/DG, stiffness, key takeaways)
 
