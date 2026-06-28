@@ -1,13 +1,86 @@
 # Metodi Numerici (differenze finite, volumi finiti, elementi finiti)
 
-## Come leggere questo capitolo (file unificato)
+
+## Introduzione e proprietà generali
+
+<details>
+<summary><strong>Come leggere questo capitolo (legenda)</strong></summary>
+
 
 Questo file **unifica** tutti i metodi numerici: prima le **proprietà/considerazioni generali** (valgono per
 tutti i metodi), poi le **discretizzazioni** (differenze finite, volumi finiti, elementi finiti) e gli
 schemi specifici. È il risultato della fusione dei vecchi `metodi_numerici`, `metodi_numerici_ode` e
 `schemi_volumi_finiti`.
 
-## 0. Classificazione dei metodi e considerazioni generali
+
+</details>
+
+<details>
+<summary><strong>Nomenclatura e glossario (tutti i simboli del capitolo)</strong></summary>
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $y(t_k)$ / $y_k$ | soluzione **esatta** / **numerica** al tempo $t_k$ | $y_k\approx y(t_k)$ |
+| $h=\dfrac{t-a}{N}$ | **passo** temporale | $N$ = numero di passi, $t\in[a,b]$ |
+| $e_k$ | **errore globale** | convergenza: $e_N\to0$ per $N\to\infty$ |
+| $\tau(h)$ | errore di **troncamento locale** | residuo del singolo passo |
+| $d(h)=\dfrac{\tau(h)}{h}=\mathcal O(h^p)$ | errore di **consistenza** | $\lim_{h\to0}d(h)=0$ |
+| $p$ | **ordine** del metodo | pendenza nel grafico log–log |
+| $\lambda,\ \lambda_i$ | autovalori dell'eq. test $y'=\lambda y$ | stabilità per $\lambda<0$ |
+| $F(h\lambda)$ | **fattore di amplificazione** | stabile se $\lvert F(h\lambda)\rvert<1$ |
+| $\bar h,\ K$ | passo limite / costante di Lipschitz | $\exists K>0,\ \bar h$ |
+| $\{i-1,i,i+1\}$ | **stencil** | n. di nodi coinvolti |
+
+
+> Teorema di **Lax**: *consistenza* + *zero-stabilità* ⇒ **convergenza**. Espliciti →
+> stabilità **condizionata** (regione limitata); impliciti → spesso **A-stabili**.
+
+---
+
+> Questa pagina è **organizzativa** (dove collocare ciascun metodo): di seguito un glossario
+> dei termini ricorrenti.
+
+| Termine | Significato | Asse |
+|---|---|---|
+| **Esplicito / Implicito** | $u^{n+1}$ dipende solo dal passato / anche da sé stesso | tempo |
+| **Regione di assoluta stabilità / CFL** | vincolo di stabilità degli espliciti | tempo |
+| **WENO** | ricostruzione spaziale ad alto ordine non oscillatoria | spazio |
+| **Discontinuous Galerkin (DG)** | alto ordine, polinomi a tratti **discontinui** per cella | spazio |
+| **Teorema barriera di Godunov** | uno schema **lineare e monotono** è al più del **1° ordine** | spazio |
+| **Limitatori di pendenza** (minmod, van Leer, superbee) | rendono **non lineare** lo schema → alto ordine senza oscillazioni (**TVD**) | spazio |
+| **MUSCL** | ricostruzione lineare in cella (2° ordine) | spazio |
+| **Upwind / Centrato** | adatto a **iperbolico** / **ellittico** | spazio |
+| **Cella-centrata / Nodo-centrata** | dove sono collocate le incognite | spazio |
+
+La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Schemes**.
+
+
+---
+
+| Simbolo | Nome | Note |
+|---|---|---|
+| $U_j$ | **valor medio di cella** | incognita dei volumi finiti |
+| $j\pm 1/2$ | **interfacce** della cella $j$ | dove si valuta il flusso numerico |
+| $\mathbf F(U)$ | flusso fisico | $\partial_t U+\partial_x F=0$ |
+| $\mathbf F^+,\ \mathbf F^-$ | flussi **splittati** (FVS) | parte a monte / a valle |
+| $\mathbf F^c$ | flusso convettivo | — |
+| $u_L,\ u_R$ | stati **sinistro / destro** | problema di **Riemann** all'interfaccia |
+| $a$ | velocità del suono | regimi $u\lessgtr a$ (sub/supersonico) |
+| $\lambda_k$ | autovalori (velocità d'onda) | Eulero: $u,\ u\pm a$ |
+| $\sigma_k\in\{-1,+1\}$ | **segno** dell'autovalore | direzione upwind |
+| $\lvert\lambda_k\rvert<\epsilon$ | **entropy fix** (Harten) | soglia sui punti sonici |
+| $\Delta t$ | passo temporale | vincolo **CFL** |
+| $\mu=k=0$ | limite di **Eulero** | niente viscosità/conduzione |
+| $\overrightarrow{DF},\ \overleftarrow{DF}$ | differenze finite (forward/backward) | ricostruzione gradiente |
+
+
+> Schemi chiave: **Godunov** (problema di Riemann), **Roe** (upwind linearizzato),
+> **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
+
+---
+
+</details>
+
 
 <details>
 <summary><strong>Concetto — con quali parametri si classificano i metodi (per orientarsi nel "marasma")</strong></summary>
@@ -136,7 +209,7 @@ termine di stabilizzazione).
 <details>
 <summary><strong>Concetto — le proprietà (convergenza, stabilità…) valgono per tutti i metodi?</strong></summary>
 
-**Sì, sono generali** → per questo stanno **a monte** (sezione 1), prima delle differenze finite. Convergenza,
+**Sì, sono generali** → per questo stanno **a monte** (qui nell'introduzione), prima delle differenze finite. Convergenza,
 consistenza e stabilità sono concetti di **analisi numerica** validi per FD, FV, FE…; il legame è il
 **teorema di equivalenza di Lax** (per problemi lineari ben posti: *consistenza + stabilità ⟺ convergenza*).
 Anche **analisi di von Neumann, CFL, fattore di amplificazione, stabilità dei termini diffusivi e
@@ -181,32 +254,6 @@ graph TD
 
 </details>
 
-## 1. Proprietà generali, errori, stabilità e integrazione temporale
-
-### Nomenclatura essenziale
-
-<details>
-<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
-
-| Simbolo | Nome | Note |
-|---|---|---|
-| $y(t_k)$ / $y_k$ | soluzione **esatta** / **numerica** al tempo $t_k$ | $y_k\approx y(t_k)$ |
-| $h=\dfrac{t-a}{N}$ | **passo** temporale | $N$ = numero di passi, $t\in[a,b]$ |
-| $e_k$ | **errore globale** | convergenza: $e_N\to0$ per $N\to\infty$ |
-| $\tau(h)$ | errore di **troncamento locale** | residuo del singolo passo |
-| $d(h)=\dfrac{\tau(h)}{h}=\mathcal O(h^p)$ | errore di **consistenza** | $\lim_{h\to0}d(h)=0$ |
-| $p$ | **ordine** del metodo | pendenza nel grafico log–log |
-| $\lambda,\ \lambda_i$ | autovalori dell'eq. test $y'=\lambda y$ | stabilità per $\lambda<0$ |
-| $F(h\lambda)$ | **fattore di amplificazione** | stabile se $\lvert F(h\lambda)\rvert<1$ |
-| $\bar h,\ K$ | passo limite / costante di Lipschitz | $\exists K>0,\ \bar h$ |
-| $\{i-1,i,i+1\}$ | **stencil** | n. di nodi coinvolti |
-
-</details>
-
-> Teorema di **Lax**: *consistenza* + *zero-stabilità* ⇒ **convergenza**. Espliciti →
-> stabilità **condizionata** (regione limitata); impliciti → spesso **A-stabili**.
-
----
 
 ### Quadro d'insieme: soluzioni, errori, proprietà
 
@@ -331,6 +378,7 @@ stabilità ↔ propagazione; **(c)** convergenza ↔ globale.
 
 </details>
 
+
 ### Tipologie di errore
 
 <details>
@@ -393,6 +441,7 @@ $$e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1}) - \tilde y_{k+1}\
 `errori_interpretazione_grafica.jpg` resta in `images/` come archivio.)*
 
 </details>
+
 
 ### Consistenza, 0-stabilità, assoluta stabilità e convergenza
 
@@ -520,6 +569,7 @@ $$\lim_{N\to\infty} y_N = y(t)$$
 ovvero se l'errore globale $e_N\to 0$. Il metodo è convergente in $[a,b]$ se lo è $\forall t\in[a,b]$.
 
 </details>
+
 
 ### Analisi di stabilità di von Neumann
 
@@ -671,6 +721,7 @@ graph TD
 
 </details>
 
+
 ### Condizione CFL, termini diffusivi ed esempi
 
 <details>
@@ -758,13 +809,13 @@ Dopo i toggle di teoria, ecco la **mappa di tutti gli esempi** svolti (e dove so
 
 ```mermaid
 graph TD
-    E["ESEMPI pratici"] --> SN["SCHEMI NUMERICI (§2)<br/>upwind / downwind / centrato espl. / centrato impl. / Lax-Friedrichs"]
+    E["ESEMPI pratici"] --> SN["SCHEMI NUMERICI (sez. Differenze finite)<br/>upwind / downwind / centrato espl. / centrato impl. / Lax-Friedrichs"]
     E --> ST["STABILITA' (von Neumann)<br/>upwind esplicito (cond. stabile)<br/>centrato esplicito (instabile)<br/>centrato implicito (incond. stabile)<br/>centrato esplicito + termine diffusivo"]
     E --> TR["SIGNIFICATO FISICO errore locale di troncamento<br/>upwind esplicito · centrato esplicito · Lax-Friedrichs"]
     E --> CF["CONDIZIONE CFL<br/>Eulero 1D non stazionario (lambda_max = |u|+a)"]
 ```
 
-- **Schemi numerici** → §2, toggle *"Esempi — gli schemi a confronto"* (stencil + equazioni + classificazione).
+- **Schemi numerici** → sez. *Differenze finite*, toggle *"Esempi — gli schemi a confronto"* (stencil + equazioni + classificazione).
 - **Stabilità (von Neumann)** → sopra, toggle *"Dimostrazione — von Neumann per l'upwind esplicito"* e
   *"Mappa — schemi analizzati e risultati"*; centrato esplicito/implicito: vedi le domande d'esame divise
   in tre (dimostrazioni in arrivo); il **centrato esplicito + diffusivo** rientra nel toggle
@@ -776,6 +827,7 @@ graph TD
   $\lambda_{\max}=|u|+a$ (come nell'esercitazione `Euler2D`).
 
 </details>
+
 
 ### Passi, espliciti-impliciti, stadi e stencil
 
@@ -869,6 +921,7 @@ Per applicare un metodo implicito serve risolvere un sistema lineare. Lo si può
 
 </details>
 
+
 ### Metodi di discretizzazione spaziale
 
 <details>
@@ -896,6 +949,7 @@ I metodi utilizzati per trasformare le equazioni differenziali in sistemi algebr
 ![Tassonomia degli schemi di flusso: upwind (FDS/FVS) e centrati](images/schemi_flusso_tassonomia.jpg)
 
 </details>
+
 
 ### Metodi di Runge-Kutta
 
@@ -952,6 +1006,7 @@ $$\sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij}\quad \forall\, i=1,
 
 </details>
 
+
 ### Problemi numerici
 
 <details>
@@ -1001,7 +1056,625 @@ $$
 
 </details>
 
-### Esercizi
+
+---
+
+## Differenze finite
+
+### Formulazione, dominio e discretizzazione
+
+<details>
+<summary><strong>Inquadramento — l'equazione di riferimento</strong></summary>
+
+Si usa l'**equazione scalare lineare** (advezione), il "modello-giocattolo" su cui si studiano tutti gli schemi:
+
+$$\frac{\partial u}{\partial t}+a\,\frac{\partial u}{\partial x}=0,\qquad
+u=\text{grandezza conservata generica},\quad a=\text{velocità del segnale}.$$
+
+Per risolverla **univocamente** servono delle **condizioni** (vedi sotto).
+
+</details>
+
+<details>
+<summary><strong>Figura + Concetto — dominio, dato iniziale e condizioni al contorno (DOVE stanno)</strong></summary>
+
+![Dominio (x,t): dato iniziale sul bordo basso, BC sul bordo sinistro](images/fd_dominio_bc.svg)
+
+Il dubbio "la BC si impone su tutto il tratto $x=0$ a $t$ variabile, o solo a $t=0$?" si scioglie guardando
+il **dominio** $[0,L]\times[0,T]$:
+- **Dato INIZIALE** $u(x,0)$ -> su **tutto il bordo inferiore** ($t=0$, **tutti gli $x$**).
+- **Condizione al CONTORNO** $u(0,t)$ -> su **tutto il bordo sinistro** ($x=0$, **tutti i $t$**), **non** solo
+  a $t=0$. (Per $a>0$ l'informazione **entra da sinistra**; il bordo destro $x=L$ e' **uscente** -> niente BC,
+  vedi `caratteristiche.md` §1.)
+
+Quindi sono **due** insiemi di dati su **due bordi diversi**: l'asse orizzontale (passato, $t=0$) e il bordo
+verticale sinistro (ingresso, $x=0$).
+
+```mermaid
+graph TD
+    EQ["u_t + a u_x = 0 (scalare lineare)"] --> NEED["Servono condizioni per risolvere univocamente"]
+    NEED --> IC["CONDIZIONE INIZIALE u(x, t=0)<br/>bordo INFERIORE: t=0, TUTTI gli x"]
+    NEED --> BC["CONDIZIONE AL CONTORNO u(x=0, t)<br/>bordo SINISTRO: x=0, TUTTI i t (a>0)"]
+    IC --> SOL["Soluzione nel dominio (x,t)"]
+    BC --> SOL
+    SOL --> OUTB["bordo DESTRO x=L: uscente -> nessuna BC (a>0)"]
+```
+
+</details>
+
+<details>
+<summary><strong>Figura + Concetto — discretizzazione spaziale e temporale ($\Delta x,\Delta t$ costanti)</strong></summary>
+
+![Discretizzazione dell'asse spaziale e di quello temporale](images/fd_discretizzazione.svg)
+
+$$\text{spazio: } x_j=j\,\Delta x=j\,\frac{L}{N}\ (j=0,\dots,N);\qquad
+\text{tempo: } t_n=n\,\Delta t=n\,\frac{T}{M}\ (n=0,\dots,M).$$
+
+```mermaid
+graph LR
+    D["Discretizzazione"] --> SX["SPAZIALE: x_j = j*dx = j*L/N, j=0..N"]
+    D --> TX["TEMPORALE: t_n = n*dt = n*T/M, n=0..M"]
+    SX --> NOTE["dx, dt COSTANTI (uniformi); N (spazio) e M (tempo) possono DIFFERIRE"]
+    TX --> NOTE
+```
+
+- **Perche' $\Delta x,\Delta t$ costanti?** Per **semplicita'** e per rendere immediate l'analisi di
+  consistenza (sviluppi di Taylor) e di stabilita' (von Neumann), che si scrivono pulite su **griglia
+  uniforme**. **Alternative** (se servono): griglie **non uniformi/stretchate** (per risolvere strati limite
+  o zone con forti gradienti) e passo temporale **adattivo** $\Delta t=\Delta t(t)$ (per seguire transitori);
+  costano in complessita' (gli sviluppi e la CFL vanno riscritti localmente).
+- **Perche' $N$ (spazio) e $M$ (tempo) possono/devono differire?** Sono **due discretizzazioni indipendenti**:
+  $\Delta x$ lo fissa l'**accuratezza spaziale** desiderata, mentre $\Delta t$ e' **vincolato dalla stabilita'**
+  (condizione **CFL** $\mathrm{CFL}=a\,\Delta t/\Delta x\le 1$ per l'esplicito). Quindi tipicamente, scelto
+  $\Delta x$, il $\Delta t$ e' **imposto** dalla CFL -> in generale $M\neq N$. E' **bene** che siano slegati:
+  cosi' si raffina lo spazio per l'accuratezza senza essere costretti a un $\Delta t$ uguale, e si sceglie
+  $\Delta t$ solo in base alla stabilita' (o lo si rende implicito per scioglierne il vincolo).
+
+</details>
+
+<details>
+<summary><strong>Schema — dalla derivata al sistema discreto (upwind esplicito)</strong></summary>
+
+Sostituendo le derivate con i **rapporti incrementali** ($\Delta x,\Delta t$ costanti):
+
+$$\frac{\partial u}{\partial t}\approx\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}\quad(\text{avanti nel tempo}),
+\qquad \frac{\partial u}{\partial x}\approx\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}\quad(\text{upwind, }a>0),$$
+
+si ottiene lo **schema upwind esplicito** (FTBS, *Forward-Time Backward-Space*):
+
+$$\boxed{\;\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}+a\,\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}=0\;}$$
+
+Da qui $u_j^{\,n+1}$ si ricava **esplicitamente** dai valori al passo $n$; la **scelta backward** in spazio
+(da monte) e' l'**upwind** corretto per $a>0$ ed e' cio' che rende lo schema stabile sotto CFL $\le 1$.
+
+</details>
+
+<details>
+<summary><strong>Esempi — gli schemi a confronto (stencil, equazioni, classificazione)</strong></summary>
+
+![Stencil degli schemi alle differenze finite: punti usati nel piano (x,t)](images/fd_schemi_stencil.svg)
+
+Tutti partono da $\dfrac{u_j^{n+1}-u_j^{n}}{\Delta t}$ per il tempo (avanti); cambia **come** si discretizza
+$a\,\partial_x u$ (quali punti, quale lato).
+
+**1) Upwind esplicito (FTBS)** — spazio *all'indietro* (da monte, per $a>0$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}=0.$$
+
+**2) Downwind esplicito** — spazio *in avanti* (lato sbagliato, per $a>0$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_j^{n}}{\Delta x}=0.$$
+
+**3) Centrato esplicito (FTCS)** — differenza centrata nello spazio:
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0
+\;\Rightarrow\; u_j^{n+1}=u_j^{n}-\frac{a\,\Delta t}{2\,\Delta x}\big(u_{j+1}^{n}-u_{j-1}^{n}\big)
+\;\Rightarrow\; u^{n+1}=f(u^{n}).$$
+
+**4) Centrato implicito** — la derivata spaziale è valutata al livello **nuovo** $n+1$:
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n+1}-u_{j-1}^{n+1}}{2\,\Delta x}=0
+\;\Rightarrow\; u^{n+1}=f(u^{n+1})\;\Rightarrow\;\text{si risolve un SISTEMA.}$$
+
+**5) Lax–Friedrichs (media)** — sostituisce $u_j^{n}$ con la **media** $\tfrac12(u_{j+1}^{n}+u_{j-1}^{n})$:
+$$\frac{u_j^{n+1}-\tfrac12\big(u_{j+1}^{n}+u_{j-1}^{n}\big)}{\Delta t}
++a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0.$$
+La media **aggiunge dissipazione numerica** → stabilizza il centrato (idea di base).
+
+**Come si contestualizzano** (rispetto alla *tabella di classificazione* dell'introduzione):
+
+| Schema | Ordine spazio | Ordine tempo | Espl./Impl. | Stencil (punti) | Stabilità |
+|---|---|---|---|---|---|
+| **Upwind (FTBS)** | 1° | 1° | esplicito | 2: $\{j-1,j\}$ a $n$ | **stabile** se CFL $\le 1$ |
+| **Downwind** | 1° | 1° | esplicito | 2: $\{j,j+1\}$ a $n$ | **instabile** (sempre) |
+| **Centrato espl. (FTCS)** | 2° | 1° | esplicito | 3: $\{j-1,j,j+1\}$ a $n$ | **instabile** (incondizionatamente) |
+| **Centrato impl.** | 2° | 1° | **implicito** | 3 a $n{+}1$ + 1 a $n$ | **stabile** (incond.) ma serve risolvere un sistema |
+| **Lax–Friedrichs** | 1° | 1° | esplicito | 3: $\{j-1,j+1\}$ a $n$ | **stabile** se CFL $\le 1$ (diffusivo) |
+
+> 📌 **Commento importante sull'upwind (perché funziona, e il confronto col downwind).**
+> Per un flusso **supersonico** il problema è **iperbolico** (per Eulero 1D non stazionario lo è
+> **sempre**, anche in subsonico — *vedi `caratteristiche.md`*; quindi qui "ellittico" sarebbe un lapsus:
+> è **iperbolico**). In un problema iperbolico l'informazione viaggia **lungo le caratteristiche**, a
+> velocità finita e in una **direzione precisa**: il **dominio di dipendenza** del punto $u_j^{n+1}$ sta
+> **solo dal lato di monte**.
+> - L'**upwind** prende l'informazione **solo dal lato da cui arriva la caratteristica** (monte): usa
+>   esattamente i punti che possono **fisicamente influenzare** $u_j^{n+1}$, e **scarta** l'altro lato → è
+>   **coerente con la fisica** ed è **stabile** (sotto CFL $\le 1$).
+> - Il **downwind** prende l'informazione dal lato di **valle**, cioè da punti che (nel tempo $\Delta t$)
+>   **non possono ancora aver raggiunto** $u_j^{n+1}$: usa dati **fuori dal dominio di dipendenza** → è
+>   **non fisico** → l'analisi di von Neumann dà fattore di amplificazione $|G|>1$ → **instabile**.
+> - Il **centrato esplicito** usa **entrambi** i lati simmetricamente: per la pura advezione è
+>   **incondizionatamente instabile** ($|G|^2=1+(a\Delta t/\Delta x)^2\sin^2\theta>1$). Si stabilizza o
+>   passando all'**implicito** (centrato implicito) o **aggiungendo dissipazione** (Lax–Friedrichs).
+>
+> Morale: in iperbolico **prendere informazione solo dal lato "giusto" (le caratteristiche) non è solo più
+> fisico: è ciò che rende il metodo stabile**. Ignorare la direzionalità (downwind/centrato esplicito) la
+> distrugge.
+
+</details>
+
+
+### Simulazione domande d'esame
+
+<details>
+<summary><strong>Domanda 7 — Il blocco "metodi impliciti ed espliciti, WENO, Discontinuous Galerkin, ecc.": dove andrebbe inserito a livello logico nella suddivisione del Notion?</strong></summary>
+
+Il blocco **non è omogeneo**: contiene cose che discretizzano il **tempo** e cose che
+discretizzano lo **spazio**. Vanno quindi separate.
+
+- **Metodi espliciti / impliciti** → pagina **Numerical Methods (ODE)**, nella sezione già
+  esistente *"Passi, espliciti-impliciti, stadi e stencil"*. La dicotomia esplicito/implicito è
+  infatti una proprietà dell'**integrazione temporale** (la $\mathbf{u}^{n+1}$ dipende solo dal
+  passato → esplicito; dipende anche da sé stessa → implicito, richiede un sistema). È lo stesso
+  asse concettuale di Eulero in avanti vs all'indietro e di Runge–Kutta.
+  - *Collegamento:* la **regione di assoluta stabilità** (già presente nel Notion) è proprio ciò
+    che distingue espliciti (stabilità condizionata, vincolo CFL) e impliciti (spesso A-stabili).
+
+- **WENO** (*Weighted Essentially Non-Oscillatory*) → pagina **Finite Volumes Schemes**. È una
+  tecnica di **ricostruzione spaziale ad alto ordine** dei valori all'interfaccia: appartiene alla
+  famiglia che nasce per **aggirare il teorema barriera di Godunov** (vedi Domanda 8). Logicamente
+  va come sottosezione *"Schemi ad alta risoluzione / ricostruzione"*, vicino a limitatori e MUSCL.
+
+- **Discontinuous Galerkin (DG)** → anch'esso **discretizzazione spaziale**, ma di natura
+  ibrida (elementi finiti + volumi finiti) con rappresentazione **polinomiale a tratti
+  discontinua** dentro ogni cella. Logicamente va in **Finite Volumes Schemes** come metodo
+  ad alto ordine "parente" dei FV (condivide i **flussi numerici** di Riemann all'interfaccia),
+  oppure in una pagina dedicata *"Metodi ad alto ordine"* se l'argomento cresce.
+
+**In sintesi:** esplicito/implicito → *Numerical Methods (ODE)*; WENO e DG → *Finite Volumes
+Schemes* (sezione ricostruzione/alto ordine). La regola: **tempo → ODE, spazio → Finite Volumes**.
+
+</details>
+
+<details>
+<summary><strong>Domanda 8 — Il teorema barriera di Godunov, i limitatori di pendenza e il calcolo del gradiente all'interfaccia/al centro cella: dove vanno inseriti logicamente?</strong></summary>
+
+Tutti e tre appartengono alla pagina **Finite Volumes Schemes**, perché riguardano la
+**ricostruzione spaziale** e l'**accuratezza** dello schema ai volumi finiti. Idealmente in una
+sottosezione *"Schemi ad alta risoluzione"* posta **dopo** Godunov e Roe.
+
+- **Teorema barriera di Godunov** (*order barrier theorem*): afferma che uno schema **lineare**
+  e **monotono** (che non crea nuove oscillazioni) può essere **al massimo del primo ordine**. È la
+  motivazione teorica di tutto ciò che viene dopo: per avere **alto ordine senza oscillazioni**
+  bisogna usare schemi **non lineari** (limitatori, WENO). Logicamente è il "ponte" tra lo schema
+  di Godunov del primo ordine e i metodi ad alta risoluzione → va subito dopo *"Godunov & Problema
+  di Riemann"*.
+
+- **Limitatori di pendenza** (*slope limiters*, es. minmod, van Leer, superbee): sono il modo
+  **pratico** di aggirare il teorema. Ricostruiscono una **pendenza lineare** dentro la cella
+  (schema MUSCL, secondo ordine) ma la **limitano** vicino a discontinuità/estremi per non creare
+  overshoot (proprietà **TVD**). Vanno nella stessa sottosezione *"Alta risoluzione"*, come
+  applicazione diretta del teorema barriera.
+
+- **Gradiente all'interfaccia e al centro cella**: è il calcolo del **gradiente** necessario sia
+  per la ricostruzione (passare dal valore medio di cella al valore all'**interfaccia**, dove si
+  valuta il flusso) sia per i termini diffusivi/viscosi. Logicamente va vicino alla **ricostruzione
+  spaziale** e alla distinzione **cella-centrata vs nodo-centrata** (già presente nel Notion, sez.
+  *"Celle Centrate vs Nodi Centrati"*), perché il *come* si calcola il gradiente dipende da dove
+  sono collocate le incognite.
+
+**Filo logico suggerito nella pagina Finite Volumes:**
+Godunov (1° ordine) → **Teorema barriera** → necessità di non-linearità → **ricostruzione +
+gradienti** → **limitatori di pendenza** (TVD) → WENO (Domanda 7).
+
+</details>
+
+<details>
+<summary><strong>Domanda 9 — Perché i metodi upwind sono "iperbolici" e quelli centrati "ellittici"?</strong></summary>
+
+La risposta sta nel **rispetto del dominio di dipendenza fisico**: uno schema numerico è "adatto"
+a un'equazione quando il suo **stencil** (le celle che usa) ricalca il modo in cui
+l'informazione si propaga in quell'equazione.
+
+**Equazioni iperboliche** (es. advezione, Eulero supersonico): l'informazione viaggia lungo le
+**linee caratteristiche** con **velocità finita** e **direzione ben precisa** (a valle, dentro il
+cono di Mach). Il **dominio di dipendenza** di un punto è solo ciò che sta **a monte** lungo le
+caratteristiche. Lo schema **upwind** usa i valori provenienti dalla **direzione da cui arriva il
+segnale**:
+
+$$
+u_i^{n+1} = u_i^n - \frac{a\Delta t}{\Delta x}\left(u_i^n - u_{i-1}^n\right) \quad (a>0)
+$$
+
+cioè guarda **all'indietro**, verso $i-1$. Questo **rispetta la causalità fisica** e introduce
+una **dissipazione numerica** che stabilizza lo schema. Un centrato puro, su un'iperbolica
+del primo ordine, è invece **instabile** (porta informazione anche da valle, dove non dovrebbe).
+Per questo gli schemi **upwind** (Godunov, Roe) sono la scelta naturale per problemi **iperbolici**.
+
+**Equazioni ellittiche** (es. Laplace/Poisson, pressione nel flusso incomprimibile, regime
+subsonico): **non esistono direzioni privilegiate** di propagazione. Una perturbazione in un punto
+si fa sentire **istantaneamente e in tutte le direzioni**: il **dominio di dipendenza è l'intero
+dominio**. Lo schema appropriato è quindi **centrato e simmetrico**, perché tratta allo stesso
+modo i vicini da ogni lato:
+
+$$
+\frac{u_{i-1} - 2u_i + u_{i+1}}{\Delta x^2} = f_i
+$$
+
+Uno schema upwind (asimmetrico) su un'ellittica introdurrebbe una **direzionalità artificiale**
+che non ha senso fisico.
+
+**Collegamento con il report (doppia rampa):** è esattamente per questo che, se nel dominio
+comparisse una **tasca subsonica**, le equazioni di Eulero stazionarie cambierebbero natura da
+**iperbolica** (supersonico) a **ellittica** (subsonico), richiedendo un trattamento diverso delle
+condizioni al contorno all'outlet. Ed è anche il motivo per cui il **metodo di proiezione di
+Chorin** (trattato nella teoria del report, sezione *Solutori Density-Based e Pressure-Based*)
+deve risolvere un'**equazione di Poisson ellittica** per la pressione: l'incomprimibilità ha
+natura ellittica.
+
+**In una frase:** *upwind = direzionale = rispetta le caratteristiche delle iperboliche;
+centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
+
+</details>
+
+---
+
+
+---
+
+## Volumi finiti e schemi per i flussi
+
+### Tassonomia, Godunov, Roe (domande)
+
+<details>
+<summary><strong>Tassonomia dei metodi ai volumi finiti + tabella comparativa (idea, pro, contro)</strong></summary>
+
+```mermaid
+graph TD
+    MN["METODI ai VOLUMI FINITI"] --> UP["UPWIND"]
+    MN --> CE["CENTRATI"]
+    MN --> OE["ORDINE ELEVATO (spazio)"]
+    UP --> FDS["Flux DIFFERENCE splitting"]
+    UP --> FVS["Flux VECTOR splitting"]
+    FDS --> G1["1. Godunov: Riemann esatto (costante a tratti)"]
+    FDS --> G2["2. Osher-Engquist-Pandolfi: Riemann semplificato (ventaglio anziche' urto)"]
+    FDS --> G3["3. Roe: linearizza il sistema (A-bar)"]
+    FVS --> G4["4. Van Leer: split del flusso vettoriale in sinistro e destro"]
+    FVS --> G5["5. AUSM: split vettore convettivo + pressione"]
+    CE --> G6["6. Lax-Friedrichs GLOBALE: media tra celle con dx,dt"]
+    CE --> G7["7. Lax-Friedrichs LOCALE / Rusanov: media con lambda_max"]
+    CE --> G8["8. Jameson-Schmidt-Turkel (JST): media + viscosita' artificiale"]
+    CE --> G9["9. Centrato puro: integrazione diretta nel tempo"]
+    OE --> G10["10. WENO: stencil multipli, pesi per evitare oscillazioni spurie"]
+    OE --> G11["11. Discontinuous Galerkin: piu' gradi di liberta', la media di cella diventa un polinomio"]
+```
+
+| # | Metodo | Categoria | Idea di base | Pro | Contro |
+|---|---|---|---|---|---|
+| 1 | **Godunov** | FDS | risolve il **Riemann esatto** all'interfaccia (dato costante a tratti) | esatto, robusto, fisicamente fondato | costoso (Riemann esatto a ogni faccia) |
+| 2 | **Osher–Engquist–Pandolfi** | FDS | **Riemann semplificato**: ventaglio di compressione **anziché** urto | liscio, differenziabile, niente entropy fix | integrali complessi |
+| 3 | **Roe** | FDS | **linearizza** il sistema con $\bar A$ costante | accurato, economico, nitido sugli urti | **espansioni non fisiche** → serve **entropy fix** |
+| 4 | **Van Leer** | FVS | **split** del flusso **vettoriale** in parte sinistra/destra ($F^+\!,F^-$) | semplice, robusto, differenziabile | **diffusivo** sui contatti |
+| 5 | **AUSM** | FVS | **split** del vettore **convettivo** + **pressione** | nitido sui contatti, robusto | varianti/taratura |
+| 6 | **Lax–Friedrichs globale** | centrato | media tra celle con $\Delta x,\Delta t$ globali | semplice | **molto diffusivo** |
+| 7 | **Lax–Friedrichs locale / Rusanov** | centrato | media con $\lambda_{\max}$ **locale** | robusto, economico | diffusivo |
+| 8 | **Jameson–Schmidt–Turkel (JST)** | centrato | media + **viscosità artificiale** (2°/4° ordine) | efficiente, molto usato in industria | taratura dei coefficienti |
+| 9 | **Centrato puro** | centrato | integrazione **diretta** nel tempo (no dissipazione) | semplicissimo | **instabile** per i convettivi |
+| 10 | **WENO** | alto ordine | più sotto-stencil + **pesi** per evitare oscillazioni | alto ordine **e** cattura urti | costoso |
+| 11 | **Discontinuous Galerkin** | alto ordine | più **gradi di libertà**: la media di cella diventa un **polinomio** | alto ordine + conservazione + upwind | costoso, complesso |
+
+</details>
+
+<details>
+<summary><strong>Concetto [27][28] — Godunov: perché è interessante fisicamente, e il Mach unitario nella rarefazione</strong></summary>
+
+- **[27] Perché fisicamente interessante.** Il flusso all'interfaccia non è una media arbitraria: viene
+  dalla **soluzione (esatta) del problema di Riemann locale**, cioè dalla **vera struttura d'onda** delle
+  equazioni (urto / contatto / rarefazione). Lo schema è quindi costruito sulla **fisica reale** di come
+  evolve una discontinuità, non su un'interpolazione.
+- **[28] Perché $M=1$ quando l'espansione è a cavallo dell'asse $t$.** Il flusso si legge in $x/t=0$ (asse
+  verticale del tempo). Se un **ventaglio di rarefazione** della famiglia $u\mp a$ **attraversa** $x/t=0$
+  (rarefazione **transonica**: un'estremità con velocità d'onda $<0$, l'altra $>0$), allora in $x/t=0$ la
+  velocità d'onda è **nulla**: $u\mp a=0\Rightarrow u=\pm a\Rightarrow M=u/a=1$. È il **punto sonico**
+  interno al ventaglio: lì la caratteristica è **stazionaria**, da cui $M=1$ (caso delicato, richiede cura).
+
+</details>
+
+<details>
+<summary><strong>Metodo di Roe — procedura, variabili, e domande [29][30][31][32][33]</strong></summary>
+
+**Idea di base:** **linearizzare** le equazioni di conservazione (iperboliche). Da $\partial_t U+\partial_x F=0$,
+con $A=\partial F/\partial U$ (Jacobiana), si passa a $\partial_t U+\bar A\,\partial_x U=0$ con $\bar A$
+**costante** all'interfaccia.
+
+```mermaid
+graph LR
+    A["IDEA: linearizzo (iperbolico)<br/>dU/dt + A dU/dx = 0"] --> B["CONDIZIONI su A-bar:<br/>1) dF = A-bar dU<br/>2) diagonalizzabile, autovalori reali<br/>3) A-bar -> A(U) se U_j ~ U_(j+1)"]
+    B --> C["MEDIE DI ROE (pesi sqrt(rho)):<br/>rho-bar=sqrt(rho_j rho_(j+1)), u-bar, h-bar"]
+    C --> D["VARIABILI: conservative U vs caratteristiche W,<br/>dU = L dW (L = autovettori destri)"]
+    D --> E["FLUX DIFFERENCE SPLITTING:<br/>dF = A-bar dU = L Lambda dW; split (lambda +/- |lambda|)/2"]
+    E --> F["Flusso numerico:<br/>F = 1/2(F_L+F_R) - 1/2 sum |lambda_k| l_k dW_k"]
+    F --> G["ENTROPY FIX dove |lambda_k| -> 0 (rarefazione transonica)"]
+```
+
+- **[31] Perché $\bar A\to A(U_j)$ se $U_j\sim U_{j+1}$?** È la **condizione di consistenza** della matrice di
+  Roe. Quando i due stati **coincidono** (regione liscia), la linearizzazione deve **ridursi** alla Jacobiana
+  **esatta** $A(U)$, altrimenti lo schema risolverebbe un'equazione **diversa** nel liscio (non consistente).
+  Attenzione al tuo dubbio: a coincidere è il **salto** $\Delta F\to0$ (e $\Delta U\to0$), **non** il flusso
+  $F$; la Jacobiana $A=\partial F/\partial U$ (le **velocità d'onda**) **non** è nulla → $\bar A\to A(U)$
+  garantisce le **velocità d'onda corrette** nel liscio = consistenza.
+- **[29] Perché la matrice degli autovettori moltiplica le variabili *caratteristiche* e non le conservative?**
+  Perché $U=L\,W$ ($dU=L\,dW$): gli **autovettori (destri)** di $\bar A$ formano una **base**, e le $W$ sono le
+  **coordinate** (le "**intensità d'onda**") dello stato conservativo in quella base. È un **cambio di base**
+  (matematica) con significato **fisico**: ogni colonna di $L$ è **un'onda**, ogni $W_k$ la sua **ampiezza**.
+  Si opera su $W$ (onde disaccoppiate) e si torna a $U$ con $L$.
+- **[30] Dove serve l'entropy fix?** Nello **split per segno** $\dfrac{\lambda_k\pm|\lambda_k|}{2}$: quando un
+  autovalore **cambia segno** attraverso l'interfaccia ($|\lambda_k|\to0$, caso **transonico**), Roe — che
+  tratta la rarefazione come un **singolo salto** — produce un'**onda d'espansione non fisica** (expansion
+  shock, viola l'entropia). Si "ripara" addolcendo $|\lambda_k|$ vicino a zero (**entropy fix** di Harten).
+- **[32] I due set di variabili (espliciti):**
+  - **Conservative:** $U=(\rho,\ \rho u,\ \rho E)^{T}$.
+  - **Caratteristiche:** $W=L^{-1}U$, con autovalori $\lambda=\{u-a,\ u,\ u+a\}$; gli incrementi $\Delta W_k$
+    sono le **intensità delle onde**.
+- **[33]** La **simulazione d'esame sul flusso di Roe** è nel file esami (sez. 3, "Schemi per i flussi"); qui
+  sopra c'è la **procedura esatta** (mermaid) e i concetti teorici.
+
+</details>
+
+<details>
+<summary><strong>Concetto [25][26] — generazione mesh: metodo iperbolico vs advancing front</strong></summary>
+
+- **[25] Perché i metodi "iperbolici" si ispirano alla propagazione ondosa.** Generano la griglia
+  **strutturata** **risolvendo un sistema di PDE iperboliche** marciate **verso l'esterno** dalla superficie
+  del corpo: le linee di griglia avanzano come un **fronte d'onda** che si propaga lungo le **caratteristiche**.
+  L'ispirazione è sia nell'**equazione** (iperbolica, marciata come un'evoluzione) sia nella **logica**
+  (marciare un fronte strato dopo strato) → ottima **ortogonalità** vicino alla parete.
+- **[26] Differenza concreta con l'advancing front.** Non solo strutturata vs non strutturata:
+  - **Advancing front** (non strutturata): "inietta" elementi (triangoli/tetraedri) **uno alla volta**,
+    avanzando un **fronte** locale finché si chiude → costruzione **elemento per elemento**, segue bene la
+    geometria ma può "incartarsi" dove i fronti si scontrano;
+  - **Iperbolico** (strutturata): marcia un **intero strato** (una linea coordinata) alla volta **risolvendo
+    le PDE** → griglia **strutturata** $(i,j)$.
+  In breve: **elemento-per-elemento locale** (advancing front) vs **strato-per-strato marciato via PDE**
+  (iperbolico).
+
+</details>
+
+
+### 1. Metodo dei Volumi Finiti in 1D
+
+<details>
+<summary><strong>Equazione conservativa</strong></summary>
+
+Si parte dalla forma differenziale conservativa:
+
+$$\frac{\partial u}{\partial t} + \frac{\partial f}{\partial x} = 0, \qquad f = f(u)$$
+
+> **Perché considerare solo il flusso convettivo equivale alle equazioni di Eulero.** Le Navier–Stokes
+> hanno flusso **convettivo + diffusivo**; il flusso diffusivo è proporzionale a $\mu$ (viscosità) e
+> $k$ (conducibilità termica). **Eulero = Navier–Stokes con $\mu=k=0$** → resta il solo flusso
+> convettivo $\mathbf F^c$, cioè $\partial_t\mathbf U + \nabla\cdot\mathbf F^c = 0$. È per questo che
+> qui si lavora con il flusso $f=f(u)$ convettivo.
+
+Si integra su ogni cella $[x_{j-\frac{1}{2}}, x_{j+\frac{1}{2}}]$, ottenendo la forma integrale:
+
+$$\frac{\partial}{\partial t}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx = -\left(f_{j+\frac12} - f_{j-\frac12}\right)$$
+
+</details>
+
+<details>
+<summary><strong>Variabile conservata media di cella</strong></summary>
+
+$$\boxed{U_j = \frac{1}{\Delta x}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx}$$
+
+> **Definizione:** $U_j$ è il valore *medio* di $u$ sull’intera cella $j$, non il valore puntuale al centro. Il FVM lavora con medie, le differenze finite con valori puntuali.
+> 
+
+</details>
+
+<details>
+<summary><strong>Schema centrato esplicito</strong></summary>
+
+Con flussi alle facce come medie aritmetiche:
+
+$$f_{j+\frac12} = \frac{1}{2}(f_j + f_{j+1}), \qquad f_{j-\frac12} = \frac{1}{2}(f_{j-1}+f_j)$$
+
+$$\frac{U_j^{n+1}-U_j^n}{\Delta t} + \frac{f_{j+\frac12}^n - f_{j-\frac12}^n}{\Delta x} = 0$$
+
+**Risultato chiave — Equivalenza FD ↔ FVM in 1D:** In 1D con schema centrato le equazioni sono identiche. La differenza è nell’*interpretazione*: FD assume $U_j \approx u(x_j,t)$ (valore puntuale), FVM assume $U_j$ = media di cella. La distinzione diventa rilevante in 2D/3D su mesh non strutturate.
+
+</details>
+
+---
+
+
+### 2. Mesh Strutturate: Generazione
+
+In una mesh strutturata ogni cella è identificata da indici $(i,j)$. I vicini fisici sono vicini in memoria — grande vantaggio computazionale (~20 contatori per cella, vs ~100 per non strutturata).
+
+| Metodo | Equazioni usate | Vantaggi | Svantaggi |
+| --- | --- | --- | --- |
+| **Algebrico** | Nessuna PDE — mapping esplicito: $x = x_1 + \xi(x_2-x_1)$ | Velocissimo, banale | No controllo ortogonalità; rischio distorsione; errori di discretizzazione occulti |
+| **Ellittico** | Laplace/Poisson: $\nabla^2\xi = 0$ | Griglia liscia, ortogonale con BC Neumann | Costoso (sistema globale iterativo) |
+| **Iperbolico** | PDE iperboliche, marcia dalla parete | $\perp$ alla parete automaticamente, ottimo per BL | Problemi su geometrie concave (sovrapposizione) |
+
+> **Note:** Il tipo di PDE usata per generare la griglia riflette come l’informazione si propaga nel dominio di calcolo. Ellittico = si sente tutto il dominio. Iperbolico = marcia in un’unica direzione.
+> 
+
+⚠ **Rischio metodo algebrico:** Non si controlla la direzione delle pareti → le linee di griglia non sono perpendicolari alla superficie → errori di discretizzazione nascosti legati allo skewness.
+
+---
+
+
+### 3. Mesh Non Strutturate
+
+La connettività deve essere memorizzata esplicitamente (maggiore memoria, massima flessibilità geometrica).
+
+<details>
+<summary><strong>Triangolazione di Delaunay</strong></summary>
+
+> **Criterio:** La circonferenza circoscritta a ogni triangolo non deve contenere altri punti della discretizzazione.
+> 
+- In 2D → triangoli; in 3D → tetraedri
+- Duale del diagramma di Voronoi
+- Algoritmo globale — buona robustezza, ma difficoltà su geometrie concave
+
+</details>
+
+<details>
+<summary><strong>Metodo Frontale (Advancing Front)</strong></summary>
+
+- Si parte dal contorno (il “fronte”) e si aggiungono celle avanzando verso l’interno
+- Costruzione locale → maggiore flessibilità su geometrie cave/concave
+- Possibile conflitto quando due fronti si incontrano da direzioni “sbagliate”
+
+</details>
+
+| Caratteristica | Delaunay | Frontale |
+| --- | --- | --- |
+| Principio | Criterio globale sulla circonscritta | Crescita locale dal contorno |
+| Gestione concavità | Delicata | Buona |
+| Qualità vicino parete | Media | Buona |
+| Robustezza | Alta | Media |
+
+---
+
+
+### 4. Celle Centrate vs Nodi Centrati
+
+|  | Celle Centrate (Fluent) | Nodi Centrati (CFX) |
+| --- | --- | --- |
+| Volume di controllo | La cella direttamente | Griglia duale costruita attorno al nodo |
+| BC | Più semplici | Più articolate (il volume di controllo taglia il bordo) |
+| Griglia duale | Non serve | Costruita una volta in preprocessing — costo trascurabile |
+| Gradi di libertà | Pari al numero di celle | Pari al numero di nodi (più numerosi) |
+
+> La griglia duale ha un overhead trascurabile: si costruisce una volta sola. I nodi centrati offrono più gdl per la stessa mesh, spesso maggiore accuratezza, ma BC più complesse.
+> 
+
+> **Quale griglia si usa a livello commerciale.** Mesh **ibride non strutturate** (ICEM, Pointwise,
+> ANSA, Gmsh): **strati prismatici strutturati** vicino alla parete (per il boundary layer) +
+> **tetraedri** non strutturati nel campo lontano. Per le turbomacchine si usano mesh **strutturate
+> multi-blocco** (TurboGrid). I codici a **nodi centrati** (CFX) sono spesso preferiti su geometrie
+> complesse, quelli a **celle centrate** (Fluent) sui casi più semplici.
+
+---
+
+
+### 5. Metodo di Godunov & Problema di Riemann
+
+<details>
+<summary><strong>Idea centrale</strong></summary>
+
+Godunov assume soluzione **costante a tratti** (primo ordine). Ogni interfaccia $j+\frac12$ separa due stati costanti → problema di Riemann locale.
+
+> **Problema di Riemann:** PDE iperbolica con dato iniziale a gradino $u(x,0) = u_L$ se $x<0$, $u_R$ se $x>0$. La soluzione consiste di onde (rarefazione, contatto, urto). Esempio classico: **tubo di Sod**.
+> 
+
+</details>
+
+<details>
+<summary><strong>Schema di Godunov</strong></summary>
+
+Si risolve il Riemann per ogni interfaccia, si ottiene $F_{j+\frac12}$, poi si avanza:
+
+$$U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x}\left[F_{j+\frac12} - F_{j-\frac12}\right]$$
+
+</details>
+
+<details>
+<summary><strong>CFL nel metodo di Godunov</strong></summary>
+
+La CFL ha interpretazione fisica diretta: $\Delta t$ deve essere abbastanza piccolo da garantire che le onde di due Riemann adiacenti **non si sovrappongano** durante il time step. Se si sovrappongono, il problema locale non è più valido.
+
+$$\text{CFL} = \frac{\lambda_{max},\Delta t}{\Delta x} \leq 1$$
+
+⚠ Risolvere il Riemann esatto per le equazioni di Eulero è iterativo e costoso → nella pratica si usano **solutori approssimati**: Lax-Friedrichs, Rusanov, Roe, HLLC.
+
+</details>
+
+---
+
+
+### 6. Flussi Numerici e Flux Splitting
+
+<details>
+<summary><strong>Tassonomia</strong></summary>
+
+| Categoria | Metodi | Cosa si spezza |
+| --- | --- | --- |
+| **Flux Difference Splitting (FDS)** | Godunov, Roe, HLLC | La *differenza* $\Delta F = F_R - F_L$ tramite Jacobiana |
+| **Flux Vector Splitting (FVS)** | Steger-Warming, van Leer, AUSM+ | Il *vettore flusso* $F = F^+ + F^-$ |
+| **Centrati** | Lax-Friedrichs, Rusanov, Jameson | Media + dissipazione artificiale scalare |
+
+</details>
+
+<details>
+<summary><strong>Lax-Friedrichs / Rusanov</strong></summary>
+
+$$F_{j+\frac12}^{LF} = \frac{1}{2}(F_j + F_{j+1}) - \frac{\lambda_{max}}{2}(U_{j+1} - U_j)$$
+
+Il termine $-\frac{\lambda_{max}}{2}\Delta U$ è dissipazione numerica scalare. Rusanov usa $\lambda_{max} = \max(|\lambda_j|,|\lambda_{j+1}|)$ — robusto ma molto diffusivo.
+
+</details>
+
+<details>
+<summary><strong>Jameson</strong></summary>
+
+Dissipazione adattiva: 2° ordine vicino a discontinuità (cattura urti), 4° ordine altrove (meno diffusivo). Metodo centrato con dissipazione adattata localmente.
+
+</details>
+
+---
+
+
+### 7. Schema di Roe
+
+Solutore di Riemann approssimato. Linearizza il problema all’interfaccia usando la **media di Roe** $\bar{U}$.
+
+<details>
+<summary><strong>Proprietà richieste</strong></summary>
+
+1. **Consistenza:** $\bar{A}(U_R - U_L) = F(U_R) - F(U_L)$
+2. **Diagonalizzabilità con autovalori reali** (sistema iperbolico)
+3. **Conservatività**
+
+</details>
+
+<details>
+<summary><strong>Media di Roe per le equazioni di Eulero</strong></summary>
+
+$$\bar{u} = \frac{\sqrt{\rho_L},u_L + \sqrt{\rho_R},u_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}, \qquad \bar{H} = \frac{\sqrt{\rho_L},H_L + \sqrt{\rho_R},H_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}$$
+
+</details>
+
+<details>
+<summary><strong>Flusso di Roe</strong></summary>
+
+$$\overrightarrow{\delta F}_j = \frac{\bar{\lambda}_1 - |\bar{\lambda}_1|}{2},e^1,\delta w_j^1 + \frac{\bar{\lambda}_2 - |\bar{\lambda}_2|}{2},e^2,\delta w_j^2 + \frac{\bar{\lambda}_3 - |\bar{\lambda}_3|}{2},e^3,\delta w_j^3$$
+
+con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}} \in \mathbb{R}$.
+
+⚠ **Entropy Fix:** Roe può produrre violazioni del 2° principio su urti sonici → si corregge con $|\lambda| \to \max(|\lambda|, \epsilon)$.
+
+</details>
+
+---
+
+
+---
+
+## Approfondimenti (esercizi, HPC, WENO, FE/DG, stiffness, key takeaways)
+
+<details>
+<summary><strong>Apri — materiale di approfondimento (non essenziale per il primo studio)</strong></summary>
+
 
 <details>
 <summary><strong>Sostituzione standard</strong></summary>
@@ -1050,7 +1723,6 @@ $$
 
 </details>
 
-### Approfondimenti teorici (HPC e parallelismo, varianti Runge-Kutta, WENO, FV/FE/DG)
 
 #### HPC & Parallelismo
 
@@ -1502,763 +2174,6 @@ Con base di Legendre ortogonalizzata, \(M\) diventa diagonale.
 - **DG è la generalizzazione unificante:** FV (p=0) e FE (p≥1) sono casi particolari del DG — la scelta del grado \(p\) è il parametro di controllo del trade-off accuratezza/costo.
 - **La parallelizzazione scala con la dimensione del problema:** per problemi 3D grandi, il rapporto calcolo/comunicazione cresce favorevolmente; è qui che HPC (InfiniBand, decomposizione di dominio) esprime tutto il suo valore.
 
-### Formule da ricordare (memo)
-
-<details>
-<summary><strong>🧠 Formule da ricordare</strong></summary>
-
-#### Errori (locale e globale)
-
-| Formula | Hint / collegamento |
-|---|---|
-| $\tilde y_{k+1} = y(t_k) + h\,f(t_k, y(t_k))$ | un passo di Eulero **partendo dal dato esatto** $y(t_k)$ (non da $y_k$) |
-| $\tau(h) = y(t_{k+1}) - \tilde y_{k+1} = y(t_{k+1}) - y(t_k) - h\,f(t_k,y(t_k))$ | **troncamento locale**: errore di un solo passo; nasce dal troncamento dei termini di grado alto |
-| $d(h) = \dfrac{\tau(h)}{h}$ | **discretizzazione locale**: dipende da come discretizzi l'intervallo; è $\tau$ "per unità di $h$" |
-| $e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1})-\tilde y_{k+1}\big)}_{\text{troncamento}} + \underbrace{\big(\tilde y_{k+1}-y_{k+1}\big)}_{\text{propagazione}}$ | **globale** = troncamento (ultimo passo) + propagazione (passi precedenti) |
-
-#### Consistenza, ordine, 0-stabilità, assoluta stabilità
-
-| Formula | Hint / collegamento |
-|---|---|
-| $\lim_{h\to0} d(h) = 0$ | **consistenza**: l'errore di discretizzazione svanisce a passo nullo |
-| $d(h) = \mathcal O(h^p)$ | **ordine** $p$ (Eulero: $p=1$); $p$ = pendenza nel grafico log–log |
-| $\lvert y_k-\hat y_k\rvert \le K\,\lvert y_0-\hat y_0\rvert,\ \forall k\le\frac{b-a}{h}$ | **0-stabilità**: $K$ come numero di condizionamento, non amplifica l'errore |
-| $\displaystyle\lim_{k\to\infty} y_k = 0$ | **assoluta stabilità**: ha senso solo se la soluzione esatta tende a 0 (asint. stabile) |
-| Lax: consistenza + 0-stabilità $\Rightarrow$ convergenza, $\lim_{N\to\infty} y_N = y(t)$ | **Lax–Richtmyer**: one-step (stabili) + consistenti $\Rightarrow$ convergenti |
-
-#### Regione di assoluta stabilità
-
-| Formula | Hint / collegamento |
-|---|---|
-| $y_{k+1} = \mathcal F(h\lambda)\,y_k \Rightarrow y_{k+1} = \mathcal F(h\lambda)^{k+1} y_0$ | qualsiasi metodo si riscrive con il **fattore di amplificazione** $\mathcal F$ |
-| $R_a = \{\, h\lambda\in\mathbb C : \lvert\mathcal F(h\lambda)\rvert < 1 \,\}$ | **regione** nel piano complesso $h\lambda$; impliciti $\to$ regione ampia |
-| $y'(t)=\lambda y(t) \to \mathrm{Re}(\lambda)<0$;  $\;y'(t)=Ay(t) \to \mathrm{Re}(\lambda_i)<0\ \forall i$ | **sistemi**: la condizione vale per **tutti** gli autovalori di $A$ |
-| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | $A$ diagonalizzabile; asint. stabile se $\mathrm{Re}\,\lambda_i<0\ \forall i$ |
-
-#### Runge-Kutta
-
-| Formula | Hint / collegamento |
-|---|---|
-| $y_{k+1}=y_k+h\sum_{i=1}^{s} a_i\,f\!\big(t_k+b_i h,\ y_k+h\sum_{j=1}^{i-1} c_{ij}k_j\big)$ | forma generica a $s$ stadi; la somma fino a $i-1$ lo rende **esplicito** (fino a $i$ $\to$ implicito) |
-| $\sum_{i=1}^{s} a_i = 1,\qquad b_i=\sum_{j=1}^{s} c_{ij}\ \ \forall i$ | **condizioni di consistenza** sul tableau di Butcher |
-| Eulero esplicito: $y_{k+1}=y_k+h f(t_k,y_k)$, $\ \mathcal F=1+h\lambda$ | $p=1$, 1 stadio |
-| Eulero implicito: $y_{k+1}=y_k+h f(t_{k+1},y_{k+1})$, $\ \mathcal F=\dfrac{1}{1-h\lambda}$ | $p=1$, A-stabile (regione ampia) |
-| Heun: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_k+h f(t_k,y_k))\big]$, $\ \mathcal F=1+h\lambda+\frac{(h\lambda)^2}{2}$ | $p=2$, esplicito, 2 stadi |
-| Trapezi: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_{k+1})\big]$ | $p=2$, implicito, 2 stadi |
-| Eulero modificato: $y_{k+1}=y_k+h f\!\big(t_k+\frac h2,\ y_k+\frac h2 f(t_k,y_k)\big)$ | esplicito, 2 stadi (punto medio) |
-
-#### Stiffness e CFL
-
-| Formula | Hint / collegamento |
-|---|---|
-| $\max_i \lvert\mathrm{Re}(\lambda_i)\rvert\,L \ll -1$ | **grado di stiffness**: autovalore molto negativo $\to$ passo piccolo forzato su intervallo $L$ grande |
-| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | il termine con $\lambda$ molto negativo decade subito ma vincola il passo (usa impliciti / ode15s) |
-
-</details>
-
-### Dimostrazioni (lista)
-
-<details>
-<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
-
-| Dimostrazione | Punto di partenza → arrivo |
-|---|---|
-| Ordine di Eulero esplicito | Sviluppo di Taylor di $y(t_{k+1})$ → $\tau(h)=\tfrac{h^2}{2}y''(\xi)=\mathcal O(h^2)$, quindi $d(h)=\mathcal O(h)\Rightarrow p=1$ |
-| Regione di assoluta stabilità di Eulero esplicito | Eq. test $y'=\lambda y$ → $y_k=(1+h\lambda)^k y_0$, $\mathcal F=1+h\lambda$, $\lvert 1+h\lambda\rvert<1$ (cerchio centro $-1$, raggio $1$) |
-| Regione di assoluta stabilità di Eulero implicito | Eq. test $y'=\lambda y$ → $\mathcal F=\tfrac{1}{1-h\lambda}$, $\lvert 1-h\lambda\rvert>1$ (esterno cerchio centro $+1$; A-stabile) |
-| Teorema di Lax | Decomposizione $e_{k+1}=$ troncamento $+$ propagazione → consistenza ($\tau\to0$) + 0-stabilità ($K$ limitato) $\Rightarrow$ $e_N=\mathcal O(h^p)\to0$ (convergenza) |
-| Condizione CFL | Dominio di dipendenza fisico $c\,\Delta t$ vs numerico $\Delta x$ → $c\,\Delta t\le\Delta x\Rightarrow \tfrac{c\,\Delta t}{\Delta x}\le1$ |
-| Ordine di Heun | Taylor dell'incremento $\tfrac h2[f_k+f(t_k+h,y_k+hf_k)]$ vs $y(t_{k+1})$ → match fino a $h^2$, $\tau=\mathcal O(h^3)\Rightarrow p=2$ |
-| Ordine di un metodo Runge-Kutta | Matching dei Taylor di $y(t_{k+1})$ e incremento RK → condizioni d'ordine sul tableau ($\sum a_i=1$, $\sum a_i b_i=\tfrac12$, …) $\Rightarrow$ $d=\mathcal O(h^p)$ |
-
-</details>
-
-## 2. Differenze finite
-
-### Formulazione, dominio e discretizzazione
-
-<details>
-<summary><strong>Inquadramento — l'equazione di riferimento</strong></summary>
-
-Si usa l'**equazione scalare lineare** (advezione), il "modello-giocattolo" su cui si studiano tutti gli schemi:
-
-$$\frac{\partial u}{\partial t}+a\,\frac{\partial u}{\partial x}=0,\qquad
-u=\text{grandezza conservata generica},\quad a=\text{velocità del segnale}.$$
-
-Per risolverla **univocamente** servono delle **condizioni** (vedi sotto).
-
-</details>
-
-<details>
-<summary><strong>Figura + Concetto — dominio, dato iniziale e condizioni al contorno (DOVE stanno)</strong></summary>
-
-![Dominio (x,t): dato iniziale sul bordo basso, BC sul bordo sinistro](images/fd_dominio_bc.svg)
-
-Il dubbio "la BC si impone su tutto il tratto $x=0$ a $t$ variabile, o solo a $t=0$?" si scioglie guardando
-il **dominio** $[0,L]\times[0,T]$:
-- **Dato INIZIALE** $u(x,0)$ -> su **tutto il bordo inferiore** ($t=0$, **tutti gli $x$**).
-- **Condizione al CONTORNO** $u(0,t)$ -> su **tutto il bordo sinistro** ($x=0$, **tutti i $t$**), **non** solo
-  a $t=0$. (Per $a>0$ l'informazione **entra da sinistra**; il bordo destro $x=L$ e' **uscente** -> niente BC,
-  vedi `caratteristiche.md` §1.)
-
-Quindi sono **due** insiemi di dati su **due bordi diversi**: l'asse orizzontale (passato, $t=0$) e il bordo
-verticale sinistro (ingresso, $x=0$).
-
-```mermaid
-graph TD
-    EQ["u_t + a u_x = 0 (scalare lineare)"] --> NEED["Servono condizioni per risolvere univocamente"]
-    NEED --> IC["CONDIZIONE INIZIALE u(x, t=0)<br/>bordo INFERIORE: t=0, TUTTI gli x"]
-    NEED --> BC["CONDIZIONE AL CONTORNO u(x=0, t)<br/>bordo SINISTRO: x=0, TUTTI i t (a>0)"]
-    IC --> SOL["Soluzione nel dominio (x,t)"]
-    BC --> SOL
-    SOL --> OUTB["bordo DESTRO x=L: uscente -> nessuna BC (a>0)"]
-```
-
-</details>
-
-<details>
-<summary><strong>Figura + Concetto — discretizzazione spaziale e temporale ($\Delta x,\Delta t$ costanti)</strong></summary>
-
-![Discretizzazione dell'asse spaziale e di quello temporale](images/fd_discretizzazione.svg)
-
-$$\text{spazio: } x_j=j\,\Delta x=j\,\frac{L}{N}\ (j=0,\dots,N);\qquad
-\text{tempo: } t_n=n\,\Delta t=n\,\frac{T}{M}\ (n=0,\dots,M).$$
-
-```mermaid
-graph LR
-    D["Discretizzazione"] --> SX["SPAZIALE: x_j = j*dx = j*L/N, j=0..N"]
-    D --> TX["TEMPORALE: t_n = n*dt = n*T/M, n=0..M"]
-    SX --> NOTE["dx, dt COSTANTI (uniformi); N (spazio) e M (tempo) possono DIFFERIRE"]
-    TX --> NOTE
-```
-
-- **Perche' $\Delta x,\Delta t$ costanti?** Per **semplicita'** e per rendere immediate l'analisi di
-  consistenza (sviluppi di Taylor) e di stabilita' (von Neumann), che si scrivono pulite su **griglia
-  uniforme**. **Alternative** (se servono): griglie **non uniformi/stretchate** (per risolvere strati limite
-  o zone con forti gradienti) e passo temporale **adattivo** $\Delta t=\Delta t(t)$ (per seguire transitori);
-  costano in complessita' (gli sviluppi e la CFL vanno riscritti localmente).
-- **Perche' $N$ (spazio) e $M$ (tempo) possono/devono differire?** Sono **due discretizzazioni indipendenti**:
-  $\Delta x$ lo fissa l'**accuratezza spaziale** desiderata, mentre $\Delta t$ e' **vincolato dalla stabilita'**
-  (condizione **CFL** $\mathrm{CFL}=a\,\Delta t/\Delta x\le 1$ per l'esplicito). Quindi tipicamente, scelto
-  $\Delta x$, il $\Delta t$ e' **imposto** dalla CFL -> in generale $M\neq N$. E' **bene** che siano slegati:
-  cosi' si raffina lo spazio per l'accuratezza senza essere costretti a un $\Delta t$ uguale, e si sceglie
-  $\Delta t$ solo in base alla stabilita' (o lo si rende implicito per scioglierne il vincolo).
-
-</details>
-
-<details>
-<summary><strong>Schema — dalla derivata al sistema discreto (upwind esplicito)</strong></summary>
-
-Sostituendo le derivate con i **rapporti incrementali** ($\Delta x,\Delta t$ costanti):
-
-$$\frac{\partial u}{\partial t}\approx\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}\quad(\text{avanti nel tempo}),
-\qquad \frac{\partial u}{\partial x}\approx\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}\quad(\text{upwind, }a>0),$$
-
-si ottiene lo **schema upwind esplicito** (FTBS, *Forward-Time Backward-Space*):
-
-$$\boxed{\;\frac{u_j^{\,n+1}-u_j^{\,n}}{\Delta t}+a\,\frac{u_j^{\,n}-u_{j-1}^{\,n}}{\Delta x}=0\;}$$
-
-Da qui $u_j^{\,n+1}$ si ricava **esplicitamente** dai valori al passo $n$; la **scelta backward** in spazio
-(da monte) e' l'**upwind** corretto per $a>0$ ed e' cio' che rende lo schema stabile sotto CFL $\le 1$.
-
-</details>
-
-<details>
-<summary><strong>Esempi — gli schemi a confronto (stencil, equazioni, classificazione)</strong></summary>
-
-![Stencil degli schemi alle differenze finite: punti usati nel piano (x,t)](images/fd_schemi_stencil.svg)
-
-Tutti partono da $\dfrac{u_j^{n+1}-u_j^{n}}{\Delta t}$ per il tempo (avanti); cambia **come** si discretizza
-$a\,\partial_x u$ (quali punti, quale lato).
-
-**1) Upwind esplicito (FTBS)** — spazio *all'indietro* (da monte, per $a>0$):
-$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}=0.$$
-
-**2) Downwind esplicito** — spazio *in avanti* (lato sbagliato, per $a>0$):
-$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_j^{n}}{\Delta x}=0.$$
-
-**3) Centrato esplicito (FTCS)** — differenza centrata nello spazio:
-$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0
-\;\Rightarrow\; u_j^{n+1}=u_j^{n}-\frac{a\,\Delta t}{2\,\Delta x}\big(u_{j+1}^{n}-u_{j-1}^{n}\big)
-\;\Rightarrow\; u^{n+1}=f(u^{n}).$$
-
-**4) Centrato implicito** — la derivata spaziale è valutata al livello **nuovo** $n+1$:
-$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_{j+1}^{n+1}-u_{j-1}^{n+1}}{2\,\Delta x}=0
-\;\Rightarrow\; u^{n+1}=f(u^{n+1})\;\Rightarrow\;\text{si risolve un SISTEMA.}$$
-
-**5) Lax–Friedrichs (media)** — sostituisce $u_j^{n}$ con la **media** $\tfrac12(u_{j+1}^{n}+u_{j-1}^{n})$:
-$$\frac{u_j^{n+1}-\tfrac12\big(u_{j+1}^{n}+u_{j-1}^{n}\big)}{\Delta t}
-+a\,\frac{u_{j+1}^{n}-u_{j-1}^{n}}{2\,\Delta x}=0.$$
-La media **aggiunge dissipazione numerica** → stabilizza il centrato (idea di base).
-
-**Come si contestualizzano** (rispetto alla *tabella di classificazione* della sezione 0):
-
-| Schema | Ordine spazio | Ordine tempo | Espl./Impl. | Stencil (punti) | Stabilità |
-|---|---|---|---|---|---|
-| **Upwind (FTBS)** | 1° | 1° | esplicito | 2: $\{j-1,j\}$ a $n$ | **stabile** se CFL $\le 1$ |
-| **Downwind** | 1° | 1° | esplicito | 2: $\{j,j+1\}$ a $n$ | **instabile** (sempre) |
-| **Centrato espl. (FTCS)** | 2° | 1° | esplicito | 3: $\{j-1,j,j+1\}$ a $n$ | **instabile** (incondizionatamente) |
-| **Centrato impl.** | 2° | 1° | **implicito** | 3 a $n{+}1$ + 1 a $n$ | **stabile** (incond.) ma serve risolvere un sistema |
-| **Lax–Friedrichs** | 1° | 1° | esplicito | 3: $\{j-1,j+1\}$ a $n$ | **stabile** se CFL $\le 1$ (diffusivo) |
-
-> 📌 **Commento importante sull'upwind (perché funziona, e il confronto col downwind).**
-> Per un flusso **supersonico** il problema è **iperbolico** (per Eulero 1D non stazionario lo è
-> **sempre**, anche in subsonico — *vedi `caratteristiche.md`*; quindi qui "ellittico" sarebbe un lapsus:
-> è **iperbolico**). In un problema iperbolico l'informazione viaggia **lungo le caratteristiche**, a
-> velocità finita e in una **direzione precisa**: il **dominio di dipendenza** del punto $u_j^{n+1}$ sta
-> **solo dal lato di monte**.
-> - L'**upwind** prende l'informazione **solo dal lato da cui arriva la caratteristica** (monte): usa
->   esattamente i punti che possono **fisicamente influenzare** $u_j^{n+1}$, e **scarta** l'altro lato → è
->   **coerente con la fisica** ed è **stabile** (sotto CFL $\le 1$).
-> - Il **downwind** prende l'informazione dal lato di **valle**, cioè da punti che (nel tempo $\Delta t$)
->   **non possono ancora aver raggiunto** $u_j^{n+1}$: usa dati **fuori dal dominio di dipendenza** → è
->   **non fisico** → l'analisi di von Neumann dà fattore di amplificazione $|G|>1$ → **instabile**.
-> - Il **centrato esplicito** usa **entrambi** i lati simmetricamente: per la pura advezione è
->   **incondizionatamente instabile** ($|G|^2=1+(a\Delta t/\Delta x)^2\sin^2\theta>1$). Si stabilizza o
->   passando all'**implicito** (centrato implicito) o **aggiungendo dissipazione** (Lax–Friedrichs).
->
-> Morale: in iperbolico **prendere informazione solo dal lato "giusto" (le caratteristiche) non è solo più
-> fisico: è ciò che rende il metodo stabile**. Ignorare la direzionalità (downwind/centrato esplicito) la
-> distrugge.
-
-</details>
-
-
-### Glossario essenziale
-
-<details>
-<summary><strong>Glossario dei termini ricorrenti</strong></summary>
-
-> Questa pagina è **organizzativa** (dove collocare ciascun metodo): di seguito un glossario
-> dei termini ricorrenti.
-
-| Termine | Significato | Asse |
-|---|---|---|
-| **Esplicito / Implicito** | $u^{n+1}$ dipende solo dal passato / anche da sé stesso | tempo |
-| **Regione di assoluta stabilità / CFL** | vincolo di stabilità degli espliciti | tempo |
-| **WENO** | ricostruzione spaziale ad alto ordine non oscillatoria | spazio |
-| **Discontinuous Galerkin (DG)** | alto ordine, polinomi a tratti **discontinui** per cella | spazio |
-| **Teorema barriera di Godunov** | uno schema **lineare e monotono** è al più del **1° ordine** | spazio |
-| **Limitatori di pendenza** (minmod, van Leer, superbee) | rendono **non lineare** lo schema → alto ordine senza oscillazioni (**TVD**) | spazio |
-| **MUSCL** | ricostruzione lineare in cella (2° ordine) | spazio |
-| **Upwind / Centrato** | adatto a **iperbolico** / **ellittico** | spazio |
-| **Cella-centrata / Nodo-centrata** | dove sono collocate le incognite | spazio |
-
-La regola: **tempo → Numerical Methods (ODE)**, **spazio → Finite Volumes Schemes**.
-
-</details>
-
----
-
-### Simulazione domande d'esame
-
-<details>
-<summary><strong>Domanda 7 — Il blocco "metodi impliciti ed espliciti, WENO, Discontinuous Galerkin, ecc.": dove andrebbe inserito a livello logico nella suddivisione del Notion?</strong></summary>
-
-Il blocco **non è omogeneo**: contiene cose che discretizzano il **tempo** e cose che
-discretizzano lo **spazio**. Vanno quindi separate.
-
-- **Metodi espliciti / impliciti** → pagina **Numerical Methods (ODE)**, nella sezione già
-  esistente *"Passi, espliciti-impliciti, stadi e stencil"*. La dicotomia esplicito/implicito è
-  infatti una proprietà dell'**integrazione temporale** (la $\mathbf{u}^{n+1}$ dipende solo dal
-  passato → esplicito; dipende anche da sé stessa → implicito, richiede un sistema). È lo stesso
-  asse concettuale di Eulero in avanti vs all'indietro e di Runge–Kutta.
-  - *Collegamento:* la **regione di assoluta stabilità** (già presente nel Notion) è proprio ciò
-    che distingue espliciti (stabilità condizionata, vincolo CFL) e impliciti (spesso A-stabili).
-
-- **WENO** (*Weighted Essentially Non-Oscillatory*) → pagina **Finite Volumes Schemes**. È una
-  tecnica di **ricostruzione spaziale ad alto ordine** dei valori all'interfaccia: appartiene alla
-  famiglia che nasce per **aggirare il teorema barriera di Godunov** (vedi Domanda 8). Logicamente
-  va come sottosezione *"Schemi ad alta risoluzione / ricostruzione"*, vicino a limitatori e MUSCL.
-
-- **Discontinuous Galerkin (DG)** → anch'esso **discretizzazione spaziale**, ma di natura
-  ibrida (elementi finiti + volumi finiti) con rappresentazione **polinomiale a tratti
-  discontinua** dentro ogni cella. Logicamente va in **Finite Volumes Schemes** come metodo
-  ad alto ordine "parente" dei FV (condivide i **flussi numerici** di Riemann all'interfaccia),
-  oppure in una pagina dedicata *"Metodi ad alto ordine"* se l'argomento cresce.
-
-**In sintesi:** esplicito/implicito → *Numerical Methods (ODE)*; WENO e DG → *Finite Volumes
-Schemes* (sezione ricostruzione/alto ordine). La regola: **tempo → ODE, spazio → Finite Volumes**.
-
-</details>
-
-<details>
-<summary><strong>Domanda 8 — Il teorema barriera di Godunov, i limitatori di pendenza e il calcolo del gradiente all'interfaccia/al centro cella: dove vanno inseriti logicamente?</strong></summary>
-
-Tutti e tre appartengono alla pagina **Finite Volumes Schemes**, perché riguardano la
-**ricostruzione spaziale** e l'**accuratezza** dello schema ai volumi finiti. Idealmente in una
-sottosezione *"Schemi ad alta risoluzione"* posta **dopo** Godunov e Roe.
-
-- **Teorema barriera di Godunov** (*order barrier theorem*): afferma che uno schema **lineare**
-  e **monotono** (che non crea nuove oscillazioni) può essere **al massimo del primo ordine**. È la
-  motivazione teorica di tutto ciò che viene dopo: per avere **alto ordine senza oscillazioni**
-  bisogna usare schemi **non lineari** (limitatori, WENO). Logicamente è il "ponte" tra lo schema
-  di Godunov del primo ordine e i metodi ad alta risoluzione → va subito dopo *"Godunov & Problema
-  di Riemann"*.
-
-- **Limitatori di pendenza** (*slope limiters*, es. minmod, van Leer, superbee): sono il modo
-  **pratico** di aggirare il teorema. Ricostruiscono una **pendenza lineare** dentro la cella
-  (schema MUSCL, secondo ordine) ma la **limitano** vicino a discontinuità/estremi per non creare
-  overshoot (proprietà **TVD**). Vanno nella stessa sottosezione *"Alta risoluzione"*, come
-  applicazione diretta del teorema barriera.
-
-- **Gradiente all'interfaccia e al centro cella**: è il calcolo del **gradiente** necessario sia
-  per la ricostruzione (passare dal valore medio di cella al valore all'**interfaccia**, dove si
-  valuta il flusso) sia per i termini diffusivi/viscosi. Logicamente va vicino alla **ricostruzione
-  spaziale** e alla distinzione **cella-centrata vs nodo-centrata** (già presente nel Notion, sez.
-  *"Celle Centrate vs Nodi Centrati"*), perché il *come* si calcola il gradiente dipende da dove
-  sono collocate le incognite.
-
-**Filo logico suggerito nella pagina Finite Volumes:**
-Godunov (1° ordine) → **Teorema barriera** → necessità di non-linearità → **ricostruzione +
-gradienti** → **limitatori di pendenza** (TVD) → WENO (Domanda 7).
-
-</details>
-
-<details>
-<summary><strong>Domanda 9 — Perché i metodi upwind sono "iperbolici" e quelli centrati "ellittici"?</strong></summary>
-
-La risposta sta nel **rispetto del dominio di dipendenza fisico**: uno schema numerico è "adatto"
-a un'equazione quando il suo **stencil** (le celle che usa) ricalca il modo in cui
-l'informazione si propaga in quell'equazione.
-
-**Equazioni iperboliche** (es. advezione, Eulero supersonico): l'informazione viaggia lungo le
-**linee caratteristiche** con **velocità finita** e **direzione ben precisa** (a valle, dentro il
-cono di Mach). Il **dominio di dipendenza** di un punto è solo ciò che sta **a monte** lungo le
-caratteristiche. Lo schema **upwind** usa i valori provenienti dalla **direzione da cui arriva il
-segnale**:
-
-$$
-u_i^{n+1} = u_i^n - \frac{a\Delta t}{\Delta x}\left(u_i^n - u_{i-1}^n\right) \quad (a>0)
-$$
-
-cioè guarda **all'indietro**, verso $i-1$. Questo **rispetta la causalità fisica** e introduce
-una **dissipazione numerica** che stabilizza lo schema. Un centrato puro, su un'iperbolica
-del primo ordine, è invece **instabile** (porta informazione anche da valle, dove non dovrebbe).
-Per questo gli schemi **upwind** (Godunov, Roe) sono la scelta naturale per problemi **iperbolici**.
-
-**Equazioni ellittiche** (es. Laplace/Poisson, pressione nel flusso incomprimibile, regime
-subsonico): **non esistono direzioni privilegiate** di propagazione. Una perturbazione in un punto
-si fa sentire **istantaneamente e in tutte le direzioni**: il **dominio di dipendenza è l'intero
-dominio**. Lo schema appropriato è quindi **centrato e simmetrico**, perché tratta allo stesso
-modo i vicini da ogni lato:
-
-$$
-\frac{u_{i-1} - 2u_i + u_{i+1}}{\Delta x^2} = f_i
-$$
-
-Uno schema upwind (asimmetrico) su un'ellittica introdurrebbe una **direzionalità artificiale**
-che non ha senso fisico.
-
-**Collegamento con il report (doppia rampa):** è esattamente per questo che, se nel dominio
-comparisse una **tasca subsonica**, le equazioni di Eulero stazionarie cambierebbero natura da
-**iperbolica** (supersonico) a **ellittica** (subsonico), richiedendo un trattamento diverso delle
-condizioni al contorno all'outlet. Ed è anche il motivo per cui il **metodo di proiezione di
-Chorin** (trattato nella teoria del report, sezione *Solutori Density-Based e Pressure-Based*)
-deve risolvere un'**equazione di Poisson ellittica** per la pressione: l'incomprimibilità ha
-natura ellittica.
-
-**In una frase:** *upwind = direzionale = rispetta le caratteristiche delle iperboliche;
-centrato = simmetrico = rispetta l'isotropia di propagazione delle ellittiche.*
-
-</details>
-
----
-
-### Formule da ricordare (memo)
-
-<details>
-<summary><strong>🧠 Schemi discreti chiave, con hint per ricordarli</strong></summary>
-
-> Specchietto di sintesi: gli schemi discreti che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** con la natura (iperbolica/ellittica) dell'equazione. Sono **discretizzazioni**, non identità: vanno ricordate per la loro *forma dello stencil*.
-
-#### Discretizzazione spaziale per natura dell'equazione
-
-| Formula | Hint / collegamento |
-| --- | --- |
-| $u_i^{n+1}=u_i^n-\dfrac{a\Delta t}{\Delta x}\big(u_i^n-u_{i-1}^n\big)$ ($a>0$) | schema **upwind** (avvezione): guarda **all'indietro** verso $i-1$, da dove arriva il segnale → rispetta il dominio di dipendenza delle **iperboliche** (Godunov, Roe). Memo: differenza *a monte* + dissipazione numerica stabilizzante. |
-| $\dfrac{u_{i-1}-2u_i+u_{i+1}}{\Delta x^2}=f_i$ | Laplaciano **centrato** (Poisson/diffusione): stencil **simmetrico** a 3 punti → rispetta l'isotropia delle **ellittiche** (nessuna direzione privilegiata). Memo: pattern $1,-2,1$. |
-
-</details>
-
----
-
-### Dimostrazioni (lista)
-
-<details>
-<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
-
-| Dimostrazione | Punto di partenza → arrivo |
-|---|---|
-| Perché l'upwind è stabile e il centrato no (advezione) | PDE $u_t+au_x=0$ + analisi di von Neumann → upwind $\lvert G\rvert\le1$ per $0\le\nu\le1$; centrato puro $\lvert G\rvert>1$ sempre (instabile incondizionatamente) |
-| Equazione modificata e diffusione numerica dell'upwind (Taylor) | Schema upwind + sviluppo di Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=\tfrac{a\Delta x}{2}(1-\nu)u_{xx}$, con $D_{num}\ge0$ |
-| Anti-diffusione del centrato (equazione modificata) | Schema centrato + Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=-\tfrac{a^2\Delta t}{2}u_{xx}$, con $D_{num}<0$ |
-| Condizione CFL dal dominio di dipendenza | Soluzione esatta $u_0(x-at)$ + stencil a 3 punti → dominio fisico $\subseteq$ numerico, $\tfrac{\lvert a\rvert\Delta t}{\Delta x}\le1$ |
-| Perché upwind=iperbolico e centrato=ellittico | Dominio di dipendenza (caratteristiche vs isotropia) → stencil asimmetrico a monte (iperbolica) vs simmetrico $1,-2,1$ (ellittica) |
-
-</details>
-
-## 3. Volumi finiti e schemi per i flussi
-
-### Tassonomia, Godunov, Roe (domande)
-
-<details>
-<summary><strong>Tassonomia dei metodi ai volumi finiti + tabella comparativa (idea, pro, contro)</strong></summary>
-
-```mermaid
-graph TD
-    MN["METODI ai VOLUMI FINITI"] --> UP["UPWIND"]
-    MN --> CE["CENTRATI"]
-    MN --> OE["ORDINE ELEVATO (spazio)"]
-    UP --> FDS["Flux DIFFERENCE splitting"]
-    UP --> FVS["Flux VECTOR splitting"]
-    FDS --> G1["1. Godunov: Riemann esatto (costante a tratti)"]
-    FDS --> G2["2. Osher-Engquist-Pandolfi: Riemann semplificato (ventaglio anziche' urto)"]
-    FDS --> G3["3. Roe: linearizza il sistema (A-bar)"]
-    FVS --> G4["4. Van Leer: split del flusso vettoriale in sinistro e destro"]
-    FVS --> G5["5. AUSM: split vettore convettivo + pressione"]
-    CE --> G6["6. Lax-Friedrichs GLOBALE: media tra celle con dx,dt"]
-    CE --> G7["7. Lax-Friedrichs LOCALE / Rusanov: media con lambda_max"]
-    CE --> G8["8. Jameson-Schmidt-Turkel (JST): media + viscosita' artificiale"]
-    CE --> G9["9. Centrato puro: integrazione diretta nel tempo"]
-    OE --> G10["10. WENO: stencil multipli, pesi per evitare oscillazioni spurie"]
-    OE --> G11["11. Discontinuous Galerkin: piu' gradi di liberta', la media di cella diventa un polinomio"]
-```
-
-| # | Metodo | Categoria | Idea di base | Pro | Contro |
-|---|---|---|---|---|---|
-| 1 | **Godunov** | FDS | risolve il **Riemann esatto** all'interfaccia (dato costante a tratti) | esatto, robusto, fisicamente fondato | costoso (Riemann esatto a ogni faccia) |
-| 2 | **Osher–Engquist–Pandolfi** | FDS | **Riemann semplificato**: ventaglio di compressione **anziché** urto | liscio, differenziabile, niente entropy fix | integrali complessi |
-| 3 | **Roe** | FDS | **linearizza** il sistema con $\bar A$ costante | accurato, economico, nitido sugli urti | **espansioni non fisiche** → serve **entropy fix** |
-| 4 | **Van Leer** | FVS | **split** del flusso **vettoriale** in parte sinistra/destra ($F^+\!,F^-$) | semplice, robusto, differenziabile | **diffusivo** sui contatti |
-| 5 | **AUSM** | FVS | **split** del vettore **convettivo** + **pressione** | nitido sui contatti, robusto | varianti/taratura |
-| 6 | **Lax–Friedrichs globale** | centrato | media tra celle con $\Delta x,\Delta t$ globali | semplice | **molto diffusivo** |
-| 7 | **Lax–Friedrichs locale / Rusanov** | centrato | media con $\lambda_{\max}$ **locale** | robusto, economico | diffusivo |
-| 8 | **Jameson–Schmidt–Turkel (JST)** | centrato | media + **viscosità artificiale** (2°/4° ordine) | efficiente, molto usato in industria | taratura dei coefficienti |
-| 9 | **Centrato puro** | centrato | integrazione **diretta** nel tempo (no dissipazione) | semplicissimo | **instabile** per i convettivi |
-| 10 | **WENO** | alto ordine | più sotto-stencil + **pesi** per evitare oscillazioni | alto ordine **e** cattura urti | costoso |
-| 11 | **Discontinuous Galerkin** | alto ordine | più **gradi di libertà**: la media di cella diventa un **polinomio** | alto ordine + conservazione + upwind | costoso, complesso |
-
-</details>
-
-<details>
-<summary><strong>Concetto [27][28] — Godunov: perché è interessante fisicamente, e il Mach unitario nella rarefazione</strong></summary>
-
-- **[27] Perché fisicamente interessante.** Il flusso all'interfaccia non è una media arbitraria: viene
-  dalla **soluzione (esatta) del problema di Riemann locale**, cioè dalla **vera struttura d'onda** delle
-  equazioni (urto / contatto / rarefazione). Lo schema è quindi costruito sulla **fisica reale** di come
-  evolve una discontinuità, non su un'interpolazione.
-- **[28] Perché $M=1$ quando l'espansione è a cavallo dell'asse $t$.** Il flusso si legge in $x/t=0$ (asse
-  verticale del tempo). Se un **ventaglio di rarefazione** della famiglia $u\mp a$ **attraversa** $x/t=0$
-  (rarefazione **transonica**: un'estremità con velocità d'onda $<0$, l'altra $>0$), allora in $x/t=0$ la
-  velocità d'onda è **nulla**: $u\mp a=0\Rightarrow u=\pm a\Rightarrow M=u/a=1$. È il **punto sonico**
-  interno al ventaglio: lì la caratteristica è **stazionaria**, da cui $M=1$ (caso delicato, richiede cura).
-
-</details>
-
-<details>
-<summary><strong>Metodo di Roe — procedura, variabili, e domande [29][30][31][32][33]</strong></summary>
-
-**Idea di base:** **linearizzare** le equazioni di conservazione (iperboliche). Da $\partial_t U+\partial_x F=0$,
-con $A=\partial F/\partial U$ (Jacobiana), si passa a $\partial_t U+\bar A\,\partial_x U=0$ con $\bar A$
-**costante** all'interfaccia.
-
-```mermaid
-graph LR
-    A["IDEA: linearizzo (iperbolico)<br/>dU/dt + A dU/dx = 0"] --> B["CONDIZIONI su A-bar:<br/>1) dF = A-bar dU<br/>2) diagonalizzabile, autovalori reali<br/>3) A-bar -> A(U) se U_j ~ U_(j+1)"]
-    B --> C["MEDIE DI ROE (pesi sqrt(rho)):<br/>rho-bar=sqrt(rho_j rho_(j+1)), u-bar, h-bar"]
-    C --> D["VARIABILI: conservative U vs caratteristiche W,<br/>dU = L dW (L = autovettori destri)"]
-    D --> E["FLUX DIFFERENCE SPLITTING:<br/>dF = A-bar dU = L Lambda dW; split (lambda +/- |lambda|)/2"]
-    E --> F["Flusso numerico:<br/>F = 1/2(F_L+F_R) - 1/2 sum |lambda_k| l_k dW_k"]
-    F --> G["ENTROPY FIX dove |lambda_k| -> 0 (rarefazione transonica)"]
-```
-
-- **[31] Perché $\bar A\to A(U_j)$ se $U_j\sim U_{j+1}$?** È la **condizione di consistenza** della matrice di
-  Roe. Quando i due stati **coincidono** (regione liscia), la linearizzazione deve **ridursi** alla Jacobiana
-  **esatta** $A(U)$, altrimenti lo schema risolverebbe un'equazione **diversa** nel liscio (non consistente).
-  Attenzione al tuo dubbio: a coincidere è il **salto** $\Delta F\to0$ (e $\Delta U\to0$), **non** il flusso
-  $F$; la Jacobiana $A=\partial F/\partial U$ (le **velocità d'onda**) **non** è nulla → $\bar A\to A(U)$
-  garantisce le **velocità d'onda corrette** nel liscio = consistenza.
-- **[29] Perché la matrice degli autovettori moltiplica le variabili *caratteristiche* e non le conservative?**
-  Perché $U=L\,W$ ($dU=L\,dW$): gli **autovettori (destri)** di $\bar A$ formano una **base**, e le $W$ sono le
-  **coordinate** (le "**intensità d'onda**") dello stato conservativo in quella base. È un **cambio di base**
-  (matematica) con significato **fisico**: ogni colonna di $L$ è **un'onda**, ogni $W_k$ la sua **ampiezza**.
-  Si opera su $W$ (onde disaccoppiate) e si torna a $U$ con $L$.
-- **[30] Dove serve l'entropy fix?** Nello **split per segno** $\dfrac{\lambda_k\pm|\lambda_k|}{2}$: quando un
-  autovalore **cambia segno** attraverso l'interfaccia ($|\lambda_k|\to0$, caso **transonico**), Roe — che
-  tratta la rarefazione come un **singolo salto** — produce un'**onda d'espansione non fisica** (expansion
-  shock, viola l'entropia). Si "ripara" addolcendo $|\lambda_k|$ vicino a zero (**entropy fix** di Harten).
-- **[32] I due set di variabili (espliciti):**
-  - **Conservative:** $U=(\rho,\ \rho u,\ \rho E)^{T}$.
-  - **Caratteristiche:** $W=L^{-1}U$, con autovalori $\lambda=\{u-a,\ u,\ u+a\}$; gli incrementi $\Delta W_k$
-    sono le **intensità delle onde**.
-- **[33]** La **simulazione d'esame sul flusso di Roe** è nel file esami (sez. 3, "Schemi per i flussi"); qui
-  sopra c'è la **procedura esatta** (mermaid) e i concetti teorici.
-
-</details>
-
-<details>
-<summary><strong>Concetto [25][26] — generazione mesh: metodo iperbolico vs advancing front</strong></summary>
-
-- **[25] Perché i metodi "iperbolici" si ispirano alla propagazione ondosa.** Generano la griglia
-  **strutturata** **risolvendo un sistema di PDE iperboliche** marciate **verso l'esterno** dalla superficie
-  del corpo: le linee di griglia avanzano come un **fronte d'onda** che si propaga lungo le **caratteristiche**.
-  L'ispirazione è sia nell'**equazione** (iperbolica, marciata come un'evoluzione) sia nella **logica**
-  (marciare un fronte strato dopo strato) → ottima **ortogonalità** vicino alla parete.
-- **[26] Differenza concreta con l'advancing front.** Non solo strutturata vs non strutturata:
-  - **Advancing front** (non strutturata): "inietta" elementi (triangoli/tetraedri) **uno alla volta**,
-    avanzando un **fronte** locale finché si chiude → costruzione **elemento per elemento**, segue bene la
-    geometria ma può "incartarsi" dove i fronti si scontrano;
-  - **Iperbolico** (strutturata): marcia un **intero strato** (una linea coordinata) alla volta **risolvendo
-    le PDE** → griglia **strutturata** $(i,j)$.
-  In breve: **elemento-per-elemento locale** (advancing front) vs **strato-per-strato marciato via PDE**
-  (iperbolico).
-
-</details>
-
-### Nomenclatura essenziale
-
-<details>
-<summary><strong>📖 Simboli e nomenclatura usati nel capitolo</strong></summary>
-
-| Simbolo | Nome | Note |
-|---|---|---|
-| $U_j$ | **valor medio di cella** | incognita dei volumi finiti |
-| $j\pm 1/2$ | **interfacce** della cella $j$ | dove si valuta il flusso numerico |
-| $\mathbf F(U)$ | flusso fisico | $\partial_t U+\partial_x F=0$ |
-| $\mathbf F^+,\ \mathbf F^-$ | flussi **splittati** (FVS) | parte a monte / a valle |
-| $\mathbf F^c$ | flusso convettivo | — |
-| $u_L,\ u_R$ | stati **sinistro / destro** | problema di **Riemann** all'interfaccia |
-| $a$ | velocità del suono | regimi $u\lessgtr a$ (sub/supersonico) |
-| $\lambda_k$ | autovalori (velocità d'onda) | Eulero: $u,\ u\pm a$ |
-| $\sigma_k\in\{-1,+1\}$ | **segno** dell'autovalore | direzione upwind |
-| $\lvert\lambda_k\rvert<\epsilon$ | **entropy fix** (Harten) | soglia sui punti sonici |
-| $\Delta t$ | passo temporale | vincolo **CFL** |
-| $\mu=k=0$ | limite di **Eulero** | niente viscosità/conduzione |
-| $\overrightarrow{DF},\ \overleftarrow{DF}$ | differenze finite (forward/backward) | ricostruzione gradiente |
-
-</details>
-
-> Schemi chiave: **Godunov** (problema di Riemann), **Roe** (upwind linearizzato),
-> **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
-
----
-
-### 1. Metodo dei Volumi Finiti in 1D
-
-<details>
-<summary><strong>Equazione conservativa</strong></summary>
-
-Si parte dalla forma differenziale conservativa:
-
-$$\frac{\partial u}{\partial t} + \frac{\partial f}{\partial x} = 0, \qquad f = f(u)$$
-
-> **Perché considerare solo il flusso convettivo equivale alle equazioni di Eulero.** Le Navier–Stokes
-> hanno flusso **convettivo + diffusivo**; il flusso diffusivo è proporzionale a $\mu$ (viscosità) e
-> $k$ (conducibilità termica). **Eulero = Navier–Stokes con $\mu=k=0$** → resta il solo flusso
-> convettivo $\mathbf F^c$, cioè $\partial_t\mathbf U + \nabla\cdot\mathbf F^c = 0$. È per questo che
-> qui si lavora con il flusso $f=f(u)$ convettivo.
-
-Si integra su ogni cella $[x_{j-\frac{1}{2}}, x_{j+\frac{1}{2}}]$, ottenendo la forma integrale:
-
-$$\frac{\partial}{\partial t}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx = -\left(f_{j+\frac12} - f_{j-\frac12}\right)$$
-
-</details>
-
-<details>
-<summary><strong>Variabile conservata media di cella</strong></summary>
-
-$$\boxed{U_j = \frac{1}{\Delta x}\int_{x_{j-\frac12}}^{x_{j+\frac12}} u,dx}$$
-
-> **Definizione:** $U_j$ è il valore *medio* di $u$ sull’intera cella $j$, non il valore puntuale al centro. Il FVM lavora con medie, le differenze finite con valori puntuali.
-> 
-
-</details>
-
-<details>
-<summary><strong>Schema centrato esplicito</strong></summary>
-
-Con flussi alle facce come medie aritmetiche:
-
-$$f_{j+\frac12} = \frac{1}{2}(f_j + f_{j+1}), \qquad f_{j-\frac12} = \frac{1}{2}(f_{j-1}+f_j)$$
-
-$$\frac{U_j^{n+1}-U_j^n}{\Delta t} + \frac{f_{j+\frac12}^n - f_{j-\frac12}^n}{\Delta x} = 0$$
-
-**Risultato chiave — Equivalenza FD ↔ FVM in 1D:** In 1D con schema centrato le equazioni sono identiche. La differenza è nell’*interpretazione*: FD assume $U_j \approx u(x_j,t)$ (valore puntuale), FVM assume $U_j$ = media di cella. La distinzione diventa rilevante in 2D/3D su mesh non strutturate.
-
-</details>
-
----
-
-### 2. Mesh Strutturate: Generazione
-
-In una mesh strutturata ogni cella è identificata da indici $(i,j)$. I vicini fisici sono vicini in memoria — grande vantaggio computazionale (~20 contatori per cella, vs ~100 per non strutturata).
-
-| Metodo | Equazioni usate | Vantaggi | Svantaggi |
-| --- | --- | --- | --- |
-| **Algebrico** | Nessuna PDE — mapping esplicito: $x = x_1 + \xi(x_2-x_1)$ | Velocissimo, banale | No controllo ortogonalità; rischio distorsione; errori di discretizzazione occulti |
-| **Ellittico** | Laplace/Poisson: $\nabla^2\xi = 0$ | Griglia liscia, ortogonale con BC Neumann | Costoso (sistema globale iterativo) |
-| **Iperbolico** | PDE iperboliche, marcia dalla parete | $\perp$ alla parete automaticamente, ottimo per BL | Problemi su geometrie concave (sovrapposizione) |
-
-> **Note:** Il tipo di PDE usata per generare la griglia riflette come l’informazione si propaga nel dominio di calcolo. Ellittico = si sente tutto il dominio. Iperbolico = marcia in un’unica direzione.
-> 
-
-⚠ **Rischio metodo algebrico:** Non si controlla la direzione delle pareti → le linee di griglia non sono perpendicolari alla superficie → errori di discretizzazione nascosti legati allo skewness.
-
----
-
-### 3. Mesh Non Strutturate
-
-La connettività deve essere memorizzata esplicitamente (maggiore memoria, massima flessibilità geometrica).
-
-<details>
-<summary><strong>Triangolazione di Delaunay</strong></summary>
-
-> **Criterio:** La circonferenza circoscritta a ogni triangolo non deve contenere altri punti della discretizzazione.
-> 
-- In 2D → triangoli; in 3D → tetraedri
-- Duale del diagramma di Voronoi
-- Algoritmo globale — buona robustezza, ma difficoltà su geometrie concave
-
-</details>
-
-<details>
-<summary><strong>Metodo Frontale (Advancing Front)</strong></summary>
-
-- Si parte dal contorno (il “fronte”) e si aggiungono celle avanzando verso l’interno
-- Costruzione locale → maggiore flessibilità su geometrie cave/concave
-- Possibile conflitto quando due fronti si incontrano da direzioni “sbagliate”
-
-</details>
-
-| Caratteristica | Delaunay | Frontale |
-| --- | --- | --- |
-| Principio | Criterio globale sulla circonscritta | Crescita locale dal contorno |
-| Gestione concavità | Delicata | Buona |
-| Qualità vicino parete | Media | Buona |
-| Robustezza | Alta | Media |
-
----
-
-### 4. Celle Centrate vs Nodi Centrati
-
-|  | Celle Centrate (Fluent) | Nodi Centrati (CFX) |
-| --- | --- | --- |
-| Volume di controllo | La cella direttamente | Griglia duale costruita attorno al nodo |
-| BC | Più semplici | Più articolate (il volume di controllo taglia il bordo) |
-| Griglia duale | Non serve | Costruita una volta in preprocessing — costo trascurabile |
-| Gradi di libertà | Pari al numero di celle | Pari al numero di nodi (più numerosi) |
-
-> La griglia duale ha un overhead trascurabile: si costruisce una volta sola. I nodi centrati offrono più gdl per la stessa mesh, spesso maggiore accuratezza, ma BC più complesse.
-> 
-
-> **Quale griglia si usa a livello commerciale.** Mesh **ibride non strutturate** (ICEM, Pointwise,
-> ANSA, Gmsh): **strati prismatici strutturati** vicino alla parete (per il boundary layer) +
-> **tetraedri** non strutturati nel campo lontano. Per le turbomacchine si usano mesh **strutturate
-> multi-blocco** (TurboGrid). I codici a **nodi centrati** (CFX) sono spesso preferiti su geometrie
-> complesse, quelli a **celle centrate** (Fluent) sui casi più semplici.
-
----
-
-### 5. Metodo di Godunov & Problema di Riemann
-
-<details>
-<summary><strong>Idea centrale</strong></summary>
-
-Godunov assume soluzione **costante a tratti** (primo ordine). Ogni interfaccia $j+\frac12$ separa due stati costanti → problema di Riemann locale.
-
-> **Problema di Riemann:** PDE iperbolica con dato iniziale a gradino $u(x,0) = u_L$ se $x<0$, $u_R$ se $x>0$. La soluzione consiste di onde (rarefazione, contatto, urto). Esempio classico: **tubo di Sod**.
-> 
-
-</details>
-
-<details>
-<summary><strong>Schema di Godunov</strong></summary>
-
-Si risolve il Riemann per ogni interfaccia, si ottiene $F_{j+\frac12}$, poi si avanza:
-
-$$U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x}\left[F_{j+\frac12} - F_{j-\frac12}\right]$$
-
-</details>
-
-<details>
-<summary><strong>CFL nel metodo di Godunov</strong></summary>
-
-La CFL ha interpretazione fisica diretta: $\Delta t$ deve essere abbastanza piccolo da garantire che le onde di due Riemann adiacenti **non si sovrappongano** durante il time step. Se si sovrappongono, il problema locale non è più valido.
-
-$$\text{CFL} = \frac{\lambda_{max},\Delta t}{\Delta x} \leq 1$$
-
-⚠ Risolvere il Riemann esatto per le equazioni di Eulero è iterativo e costoso → nella pratica si usano **solutori approssimati**: Lax-Friedrichs, Rusanov, Roe, HLLC.
-
-</details>
-
----
-
-### 6. Flussi Numerici e Flux Splitting
-
-<details>
-<summary><strong>Tassonomia</strong></summary>
-
-| Categoria | Metodi | Cosa si spezza |
-| --- | --- | --- |
-| **Flux Difference Splitting (FDS)** | Godunov, Roe, HLLC | La *differenza* $\Delta F = F_R - F_L$ tramite Jacobiana |
-| **Flux Vector Splitting (FVS)** | Steger-Warming, van Leer, AUSM+ | Il *vettore flusso* $F = F^+ + F^-$ |
-| **Centrati** | Lax-Friedrichs, Rusanov, Jameson | Media + dissipazione artificiale scalare |
-
-</details>
-
-<details>
-<summary><strong>Lax-Friedrichs / Rusanov</strong></summary>
-
-$$F_{j+\frac12}^{LF} = \frac{1}{2}(F_j + F_{j+1}) - \frac{\lambda_{max}}{2}(U_{j+1} - U_j)$$
-
-Il termine $-\frac{\lambda_{max}}{2}\Delta U$ è dissipazione numerica scalare. Rusanov usa $\lambda_{max} = \max(|\lambda_j|,|\lambda_{j+1}|)$ — robusto ma molto diffusivo.
-
-</details>
-
-<details>
-<summary><strong>Jameson</strong></summary>
-
-Dissipazione adattiva: 2° ordine vicino a discontinuità (cattura urti), 4° ordine altrove (meno diffusivo). Metodo centrato con dissipazione adattata localmente.
-
-</details>
-
----
-
-### 7. Schema di Roe
-
-Solutore di Riemann approssimato. Linearizza il problema all’interfaccia usando la **media di Roe** $\bar{U}$.
-
-<details>
-<summary><strong>Proprietà richieste</strong></summary>
-
-1. **Consistenza:** $\bar{A}(U_R - U_L) = F(U_R) - F(U_L)$
-2. **Diagonalizzabilità con autovalori reali** (sistema iperbolico)
-3. **Conservatività**
-
-</details>
-
-<details>
-<summary><strong>Media di Roe per le equazioni di Eulero</strong></summary>
-
-$$\bar{u} = \frac{\sqrt{\rho_L},u_L + \sqrt{\rho_R},u_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}, \qquad \bar{H} = \frac{\sqrt{\rho_L},H_L + \sqrt{\rho_R},H_R}{\sqrt{\rho_L}+\sqrt{\rho_R}}$$
-
-</details>
-
-<details>
-<summary><strong>Flusso di Roe</strong></summary>
-
-$$\overrightarrow{\delta F}_j = \frac{\bar{\lambda}_1 - |\bar{\lambda}_1|}{2},e^1,\delta w_j^1 + \frac{\bar{\lambda}_2 - |\bar{\lambda}_2|}{2},e^2,\delta w_j^2 + \frac{\bar{\lambda}_3 - |\bar{\lambda}_3|}{2},e^3,\delta w_j^3$$
-
-con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}} \in \mathbb{R}$.
-
-⚠ **Entropy Fix:** Roe può produrre violazioni del 2° principio su urti sonici → si corregge con $|\lambda| \to \max(|\lambda|, \epsilon)$.
-
-</details>
-
----
-
-### Key Takeaways
 
 - $U_j$ nel FVM è una **media di cella**, non un valore puntuale — in 1D centrato coincide con le differenze finite, ma l’interpretazione è diversa.
 - Le mesh strutturate si generano con PDE il cui tipo (ellittico/iperbolico) riflette la propagazione dell’informazione geometrica nel dominio.
@@ -2560,10 +2475,72 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 
 ---
 
-### Formule da ricordare (memo)
+
+</details>
+
+## Formule da ricordare
 
 <details>
-<summary><strong>🧠 Tutte le formule chiave dei volumi finiti, con hint per ricordarle</strong></summary>
+<summary><strong>🧠 Tutte le formule del capitolo (differenze finite + volumi finiti + proprietà)</strong></summary>
+
+#### Errori (locale e globale)
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\tilde y_{k+1} = y(t_k) + h\,f(t_k, y(t_k))$ | un passo di Eulero **partendo dal dato esatto** $y(t_k)$ (non da $y_k$) |
+| $\tau(h) = y(t_{k+1}) - \tilde y_{k+1} = y(t_{k+1}) - y(t_k) - h\,f(t_k,y(t_k))$ | **troncamento locale**: errore di un solo passo; nasce dal troncamento dei termini di grado alto |
+| $d(h) = \dfrac{\tau(h)}{h}$ | **discretizzazione locale**: dipende da come discretizzi l'intervallo; è $\tau$ "per unità di $h$" |
+| $e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1})-\tilde y_{k+1}\big)}_{\text{troncamento}} + \underbrace{\big(\tilde y_{k+1}-y_{k+1}\big)}_{\text{propagazione}}$ | **globale** = troncamento (ultimo passo) + propagazione (passi precedenti) |
+
+#### Consistenza, ordine, 0-stabilità, assoluta stabilità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\lim_{h\to0} d(h) = 0$ | **consistenza**: l'errore di discretizzazione svanisce a passo nullo |
+| $d(h) = \mathcal O(h^p)$ | **ordine** $p$ (Eulero: $p=1$); $p$ = pendenza nel grafico log–log |
+| $\lvert y_k-\hat y_k\rvert \le K\,\lvert y_0-\hat y_0\rvert,\ \forall k\le\frac{b-a}{h}$ | **0-stabilità**: $K$ come numero di condizionamento, non amplifica l'errore |
+| $\displaystyle\lim_{k\to\infty} y_k = 0$ | **assoluta stabilità**: ha senso solo se la soluzione esatta tende a 0 (asint. stabile) |
+| Lax: consistenza + 0-stabilità $\Rightarrow$ convergenza, $\lim_{N\to\infty} y_N = y(t)$ | **Lax–Richtmyer**: one-step (stabili) + consistenti $\Rightarrow$ convergenti |
+
+#### Regione di assoluta stabilità
+
+| Formula | Hint / collegamento |
+|---|---|
+| $y_{k+1} = \mathcal F(h\lambda)\,y_k \Rightarrow y_{k+1} = \mathcal F(h\lambda)^{k+1} y_0$ | qualsiasi metodo si riscrive con il **fattore di amplificazione** $\mathcal F$ |
+| $R_a = \{\, h\lambda\in\mathbb C : \lvert\mathcal F(h\lambda)\rvert < 1 \,\}$ | **regione** nel piano complesso $h\lambda$; impliciti $\to$ regione ampia |
+| $y'(t)=\lambda y(t) \to \mathrm{Re}(\lambda)<0$;  $\;y'(t)=Ay(t) \to \mathrm{Re}(\lambda_i)<0\ \forall i$ | **sistemi**: la condizione vale per **tutti** gli autovalori di $A$ |
+| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | $A$ diagonalizzabile; asint. stabile se $\mathrm{Re}\,\lambda_i<0\ \forall i$ |
+
+#### Runge-Kutta
+
+| Formula | Hint / collegamento |
+|---|---|
+| $y_{k+1}=y_k+h\sum_{i=1}^{s} a_i\,f\!\big(t_k+b_i h,\ y_k+h\sum_{j=1}^{i-1} c_{ij}k_j\big)$ | forma generica a $s$ stadi; la somma fino a $i-1$ lo rende **esplicito** (fino a $i$ $\to$ implicito) |
+| $\sum_{i=1}^{s} a_i = 1,\qquad b_i=\sum_{j=1}^{s} c_{ij}\ \ \forall i$ | **condizioni di consistenza** sul tableau di Butcher |
+| Eulero esplicito: $y_{k+1}=y_k+h f(t_k,y_k)$, $\ \mathcal F=1+h\lambda$ | $p=1$, 1 stadio |
+| Eulero implicito: $y_{k+1}=y_k+h f(t_{k+1},y_{k+1})$, $\ \mathcal F=\dfrac{1}{1-h\lambda}$ | $p=1$, A-stabile (regione ampia) |
+| Heun: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_k+h f(t_k,y_k))\big]$, $\ \mathcal F=1+h\lambda+\frac{(h\lambda)^2}{2}$ | $p=2$, esplicito, 2 stadi |
+| Trapezi: $y_{k+1}=y_k+\frac h2\big[f(t_k,y_k)+f(t_{k+1},y_{k+1})\big]$ | $p=2$, implicito, 2 stadi |
+| Eulero modificato: $y_{k+1}=y_k+h f\!\big(t_k+\frac h2,\ y_k+\frac h2 f(t_k,y_k)\big)$ | esplicito, 2 stadi (punto medio) |
+
+#### Stiffness e CFL
+
+| Formula | Hint / collegamento |
+|---|---|
+| $\max_i \lvert\mathrm{Re}(\lambda_i)\rvert\,L \ll -1$ | **grado di stiffness**: autovalore molto negativo $\to$ passo piccolo forzato su intervallo $L$ grande |
+| $y(t)=c_1 e^{\lambda_1(t-t_0)}v_1+\dots+c_m e^{\lambda_m(t-t_0)}v_m$ | il termine con $\lambda$ molto negativo decade subito ma vincola il passo (usa impliciti / ode15s) |
+
+> Specchietto di sintesi: gli schemi discreti che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** con la natura (iperbolica/ellittica) dell'equazione. Sono **discretizzazioni**, non identità: vanno ricordate per la loro *forma dello stencil*.
+
+#### Discretizzazione spaziale per natura dell'equazione
+
+| Formula | Hint / collegamento |
+| --- | --- |
+| $u_i^{n+1}=u_i^n-\dfrac{a\Delta t}{\Delta x}\big(u_i^n-u_{i-1}^n\big)$ ($a>0$) | schema **upwind** (avvezione): guarda **all'indietro** verso $i-1$, da dove arriva il segnale → rispetta il dominio di dipendenza delle **iperboliche** (Godunov, Roe). Memo: differenza *a monte* + dissipazione numerica stabilizzante. |
+| $\dfrac{u_{i-1}-2u_i+u_{i+1}}{\Delta x^2}=f_i$ | Laplaciano **centrato** (Poisson/diffusione): stencil **simmetrico** a 3 punti → rispetta l'isotropia delle **ellittiche** (nessuna direzione privilegiata). Memo: pattern $1,-2,1$. |
+
+
+---
 
 > Specchietto di sintesi: le formule che vale la pena tenere a memoria, con un **gancio** mnemonico e i **collegamenti** tra loro. Schemi chiave: **Godunov** (Riemann), **Roe** (upwind linearizzato), **Lax–Friedrichs** (centrato), **flux vector/difference splitting**.
 
@@ -2613,14 +2590,33 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 | $\overrightarrow{\delta F}_j=\sum_k\dfrac{\bar\lambda_k-|\bar\lambda_k|}{2}\,e^k\,\delta w_j^k$ | flusso di Roe: $\tfrac{\lambda-|\lambda|}{2}$ tiene solo i contributi **upwind** (autovettori $e^k$). |
 | $|\lambda|\to\max(|\lambda|,\epsilon)$ | **entropy fix** (Harten-Hyman): viscosità artificiale solo sui **punti sonici** $|\lambda_k|<\epsilon$ → no urti espansivi non fisici. |
 
-</details>
 
 ---
 
-### Dimostrazioni (lista)
+</details>
+
+## Dimostrazioni
 
 <details>
-<summary><strong>📐 Dimostrazioni da saper fare</strong></summary>
+<summary><strong>📐 Tutte le dimostrazioni da saper fare</strong></summary>
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Ordine di Eulero esplicito | Sviluppo di Taylor di $y(t_{k+1})$ → $\tau(h)=\tfrac{h^2}{2}y''(\xi)=\mathcal O(h^2)$, quindi $d(h)=\mathcal O(h)\Rightarrow p=1$ |
+| Regione di assoluta stabilità di Eulero esplicito | Eq. test $y'=\lambda y$ → $y_k=(1+h\lambda)^k y_0$, $\mathcal F=1+h\lambda$, $\lvert 1+h\lambda\rvert<1$ (cerchio centro $-1$, raggio $1$) |
+| Regione di assoluta stabilità di Eulero implicito | Eq. test $y'=\lambda y$ → $\mathcal F=\tfrac{1}{1-h\lambda}$, $\lvert 1-h\lambda\rvert>1$ (esterno cerchio centro $+1$; A-stabile) |
+| Teorema di Lax | Decomposizione $e_{k+1}=$ troncamento $+$ propagazione → consistenza ($\tau\to0$) + 0-stabilità ($K$ limitato) $\Rightarrow$ $e_N=\mathcal O(h^p)\to0$ (convergenza) |
+| Condizione CFL | Dominio di dipendenza fisico $c\,\Delta t$ vs numerico $\Delta x$ → $c\,\Delta t\le\Delta x\Rightarrow \tfrac{c\,\Delta t}{\Delta x}\le1$ |
+| Ordine di Heun | Taylor dell'incremento $\tfrac h2[f_k+f(t_k+h,y_k+hf_k)]$ vs $y(t_{k+1})$ → match fino a $h^2$, $\tau=\mathcal O(h^3)\Rightarrow p=2$ |
+| Ordine di un metodo Runge-Kutta | Matching dei Taylor di $y(t_{k+1})$ e incremento RK → condizioni d'ordine sul tableau ($\sum a_i=1$, $\sum a_i b_i=\tfrac12$, …) $\Rightarrow$ $d=\mathcal O(h^p)$ |
+
+| Dimostrazione | Punto di partenza → arrivo |
+|---|---|
+| Perché l'upwind è stabile e il centrato no (advezione) | PDE $u_t+au_x=0$ + analisi di von Neumann → upwind $\lvert G\rvert\le1$ per $0\le\nu\le1$; centrato puro $\lvert G\rvert>1$ sempre (instabile incondizionatamente) |
+| Equazione modificata e diffusione numerica dell'upwind (Taylor) | Schema upwind + sviluppo di Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=\tfrac{a\Delta x}{2}(1-\nu)u_{xx}$, con $D_{num}\ge0$ |
+| Anti-diffusione del centrato (equazione modificata) | Schema centrato + Taylor + $u_{tt}=a^2u_{xx}$ → $u_t+au_x=-\tfrac{a^2\Delta t}{2}u_{xx}$, con $D_{num}<0$ |
+| Condizione CFL dal dominio di dipendenza | Soluzione esatta $u_0(x-at)$ + stencil a 3 punti → dominio fisico $\subseteq$ numerico, $\tfrac{\lvert a\rvert\Delta t}{\Delta x}\le1$ |
+| Perché upwind=iperbolico e centrato=ellittico | Dominio di dipendenza (caratteristiche vs isotropia) → stencil asimmetrico a monte (iperbolica) vs simmetrico $1,-2,1$ (ellittica) |
 
 | Dimostrazione | Punto di partenza → arrivo |
 | --- | --- |
@@ -2633,5 +2629,3 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 | Necessità dell'entropy fix in Roe | linearizzazione $\bar A$ → urto espansivo non fisico su punto sonico → $|\lambda|\to\max(|\lambda|,\epsilon)$ |
 
 </details>
-
-
