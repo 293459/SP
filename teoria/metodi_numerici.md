@@ -959,7 +959,19 @@ I metodi utilizzati per trasformare le equazioni differenziali in sistemi algebr
 <details>
 <summary><strong>Tipologie</strong></summary>
 
-![Tassonomia degli schemi di flusso: upwind (FDS/FVS) e centrati](images/schemi_flusso_tassonomia.jpg)
+```mermaid
+graph TD
+    S["SCHEMI per i FLUSSI"] --> U["UPWIND<br/>(direzionali, per iperbolici)"]
+    S --> C["CENTRATI<br/>(simmetrici + dissipazione artificiale)"]
+    U --> FDS["Flux DIFFERENCE splitting<br/>Godunov, Osher, Roe"]
+    U --> FVS["Flux VECTOR splitting<br/>Van Leer, AUSM"]
+    C --> CL["Lax-Friedrichs / Rusanov"]
+    C --> CJ["JST (viscosita' artificiale)"]
+    C --> CP["centrato puro (instabile sui convettivi)"]
+```
+
+*(La tassonomia completa con idee, pro e contro è nel toggle "Tassonomia, Godunov,
+Roe" della sezione Volumi finiti.)*
 
 </details>
 
@@ -1001,7 +1013,18 @@ $$
 <details>
 <summary><strong>Tableau di Butcher</strong></summary>
 
-![Struttura del tableau di Butcher: vettori b, c e aᵀ](images/butcher_tableau_struttura.jpg)
+$$
+\begin{array}{c|ccc}
+b_1 & c_{11} & \cdots & c_{1s}\\
+\vdots & \vdots & \ddots & \vdots\\
+b_s & c_{s1} & \cdots & c_{ss}\\
+\hline
+ & a_1 & \cdots & a_s
+\end{array}
+$$
+
+dove la colonna $b$ (nodi) e la matrice $C$ (accoppiamenti) stanno sopra la linea, i
+pesi $a^{T}$ sotto.
 
 <aside>
 💡
@@ -1013,11 +1036,6 @@ Il tableau di Butcher è un metodo grafico e ordinato per rappresentare tutti i 
 Condizioni di consistenza sui coefficienti del tableau:
 
 $$\sum_{i=1}^{s} a_i = 1, \qquad b_i = \sum_{j=1}^{s} c_{ij}\quad \forall\, i=1,\dots,s$$
-
-</details>
-
-<details>
-<summary><strong>Ordine</strong></summary>
 
 </details>
 
@@ -1072,31 +1090,16 @@ $$
 </details>
 
 <details>
-<summary><strong>Diffusione numerica</strong></summary>
-
-</details>
-
-<details>
 <summary><strong>Dispersione numerica</strong></summary>
 
-Prendiamo l'equazione del trasporto u_t + c u_x = 0. Se usiamo uno schema numerico, la "vera" equazione che il computer risolve (Equazione Modificata) è:
+Prendiamo l'equazione del trasporto $u_t + c\,u_x = 0$. Se usiamo uno schema numerico, la
+"vera" equazione che il computer risolve (**equazione modificata**) ha un termine dominante
+con la **derivata terza**:
 
-$$
-
-$$
+$$u_t + c\,u_x = \mu_3\,u_{xxx} + \dots$$
 
 - **Punto di vista Fisico:** La derivata terza causa **dispersione**. Significa che onde di frequenza diversa viaggiano a velocità diverse. Vicino a un gradiente forte (urto), le frequenze "si separano" creando le oscillazioni (wiggles).
 - **Punto di vista Matematico:** Le derivate pari (2ª, 4ª) agiscono come filtri passa-basso (smussano), mentre le derivate dispari (3ª, 5ª) introducono errori di fase. Immagina di voler rappresentare un gradino: se le onde che lo compongono non viaggiano insieme, il gradino "si rompe" in una serie di onde.
-
-</details>
-
-<details>
-<summary><strong>Urti di espansione e entropia</strong></summary>
-
-</details>
-
-<details>
-<summary><strong>Carbuncolo</strong></summary>
 
 </details>
 
@@ -1749,6 +1752,8 @@ con autovalori $\lambda(\bar{A}) = {\bar{u}-\bar{a},; \bar{u},; \bar{u}+\bar{a}}
 
 <details>
 <summary><strong>Passi di Eulero Implicito (equazione)</strong></summary>
+
+*Eulero Implicito (PDF allegato Notion, non incluso nell'export)*
 
 </details>
 
@@ -2486,15 +2491,15 @@ Con base di Legendre ortogonalizzata, \(M\) diventa diagonale.
     
     ### Aggiornamento della cella $j$
     
-    Il flusso numerico di Godunov è 
+    Il flusso numerico di Godunov si scrive in forma di flux-difference splitting.
     Sostituendo nell'equazione di bilancio, otteniamo il risultato centrale (natura **upwind**):
     
     $$
-    F_{j+1/2} = F_j + \overleftarrow{DF}j = F{j+1} - \overrightarrow{DF}_j
+    F_{j+1/2} = F_j + \overleftarrow{DF}_j = F_{j+1} - \overrightarrow{DF}_j
     $$
     
     $$
-    U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x} \left[ \overleftarrow{DF}j + \overrightarrow{DF}{j-1} \right]
+    U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x} \left[ \overleftarrow{DF}_j + \overrightarrow{DF}_{j-1} \right]
     $$
     
     La cella $j$ riceve solo informazioni fisicamente entranti: onde destre dall'interfaccia sinistra e onde sinistre dall'interfaccia destra.
