@@ -256,10 +256,11 @@ graph TD
 
 
 <details>
-<summary><strong>Quadro d'insieme: soluzioni, errori, proprietà</strong></summary>
+<summary><strong>Errori: troncamento (locale), discretizzazione, propagazione, globale</strong></summary>
 
-> Tre toggle riassuntivi (sotto, le sezioni di dettaglio). L'ordine logico delle proprietà è
-> **consistenza → stabilità → convergenza** (vedi il toggle "Proprietà").
+> Quadro d'insieme **+** definizioni formali in un unico posto: prima la vista
+> **intuitiva/fisica** (mermaid, equazione modificata, viscosità numerica), poi le
+> **definizioni con le formule** ($\tau(h)$, $d(h)$, $e_k$).
 
 <details>
 <summary><strong>Soluzioni — quali "soluzioni" sono in gioco</strong></summary>
@@ -344,47 +345,6 @@ una **equazione di diffusione** con **viscosità numerica** $\varepsilon$:
 </details>
 
 <details>
-<summary><strong>Proprietà — consistenza → stabilità → convergenza (ordine "intuitivo")</strong></summary>
-
-```mermaid
-graph LR
-    CO["CONSISTENZA<br/>dt→0 ⇒ E_troncamento→0"] --> CV["CONVERGENZA<br/>dt→0 ⇒ E_globale→0"]
-    ST["STABILITA'<br/>dt→0 ⇒ E_propagazione→0"] --> CV
-    CV -. "teorema di Lax" .-> LX["consistenza + stabilita' ⟺ convergenza<br/>(problema lineare ben posto)"]
-```
-
-**Perché questo ordine (e non convergenza per prima)?** La convergenza è la proprietà per cui, raffinando
-($\Delta t\to0$), l'**errore globale** tende a **zero**. Ma l'errore globale **si scompone** in
-troncamento + propagazione:
-- la **consistenza** garantisce $E_{\text{troncamento}}\to0$;
-- la **stabilità** garantisce $E_{\text{propagazione}}\to0$;
-- se **entrambi** vanno a zero, la loro **somma** (= errore globale) va a zero → **convergenza**.
-
-Quindi è più intuitivo costruire prima i due "mattoni" (consistenza, stabilità) e poi dedurne la
-convergenza — esattamente il **teorema di equivalenza di Lax**: *consistenza + stabilità ⟺ convergenza*
-(per problemi lineari ben posti). Mappa: **(a)** consistenza ↔ troncamento/discretizzazione; **(b)**
-stabilità ↔ propagazione; **(c)** convergenza ↔ globale.
-
-**Altre proprietà (per completezza):**
-- **Ordine di convergenza:** la **potenza** $p$ con cui l'errore va a zero, $E\sim O(\Delta x^{p})$ (es. 1°,
-  2° ordine). Dice *quanto in fretta* converge.
-- **Monotonicità:** lo schema **non crea nuovi massimi/minimi** (niente oscillazioni spurie vicino alle
-  discontinuità) — legata alla proprietà **TVD**.
-- **Conservatività:** il **flusso** che esce da una cella **entra** nell'adiacente → la grandezza si
-  **conserva** globalmente (massa, q. di moto, energia). Essenziale per gli **urti** (velocità d'urto
-  corretta, Rankine–Hugoniot).
-
-> *(Monotonicità e conservatività potrebbero non essere state trattate a lezione, ma vale la pena
-> conoscerle: completano il quadro delle proprietà.)*
-
-</details>
-
-</details>
-
-<details>
-<summary><strong>Tipologie di errore</strong></summary>
-
-<details>
 <summary><strong>Nomenclatura</strong></summary>
 
 - $y_k$ — soluzione **numerica** nel nodo $t_k$, $\forall k$;
@@ -440,15 +400,56 @@ $$e_{k+1} = y(t_{k+1}) - y_{k+1} = \underbrace{\big(y(t_{k+1}) - \tilde y_{k+1}\
 
 ![Interpretazione grafica degli errori: troncamento (locale) + propagazione = globale](images/errori_interpretazione.svg)
 
-*(Figura Python aggiornata; vedi anche il toggle "Errori" nel quadro d'insieme. La vecchia immagine a mano
-`errori_interpretazione_grafica.jpg` resta in `images/` come archivio.)*
+*(Figura Python aggiornata; vedi anche il toggle "Errori — troncamento (locale), propagazione,
+globale" qui sopra. La vecchia immagine a mano `errori_interpretazione_grafica.jpg` resta in
+`images/` come archivio.)*
 
 </details>
 
 </details>
 
 <details>
-<summary><strong>Consistenza, 0-stabilità, assoluta stabilità e convergenza</strong></summary>
+<summary><strong>Proprietà: consistenza → stabilità → convergenza</strong></summary>
+
+> L'ordine logico è **consistenza → stabilità → convergenza** (teorema di **Lax**).
+> Prima la vista **intuitiva** del perché di quest'ordine, poi le **definizioni formali**
+> (0-stabilità, assoluta stabilità, regione, sistemi, convergenza di Lax–Richtmyer).
+
+<details>
+<summary><strong>Proprietà — consistenza → stabilità → convergenza (ordine "intuitivo")</strong></summary>
+
+```mermaid
+graph LR
+    CO["CONSISTENZA<br/>dt→0 ⇒ E_troncamento→0"] --> CV["CONVERGENZA<br/>dt→0 ⇒ E_globale→0"]
+    ST["STABILITA'<br/>dt→0 ⇒ E_propagazione→0"] --> CV
+    CV -. "teorema di Lax" .-> LX["consistenza + stabilita' ⟺ convergenza<br/>(problema lineare ben posto)"]
+```
+
+**Perché questo ordine (e non convergenza per prima)?** La convergenza è la proprietà per cui, raffinando
+($\Delta t\to0$), l'**errore globale** tende a **zero**. Ma l'errore globale **si scompone** in
+troncamento + propagazione:
+- la **consistenza** garantisce $E_{\text{troncamento}}\to0$;
+- la **stabilità** garantisce $E_{\text{propagazione}}\to0$;
+- se **entrambi** vanno a zero, la loro **somma** (= errore globale) va a zero → **convergenza**.
+
+Quindi è più intuitivo costruire prima i due "mattoni" (consistenza, stabilità) e poi dedurne la
+convergenza — esattamente il **teorema di equivalenza di Lax**: *consistenza + stabilità ⟺ convergenza*
+(per problemi lineari ben posti). Mappa: **(a)** consistenza ↔ troncamento/discretizzazione; **(b)**
+stabilità ↔ propagazione; **(c)** convergenza ↔ globale.
+
+**Altre proprietà (per completezza):**
+- **Ordine di convergenza:** la **potenza** $p$ con cui l'errore va a zero, $E\sim O(\Delta x^{p})$ (es. 1°,
+  2° ordine). Dice *quanto in fretta* converge.
+- **Monotonicità:** lo schema **non crea nuovi massimi/minimi** (niente oscillazioni spurie vicino alle
+  discontinuità) — legata alla proprietà **TVD**.
+- **Conservatività:** il **flusso** che esce da una cella **entra** nell'adiacente → la grandezza si
+  **conserva** globalmente (massa, q. di moto, energia). Essenziale per gli **urti** (velocità d'urto
+  corretta, Rankine–Hugoniot).
+
+> *(Monotonicità e conservatività potrebbero non essere state trattate a lezione, ma vale la pena
+> conoscerle: completano il quadro delle proprietà.)*
+
+</details>
 
 <details>
 <summary><strong>Consistenza e ordine di consistenza</strong></summary>
