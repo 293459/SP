@@ -332,19 +332,29 @@ sta nel cerchio unitario $\iff \boxed{\nu\le1}$ (**CFL**). → **condizionatamen
 <details>
 <summary><strong>🟦 [T] Stabilità di uno schema numerico — (b) CENTRATO ESPLICITO (FTCS)</strong></summary>
 
-> 📌 *Dimostrazione in arrivo (la fornisci tu come PDF → la converto in LaTeX/markdown qui).*
-> **Risultato atteso:** $G=1-i\,\nu\sin\theta$ → $|G|^2=1+\nu^2\sin^2\theta>1$ → **incondizionatamente
-> instabile** (per la pura advezione). Riferimento: `teoria/metodi_numerici.md` §1–§2.
+Schema **centrato esplicito (FTCS)** per $u_t+a\,u_x=0$: derivata spaziale centrata, tempo esplicito,
+$$u_j^{n+1}=u_j^{n}-\frac{\nu}{2}\big(u_{j+1}^{n}-u_{j-1}^{n}\big),\qquad \nu=\frac{a\,\Delta t}{\Delta x}.$$
+Inserisco il modo $e_j^{n}=E^{n}e^{i\beta x_j}$ e divido per $E^{n}e^{i\beta j\Delta x}$:
+$$G=1-\frac{\nu}{2}\big(e^{i\theta}-e^{-i\theta}\big)=1-\frac{\nu}{2}\,(2i\sin\theta)=1-i\,\nu\sin\theta,\qquad \theta=\beta\Delta x.$$
+Il fattore è **puramente immaginario** nella parte oscillante, quindi
+$$|G|^2=1+\nu^2\sin^2\theta\ \ge\ 1,$$
+e $|G|>1$ per ogni $\theta$ con $\sin\theta\neq0$: **incondizionatamente instabile** (nessun $\Delta t$ lo salva).
+**Perché:** il centrato non ha dissipazione numerica, mentre l'errore di troncamento è **dispersivo** (derivata dispari); serve aggiungere diffusione — è ciò che fanno **Lax–Friedrichs** ($+\tfrac{\lambda_{max}}{2}\Delta U$) o il passaggio all'**implicito**. Riferimento: `teoria/metodi_numerici.md` §1–§2.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Stabilità di uno schema numerico — (c) CENTRATO IMPLICITO</strong></summary>
 
-> 📌 *Dimostrazione in arrivo (la fornisci tu come PDF → la converto in LaTeX/markdown qui).*
-> **Risultato atteso:** $G=\dfrac{1}{1+i\,\nu\sin\theta}$ → $|G|=\dfrac{1}{\sqrt{1+\nu^2\sin^2\theta}}\le1$
-> sempre → **incondizionatamente stabile** (al prezzo di risolvere un **sistema** ad ogni passo).
-> Riferimento: `teoria/metodi_numerici.md` §1.
+Schema **centrato implicito** per $u_t+a\,u_x=0$: derivata spaziale centrata valutata al livello $n+1$,
+$$u_j^{n+1}+\frac{\nu}{2}\big(u_{j+1}^{n+1}-u_{j-1}^{n+1}\big)=u_j^{n},\qquad \nu=\frac{a\,\Delta t}{\Delta x}.$$
+Inserisco il modo $e_j^{n}=E^{n}e^{i\beta x_j}$: al primo membro compare $E^{n+1}\big[1+\tfrac{\nu}{2}(e^{i\theta}-e^{-i\theta})\big]$, al secondo $E^{n}$, da cui
+$$G=\frac{1}{1+\tfrac{\nu}{2}(e^{i\theta}-e^{-i\theta})}=\frac{1}{1+i\,\nu\sin\theta}.$$
+Il denominatore ha modulo $\sqrt{1+\nu^2\sin^2\theta}\ge1$, quindi
+$$|G|=\frac{1}{\sqrt{1+\nu^2\sin^2\theta}}\ \le\ 1\quad\text{per ogni }\theta,\ \forall\,\nu,$$
+cioè **incondizionatamente stabile** (nessun vincolo CFL): rendere implicito lo stesso schema centrato lo
+trasforma da sempre-instabile a sempre-stabile. Il prezzo è la **matrice** (tridiagonale) da risolvere ad
+ogni passo. Riferimento: `teoria/metodi_numerici.md` §1.
 
 </details>
 
