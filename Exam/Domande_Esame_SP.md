@@ -170,9 +170,11 @@ degli appelli.
 ## 1) Leggi di conservazione e sistema di Eulero — `teoria/bilancio.md`
 
 <details>
-<summary><strong>🟦 [T] Equazione di Burgers, collegandosi ai casi delle condizioni al contorno</strong></summary>
+<summary><strong>🟦 [T] Equazione di Burgers (modello scalare non lineare) e collegamento alle condizioni al contorno</strong></summary>
 
-L'**equazione di Burgers inviscida** è il prototipo di legge di conservazione **scalare non lineare** (in `bilancio.md` è l'archetipo scalare+non lineare, accanto ad advezione, acustica ed Eulero):
+> *Domanda posta in due varianti (secca "equazione di Burgers" e "collegandosi ai casi delle condizioni al contorno"): stessa risposta.*
+
+L'**equazione di Burgers inviscida** è il prototipo di legge di conservazione **scalare non lineare** (in `bilancio.md` è l'archetipo scalare+non lineare, accanto ad advezione, acustica ed Eulero); è l'analogo "**giocattolo**" di Eulero per studiare la formazione delle discontinuità:
 
 $$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrightarrow\;\frac{\partial u}{\partial t}+\frac{\partial}{\partial x}\!\Big(\frac{u^2}{2}\Big)=0,$$
 
@@ -182,19 +184,51 @@ cioè forma **conservativa** con flusso $f=u^2/2$. La **velocità caratteristica
 
 </details>
 
-
 <details>
-<summary><strong>🟦 [T] Equazione di Burgers</strong></summary>
+<summary><strong>🟦 [T] Flusso ellittico vs iperbolico e teoria dei segnali</strong></summary>
 
-L'**equazione di Burgers inviscida** è il modello scalare **non lineare** di riferimento:
+La **natura matematica** delle equazioni cambia col regime e determina **come si propaga
+l'informazione** — da cui la scelta di schemi e condizioni al contorno.
 
-$$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrightarrow\;\partial_t u+\partial_x\!\Big(\tfrac{u^2}{2}\Big)=0,$$
+- **Iperbolico (supersonico):** l'informazione viaggia lungo **caratteristiche** a **velocità finita**
+  e in **direzioni ben precise** (le $\lambda=u,\,u\pm a$). Un disturbo in un punto influenza solo il suo
+  **cono di dipendenza/influenza** a valle: esistono zone del dominio che **non "sentono"** ciò che accade
+  altrove. È il regime del **problema di Riemann**, degli **urti** e delle **espansioni**; numericamente
+  chiede schemi **upwind** (direzionali) e un conteggio delle **caratteristiche entranti** per le BC.
+- **Ellittico (subsonico):** non ci sono direzioni privilegiate; l'informazione si propaga in **tutte le
+  direzioni** e **ogni punto** del dominio sente **tutti** gli altri (dipendenza globale). Tipico dei
+  flussi incomprimibili/subsonici (equazione di Laplace/Poisson per la pressione); numericamente chiede
+  schemi **centrati** e solutori **globali/impliciti**.
 
-**forma conservativa** con flusso $f=u^2/2$. La velocità caratteristica è $f'(u)=u$: **ogni valore viaggia a velocità pari a se stesso**, quindi $u=\text{cost}$ lungo $dx/dt=u$. Poiché le caratteristiche hanno pendenze diverse, possono **convergere** → **urto** (dato $u_0'<0$), o **divergere** → **ventaglio di rarefazione** ($u=x/t$). All'urto vale **Rankine–Hugoniot** $s=[\![f]\!]/[\![u]\!]=(u_A+u_B)/2$, e la **condizione di entropia** seleziona la soluzione fisica (caratteristiche che entrano nell'urto). È l'analogo "giocattolo" di Eulero per studiare la formazione delle discontinuità.
+**Teoria dei segnali.** È l'analogia con la propagazione dei segnali: le **caratteristiche** sono le
+"linee" lungo cui viaggiano i segnali (onde) portando l'informazione. In iperbolico il segnale è
+**localizzato** e **causale** (ritardo finito); in ellittico è **istantaneo e diffuso** su tutto il
+dominio. Il **tipo** di PDE (segno del discriminante) dice quindi *se e come* un punto può comunicare con
+gli altri — ed è il criterio per impostare correttamente **schema numerico e condizioni al contorno**.
 
 </details>
 
 ## 2) Linee caratteristiche: pistone, Sod, condizioni al contorno — `teoria/caratteristiche.md`
+
+<details>
+<summary><strong>🟦 [T] Equazioni di Eulero non stazionarie: cosa si può dire, caratteristiche e invarianti di Riemann</strong></summary>
+
+Le **equazioni di Eulero 1D non stazionarie** ($\partial_t U+\partial_x F=0$) sono un sistema
+**iperbolico**: la Jacobiana $A=\partial F/\partial U$ ha **autovalori reali** e autovettori indipendenti.
+Gli autovalori sono le **tre velocità d'onda**
+$$\lambda_1=u-a,\qquad \lambda_2=u,\qquad \lambda_3=u+a,$$
+lungo le rispettive **caratteristiche** nel piano $(x,t)$. Diagonalizzando il sistema si passa alle
+**variabili caratteristiche**: lungo ciascuna caratteristica si **conserva** un **invariante di Riemann**.
+Per un gas politropico (flusso omoentropico) $J^{\pm}=u\pm\dfrac{2a}{\gamma-1}$ costanti lungo
+$\lambda_{3,1}=u\pm a$, e l'**entropia** $S$ costante lungo $\lambda_2=u$ (onda di contatto).
+
+**Cosa se ne può dire:** (i) le perturbazioni viaggiano a **velocità finita** lungo le caratteristiche;
+(ii) noti gli invarianti si ricostruisce lo **stato locale** (2 invarianti + entropia → 3 incognite
+$u,a,S$); (iii) quando caratteristiche della stessa famiglia **convergono** si forma un **urto** (lì gli
+invarianti non si conservano più: vale **Rankine–Hugoniot**), quando **divergono** un **ventaglio di
+rarefazione**. È la base del **metodo delle caratteristiche** (pistone) e del **problema di Riemann** (Sod).
+
+</details>
 
 <details>
 <summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
@@ -218,12 +252,12 @@ $$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrig
 
 Il **tubo di Sod** (`caratteristiche.md`, §7) è il **problema di Riemann** canonico per Eulero 1D: una **membrana** separa due stati costanti **a riposo** con densità e pressione diverse. Nel benchmark storico (Sod, 1978): $(\rho_L,p_L,u_L)=(1,1,0)$ e $(\rho_R,p_R,u_R)=(0.125,0.1,0)$ (rapporti $10:1$ e $8:1$, stesso gas $\gamma$). La soluzione è **autosimile** ($x/t$): rimossa la membrana, dall'origine parte **un'onda per famiglia**.
 
-**Struttura a 3 onde / 4 stati** ($L$, $L^\*$, $R^\*$, $R$):
-- **Ventaglio di rarefazione** (sinistra, $\lambda_1=u-a$): collega $L$ a $L^\*$, **isentropico** → si usano gli invarianti $J^{+}$; variazione **liscia** e continua.
-- **Superficie di contatto** (centro, $\lambda_2=u$): separa $L^\*$ da $R^\*$. Attraverso di essa **pressione e velocità sono continue** ($p^\*,u^\*$ uguali ai due lati), mentre **densità, temperatura ed entropia sono discontinue**. È linearmente degenere: viene solo trasportata a velocità $u$.
-- **Onda d'urto** (destra, $\lambda_3=u+a$): collega $R$ a $R^\*$ via **Rankine–Hugoniot**; salta $p,\rho,u,T$.
+**Struttura a 3 onde / 4 stati** ($L$, $L^*$, $R^*$, $R$):
+- **Ventaglio di rarefazione** (sinistra, $\lambda_1=u-a$): collega $L$ a $L^*$, **isentropico** → si usano gli invarianti $J^{+}$; variazione **liscia** e continua.
+- **Superficie di contatto** (centro, $\lambda_2=u$): separa $L^*$ da $R^*$. Attraverso di essa **pressione e velocità sono continue** ($p^*,u^*$ uguali ai due lati), mentre **densità, temperatura ed entropia sono discontinue**. È linearmente degenere: viene solo trasportata a velocità $u$.
+- **Onda d'urto** (destra, $\lambda_3=u+a$): collega $R$ a $R^*$ via **Rankine–Hugoniot**; salta $p,\rho,u,T$.
 
-**Cosa si vede:** i profili di $p$ e $u$ mostrano solo espansione + urto (il contatto è **invisibile** perché $p,u$ continue); i profili di $\rho$ e $T$ mostrano **tutte e tre** le strutture (il contatto si localizza in densità/temperatura). Si risolve imponendo $p^\*,u^\*$ uguali ai due lati del contatto e cercando l'unico $(p^\*,u^\*)$ che soddisfa entrambe le relazioni acustiche (eq. non lineare in $p^\*$).
+**Cosa si vede:** i profili di $p$ e $u$ mostrano solo espansione + urto (il contatto è **invisibile** perché $p,u$ continue); i profili di $\rho$ e $T$ mostrano **tutte e tre** le strutture (il contatto si localizza in densità/temperatura). Si risolve imponendo $p^*,u^*$ uguali ai due lati del contatto e cercando l'unico $(p^*,u^*)$ che soddisfa entrambe le relazioni acustiche (eq. non lineare in $p^*$).
 
 **Uso:** avendo **soluzione esatta** e struttura sempre uguale, è il **test di validazione** riproducibile per schemi numerici (Roe, Lax–Friedrichs, Godunov), e il "mattone" che i metodi a volumi finiti risolvono a ogni interfaccia.
 
@@ -445,6 +479,29 @@ un **cerchio** di centro $(1-\nu,0)$ e raggio $\nu$: sta nel cerchio unitario so
 **Implicito (upwind implicito).** Da $(1+\nu)u_j^{n+1}-\nu u_{j-1}^{n+1}=u_j^{n}$:
 $$G=\frac{1}{1+\nu\,(1-e^{-i\theta})}.$$
 Il denominatore ha parte reale $\ge1$ per **ogni** $\theta$ e ogni $\nu>0$, quindi $|G|\le1$ **SEMPRE**. Lo schema è **incondizionatamente stabile** (come il centrato implicito): $\Delta t$ libero, nessun vincolo CFL. Il prezzo è la risoluzione di un **sistema** ad ogni passo — ecco perché gli impliciti, pur più costosi, si usano: la loro **regione di assoluta stabilità è molto ampia**.
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Metodi ODE in generale: pro e contro (tabella comparativa) e Eulero implicito</strong></summary>
+
+Con il **metodo delle linee** la discretizzazione spaziale trasforma la PDE in un sistema di **ODE** $\dfrac{d\mathbf U}{dt}=\mathbf R(\mathbf U)$, che si integra nel tempo. Un metodo ODE si classifica per: **esplicito/implicito**, **numero di stadi** (Runge–Kutta) o **passi** (multistep), **ordine** di accuratezza e **regione di assoluta stabilità**. Il compromesso di fondo è **accuratezza ↔ costo ↔ stabilità**.
+
+| Metodo | Tipo | Ordine | Stabilità | Pro | Contro |
+|---|---|---|---|---|---|
+| **Eulero esplicito** | 1 passo, espl. | 1 | condizionata (regione piccola) | semplicissimo, 1 valutazione/passo, parallelo | 1° ordine (diffusivo), **CFL** stringente |
+| **Eulero implicito** | 1 passo, impl. | 1 | **A-stabile** (incondizionata) | ottimo per **stiff**, $\Delta t$ libero | 1° ordine, **sistema** da risolvere ogni passo |
+| **Trapezi / Crank–Nicolson** | 1 passo, impl. | 2 | A-stabile | 2° ordine **e** A-stabile | non **L-stabile** → può **oscillare** sugli stiff; sistema |
+| **Heun (RK2)** | 2 stadi, espl. | 2 | condizionata | 2° ordine esplicito, semplice | 2 valutazioni/passo, ancora CFL |
+| **Runge–Kutta 4** | 4 stadi, espl. | 4 | condizionata (regione ampia) | **alta accuratezza**, auto-avviante | **4 valutazioni/passo**, non per stiff |
+| **Adams–Bashforth** | multistep espl. | $p$ | condizionata (piccola) | **riusa** valori passati → 1 valutazione/passo | non auto-avviante, poco stabile |
+| **Adams–Moulton / BDF** | multistep impl. | $p$ | ampia (**BDF** ~L-stabile) | **BDF** eccellenti per **stiff** | impliciti (sistema), BDF alti instabili |
+
+**Regola pratica.** **Espliciti** (RK, AB) per problemi **non stiff**/instazionari dove serve comunque un $\Delta t$ piccolo (turbolenza risolta, acustica): economici per passo. **Impliciti** (Eulero impl., BDF, CN) per **stazionari** (si "salta" con $\Delta t$ grande) e per **stiff** (autovalori con $\mathrm{Re}\,\lambda\ll0$): evitano il passo minuscolo, al prezzo di un sistema per passo.
+
+**Eulero implicito** (richiesto esplicitamente):
+$$u^{n+1}=u^{n}+\Delta t\,f(t_{n+1},u^{n+1}),$$
+la dipendenza da $u^{n+1}$ a secondo membro richiede di **risolvere un'equazione** (sistema lineare/non lineare); in cambio è **incondizionatamente stabile** ($|G|\le1$ per ogni $\Delta t$).
 
 </details>
 
@@ -719,6 +776,40 @@ La LES è l'equilibrio giusto quando le grandi strutture instazionarie contano (
 
 </details>
 
+<details>
+<summary><strong>🟦 [T] Strato limite: come si trova lo sforzo di parete $\tau_w$ con il processo iterativo</strong></summary>
+
+Riferimento: `teoria/report_QA.md` (Domande 1 e sul $y^+$). Nello strato limite turbolento risolto con la
+**legge di parete** (wall function), lo sforzo di parete $\tau_w$ **non** si ottiene in forma chiusa: la
+velocità del primo nodo e la $\tau_w$ sono legate da una relazione **implicita**, che si risolve **iterando**.
+
+**Grandezze in gioco.** Dalla soluzione si conosce la velocità $u_P$ nel **primo nodo** a distanza $y_P$
+dalla parete, e la viscosità $\nu$. Si definiscono la **velocità d'attrito** $u_\tau=\sqrt{\tau_w/\rho}$, le
+variabili di parete $y^+=\dfrac{y_P\,u_\tau}{\nu}$ e $u^+=\dfrac{u_P}{u_\tau}$, legate dalla **legge logaritmica**
+$$u^+=\frac{1}{\kappa}\ln(y^+)+B\qquad(\kappa\approx0.41,\ B\approx5.2).$$
+
+**Perché serve iterare.** In $y^+=y_P u_\tau/\nu$ compare $u_\tau$, che è **proprio l'incognita**: $u_\tau$ sta
+sia a sinistra (in $u^+=u_P/u_\tau$) sia dentro il logaritmo (in $y^+$). L'equazione è **trascendente** in
+$u_\tau$ → si risolve con un **ciclo iterativo** (punto fisso o Newton):
+
+```mermaid
+flowchart TD
+    A["Noti dalla soluzione:<br/>u_P (1o nodo), y_P (distanza parete), nu"] --> B["Stima iniziale di u_tau<br/>(es. da tau_w di tentativo o correlazione)"]
+    B --> C["y+ = y_P * u_tau / nu"]
+    C --> D["Legge di parete (log-law):<br/>u+ = (1/kappa) ln(y+) + B"]
+    D --> E["Aggiorna: u_tau = u_P / u+"]
+    E --> F{"convergenza?<br/>|u_tau - u_tau_old| < toll"}
+    F -->|no| C
+    F -->|si| G["tau_w = rho * u_tau^2<br/>(e y+ finale per il check di mesh)"]
+```
+
+**In sintesi:** si **stima** $u_\tau$, si calcola $y^+$, dalla log-law si ricava $u^+$ e quindi un nuovo
+$u_\tau=u_P/u^+$; si **ripete** finché $u_\tau$ converge, poi $\boxed{\tau_w=\rho\,u_\tau^2}$. Lo stesso $u_\tau$
+fornisce il $y^+$ **effettivo**, che serve a verificare l'adeguatezza della mesh a parete ($y^+\lesssim1$ per
+risolvere il sottostrato viscoso, oppure $30\lesssim y^+\lesssim300$ se si usano le wall function).
+
+</details>
+
 ## 5) Turbomacchine — `teoria/turbomacchine.md`
 
 
@@ -809,7 +900,7 @@ Le **difficoltà** principali sono la **stiffness** della chimica (scale tempora
 > modo autonomo.
 
 <details>
-<summary><strong>🟩 [E] Estrapolazione di Richardson nel caso del Bump ✅ (risposta completa)</strong></summary>
+<summary><strong>🟩 [E] Estrapolazione di Richardson nel caso del Bump ✅ (risposta completa + FAQ)</strong></summary>
 
 ### 1. Cos'è l'estrapolazione di Richardson
 
@@ -925,14 +1016,12 @@ $h\to 0$.
 
 > 🔧 **Nota di coerenza interna al progetto.** In `Latex/teoria.tex` l'equazione equivalente è
 > scritta come $u_{\rm esatto}\approx u_h + \frac{u_{2h}-u_h}{2^p-1}$: con la convenzione
-> $E=u-u_{\rm esatto}$ il segno corretto è $u_{\rm esatto}\approx u_h - \frac{u_{2h}-u_h}{2^p-1}
-> = u_h + \frac{u_h-u_{2h}}{2^p-1}$ (coerente col box qui sopra e con `report_QA.md` Domanda 24).
+> $E=u-u_{\rm esatto}$ il segno corretto è $u_{\rm esatto}\approx u_h - \frac{u_{2h}-u_h}{2^p-1} = u_h + \frac{u_h-u_{2h}}{2^p-1}$ (coerente col box qui sopra e con `report_QA.md` Domanda 24).
 > È un **refuso di segno** nel report da correggere.
 
 ### 5. Derivazione dell'ordine effettivo (3 griglie)
 
-Se **non** si vuole assumere il teorico, $p$ diventa **incognita**: le incognite sono ora $u_{\rm
-esatto}$ **e** $p$ (la $k$ continua a non interessarci, viene eliminata), quindi serve una **terza**
+Se **non** si vuole assumere il teorico, $p$ diventa **incognita**: le incognite sono ora $u_{\rm esatto}$ **e** $p$ (la $k$ continua a non interessarci, viene eliminata), quindi serve una **terza**
 griglia. Con tre griglie a **rapporto costante** $r$, comodamente $h,\;2h,\;4h$ (cioè $r=2$):
 
 $$
@@ -1011,8 +1100,7 @@ Letture:
 - entrambi **sotto** l'ordine teorico $p=1$ ⟹ griglie **non ancora pienamente asintotiche**;
 - **Roe** più accurato e più vicino a 1 (minore dissipazione: scompone il salto sulle onde
   caratteristiche, mentre LF usa una dissipazione unica $\propto\lambda_{max}$);
-- l'estrapolazione a **ordine effettivo** sul bump risulta **non affidabile** ($p_{\rm eff}\approx
-  0.5$–$0.8$, fuori regime asintotico): per questo, *avendo* la soluzione esatta, si preferisce la
+- l'estrapolazione a **ordine effettivo** sul bump risulta **non affidabile** ($p_{\rm eff}\approx   0.5$–$0.8$, fuori regime asintotico): per questo, *avendo* la soluzione esatta, si preferisce la
   stima "sol. esatta nota". È la conferma quantitativa del punto §1.
 
 ### 9. Risposte sintetiche ai tuoi dubbi puntuali
@@ -1027,13 +1115,10 @@ Letture:
 - **$k$ costante / da ricordare?** Costante nelle ipotesi di Richardson, **eliminata** nei conti,
   **non** riutilizzabile altrove: non serve ricordarla.
 
-</details>
+### 10. FAQ / approfondimenti (Q1–Q8)
 
-<details>
-<summary><strong>🟩 [E] Estrapolazione di Richardson — approfondimenti e FAQ (Q1–Q8) ✅</strong></summary>
-
-> Chiarimenti puntuali emersi sul punto precedente. Gli stessi contenuti sono stati integrati anche
-> nella **parte teorica del report** (`Latex/teoria.tex`, sezione Richardson, e `Latex/bump.tex`).
+> Chiarimenti puntuali. Gli stessi contenuti sono integrati anche nella **parte teorica del report**
+> (`Latex/teoria.tex`, sezione Richardson, e `Latex/bump.tex`).
 
 #### Q1 — Perché si dice che **stima** la soluzione esatta e non la **calcola**? Da dove viene il $\approx$?
 
@@ -1189,19 +1274,60 @@ $$
 </details>
 
 <details>
-<summary><strong>🟩 [E] Discutere la simulazione della paletta (LS59)</strong></summary>
+<summary><strong>🟩 [E] Paletta LS59 — simulazione, campo di moto e risultati</strong></summary>
 
-**Cos'è.** Cascata (schiera) di turbina con profilo **LS59**, transonico, tipico degli stadi HP. Dominio = **intercella periodica** (una sola pala in schiera infinita).
+> *Toggle unico: accorpa "discutere la simulazione della paletta", "LS59 (campo di moto e risultati)" e la parte di campo LS59 della domanda su Richardson/presa.*
 
-**BC.** Ingresso: $T^\circ=P^\circ=1$, $M_{\rm in}=0.5$ (subsonico), $\alpha=30^\circ$. Uscita: pressione statica imposta $p_{\rm out}=0.4124$. Regime globale **transonico**, $M_{\rm out}\approx 1.2$ di progetto.
+**Cos'è.** Cascata (schiera) di turbina con profilo **LS59**, transonico, tipico degli stadi HP. Dominio = **intercella periodica** (una sola pala in schiera infinita). Schema di **Roe**; mesh non strutturata a prevalenza di quadrilateri, $l_c=0.01$, infittita attorno al profilo. L'analisi di convergenza **non** viene ripetuta (fatta solo sulla presa): si parte da una griglia già convergente.
 
-**Mesh.** Non strutturata a prevalenza di quadrilateri, $l_c=0.01$, infittita attorno al profilo. L'analisi di convergenza **non** viene ripetuta (fatta solo sulla presa): si usa una griglia già convergente. Schema di **Roe**.
+**BC.** Ingresso: $T^\circ=P^\circ=1$, $M_{\rm in}=0.5$ (subsonico), $\alpha=30^\circ$. Uscita: pressione statica imposta $p_{\rm out}=0.4124$. Regime globale **transonico**, $M_{\rm out}\approx 1.2$ di progetto. Check BC: $P_\infty=(1.05)^{-3.5}\approx0.843$ per $M=0.5$, coincide col valore letto a monte.
 
-**Campi.** Pressione: $P_{\max}=1.003$ (ristagno, $\approx P^\circ$), $P_{\min}=0.178$; a monte $\approx0.843$, a valle $\approx0.41$. Mach: $M_{\max}=1.487$, con **cuscinetto supersonico sul dorso** nella parte posteriore. Temperatura speculare al Mach ($T_{\max}=1.040$, $T_{\min}=0.678$). La coerenza incrociata isentropica $M$-$P$-$T$ è la prima **validazione** del solutore.
+**Campo di moto.**
+- **Ingresso** uniforme a $M\approx0.5$ ($P\approx0.843$).
+- **Ristagno al bordo d'attacco:** $M\to0$, $P_{\max}=1.003\approx P^\circ$, $T\to T^\circ$ (isentropico, niente urti a monte); il $+0.3\%$ è overshoot di Roe.
+- **Espansione nel canale palare:** sul **dorso** (convesso) la corrente accelera per deflettere il flusso → $P_{\min}=0.178$ e $M_{\max}=1.487$, con **cuscinetto supersonico** nella parte posteriore. È la differenza dorso/ventre a generare il **carico**. Temperatura speculare al Mach ($T_{\max}=1.040$, $T_{\min}=0.678$).
+- **Bordo di fuga:** punto singolare inviscido (Kutta non imposta) → **debole urto/onde** di chiusura e **spike numerici** di Mach/temperatura ($T>T^\circ$ = overshoot certo). La "scia" inviscida è il ricongiungimento dorso/ventre, non una separazione (viscosa, solo in RANS). È la principale sorgente di **entropia numerica**.
+
+La coerenza incrociata isentropica $M$-$P$-$T$ è la prima **validazione** del solutore.
 
 **$M_{is}$ a parete e confronto sperimentale.** Si estrae $P_w/P^\circ$ nelle celle di bordo (tag parete), separando intradosso/estradosso via coordinata $y$, e si confronta con **dati sperimentali**, Euler-Roe, Euler-Fluent e **RANS (Spalart–Allmaras)**. I modelli inviscidi concordano bene con l'esperimento **sull'intradosso** (flusso attaccato); le **discrepanze sono sull'estradosso vicino al bordo di uscita**, dove pesano gli effetti viscosi non modellati da Eulero.
 
-**Bordo di fuga.** In calcolo inviscido è un **punto singolare** (Kutta non imposta): spike numerici di Mach/temperatura ($T>T^\circ$ è overshoot). È la principale sorgente di entropia numerica e di discrepanza col dato sperimentale.
+**Risultati principali.** Regime transonico confermato (ingresso subsonico, uscita supersonica $M_{\rm out}\approx1.2$); perdite d'urto **modeste** (urto debole); l'entropia numerica si concentra al bordo di fuga, principale scarto con l'esperimento.
+
+</details>
+
+<details>
+<summary><strong>🟩 [E] Mach isentropico $M_{is}$ a parete: come si ricava e perché "isentropico"</strong></summary>
+
+**Come si ricava.** Sulla parete non si misura direttamente il Mach: si misura la **pressione statica**
+$p_w$. Il $M_{is}$ è il numero di Mach che si avrebbe **se** il flusso arrivasse in quel punto per
+**espansione isentropica** dalle condizioni totali (di ristagno) $p^\circ$. Invertendo la relazione
+isentropica $\dfrac{p^\circ}{p}=\Big(1+\dfrac{\gamma-1}{2}M^2\Big)^{\frac{\gamma}{\gamma-1}}$:
+$$M_{is}=\sqrt{\frac{2}{\gamma-1}\left[\left(\frac{p^\circ}{p_w}\right)^{\frac{\gamma-1}{\gamma}}-1\right]}.$$
+In pratica: si legge $p_w/p^\circ$ nelle celle di parete e si applica questa formula → distribuzione di
+$M_{is}$ lungo il profilo (intradosso/estradosso), che è ciò che si **confronta con l'esperimento**.
+
+**Perché "isentropico".** Perché è **definito** tramite la relazione **isentropica** $p^\circ\!-\!p_w$: usa
+$p^\circ$ **costante** (conservazione dell'entropia e dell'entalpia totale). È un **Mach equivalente** legato
+alla sola pressione di parete, non la velocità reale. L'ipotesi è ottima dove il flusso è **attaccato e
+senza perdite** (grosso del profilo); **decade** dove ci sono **urti** o **scia viscosa** (lì $p^\circ$ cala
+e il vero Mach differisce dal $M_{is}$). Vantaggio: dipende solo da $p_w$, quindi è **facile da misurare** in
+galleria e da estrarre dal calcolo, ed è il parametro standard di confronto per le cascate di turbina.
+
+</details>
+
+<details>
+<summary><strong>🟩 [E] Perché si impone la pressione all'uscita anche se il flusso è supersonico (LS59)</strong></summary>
+
+Domanda del 01/07. Apparente paradosso: se l'uscita è **supersonica** le caratteristiche escono tutte e non
+si dovrebbe imporre nulla — eppure sulla LS59 si **impone la pressione statica** all'outlet.
+
+**Risposta.** Conta il **segno di $\lambda_1=u_n-a$ in direzione normale al bordo**, non il modulo della
+velocità. All'uscita della schiera il flusso è supersonico ma **fortemente deviato** (grande angolo di
+efflusso): la **componente normale** $u_n$ alle facce del bordo d'uscita è **subsonica** ($u_n<a$), anche se
+la velocità **totale** è supersonica. Quindi, rispetto alla direzione che conta per le BC (la normale al
+bordo), $\lambda_1=u_n-a<0$ **rientra** → serve **1 condizione**, ed è la **pressione statica**. È lo stesso
+conteggio delle caratteristiche entranti visto per l'uscita subsonica, applicato alla **velocità normale**.
 
 </details>
 
@@ -1219,13 +1345,13 @@ $$
 </details>
 
 <details>
-<summary><strong>🟩 [E] Estrapolazione di Richardson, metodi diretti, $p_{wall}$ per la presa a doppia rampa e campo di moto generico per la LS59</strong></summary>
+<summary><strong>🟩 [E] Estrapolazione di Richardson sulla presa a doppia rampa e $p_{wall}$ (metodi diretti)</strong></summary>
+
+> *La parte sul campo di moto della LS59 è stata spostata nel toggle della paletta.*
 
 **Richardson (già impostata sul bump) applicata alla presa.** A differenza del bump (subsonico, senza urti, soluzione esatta $\bar S=0$ nota), nella **presa a doppia rampa** gli urti obliqui producono **entropia fisica non nulla**: non c'è soluzione esatta, quindi si usa la sola **estrapolazione di Richardson** sulla **norma $L_2$ dell'entropia**, con schema di Roe su 3 griglie self-simili ($l_c=1,\,0.5,\,0.25$; $r=2$). Valori: $u_h=1.443\cdot10^{-2}$, $u_{2h}=1.651\cdot10^{-2}$, $u_{4h}=1.973\cdot10^{-2}$ (decrescita monotòna). Estrapolazione: $u_{\rm esatto}\approx1.1$–$1.2\cdot10^{-2}$ (entropia fisica degli urti), **ordine effettivo $p_{\rm eff}\approx0.64<1$** (gli urti degradano l'ordine: presso una discontinuità lo schema cade al prim'ordine), **GCI $\sim1\%$** sulla griglia fine → sostanzialmente grid-independent (per i campi si usa la griglia intermedia, già convergente).
 
 **$p_{\rm wall}$ della doppia presa.** Si estrae $P_w/P^\circ$ sulla parete inferiore. La pressione parte da $\approx0.027$ ($M_\infty=3$), **cresce a gradini** attraverso i due urti obliqui (1ª rampa $\approx10^\circ$, 2ª rampa $\approx21.4^\circ$) fino al **picco $\approx0.29$** dove gli urti **si focalizzano al labbro**. Inviscido e RANS **concordano fino a $x\approx0.5$**; a valle divergono dall'esperimento per l'**interazione urto–strato limite (SBLI)** non catturata da Eulero.
-
-**Campo della LS59.** Coerente con le isentropiche fuori dagli urti: monte uniforme, ristagno al BA, forte accelerazione sul dorso fino a $M>1$, uscita supersonica, spike numerici ai bordi. La verifica $P_\infty\approx0.843$ (per $M=0.5$) è il **check standard** delle BC.
 
 </details>
 
@@ -1283,23 +1409,8 @@ Vale il **paradosso di d'Alembert**: in un flusso inviscido, stazionario e senza
 | 0.010 | $1.91\cdot10^{-3}$ | $1.79\cdot10^{-3}$ |
 | 0.005 | $1.22\cdot10^{-3}$ | $0.90\cdot10^{-3}$ |
 
+> **Da citare (dal report):** «Sulle griglie più fini lo schema di **Roe** produce errori più piccoli di **Lax–Friedrichs** ($8.98\times10^{-4}$ contro $1.22\times10^{-3}$ sulla griglia $h$), coerentemente con la sua **minore dissipazione numerica**.»
+
 Sulle griglie **fini Roe è meno diffusivo** e dà errore più basso; sulla griglia più rada l'ordine si inverte. L'**ordine** (soluzione esatta nota, $\bar S=0$) è $p\approx0.96$ per Roe e $p\approx0.62$ per LF, entrambi $<1$ perché le griglie non sono ancora nel regime asintotico, ma Roe è **più vicino al teorico**. Motivo: LF aggiunge dissipazione $\propto\lambda_{\max}(u^R-u^L)$ uguale per tutte le onde; Roe **decompone il salto sugli autovettori** e smorza ogni onda correttamente → interfaccia più netta, meno smearing.
-
-</details>
-
-<details>
-<summary><strong>🟩 [E] LS59 (campo di moto e risultati)</strong></summary>
-
-**Ingresso.** Uniforme a $M_\infty\approx0.5$; verifica BC: $P_\infty=(1.05)^{-3.5}\approx0.843$, coincidente col letto a monte (check di consistenza superato).
-
-**Ristagno al BA.** $M\to0$; $P_{\max}=1.003\approx P^\circ$ e $T\to T^\circ$: tutta l'energia cinetica torna pressione (isentropico, no urti a monte). Il piccolo $+0.3\%$ è overshoot di Roe.
-
-**Espansione nel canale palare.** Sul **dorso** (convesso) la corrente accelera per deflettere il flusso: la pressione cala fino a $P_{\min}=0.178$ e il Mach cresce fino a $M_{\max}=1.487$, formando un **cuscinetto supersonico** nella parte posteriore. È la differenza dorso/ventre a generare il **carico** della pala.
-
-**Bordo di fuga.** Punto singolare inviscido (Kutta non imposta): **debole urto/onde** di chiusura sul dorso transonico e **spike numerici** di Mach e temperatura ($T_{\max}=1.040>T^\circ$, overshoot). "Scia" inviscida = ricongiungimento dorso/ventre, non separazione (viscosa, solo in RANS).
-
-**$M_{is}$ a parete e confronto.** $P_w/P^\circ$ estratto sulle celle di parete: Euler-Roe/Euler-Fluent/RANS concordano con l'esperimento **sull'intradosso**; **discrepanze sull'estradosso al bordo di uscita** (effetti viscosi non modellati).
-
-**Risultati principali.** Coerenza isentropica $M$-$P$-$T$ (validazione), regime transonico confermato (ingresso subsonico, uscita supersonica $M_{\rm out}\approx1.2$), perdite d'urto **modeste** perché l'urto è debole; l'entropia numerica si concentra al bordo di fuga, principale sorgente di scarto con l'esperimento.
 
 </details>

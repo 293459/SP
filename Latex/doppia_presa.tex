@@ -401,15 +401,16 @@ infinita ($u_{\rm esatto}$) e il GCI quantifica quanto la griglia più fine ne s
 ed è già calcolata dal codice come integrale di superficie.
 
 \paragraph{Valori calcolati sulle tre griglie (schema di Roe).}
-Eseguendo il codice fino a convergenza dei residui, la norma dell'entropia vale (si riporta sempre
-l'$l_c$ associato; i tre valori sono impilati per chiarezza):
-\begin{align*}
-  u_{h}   &= 1.443\times10^{-2} \qquad (l_c = 0.25,\ \text{M3},\ 65\,130\ \text{nodi}) \\
-  u_{2h}  &= 1.651\times10^{-2} \qquad (l_c = 0.50,\ \text{M2},\ 16\,564\ \text{nodi}) \\
-  u_{4h}  &= 1.973\times10^{-2} \qquad (l_c = 1.00,\ \text{M1},\ 4\,320\ \text{nodi})
-\end{align*}
-con rapporto di diradamento $r=2$ (dimezzando $l_c$ il numero di nodi quadruplica, quindi
-$r=(N_{\rm fine}/N_{\rm rada})^{1/2}\approx2$).
+Eseguendo il codice fino a convergenza dei residui, la norma dell'entropia vale
+\begin{equation*}
+  u_{h} = 1.443\times10^{-2},\quad
+  u_{2h} = 1.651\times10^{-2},\quad
+  u_{4h} = 1.973\times10^{-2},
+\end{equation*}
+dove le tre griglie sono, dalla più fine alla più rada:
+$u_{h}\!\to$ M3 ($l_c=0.25$, $65\,130$ nodi), $u_{2h}\!\to$ M2 ($l_c=0.50$, $16\,564$ nodi),
+$u_{4h}\!\to$ M1 ($l_c=1.00$, $4\,320$ nodi). Il rapporto di diradamento è $r=2$ (dimezzando $l_c$ il
+numero di nodi quadruplica, quindi $r=(N_{\rm fine}/N_{\rm rada})^{1/2}\approx2$).
 
 \begin{table}[H]
   \centering

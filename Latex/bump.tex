@@ -26,31 +26,34 @@ diretta dell'errore numerico.
 
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[scale=5.0, >=Stealth]
-    % Pareti esterne
-    \draw[thick] (0,0.3) -- (1,0.3);   % tetto
-    \draw[thick,blue!70!black,->] (-0.05,0.1) -- (0,0.1) node[right,black,xshift=2pt]{};
-    % Inlet
-    \draw[very thick, green!60!black] (0,0) -- (0,0.3) node[midway,left]{Inlet};
-    % Outlet
-    \draw[very thick, red!70!black] (1,0) -- (1,0.3) node[midway,right]{Outlet};
-    % Wall (tetto)
-    \draw[very thick, gray] (0,0.3) -- (1,0.3) node[midway, above]{Wall};
-    % Bump: spline approssimata con curve di Bezier
-    \draw[very thick, gray]
-      (0,0) -- (0.375,0) .. controls (0.42,0) and (0.45,0.03) ..
-      (0.5,0.03) .. controls (0.55,0.03) and (0.58,0) .. (0.625,0) -- (1,0);
-    \node[below] at (0.5,-0.01) {\small Parete (bump)};
-    % Dimensioni
-    \draw[<->,gray!60] (0,-0.04) -- (1,-0.04) node[midway,below]{\small $L = 1$};
-    \draw[<->,gray!60] (1.04,0) -- (1.04,0.3) node[midway,right]{\small $h = 0.3$};
-    \draw[<->,gray!60] (0.5,0) -- (0.5,0.03) node[midway,right]{\small $h/10$};
-    % Freccia flusso
-    \foreach \y in {0.08, 0.15, 0.22}
-      \draw[->, blue!60, thick] (-0.07,\y) -- (0,\y);
-    \node[left, blue!60] at (-0.07,0.15) {\small $M_{\rm in}=0.3$};
+  \begin{tikzpicture}[scale=6.0, >=Stealth,
+        dim/.style={<->, gray!55, thin}]
+    % --- contorno del dominio ---
+    \draw[very thick, gray]           (0,0.3) -- (1,0.3);          % tetto (piano di simmetria)
+    \draw[very thick, green!55!black] (0,0)   -- (0,0.3);          % Inlet
+    \draw[very thick, red!70!black]   (1,0)   -- (1,0.3);          % Outlet
+    \draw[very thick, gray]                                        % parete inferiore con bump
+      (0,0) -- (0.375,0) .. controls (0.44,0) and (0.46,0.03) ..
+      (0.5,0.03) .. controls (0.54,0.03) and (0.56,0) .. (0.625,0) -- (1,0);
+    % --- etichette dei bordi (interne, nello spazio libero) ---
+    \node[green!45!black, rotate=90, anchor=south] at (0.028,0.15) {Inlet};
+    \node[red!60!black,   rotate=90, anchor=south] at (0.972,0.15) {Outlet};
+    \node[gray!55!black, above] at (0.5,0.3) {\small Wall (piano di simmetria)};
+    % --- etichetta del bump con leader nello spazio libero sopra il rialzo ---
+    \node[align=center] (bl) at (0.5,0.15) {\small parete inferiore\\(bump)};
+    \draw[->, gray!55] (bl) -- (0.5,0.038);
+    % --- quote dimensionali (staccate dal disegno) ---
+    \draw[dim] (0,-0.065) -- (1,-0.065) node[midway,below]{\small $L = 1$};
+    \draw[dim] (1.075,0)  -- (1.075,0.3) node[midway,right]{\small $h = 0.3$};
+    \draw[dim] (0.5,0)    -- (0.5,0.03) node[right,xshift=2pt]{\small $h/10=0.03$};
+    % --- corrente in ingresso (a sinistra, staccata dall'etichetta Inlet) ---
+    \foreach \y in {0.09,0.15,0.21}
+      \draw[->, blue!60, thick] (-0.14,\y) -- (-0.03,\y);
+    \node[blue!60, anchor=east] at (-0.03,0.27) {\small $M_{\rm in}=0.3$};
   \end{tikzpicture}
-  \caption{Schema del dominio computazionale per il caso bump (non in scala).}
+  \caption{Schema del dominio computazionale per il caso bump (non in scala): condotto
+           $L\times h = 1\times0.3$ con rialzo (\emph{bump}) di apice $h/10=0.03$ al centro della
+           parete inferiore; a sinistra l'Inlet, a destra l'Outlet, in alto il piano di simmetria.}
   \label{fig:dominio_bump}
 \end{figure}
 
