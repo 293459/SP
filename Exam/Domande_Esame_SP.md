@@ -233,7 +233,7 @@ Il **tubo di Sod** (`caratteristiche.md`, §7) è il **problema di Riemann** can
 
 
 <details>
-<summary><strong>🟦 [T] Outlet subsonico (e in generale le condizioni al contorno in base al regime)</strong></summary>
+<summary><strong>🟦 [T] Condizioni al contorno in generale (regime e caratteristiche entranti; outlet subsonico)</strong></summary>
 
 **Principio** (`caratteristiche.md` §8, `report_QA.md` D.12–13): il **numero di condizioni al contorno da imporre su un bordo = numero di caratteristiche entranti** in quel bordo. Una caratteristica **entrante** porta informazione **da fuori** il dominio (dato mancante → va **imposto**, è una BC); una **uscente** porta informazione **dall'interno** (risalendola si rientra nel campo noto → si **estrapola** via compatibilità $W_k=W_k^{\text{interno}}$). Imporre una BC su una uscente **sovra-determina** il problema e genera **riflessioni spurie**.
 
@@ -253,6 +253,41 @@ Le tre famiglie sono $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$; il **regime*
 Rimedi pratici: run di prova con $p$ → media → $W_1$ → seconda run; oppure **strati assorbenti** (tipico in LES). In turbomacchine si impone $p_0,T_0$ totali a monte e $p$ statica a valle: è esattamente il conteggio delle caratteristiche entranti.
 
 ![Le 4 casistiche delle condizioni al contorno (ingresso/uscita, sub/super)](../teoria/images/lc_bc_quattro_casi.svg)
+
+**Appunti — uscita subsonica.** Nel piano $(x,t)$ le tre caratteristiche $\lambda=\{u-a,\ u,\ u+a\}$: in
+regime **subsonico** $u<a\Rightarrow\lambda_1<0$ (rientra), $\lambda_2,\lambda_3>0$ → **1 sola** condizione
+al contorno. Scelta **non riflettente** (invariante $W_1=a/\phi-u=W_{1c}$, più complessa) vs **riflettente**
+($p_e=p_e$, più facile ma le onde acustiche si **riflettono** sul bordo, come nello schizzo in basso a destra).
+
+![Appunti: uscita subsonica — 3 caratteristiche e BC riflettente/non riflettente](images/lc_uscita_subsonica_appunti.jpg)
+
+</details>
+
+<details>
+<summary><strong>🟦 [T] Condizione al contorno a parete con onda d'urto (caso particolare)</strong></summary>
+
+Riferimento: `teoria/caratteristiche.md`, `teoria/bilancio.md` (Rankine–Hugoniot); esercitazione
+**doppia rampa/presa** (`Latex/doppia_presa.tex`). È un caso che il docente chiede **a sé stante**.
+
+**BC di parete in Eulero = tangenza (impermeabilità).** Su una parete solida non viscosa non si impone una
+pressione né una velocità: si impone che il flusso sia **tangente** alla parete, $\mathbf{u}\cdot\mathbf{n}=0$
+(la parete è una **linea di corrente**). Numericamente si realizza con **celle fantasma / stato specchiato**:
+si riflette la componente **normale** della velocità e si specchiano $p,\rho$ e la componente tangenziale →
+la parete si comporta come un **piano di simmetria**. Non si "contano le caratteristiche" come su ingresso/
+uscita: la condizione è **geometrica** (tangenza).
+
+**Cosa cambia con l'onda d'urto.** Quando un **urto obliquo** incide sulla parete (rampa/presa supersonica),
+la tangenza va **ripristinata a valle**: l'urto incidente devia il flusso verso la parete, e per tornare
+parallelo nasce un **urto riflesso** (**riflessione regolare**). Le relazioni sono quelle dell'**urto obliquo**
+($\theta$–$\beta$–$M$): dato l'angolo di deflessione $\theta$ (imposto dalla geometria) si ricava l'angolo
+d'urto $\beta$ e lo stato a valle. Se la deflessione supera il massimo per la riflessione regolare, si passa
+alla **riflessione di Mach** (gambo di Mach + punto triplo). La **pressione a parete** $p_w$ **salta** al piede
+di ogni urto → l'andamento "a gradini" di $p_{wall}$ visto nella doppia rampa.
+
+**Perché è un caso interessante / entropia in Eulero 2D.** Attraverso l'urto vale **Rankine–Hugoniot**, che
+**non è isentropica**: l'entropia **aumenta** attraverso l'urto anche in **Eulero 2D** (senza viscosità). È il
+motivo per cui, pur risolvendo le equazioni non viscose, il campo mostra una **variazione di entropia** (e una
+**caduta di pressione totale**) concentrata sugli urti e sulle loro riflessioni a parete.
 
 </details>
 
