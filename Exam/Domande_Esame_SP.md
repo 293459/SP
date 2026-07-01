@@ -172,11 +172,13 @@ degli appelli.
 <details>
 <summary><strong>🟦 [T] Equazione di Burgers, collegandosi ai casi delle condizioni al contorno</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (modello di Burgers),
-> `teoria/caratteristiche.md` (condizioni al contorno via caratteristiche), `teoria/metodi_numerici.md`.
-> Attesi: Burgers come **modello scalare non lineare** (formazione di urti, onde di rarefazione,
-> condizione di entropia), e come si traducono le **condizioni al contorno** a seconda del segno
-> delle caratteristiche.
+L'**equazione di Burgers inviscida** è il prototipo di legge di conservazione **scalare non lineare** (in `bilancio.md` è l'archetipo scalare+non lineare, accanto ad advezione, acustica ed Eulero):
+
+$$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrightarrow\;\frac{\partial u}{\partial t}+\frac{\partial}{\partial x}\!\Big(\frac{u^2}{2}\Big)=0,$$
+
+cioè forma **conservativa** con flusso $f=u^2/2$. La **velocità caratteristica** è $f'(u)=u$: **dipende dalla soluzione**, quindi lungo le rette $x=\xi+u_0(\xi)\,t$ la soluzione è costante ($u=\text{cost}$ lungo $dx/dt=u$) ma le rette hanno **pendenze diverse**. Le creste ($u$ alto) corrono più veloci dei ventri → le caratteristiche possono **convergere** (compressione → **urto**) o **divergere** (espansione → **ventaglio di rarefazione**, soluzione autosimile $u=x/t$). Il breaking avviene a $t_b=-1/\min u_0'$ (serve $u_0'<0$). Oltre l'urto la soluzione classica sarebbe multivalore: si sostituisce con una **discontinuità** a velocità data da **Rankine–Hugoniot** $s=[\![f]\!]/[\![u]\!]=(u_A+u_B)/2$, selezionando la soluzione fisica con la **condizione di entropia** (le caratteristiche entrano nell'urto, non ne escono).
+
+**Collegamento alle condizioni al contorno** (`caratteristiche.md`, caso scalare): per conoscere $u$ in $P$ si risale la sua caratteristica. Il **segno** della velocità caratteristica decide dove imporre la BC: se $a>0$ (qui $u>0$) le caratteristiche **entrano** dal bordo sinistro → **BC a sinistra**; se $u<0$ risalgono → **BC a destra**. Regola generale: **# BC su un bordo = # caratteristiche entranti** (info da fuori → si impone; caratteristica uscente → info dall'interno → si estrapola). Burgers è quindi il modello scalare che anticipa la logica di urti/BC delle Eulero.
 
 </details>
 
@@ -184,7 +186,11 @@ degli appelli.
 <details>
 <summary><strong>🟦 [T] Equazione di Burgers</strong></summary>
 
-> 📌 *Risposta da compilare.* Variante "secca" della precedente. Riferimento: `teoria/bilancio.md`.
+L'**equazione di Burgers inviscida** è il modello scalare **non lineare** di riferimento:
+
+$$\frac{\partial u}{\partial t}+u\,\frac{\partial u}{\partial x}=0\;\Longleftrightarrow\;\partial_t u+\partial_x\!\Big(\tfrac{u^2}{2}\Big)=0,$$
+
+**forma conservativa** con flusso $f=u^2/2$. La velocità caratteristica è $f'(u)=u$: **ogni valore viaggia a velocità pari a se stesso**, quindi $u=\text{cost}$ lungo $dx/dt=u$. Poiché le caratteristiche hanno pendenze diverse, possono **convergere** → **urto** (dato $u_0'<0$), o **divergere** → **ventaglio di rarefazione** ($u=x/t$). All'urto vale **Rankine–Hugoniot** $s=[\![f]\!]/[\![u]\!]=(u_A+u_B)/2$, e la **condizione di entropia** seleziona la soluzione fisica (caratteristiche che entrano nell'urto). È l'analogo "giocattolo" di Eulero per studiare la formazione delle discontinuità.
 
 </details>
 
@@ -193,22 +199,13 @@ degli appelli.
 <details>
 <summary><strong>🟦 [T] Esempio del pistone in accelerazione</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md` §6 (toggle "simulazione d'esame").
-> Attesi: pistone che accelera in un condotto → **compressione progressiva** → coalescenza delle
-> onde di compressione in un **urto** (caratteristiche che convergono); caso speculare di espansione
-> con pistone che retrocede.
->
-> **Considerazioni dalla simulazione d'esame:**
-> - **Zone:** a sinistra della faccia del pistone **no gas**, a destra **gas compresso**; la zona
->   **indisturbata** è quella **sotto la prima caratteristica** (dall'origine).
-> - **Dal pistone** ha senso solo $\lambda_3=u+a$ (più veloce di $u_p$): $\lambda_1$ andrebbe nel vuoto,
->   $\lambda_2$ resta sul pistone. (Vale solo per le caratteristiche che originano sul pistone.)
-> - **Pendenza** $dt/dx=1/\lambda$ (l'inverso della velocità); accelerando, le $\lambda_3$ diventano più
->   veloci → meno inclinate → **convergono** → urto (poi **Rankine–Hugoniot**).
-> - **Procedura (invarianti di Riemann):** $W_1(5)=W_1(2)$ con $u_2$ = velocità del pistone (nota) → ricavo
->   $a_2$; poi $W_3(2)=W_3(P)$ e $W_1(4)=W_1(P)$ → stato in $P$. **3 incognite ($a_2,u_P,a_P$), 3 equazioni
->   → determinato.** La velocità del pistone è nota ovunque (legge di moto), ma $a_2$ **no** (il pistone
->   impone solo la cinematica). $S$ ("$\delta$") costante (omoentropico) chiude la termodinamica.
+**Setup** (`caratteristiche.md`, §6): un pistone parte da fermo al **punto morto** (estremità chiusa, tenuta stagna) e **accelera** in un condotto. **A sinistra della faccia non c'è gas** (vuoto → niente mezzo, niente suono); tutto il gas è **a destra** e viene **compresso**. Nel piano $(x,t)$ (con $t$ in ordinata, pendenza $dt/dx=1/\lambda$) la traiettoria del pistone è dapprima verticale ($v=0$) poi si inclina (velocità crescente).
+
+**Quali $\lambda$ dal pistone.** Delle tre famiglie di Eulero $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$, dalla faccia del pistone (velocità $u_p$) entra nel gas **solo** $\lambda_3=u+a$ ($>u_p$, corre in avanti): $\lambda_1$ finirebbe nel vuoto, $\lambda_2$ resta sul pistone (percorso particellare). Accelerando, il pistone emette onde $\lambda_3$ **sempre più veloci** → **caratteristiche convergenti** → **coalescenza in un urto** (stesso meccanismo di Burgers, ma con velocità $u+a$). Sotto la **prima caratteristica** c'è la **zona indisturbata** (stato iniziale uniforme, noto). Caso **speculare**: pistone che si ritira → caratteristiche divergenti → **espansione** (rarefazione).
+
+**Stato in un punto $P$ (invarianti di Riemann).** Nel campo liscio omoentropico si trasportano gli invarianti $J^{\pm}=a/\phi\pm u$ (cost. lungo $\lambda_{3,1}$) e $S$ lungo $\lambda_2$. Con 3 incognite $(a_2,\,u_P,\,a_P)$ e 3 equazioni: $W_1(5)=W_1(2)$ (da punto noto 5 al punto 2 sul pistone, dove $u_2$ = velocità nota del pistone → ricavo $a_2$), $W_3(2)=W_3(P)$ e $W_1(4)=W_1(P)$ (da punto noto 4). Sistema **determinato** → $(a_P,u_P)\to T,p,\rho$.
+
+**Ruolo di Rankine–Hugoniot.** Attraverso l'urto l'**entropia salta** → non si trasportano $J^{\pm}$: si usa **RH** $s=[\![F]\!]/[\![U]\!]$ (massa, q.moto, energia) per il salto; oltre l'urto, nella nuova regione, si riprende con gli **invarianti**.
 
 ![Pistone: due stati (gas/no gas)](../teoria/images/piston_due_stati.svg)
 ![Costruzione dello stato in P con le caratteristiche (frecce dal noto verso P)](../teoria/images/piston_costruzione_P.svg)
@@ -219,9 +216,16 @@ degli appelli.
 <details>
 <summary><strong>🟦 [T] Tubo di Sod</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`, `teoria/caratteristiche.md`.
-> Attesi: problema di Riemann "canonico" (membrana che separa due stati), soluzione con
-> espansione + contatto + urto, uso come **test di validazione** degli schemi.
+Il **tubo di Sod** (`caratteristiche.md`, §7) è il **problema di Riemann** canonico per Eulero 1D: una **membrana** separa due stati costanti **a riposo** con densità e pressione diverse. Nel benchmark storico (Sod, 1978): $(\rho_L,p_L,u_L)=(1,1,0)$ e $(\rho_R,p_R,u_R)=(0.125,0.1,0)$ (rapporti $10:1$ e $8:1$, stesso gas $\gamma$). La soluzione è **autosimile** ($x/t$): rimossa la membrana, dall'origine parte **un'onda per famiglia**.
+
+**Struttura a 3 onde / 4 stati** ($L$, $L^\*$, $R^\*$, $R$):
+- **Ventaglio di rarefazione** (sinistra, $\lambda_1=u-a$): collega $L$ a $L^\*$, **isentropico** → si usano gli invarianti $J^{+}$; variazione **liscia** e continua.
+- **Superficie di contatto** (centro, $\lambda_2=u$): separa $L^\*$ da $R^\*$. Attraverso di essa **pressione e velocità sono continue** ($p^\*,u^\*$ uguali ai due lati), mentre **densità, temperatura ed entropia sono discontinue**. È linearmente degenere: viene solo trasportata a velocità $u$.
+- **Onda d'urto** (destra, $\lambda_3=u+a$): collega $R$ a $R^\*$ via **Rankine–Hugoniot**; salta $p,\rho,u,T$.
+
+**Cosa si vede:** i profili di $p$ e $u$ mostrano solo espansione + urto (il contatto è **invisibile** perché $p,u$ continue); i profili di $\rho$ e $T$ mostrano **tutte e tre** le strutture (il contatto si localizza in densità/temperatura). Si risolve imponendo $p^\*,u^\*$ uguali ai due lati del contatto e cercando l'unico $(p^\*,u^\*)$ che soddisfa entrambe le relazioni acustiche (eq. non lineare in $p^\*$).
+
+**Uso:** avendo **soluzione esatta** e struttura sempre uguale, è il **test di validazione** riproducibile per schemi numerici (Roe, Lax–Friedrichs, Godunov), e il "mattone" che i metodi a volumi finiti risolvono a ogni interfaccia.
 
 ![Profili di Sod: rho, p, u, T (espansione + contatto + urto)](../teoria/images/lc_sod_profili.svg)
 
@@ -231,19 +235,22 @@ degli appelli.
 <details>
 <summary><strong>🟦 [T] Outlet subsonico (e in generale le condizioni al contorno in base al regime)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/caratteristiche.md`, `teoria/report_QA.md`
-> (Domande 12–13). Attesi: numero di **caratteristiche entranti** = numero di condizioni da imporre.
->
-> **Le 4 casistiche** (vedi figura `teoria/images/lc_bc_quattro_casi.svg`):
->
-> | Caso | Bordo | Segni $\lambda_1,\lambda_2,\lambda_3$ | Entranti | **# BC** | Cosa si impone |
-> |---|---|---|---|---|---|
-> | **A** Ingresso supersonico | sx | $+,+,+$ | 3 | **3** | $p_0,T_0,M$ (o $u,S$+1 termo) |
-> | **B** Ingresso subsonico | sx | $-,+,+$ | 2 | **2** | $p_0,T_0$; $\lambda_1$ esce → si estrapola |
-> | **C** Uscita supersonica | dx | $+,+,+$ | 0 | **0** | nulla (tutto estrapolato) |
-> | **D** Uscita subsonica | dx | $-,+,+$ | 1 | **1** | $p$ statica (rifl.) o invariante $W_1$ (non rifl.) |
->
-> Logica: le **entranti** portano info da fuori → si **impongono**; le **uscenti** portano info dall'interno → si **estrapolano** (risalendo la caratteristica). Dettaglio in `teoria/caratteristiche.md` §8.
+**Principio** (`caratteristiche.md` §8, `report_QA.md` D.12–13): il **numero di condizioni al contorno da imporre su un bordo = numero di caratteristiche entranti** in quel bordo. Una caratteristica **entrante** porta informazione **da fuori** il dominio (dato mancante → va **imposto**, è una BC); una **uscente** porta informazione **dall'interno** (risalendola si rientra nel campo noto → si **estrapola** via compatibilità $W_k=W_k^{\text{interno}}$). Imporre una BC su una uscente **sovra-determina** il problema e genera **riflessioni spurie**.
+
+Le tre famiglie sono $\lambda_1=u-a,\ \lambda_2=u,\ \lambda_3=u+a$; il **regime** (segno di $\lambda_1$, l'unico che cambia: subsonico $u<a\Rightarrow\lambda_1<0$) decide quante entrano:
+
+| Bordo / regime | $\lambda_1$ | # BC | Cosa si impone / estrapola |
+|---|---|---|---|
+| **Ingresso supersonico** | $+$ (entra) | **3** | tutto lo stato ($p_0,T_0,M$); nulla estrapolato |
+| **Ingresso subsonico** | $-$ (esce) | **2** | $p_0,T_0$ (2 termodinamiche); $u$ via $W_1$ estrapolato |
+| **Uscita supersonica** | $+$ (esce) | **0** | nulla imposta; tutto estrapolato dall'interno |
+| **Uscita subsonica** | $-$ (rientra) | **1** | 1 BC; $W_2,W_3$ estrapolati |
+
+**Uscita subsonica** (il caso chiave): $\lambda_1=u-a<0$ **rientra** dall'esterno → serve **1** condizione. Due scelte:
+- **Pressione statica $p$** di valle: semplice e robusta, ma **riflettente** — fissare $p$ impedisce alla pressione di variare e genera un'**onda acustica fittizia** riflessa che falsa il campo;
+- **Invariante $W_1=a/\phi-u$** entrante: **non riflettente** (serve però un valore di riferimento).
+
+Rimedi pratici: run di prova con $p$ → media → $W_1$ → seconda run; oppure **strati assorbenti** (tipico in LES). In turbomacchine si impone $p_0,T_0$ totali a monte e $p$ statica a valle: è esattamente il conteggio delle caratteristiche entranti.
 
 ![Le 4 casistiche delle condizioni al contorno (ingresso/uscita, sub/super)](../teoria/images/lc_bc_quattro_casi.svg)
 
@@ -344,27 +351,55 @@ sta nel cerchio unitario $\iff \boxed{\nu\le1}$ (**CFL**). → **condizionatamen
 <details>
 <summary><strong>🟦 [T] Integrazione temporale con metodi espliciti ed impliciti</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: Eulero esplicito vs implicito, Runge–Kutta, costo per passo vs ampiezza del $\Delta t$,
-> **stiffness**, A-stabilità.
+Nel **metodo delle linee** si discretizza prima lo spazio ottenendo un sistema di ODE $\dfrac{dU}{dt}=R(U)$, poi si integra in tempo. La dicotomia riguarda **come si valuta $u^{n+1}$**:
+
+- **Esplicito:** $u^{n+1}$ dipende **solo dal passato** (livelli $n, n-1,\dots$). Aggiornamento con **formula esplicita**, facile, basso costo/memoria per passo e ottima **scalabilità parallela**.
+- **Implicito:** $u^{n+1}$ dipende **anche da sé stesso**, quindi ad ogni passo si deve **risolvere un sistema** (lineare o non lineare), con maggior costo e memoria.
+
+**Costo per passo vs stabilità.** Gli espliciti hanno **stabilità condizionata**: regione di assoluta stabilità limitata, da cui il vincolo **CFL** $\;\nu=\dfrac{a\,\Delta t}{\Delta x}\le1$ (per i termini diffusivi ancora più severo, $\Delta t\lesssim\Delta x^2/2\alpha$). Gli impliciti hanno regione molto ampia (spesso **A-stabili**): $\Delta t$ **arbitrario** senza vincoli di stabilità, al prezzo del sistema da risolvere.
+
+**Quando usare l'uno o l'altro.** Espliciti per problemi **instazionari** in cui serve comunque un $\Delta t$ piccolo (es. **DNS**, alte frequenze): il CFL non penalizza. Impliciti per **analisi stazionarie** (si "salta" alla soluzione asintotica con $\Delta t$ grande) e per problemi **stiff** (autovalori con $\mathrm{Re}\,\lambda$ molto negativa): l'implicito evita il passo minuscolo imposto dall'autovalore più piccolo.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Scrivere la formula dello schema numerico per il metodo esplicito e implicito</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: $\mathbf{U}^{n+1} = \mathbf{U}^n + \Delta t\,\mathbf{R}(\mathbf{U}^n)$ (esplicito) vs
-> $\mathbf{U}^{n+1} = \mathbf{U}^n + \Delta t\,\mathbf{R}(\mathbf{U}^{n+1})$ (implicito), con la
-> linearizzazione/Jacobiano per l'implicito.
+Per l'ODE $\dfrac{du}{dt}=f(u)$:
+
+- **Eulero esplicito:** $\;u^{n+1}=u^{n}+\Delta t\,f(u^{n})\;$ → calcolo **diretto**.
+- **Eulero implicito:** $\;u^{n+1}=u^{n}+\Delta t\,f(u^{n+1})\;$ → serve **risolvere un'equazione**.
+
+Nota: la sola presenza di $t_{k+1}$ non rende implicito il metodo (i nodi sono noti); è la dipendenza da $u^{n+1}$ a renderlo tale.
+
+**Trasporto $u_t+a\,u_x=0$ con upwind ($a>0$).** Derivata spaziale *all'indietro* (da monte):
+
+Forma **esplicita** (spazio al livello $n$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n}-u_{j-1}^{n}}{\Delta x}=0
+\;\Rightarrow\; u_j^{n+1}=u_j^{n}-\nu\,(u_j^{n}-u_{j-1}^{n}),\quad \nu=\frac{a\,\Delta t}{\Delta x}.$$
+
+Forma **implicita** (spazio al livello $n+1$):
+$$\frac{u_j^{n+1}-u_j^{n}}{\Delta t}+a\,\frac{u_j^{n+1}-u_{j-1}^{n+1}}{\Delta x}=0
+\;\Rightarrow\;(1+\nu)\,u_j^{n+1}-\nu\,u_{j-1}^{n+1}=u_j^{n}.$$
+
+**Struttura a matrice nell'implicito.** Raccogliendo le incognite $\mathbf{u}^{n+1}$, l'equazione per tutti i nodi diventa un **sistema lineare** $\;A\,\mathbf{u}^{n+1}=\mathbf{u}^{n}$, con $A$ **bidiagonale** (upwind) — o **tridiagonale** per lo schema centrato implicito. La matrice è **sparsa**; si risolve con metodi diretti (2D) o iterativi con precondizionatore (3D).
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Stabilità di uno schema numerico generico e poi per il metodo implicito</strong></summary>
 
-> 📌 *Risposta da compilare.* Variante combinata: parte generale + **stabilità del metodo implicito**
-> (A-stabilità, incondizionata). Riferimento: `teoria/metodi_numerici.md`.
+**Analisi di von Neumann (caso generale).** La stabilità misura l'errore di **propagazione**: uno schema è stabile se gli errori **non crescono** illimitatamente. Si decompone l'errore in **modi di Fourier** spaziali, $e_j^{n}=E^{n}e^{i\beta x_j}$; la parte spaziale $e^{i\beta x}$ è pura fase ($|e^{i\beta x}|=1$), tutta l'ampiezza sta in $E^{n}$. Sostituendo nello schema e dividendo per $E^{n}e^{i\beta j\Delta x}$ si ricava il **fattore di amplificazione**
+$$G=\frac{E^{n+1}}{E^{n}},\qquad \text{stabilità}\iff |G(\beta)|\le1\ \ \forall\,\beta.$$
+È la traduzione di Fourier del principio generale (**Lax–Richtmyer**): le potenze dell'operatore di avanzamento restano limitate.
+
+**Esplicito (upwind, $a>0$).** $u_j^{n+1}=u_j^{n}-\nu(u_j^{n}-u_{j-1}^{n})$ dà
+$$G=(1-\nu)+\nu e^{-i\theta},\quad \theta=\beta\Delta x,$$
+un **cerchio** di centro $(1-\nu,0)$ e raggio $\nu$: sta nel cerchio unitario solo se $\nu\le1$ → stabilità **condizionata** dalla **CFL** $\nu\le1$.
+
+**Implicito (upwind implicito).** Da $(1+\nu)u_j^{n+1}-\nu u_{j-1}^{n+1}=u_j^{n}$:
+$$G=\frac{1}{1+\nu\,(1-e^{-i\theta})}.$$
+Il denominatore ha parte reale $\ge1$ per **ogni** $\theta$ e ogni $\nu>0$, quindi $|G|\le1$ **SEMPRE**. Lo schema è **incondizionatamente stabile** (come il centrato implicito): $\Delta t$ libero, nessun vincolo CFL. Il prezzo è la risoluzione di un **sistema** ad ogni passo — ecco perché gli impliciti, pur più costosi, si usano: la loro **regione di assoluta stabilità è molto ampia**.
 
 </details>
 
@@ -374,60 +409,97 @@ sta nel cerchio unitario $\iff \boxed{\nu\le1}$ (**CFL**). → **condizionatamen
 <details>
 <summary><strong>🟦 [T] Calcolo del gradiente nelle celle (Gauss–Green e minimi quadrati pesati) e all'interfaccia per i termini diffusivi</strong></summary>
 
-> 📌 *Risposta da compilare — verrà fornita la spiegazione dell'utente, da rifinire.*
-> Riferimento: `teoria/metodi_numerici.md` (ricostruzione e gradienti) e `teoria/meshing.md`.
-> Punti chiave attesi: gradiente di cella con il **teorema di Gauss–Green** (integrale di superficie
-> dei valori di faccia), **minimi quadrati pesati** (sistema sui vicini, peso $\propto 1/d$), e
-> il gradiente **all'interfaccia** necessario per i **flussi diffusivi** (media + correzione
-> di non-ortogonalità).
+Nei volumi finiti l'incognita è la **media di cella** $U_j$; per la ricostruzione al 2° ordine e per i flussi **diffusivi** ($\propto\nabla u$) serve stimare il **gradiente**.
+
+**Green–Gauss.** Dal teorema della divergenza sul volume $V_P$: il gradiente medio in cella è la somma dei valori di faccia pesati per le **normali**, diviso il **volume**,
+$$\nabla U_P\;\approx\;\frac{1}{V_P}\sum_{f}\,u_f\,\mathbf{n}_f\,A_f,$$
+con $u_f$ interpolato sulla faccia, $\mathbf{n}_f$ normale uscente, $A_f$ area. Economico e conservativo, ma perde accuratezza su **mesh distorte**.
+
+**Minimi quadrati pesati.** Si impone la variazione lineare $U_{nb}-U_P\approx\nabla U_P\cdot(\mathbf{x}_{nb}-\mathbf{x}_P)$ sui vicini, con **peso** $w_{nb}\sim1/\|\mathbf{x}_{nb}-\mathbf{x}_P\|$. Più robusto su griglie irregolari.
+
+**Gradiente all'INTERFACCIA.** Per i termini diffusivi serve il gradiente **sulla faccia** tra $P$ e il vicino $N$ ($\propto \nabla u\cdot\mathbf{n}_f A_f$). La componente lungo $PN$ si stima con la differenza compatta
+$$\nabla u\cdot\mathbf{n}_f\;\approx\;\frac{U_N-U_P}{\|\mathbf{x}_N-\mathbf{x}_P\|}.$$
+
+**Problema dell'ortogonalità.** Questa formula è esatta solo se $PN$ è **ortogonale** alla faccia. Su mesh **non ortogonali** si introduce una **correzione**: si separa il flusso in parte **ortogonale** (differenza compatta $U_N-U_P$) e parte **tangenziale/di correzione** valutata con i gradienti di cella (Green–Gauss/LSQ) interpolati alla faccia. Senza correzione si perde accuratezza e robustezza.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Limitatori di pendenza per griglie strutturate e non strutturate</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: motivazione (monotonicità / TVD, evitare oscillazioni spurie a cavallo delle
-> discontinuità), limitatori classici (minmod, Van Leer, Barth–Jespersen / Venkatakrishnan per
-> mesh non strutturate), differenza nello **stencil** tra strutturato e non strutturato.
+**Perché servono (barriera di Godunov).** Il **teorema barriera di Godunov** afferma che uno schema **lineare e monotono** è al più del **1° ordine**. Per avere il **2° ordine senza oscillazioni** (wiggles vicino agli urti) bisogna rendere lo schema **non lineare**: si ricostruisce una pendenza lineare in cella (**MUSCL**) e la si **limita** dove la soluzione è brusca, ottenendo la proprietà **TVD**.
+
+**Strutturate — rapporto di pendenze.** Si definisce il rapporto tra pendenze consecutive $\;r=\dfrac{u_j-u_{j-1}}{u_{j+1}-u_j}\;$ e la pendenza limitata è $\phi(r)\cdot(\text{pendenza})$. Limitatori tipici:
+- **minmod:** $\ \mathrm{minmod}(a,b)=\begin{cases}a & |a|<|b|,\ ab>0\\ b & |b|<|a|,\ ab>0\\ 0 & ab\le0\end{cases}$ — il più **dissipativo/robusto** (sceglie la pendenza minore, azzera sugli estremi).
+- **superbee:** $\ \phi(r)=\max\big(0,\min(2r,1),\min(r,2)\big)$ — il più **compressivo** (mantiene ripidi i fronti), al limite superiore della regione TVD.
+
+**Non strutturate — limitatori multidimensionali.** Manca la nozione di "cella precedente/successiva" e il rapporto $r$ 1D. Si usano limitatori **multidimensionali** sulla ricostruzione $u_f=U_P+\Phi_P\,\nabla U_P\cdot(\mathbf{x}_f-\mathbf{x}_P)$, con $\Phi_P\in[0,1]$ scelto perché il valore ricostruito su ogni faccia **non superi** il min/max dei vicini (principio del massimo): **Barth–Jespersen** (esatto ma non differenziabile → può bloccare la convergenza) e **Venkatakrishnan** (versione **liscia/differenziabile**, migliore per lo stato stazionario).
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Limitatori per mesh strutturate e non, spiegando la precisione di macchina in termini di ordine di accuratezza</strong></summary>
 
-> 📌 *Risposta da compilare.* Variante della precedente. Aggancio extra: come la **precisione di
-> macchina** (round-off) pone un **limite inferiore** all'errore raggiungibile e interagisce con
-> l'**ordine di accuratezza** (oltre un certo raffinamento l'errore di troncamento scende sotto il
-> round-off e non si guadagna più). Riferimento: `teoria/metodi_numerici.md`.
+**Perché i limitatori (in breve).** Per il **teorema barriera di Godunov** uno schema lineare monotono è al più di 1° ordine; per il **2° ordine senza oscillazioni** si rende lo schema **non lineare** limitando la pendenza (ricostruzione **MUSCL**, proprietà **TVD**).
+- **Strutturate:** limitatore $\phi(r)$ sul rapporto $r=\dfrac{u_j-u_{j-1}}{u_{j+1}-u_j}$; es. **minmod** (robusto), **superbee** (compressivo).
+- **Non strutturate:** limitatori **multidimensionali** su $u_f=U_P+\Phi_P\,\nabla U_P\cdot(\mathbf{x}_f-\mathbf{x}_P)$ con $\Phi_P\in[0,1]$: **Barth–Jespersen** e **Venkatakrishnan** (liscio).
+
+**Precisione di macchina e ordine di accuratezza.** L'**ordine** $p$ dice quanto velocemente decresce l'**errore di troncamento**, $E_{\text{tronc}}=\mathcal{O}(\Delta x^{p})$. Ma l'errore totale è la somma di **due contributi opposti**:
+- **errore di troncamento**, che **diminuisce** raffinando;
+- **errore di round-off** (di **precisione di macchina**, $\sim\varepsilon_{mach}\approx10^{-16}$ in doppia precisione), che **non dipende** dall'ordine e tende ad **aumentare** raffinando (più operazioni, differenze tra numeri vicini).
+
+Finché il **troncamento domina**, aumentare l'ordine (o raffinare) fa scendere l'errore lungo la pendenza $p$. Quando il troncamento scende **sotto il round-off**, l'errore totale **satura** al livello della precisione di macchina: la curva log–log si appiattisce e spingere ancora l'ordine **non ha più senso**. In sintesi: **l'ordine di accuratezza è utile solo nel regime in cui il troncamento domina il round-off.**
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Calcolo dei gradienti: tutti e 3 i metodi (Green–Gauss, minimi quadrati, minimi quadrati pesati) con esempi</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: i **tre** approcci, vantaggi/limiti (Green–Gauss sensibile alla qualità mesh; minimi
-> quadrati più robusto su mesh distorte; pesatura per dare più importanza ai vicini vicini),
-> con esempio numerico/geometrico.
+Nei volumi finiti l'incognita è la media di cella $U_P$; per la **ricostruzione** al 2° ordine e per i flussi **diffusivi** serve $\nabla U_P$. Tre metodi:
+
+**1) Green–Gauss.** Dal teorema della divergenza sul volume $V_P$:
+$$\nabla U_P\approx\frac{1}{V_P}\sum_{f} u_f\,\mathbf{n}_f\,A_f,$$
+con $u_f$ interpolato alle facce. *Logica:* "media dei valori di faccia per le normali, diviso il volume". Economico e conservativo; su griglia cartesiana uniforme recupera la differenza centrata $\tfrac{U_E-U_W}{2\Delta x}$. Sensibile a **distorsione**.
+
+**2) Minimi quadrati (LSQ).** Si impone la variazione lineare sui vicini:
+$$U_{nb}-U_P\approx\nabla U_P\cdot(\mathbf{x}_{nb}-\mathbf{x}_P)\quad\forall\,nb,$$
+sistema **sovradeterminato** risolto ai minimi quadrati ($\nabla U_P=(A^TA)^{-1}A^T\,\mathbf{b}$). *Esempio:* con 4 vicini in 2D si hanno 4 equazioni per 2 incognite $(\partial_x U,\partial_y U)$.
+
+**3) Minimi quadrati pesati (WLSQ).** Come sopra ma con **peso** $w_{nb}\sim 1/\|\mathbf{x}_{nb}-\mathbf{x}_P\|$: si minimizza $\sum_{nb} w_{nb}\big(U_{nb}-U_P-\nabla U_P\cdot\Delta\mathbf{x}\big)^2$.
+
+**Quando pesare e perché migliora.** Su **mesh distorte/stretchate** (celle molto diverse, es. strato limite) i vicini lontani, se non pesati, "sporcano" la stima. Il peso $\sim 1/d$ dà più importanza ai vicini **vicini**, dove l'ipotesi di linearità è più valida: ricostruzione più **accurata e robusta** rispetto sia al Green–Gauss (che degrada con la distorsione) sia al LSQ non pesato.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Gradiente all'interfaccia e metodo dei minimi quadrati pesati</strong></summary>
 
-> 📌 *Risposta da compilare.* Sottocaso delle precedenti, focalizzato su **interfaccia** (flussi
-> diffusivi) + **WLSQ**. Riferimento: `teoria/metodi_numerici.md`.
+**Perché il gradiente sulla FACCIA.** I termini **diffusivi/viscosi** delle Navier–Stokes (proporzionali a $\mu,k$) sono flussi $\propto\nabla u\cdot\mathbf{n}_f\,A_f$, valutati **sulle facce** del volume di controllo. Serve quindi il gradiente **all'interfaccia** tra la cella $P$ e il vicino $N$.
+
+**Stima diretta (parte ortogonale).** La componente di $\nabla u$ lungo la congiungente $PN$:
+$$\nabla u\cdot\mathbf{n}_f\;\approx\;\frac{U_N-U_P}{\|\mathbf{x}_N-\mathbf{x}_P\|},$$
+accurata e stabilizzante (stencil compatto), ma **esatta solo se** $PN\parallel\mathbf{n}_f$ (mesh ortogonale).
+
+**Ruolo dei minimi quadrati pesati.** Per il gradiente **completo** (tutte le componenti) si usano i gradienti di cella calcolati con **WLSQ**: si impone $U_{nb}-U_P\approx\nabla U_P\cdot(\mathbf{x}_{nb}-\mathbf{x}_P)$ su tutti i vicini con peso $w_{nb}\sim 1/\|\mathbf{x}_{nb}-\mathbf{x}_P\|$. Il gradiente sulla faccia si ottiene **interpolando** $\nabla U_P,\nabla U_N$. Il peso $1/d$ rende la stima robusta su mesh **distorte/stretchate** (strati limite).
+
+**Correzione di non-ortogonalità.** Su mesh non ortogonali si **splitta** il flusso diffusivo:
+$$\nabla u\cdot\mathbf{n}_f = \underbrace{\frac{U_N-U_P}{\|\mathbf{x}_N-\mathbf{x}_P\|}}_{\text{ortogonale (compatto)}} + \underbrace{\big(\overline{\nabla u}_f\cdot\mathbf{n}_f - \overline{\nabla u}_f\cdot\hat{\mathbf{e}}_{PN}\big)}_{\text{correzione tangenziale}},$$
+con $\overline{\nabla u}_f$ dai gradienti WLSQ interpolati. La parte ortogonale garantisce robustezza, la correzione recupera l'**accuratezza** persa dalla distorsione.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Schemi di ordine superiore al primo nello spazio (intro generica) e calcolo della pendenza per griglie strutturate</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: dal **primo ordine** (Godunov) alla **ricostruzione MUSCL** (pendenza/slope), upwind vs
-> centrati, ruolo del limitatore; calcolo della **pendenza** su griglia strutturata (differenze su
-> stencil regolare).
+**Introduzione (alto ordine).** Gli schemi base (upwind, Godunov del 1° ordine) sono molto **diffusivi** e "spalmano" gli urti. Salire al **2° ordine** riduce la dissipazione, ma per il **teorema barriera di Godunov** uno schema lineare monotono è al più del 1° ordine → serve uno schema **non lineare** (limitatori/WENO). L'approccio classico è la **ricostruzione lineare in cella (MUSCL)**: invece di $u$ costante (Godunov), si assume che vari **linearmente**,
+$$u(x)=U_j+s_j\,(x-x_j),$$
+con $s_j$ **pendenza** in cella. I valori ricostruiti alle interfacce sono $u_{j+1/2}^{L}=U_j+\tfrac{\Delta x}{2}s_j$, $u_{j-1/2}^{R}=U_j-\tfrac{\Delta x}{2}s_j$, in input al solutore di Riemann → **2° ordine** nelle regioni lisce.
+
+**Calcolo della pendenza su griglia strutturata.** Con le **differenze tra celle adiacenti**:
+$$s_j^{-}=\frac{U_j-U_{j-1}}{\Delta x}\ (\text{backward}),\qquad s_j^{+}=\frac{U_{j+1}-U_j}{\Delta x}\ (\text{forward}),$$
+o la centrata $\tfrac{U_{j+1}-U_{j-1}}{2\Delta x}$.
+
+**Limitazione (rapporto $r$ + limitatore).** La pendenza "cruda" ridà oscillazioni; si definisce il **rapporto** $\;r=\dfrac{U_j-U_{j-1}}{U_{j+1}-U_j}\;$ e si limita $s_j=\phi(r)\cdot s_j^{+}$ con un limitatore **TVD** $\phi(r)\in[0,2]$: **minmod** (robusto, azzera $s_j$ sugli estremi $r\le0$), **van Leer**, **superbee** (compressivo). Così lo schema è **2° ordine** dove la soluzione è liscia e **degrada a 1° ordine** vicino a urti/estremi, evitando i wiggles.
 
 </details>
 
@@ -461,56 +533,104 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] Metodo di Godunov</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`
-> (Godunov/Riemann, flux splitting, Roe). Attesi: ricostruzione costante a tratti → **problema di
-> Riemann** a ogni interfaccia → flusso esatto/approssimato; primo ordine; legame con l'upwind.
+**Idea centrale.** Godunov assume la soluzione **costante a tratti**: in ogni cella la variabile conservata è la sola **media di cella** $U_j$ (schema del **1° ordine**). Ogni interfaccia $j+\tfrac12$ separa due stati costanti $U_j,\,U_{j+1}$ e definisce un **problema di Riemann locale**.
+
+**Calcolo del flusso.** Si risolve il **problema di Riemann esatto** a ogni interfaccia: la sua soluzione è un ventaglio di onde (**rarefazione, contatto, urto**). Il flusso numerico $F_{j+\frac12}$ si legge lungo $x/t=0$ (l'asse del tempo), da cui l'aggiornamento
+
+$$U_j^{n+1} = U_j^n - \frac{\Delta t}{\Delta x}\left[F_{j+\frac12} - F_{j-\frac12}\right].$$
+
+**Perché è fisicamente interessante.** Il flusso all'interfaccia **non è una media arbitraria**: viene dalla **vera struttura d'onda** delle equazioni iperboliche, cioè dalla fisica reale con cui evolve una discontinuità. Lo schema è costruito sulla **fisica** del problema, non su un'interpolazione: robusto e non oscillatorio.
+
+**CFL.** Ha interpretazione fisica diretta: $\Delta t$ deve essere tanto piccolo da impedire che le onde di due problemi di Riemann **adiacenti si sovrappongano** nel passo, altrimenti il problema locale perde validità: $\;\text{CFL}=\lambda_{max}\,\Delta t/\Delta x\le 1$.
+
+**Contro.** Risolvere il Riemann **esatto** per Eulero è **iterativo e costoso** (a ogni faccia). Per questo in pratica si usano solutori **approssimati** (Roe, HLLC, Rusanov). Resta lo schema **upwind FDS per eccellenza** e il riferimento concettuale di tutti gli altri.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Problema di Riemann e tubo d'urto di Sod: applicazione al calcolo dei flussi all'interfaccia tra celle (perché farlo, come si usa nel CFD, ODE risultante), metodi di risoluzione del problema di Riemann e metodo di Godunov</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`,
-> `teoria/caratteristiche.md`. Attesi: struttura a **3 onde** (urto, contatto, espansione), perché
-> all'interfaccia tra celle nasce un problema di Riemann locale, risolutori **esatti vs approssimati**
-> (Roe, HLL/HLLC), e il metodo di **Godunov**.
+**Perché è il mattone del FVM.** Nel metodo dei volumi finiti la variabile è la **media di cella** $U_j=\tfrac1{\Delta x}\int u\,dx$, quindi il dato è naturalmente **costante a tratti**. Ogni interfaccia $j+\tfrac12$ separa due stati costanti $U_L,U_R$: è esattamente un **problema di Riemann**, cioè una PDE iperbolica con dato a gradino ($u=u_L$ per $x<0$, $u_R$ per $x>0$). La sua soluzione (onde di **rarefazione, contatto, urto**) fornisce il **flusso all'interfaccia**. L'esempio canonico è il **tubo d'urto di Sod**.
+
+**ODE risultante (semidiscretizzazione).** Integrando la forma conservativa sulla cella e valutando i flussi alle facce si ottiene la forma **semi-discreta**, un sistema di **ODE nel tempo**:
+
+$$\frac{dU_j}{dt} = -\frac{F_{j+\frac12}-F_{j-\frac12}}{\Delta x}.$$
+
+Il problema PDE è ridotto a un'ODE integrabile con Runge–Kutta o Eulero (**metodo delle linee**); i flussi $F_{j\pm\frac12}$ vengono dal Riemann.
+
+**Metodi di risoluzione del Riemann.**
+- **Esatto:** vera struttura d'onda, ma **iterativo e costoso** a ogni faccia.
+- **Approssimati:** **Roe** (linearizza con $\bar A$ tale che $\bar A\,\Delta U=\Delta F$; serve **entropy fix** sugli urti sonici), **Osher–Engquist–Pandolfi** (rarefazione anziché urto), **HLL/HLLC** (poche onde stimate dalle velocità estreme). Più economici e robusti.
+
+**Godunov.** Applica il **Riemann esatto** a ogni interfaccia e legge $F_{j+\frac12}$ in $x/t=0$: schema del **1° ordine**, robusto, fisicamente fondato, con **CFL** $\lambda_{max}\Delta t/\Delta x\le1$ che impedisce la sovrapposizione delle onde adiacenti.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Schemi di Lax(–Friedrichs) e Jameson–Schmidt–Turkel (JST)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md`.
-> Attesi: **Lax–Friedrichs** (centrato + dissipazione $\propto \lambda_{max}$), **JST** (centrato con
-> dissipazione artificiale del 2°/4° ordine commutata da sensore di pressione), pro/contro.
+Sono **schemi centrati**: il flusso alla faccia è una **media aritmetica** più un **termine dissipativo** che stabilizza (un centrato puro sarebbe **instabile** sui termini convettivi).
+
+**Lax–Friedrichs / Rusanov.** Alla media si aggiunge una dissipazione **scalare** proporzionale alla massima velocità d'onda:
+
+$$F_{j+\frac12}^{LF} = \frac{1}{2}(F_j + F_{j+1}) - \frac{\lambda_{max}}{2}(U_{j+1} - U_j).$$
+
+Il termine $-\tfrac{\lambda_{max}}{2}\Delta U$ è dissipazione numerica. Nella versione **globale** $\lambda_{max}$ (e i $\Delta x,\Delta t$) sono presi sull'intero dominio → **semplice ma molto diffusivo**. Nella versione **locale / Rusanov** si usa $\lambda_{max}=\max(|\lambda_j|,|\lambda_{j+1}|)$ **locale**: robusto ed economico, meno diffusivo.
+
+**JST (Jameson–Schmidt–Turkel).** Anch'esso centrato, ma con **viscosità artificiale adattiva** combinazione di due termini:
+- **2° ordine**, attivato da un **sensore di pressione** (switch) vicino a **discontinuità/urti**, per catturarli senza oscillazioni;
+- **4° ordine**, attivo nelle regioni **lisce**, molto meno diffusivo, per non degradare l'accuratezza.
+
+Il sensore "accende" il termine giusto localmente. Risultato: schema **efficiente**, meno diffusivo del Lax–Friedrichs, **largamente usato in industria** (aerodinamica compressibile). **Contro:** richiede la **taratura dei coefficienti** di dissipazione.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Equazioni di Eulero 2D, discretizzazione a volumi finiti (arrivare a $\mathrm{d}\mathbf{U}/\mathrm{d}t = \sum \text{flussi}$), panoramica degli schemi per i flussi convettivi e illustrare Jameson</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/bilancio.md` (sistema di Eulero),
-> `teoria/metodi_numerici.md`. Attesi: forma conservativa, integrazione sul volume di controllo,
-> teorema della divergenza → bilancio dei flussi sulle facce, semidiscretizzazione, poi rassegna
-> schemi e dettaglio **Jameson**.
+**Punto di partenza.** Le equazioni di Eulero sono le Navier–Stokes con $\mu=k=0$: resta il solo **flusso convettivo** $\mathbf F^c$, in forma **conservativa** $\;\partial_t \mathbf U + \nabla\cdot\mathbf F^c(\mathbf U)=0$.
+
+**Forma integrale sulla cella.** Integrando sul volume di controllo $\Omega_i$ e applicando il teorema della divergenza, l'integrale di volume del flusso diventa un **integrale sul contorno** (le facce):
+
+$$\frac{d}{dt}\int_{\Omega_i}\mathbf U\,d\Omega = -\oint_{\partial\Omega_i}\mathbf F^c\cdot \mathbf n\,dS.$$
+
+Introducendo la **media di cella** $\mathbf U_i$ e sommando sulle facce si arriva alla forma **semi-discreta**:
+
+$$\frac{d\mathbf U_i}{dt} = -\frac{1}{|\Omega_i|}\sum_{\text{facce}} \mathbf F^c\cdot \mathbf n\,\Delta S.$$
+
+Il cuore del metodo è il calcolo del **flusso su ciascuna faccia**.
+
+**Panoramica degli schemi convettivi.**
+- **Upwind:** **FDS** (spezzano la differenza $\Delta F=F_R-F_L$ via Jacobiana: Godunov, Roe, HLLC) e **FVS** (spezzano il vettore $F=F^++F^-$: Steger–Warming, van Leer, AUSM+).
+- **Centrati:** media + dissipazione (Lax–Friedrichs, Rusanov, **Jameson**).
+- **Alto ordine:** WENO, DG.
+
+**Jameson (JST).** Schema **centrato**: flusso $\tfrac12(\mathbf F_i+\mathbf F_j)$ più una **viscosità artificiale adattiva**. Uno **switch/sensore di pressione** attiva il termine di **2° ordine** vicino agli urti (cattura senza oscillazioni) e lascia agire il termine di **4° ordine** nelle zone lisce (poco diffusivo). È **efficiente e molto usato in industria**, al prezzo della **taratura** dei coefficienti.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] Metodi WENO e Discontinuous Galerkin (esempio 2D e formulazione variazionale)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/metodi_numerici.md` (approfondimenti
-> WENO/DG). Attesi: **WENO** (combinazione pesata di stencil, pesi non lineari per evitare gli
-> stencil che attraversano la discontinuità), **DG** (incognite = coefficienti modali per cella,
-> **formulazione debole/variazionale**, flussi numerici tra elementi), esempio 2D.
+Sono schemi di **ordine elevato nello spazio**, pensati per unire **alta accuratezza** e **cattura degli urti**.
+
+**WENO (Weighted Essentially Non-Oscillatory).** Obiettivo: ricostruire i valori alle facce con **alto ordine** ma **senza oscillazioni spurie** (fenomeno di **Gibbs**: un polinomio di grado alto vicino a una discontinuità oscilla). Invece di un unico polinomio, si usano **più sotto-stencil**, ognuno con una ricostruzione candidata; a ciascuno si assegna un **peso non lineare** $\omega_k$ basato su un **indicatore di regolarità** $\beta_k$. Vicino a una discontinuità il sotto-stencil che la attraversa ha $\beta_k\gg1$, quindi $\omega_k\approx0$: contribuiscono solo i sotto-stencil **dal lato regolare**, impedendo le oscillazioni; nelle zone lisce i pesi tendono ai valori ottimali e si recupera l'ordine massimo.
+
+**DG (Discontinuous Galerkin).** In ogni elemento la soluzione è un **polinomio**: $u_h=\sum_i \hat a_i\phi_i$, con $\phi_i$ funzioni di base e $\hat a_i$ **gradi di libertà**. Con $p=0$ ($\phi=1$) si ricade nella **media di cella** → **FV = DG di grado 0**. La formulazione è **variazionale/debole**: si moltiplica per una funzione test e si integra sull'elemento. DG **ammette discontinuità alle interfacce** e usa **flussi numerici upwind** (solutori di Riemann) per accoppiare gli elementi → adatto agli **shock**, con **conservazione locale** e alta accuratezza nelle regioni lisce.
+
+**Esempio 2D.** Su una mesh di triangoli con $p=1$ ogni elemento ha 3 DOF ($\phi_1=1,\ \phi_2=\xi,\ \phi_3=\eta$); il sistema semi-discreto è $[M]\dot{\hat a}=\{R\}$, con $M$ **matrice di massa** invertibile per elemento.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] WENO 5 e Galerkin Discontinuo</strong></summary>
 
-> 📌 *Risposta da compilare.* Variante della precedente, focus su **WENO di ordine 5** (3 sottostencil)
-> e DG. Riferimento: `teoria/metodi_numerici.md`, immagine `weno5_stencil_sottogruppi.jpg`.
+**WENO5.** Obiettivo: **ordine 5** senza le oscillazioni (**over/undershoot**, il Gibbs discreto: pressione o densità negative sono catastrofiche). Su una finestra di 5 punti $\{j-2,\dots,j+2\}$, anziché costruire direttamente un **polinomio di grado 4** (che oscilla vicino a uno shock), WENO5 usa **3 sotto-stencil parabolici** (grado 2) sovrapposti, **da 3 punti** ciascuno. Ognuno dà una ricostruzione candidata di ordine 3; a ciascuno si assegna un **peso non lineare** $\omega_k$ basato su un **indicatore di regolarità** $\beta_k$.
+
+- **Zona liscia:** tutti i $\beta_k\approx0$, i pesi tendono a quelli **ottimali** $d_k$; per cancellazione degli errori la combinazione raggiunge **ordine 5**.
+- **Vicino a una discontinuità:** il sotto-stencil che la attraversa ha $\beta_k\gg1\Rightarrow\omega_k\approx0$; contribuiscono solo i sotto-stencil **dal lato regolare**, quindi la ricostruzione **non oscilla** (l'ordine degrada localmente: è il trade-off accuratezza/non-oscillatorietà). Ai punti critici ($u'=0$) il WENO5 classico scende a ordine 3; **WENO-Z/WENO-M** correggono i pesi.
+
+**Discontinuous Galerkin.** In ogni elemento la soluzione è un **polinomio** $u_h=\sum_i\hat a_i\phi_i$: i **gradi di libertà** sono i coefficienti (la media di cella del FV è il caso $p=0$). Formulazione **debole**: si moltiplica per una funzione test e si integra, ottenendo $[M]\dot{\hat a}=\{R\}$. DG **ammette discontinuità alle interfacce** e usa **flussi upwind** (Riemann) → **alto ordine + conservazione**, naturalmente adatto agli shock.
 
 </details>
 
@@ -520,19 +640,37 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] RANS</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/turbolenza.md`.
-> Attesi: media di Reynolds, **tensore degli sforzi di Reynolds**, problema di chiusura, modelli
-> (Spalart–Allmaras, $k$–$\varepsilon$, $k$–$\omega$ SST), ipotesi di Boussinesq.
+Nelle **RANS** (*Reynolds-Averaged Navier–Stokes*) si applica la **decomposizione di Reynolds**: ogni grandezza è somma di media e fluttuazione, $u = \bar u + u'$, con $\overline{u'}=0$. Sostituendo nelle Navier–Stokes e mediando, i termini **lineari** restano funzione del solo campo medio; l'unico problematico è il **convettivo non lineare**, perché $\overline{u_i u_j} = \bar u_i\bar u_j + \overline{u_i' u_j'}$.
+
+Compaiono così gli **sforzi di Reynolds** $-\rho\,\overline{u_i' u_j'}$:
+
+$$\rho\frac{\partial\bar u_i}{\partial t} + \rho\,\bar u_j\frac{\partial\bar u_i}{\partial x_j} = -\frac{\partial\bar p}{\partial x_i} + \frac{\partial}{\partial x_j}\big(\bar\tau_{ij} - \rho\,\overline{u_i' u_j'}\big).$$
+
+Fisicamente questo tensore è il **trasporto di quantità di moto operato dai vortici**: le fluttuazioni $u'$ e $v'$ sono **correlate** (un guizzo verso l'alto porta con sé fluido lento), quindi $\overline{u'v'}\neq0$ e frena il campo medio come uno sforzo extra. È una **nuova incognita** non chiudibile con le sole equazioni mediate: nasce il **problema di chiusura**.
+
+La chiusura più comune è l'**ipotesi di Boussinesq**, che modella gli sforzi di Reynolds in analogia con quelli viscosi, introducendo una **viscosità turbolenta** $\mu_T$: $-\rho\,\overline{u_i'u_j'} \approx \mu_T(\partial_j\bar u_i+\partial_i\bar u_j) - \tfrac23\rho k\,\delta_{ij}$. La $\mu_T$ **non è una proprietà del fluido** ma modella l'effetto diffusivo dei vortici. Serve poi un modello che la calcoli: **$k$–$\epsilon$** (robusto nel free-stream), **$k$–$\omega$** (accurato a parete), **$k$–$\omega$ SST** (blending, standard industriale). Costo basso, ideale per flussi **stazionari/industriali** ad alto $Re$; l'errore è tutto nel modello di chiusura.
 
 </details>
 
 <details>
 <summary><strong>🟦 [T] LES e modelli per la eddy viscosity</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/turbolenza.md`.
-> Attesi: **filtraggio** spaziale, scale risolte vs **sottogriglia (SGS)**, modello di
-> **Smagorinsky** e Smagorinsky **dinamico** (Germano), DES/DDES. Immagini
-> `les_filtri_top_hat_vs_gaussian.jpg`, `smagorinsky_dinamico_filtri_test_germano.jpg`.
+Nella **LES** (*Large Eddy Simulation*) l'idea è **risolvere direttamente le grandi scale** e **modellare solo le piccole**. Si applica un **filtraggio spaziale** (larghezza $\Delta$ legata alla griglia): le strutture più grandi di $\Delta$ sono calcolate, quelle più piccole (**sottogriglia**, SGS) sono modellate.
+
+La giustificazione fisica è l'**universalità delle piccole scale** (Kolmogorov): le scale piccole $\eta$ dipendono solo dalla viscosità $\nu$ e dalla dissipazione $\varepsilon$, **indipendentemente da geometria e condizioni al contorno**. Sono quindi statisticamente universali e più facili da modellare in modo generale, mentre le grandi scale — dipendenti dal problema — vanno risolte.
+
+Il **modello di sottogriglia** più classico è quello di **Smagorinsky**, con una **eddy viscosity di sottogriglia**:
+
+$$\nu_{sgs} = (C_s\Delta)^2\,\lvert\bar S\rvert,$$
+
+con $\bar S_{ij}$ tensore velocità di deformazione filtrato e $C_s$ costante di Smagorinsky. Il modello SGS **drena l'energia** dalle scale risolte a quelle non risolte. Esiste la variante **dinamica** (Germano), che calcola $C_s$ localmente.
+
+**Confronto pregi/difetti:**
+- **RANS** — modella *tutta* la turbolenza, costo minimo, ma dipende dal modello di chiusura;
+- **DNS** — risolve *tutte* le scale senza modelli (esatta), ma costo $\propto Re^3$ (proibitivo);
+- **LES** — **compromesso**: costo intermedio, alta fedeltà sulle strutture instazionarie, modella solo la parte universale.
+
+La LES è l'equilibrio giusto quando le grandi strutture instazionarie contano (mescolamento, acustica, distacco di vortici) ma il DNS è troppo costoso.
 
 </details>
 
@@ -542,10 +680,15 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] Metodi per valutare l'interazione statore–rotore</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/turbomacchine.md`.
-> Attesi: **mixing plane** (media circonferenziale all'interfaccia, stazionario), **sliding mesh**
-> (non stazionario), metodi **corocronici**, **tempo inclinato**. Immagini `mixing_plane.jpg`,
-> `sliding_mesh_ripartizione_flussi.jpg`.
+In una turbomacchina statore e rotore hanno in genere **numero di pale diverso** ($Z_1\neq Z_2$) e sono in **moto relativo**: simulare l'intero anello è proibitivo, quindi si raccordano pochi canali con una **condizione di interfaccia**. I metodi si distinguono per **quanta interazione instazionaria** (scie, campi di potenziale) conservano e a **quale costo**.
+
+**Mixing plane.** All'interfaccia si fa una **media circonferenziale** delle grandezze: si passa alla schiera opposta solo il **profilo radiale mediato**, indipendente dal numero di pale (**accetta qualsiasi $Z_1/Z_2$**). È **stazionario** ed economico. In Fourier circonferenziale conserva solo l'armonica $n=0$ e **azzera le superiori**: si perde la **scia** e l'interazione instazionaria; il miscelamento istantaneo genera **perdite di mixing numeriche** (entropia spuria).
+
+**Frozen rotor.** Stazionario, congela statore e rotore in una **posizione relativa fissa** senza mediare: conserva la non-uniformità circonferenziale (la scia si vede), ma solo per *una* posizione arbitraria.
+
+**Sliding mesh.** **Instazionario ad alta fedeltà**: la mesh del rotore **scorre** e all'interfaccia si interpola conservativamente. Conserva **tutta** l'interazione instazionaria, ma è **costoso**; richiede settori di uguale estensione angolare (passi quasi uguali via **MCD** dei conteggi pala, spesso modificando leggermente $Z$).
+
+**Condizioni corocroniche / phase-lag.** Instazionario che sfrutta la **periodicità spazio-temporale**: il bordo di un canale eguaglia quello adiacente valutato a un **istante sfasato** $t+\delta_t$. Simula **un solo canale** memorizzando la storia temporale al bordo: scambia **memoria ⇄ numero di canali**. Alta fedeltà a costo medio.
 
 </details>
 
@@ -555,9 +698,25 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] Modelli di ordine ridotto: POD</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/modelli_ordine_ridotto.md`.
-> Attesi: **snapshot**, decomposizione in **modi** (energia, RIC), training **offline/online**,
-> proiezione di Galerkin.
+La **POD** (*Proper Orthogonal Decomposition*) è il motore della fase **offline** di un modello di ordine ridotto (**ROM**): costruisce una **base spaziale** ottima estratta dai dati.
+
+**Snapshot.** Si generano $N_s$ soluzioni full-order (RANS/LES/DNS o esperimenti), ciascuna a un valore fissato dei parametri: $u_J(\bar x)$. Ogni snapshot è un campo completo e corrisponde a **un punto dello spazio dei parametri**.
+
+**Modi POD.** Si cercano i modi $\phi_i(\bar x)$ che **massimizzano la proiezione** degli snapshot, a norma unitaria:
+
+$$\max_{\phi_i}\sum_{k=1}^{N_s}\langle u_k,\phi_i\rangle^2 \quad\text{s.t.}\quad \|\phi_i\|^2=1.$$
+
+La soluzione è un **problema agli autovalori** della matrice di correlazione: gli **autovettori** danno i modi (ortonormali), gli **autovalori** $\lambda_i$ misurano l'**energia** catturata da ciascun modo.
+
+**Energia e troncamento (RIC).** L'energia totale è $E_{tot}=\sum_i\lambda_i$. Si tronca ai primi $n$ modi col **Relative Information Content**:
+
+$$RIC(n)=\frac{\sum_{i=1}^n\lambda_i}{\sum_{i=1}^{N_s}\lambda_i}>0.99,$$
+
+e in genere bastano ~10 modi. La base POD è **ottima**: nessun'altra base lineare cattura più energia a parità di troncamento.
+
+**Modello ridotto.** Si scrive $u(\bar x,\bar\mu)=\sum_{i=1}^n \tilde u_i(\bar\mu)\,\phi_i(\bar x)$: la **proiezione di Galerkin** ($\langle u-u_n,\phi_j\rangle=0$) dà $\tilde u_j=\langle u,\phi_j\rangle$ e riduce il problema a $n$ gradi di libertà. Online i coefficienti si **interpolano** nei parametri (RBF, kriging, reti neurali).
+
+**Vantaggi:** enorme accelerazione (da milioni di celle a ~10 coefficienti), ideale per ottimizzazione e digital twin. **Limiti:** tecnica **lineare** → soffre le **non-linearità forti** (un urto che si sposta col parametro viene "spalmato") e la **scarsa robustezza fuori dal training** (interpola, non estrapola).
 
 </details>
 
@@ -567,10 +726,15 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] Come si affronta il problema dei flussi reagenti — senza scrivere equazioni</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `teoria/reacting_flows.md`.
-> Attesi (qualitativo): specie chimiche aggiuntive, **mixing**, fiamme **premiscelate vs diffusive**,
-> scale temporali della chimica (stiffness), metodo di **proiezione**. Immagine
-> `fiamme_premiscelata_vs_diffusiva.svg`.
+I **flussi reagenti** descrivono fluidi in cui avvengono **reazioni chimiche** che rilasciano/assorbono calore e **modificano la composizione**. Il caso tipico è la combustione, ma compaiono anche nel supersonico/ipersonico (dissociazione dietro urti forti). Rispetto a un flusso inerte si aggiungono il **trasporto delle specie** (una frazione di massa $Y_i$ per specie, $\sum_i Y_i=1$) e un **termine sorgente chimico** fortemente non lineare, mentre massa globale, quantità di moto ed energia restano formalmente inalterate: la reazione è un riarrangiamento di atomi che conserva le grandezze fondamentali e cambia solo l'**identità delle specie**.
+
+L'**accoppiamento con la fluidodinamica** è duplice: la chimica dipende dal campo di moto (che porta e mescola i reagenti) e a sua volta lo altera scaldando il gas (la densità può calare di 5–7 volte) e cambiando le proprietà di trasporto con la temperatura.
+
+Concetto centrale è la **separazione di scale temporali**: il tempo chimico $\tau_c$ confrontato col tempo di mescolamento turbolento $\tau_t$ definisce il **numero di Damköhler** $\mathrm{Da}=\tau_t/\tau_c$. Se $\mathrm{Da}\gg1$ la chimica è quasi istantanea e la combustione è **limitata dal mescolamento** (*mixed-is-burnt*); se $\mathrm{Da}\ll1$ (es. NOₓ) è **limitata dalla chimica**, e serve cinetica dettagliata.
+
+Si distinguono regimi **premiscelato** (reagenti già mescolati, la fiamma è un fronte che avanza, *progress variable* $c$) e **diffusivo/non premiscelato** (combustibile e ossidante separati che bruciano dove si incontrano, **mixture fraction** $Z$).
+
+Le **difficoltà** principali sono la **stiffness** della chimica (scale temporali molto diverse → integratori impliciti, operator splitting) e, in turbolenza, la **chiusura del termine sorgente medio**: la forte non-linearità del rateo rende $\overline{\dot\omega_i}\neq\dot\omega_i(\bar Y,\bar T)$, per cui servono modelli di combustione turbolenta dedicati.
 
 </details>
 
@@ -580,9 +744,13 @@ economico, nitido sugli urti. Contro: richiede l'entropy fix.
 <details>
 <summary><strong>🟦 [T] Ottimizzazione di forma</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/ottimizzazione.tex`, cartella `Ottimizzazione/`.
-> Attesi: parametrizzazione della geometria, **funzione obiettivo** e vincoli, algoritmi
-> (gradiente/aggiunto vs evolutivi), workflow con **modeFRONTIER**.
+**Problema.** Ottimizzazione di forma di un **ugello supersonico convergente-divergente** con **modeFRONTIER** (ESTECO). Parametri **fissati**: rapporto aree $A_e/A^*$ (fissa $M_{\rm out}$ isentropico) e geometria della gola. Le **variabili di design** sono l'angolo iniziale del divergente $\boldsymbol{\theta}$ e la lunghezza totale $\boldsymbol{L}$; range esplorati $L\in[10,17]$, $\theta\in[20^\circ,40^\circ]$.
+
+**Funzioni obiettivo (bi-obiettivo).** Si **massimizza la spinta** $T$ (`max_thrust`) e si **minimizza la superficie** $S$ (`min_surface`, proxy di peso/ingombro). Punto chiave: **nessuna CFD**. Le prestazioni sono valutate **analiticamente** (relazioni isentropiche per ugello adattato, senza urti interni), a costo di $\sim$ms per valutazione: da qui le **~300 valutazioni** dell'intera campagna.
+
+**DOE e algoritmo.** Campionamento iniziale **Uniform Latin Hypercube (ULH)** (space-filling, niente cluster né vuoti come nel Monte Carlo). L'algoritmo è **pilOPT** (meta-euristico): prima i design del DOE su griglia regolare, poi valori di $\theta$ non interi (es. $\theta=24.83^\circ$) → **raffinamento locale adattivo** nelle zone promettenti, più efficiente di un DOE puro.
+
+**Fronte di Pareto.** Nello spazio degli obiettivi le soluzioni **non dominate** ($A$ domina $B$ se migliore su un obiettivo e non peggiore sugli altri) formano il fronte, con la tipica **concavità**: il **trade-off** è chiaro — più spinta richiede ugelli più lunghi (più pesanti), ridurre $L$ costa prestazione. Tutti i punti sul fronte sono equivalenti; la scelta finale è **ingegneristica** (requisiti di missione).
 
 </details>
 
@@ -978,75 +1146,115 @@ $$
 <details>
 <summary><strong>🟩 [E] Discutere la simulazione della paletta (LS59)</strong></summary>
 
-> 📌 *Risposta da compilare* (parte del punto d'esame originale, separata). Riferimento:
-> `Latex/paletta.tex`, `teoria/report_QA.md` (Domande 1–4), cartelle `Paletta/`, `Fluent/`.
-> Da trattare: cascata di turbina LS59 transonica, campi di Mach/pressione, scia al bordo di fuga,
-> $y^+$, setup della simulazione.
+**Cos'è.** Cascata (schiera) di turbina con profilo **LS59**, transonico, tipico degli stadi HP. Dominio = **intercella periodica** (una sola pala in schiera infinita).
+
+**BC.** Ingresso: $T^\circ=P^\circ=1$, $M_{\rm in}=0.5$ (subsonico), $\alpha=30^\circ$. Uscita: pressione statica imposta $p_{\rm out}=0.4124$. Regime globale **transonico**, $M_{\rm out}\approx 1.2$ di progetto.
+
+**Mesh.** Non strutturata a prevalenza di quadrilateri, $l_c=0.01$, infittita attorno al profilo. L'analisi di convergenza **non** viene ripetuta (fatta solo sulla presa): si usa una griglia già convergente. Schema di **Roe**.
+
+**Campi.** Pressione: $P_{\max}=1.003$ (ristagno, $\approx P^\circ$), $P_{\min}=0.178$; a monte $\approx0.843$, a valle $\approx0.41$. Mach: $M_{\max}=1.487$, con **cuscinetto supersonico sul dorso** nella parte posteriore. Temperatura speculare al Mach ($T_{\max}=1.040$, $T_{\min}=0.678$). La coerenza incrociata isentropica $M$-$P$-$T$ è la prima **validazione** del solutore.
+
+**$M_{is}$ a parete e confronto sperimentale.** Si estrae $P_w/P^\circ$ nelle celle di bordo (tag parete), separando intradosso/estradosso via coordinata $y$, e si confronta con **dati sperimentali**, Euler-Roe, Euler-Fluent e **RANS (Spalart–Allmaras)**. I modelli inviscidi concordano bene con l'esperimento **sull'intradosso** (flusso attaccato); le **discrepanze sono sull'estradosso vicino al bordo di uscita**, dove pesano gli effetti viscosi non modellati da Eulero.
+
+**Bordo di fuga.** In calcolo inviscido è un **punto singolare** (Kutta non imposta): spike numerici di Mach/temperatura ($T>T^\circ$ è overshoot). È la principale sorgente di entropia numerica e di discrepanza col dato sperimentale.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Differenze con il caso RANS (Eulero vs RANS, p.es. sulla paletta)</strong></summary>
 
-> 📌 *Risposta da compilare* (parte del punto d'esame originale, separata).
-> ❓ *Da chiarire a cosa si riferisce esattamente "il caso RANS"* (paletta? presa?): plausibilmente
-> il confronto **Eulero vs RANS** sulla paletta. Riferimento: `teoria/report_QA.md` (Domande 17, 19),
-> `Latex/fluent.tex`, `Latex/paletta.tex`. Da trattare: cosa coglie il RANS che Eulero ignora
-> (strato limite, separazione, scia viscosa, SBLI), e perché.
+**Cosa cattura Eulero.** Il campo non viscoso **principale**: distribuzione di pressione, accelerazione sul dorso, cuscinetto supersonico ($M_{\max}\approx1.49$), eventuale **debole urto transonico**. In Eulero l'**unica entropia** è quella (fisica + numerica) concentrata negli **urti** e al **bordo di fuga**.
+
+**Cosa NON cattura.** Essendo non viscoso: **niente strato limite, niente separazione, niente scia viscosa, niente perdite viscose** né la relativa **caduta di pressione totale**. La "scia" che si vede è solo una **ricompressione inviscida**, non una separazione turbolenta (che comparirebbe in RANS con Spalart–Allmaras).
+
+**Dove divergono su $M_{is}$ e nella scia.** Sul confronto $P_w/P^\circ$ (equivalente al $M_{is}$ a parete) i due coincidono **sull'intradosso** (flusso attaccato) ma **divergono sull'estradosso presso il bordo di uscita**: lì il RANS risolve strato limite/separazione e si avvicina all'esperimento, mentre Eulero se ne discosta. Nella **scia**, Eulero produce uno spike puntuale al trailing edge ($T_{\max}=1.040>T^\circ$, overshoot di Roe); il RANS produce invece una scia **diffusa e regolare**.
+
+**Sorgenti di dissipazione.** In **Eulero**: solo dissipazione **numerica** dello schema (attiva soprattutto negli urti). In **RANS**: alla dissipazione numerica si sommano la **viscosità molecolare** e soprattutto la **viscosità turbolenta** del modello, che producono le perdite fisiche e la corretta caduta di $p^\circ$. In sintesi: Eulero è ottimo per il campo e il carico, ma le **perdite** richiedono il RANS.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Estrapolazione di Richardson, metodi diretti, $p_{wall}$ per la presa a doppia rampa e campo di moto generico per la LS59</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/doppia_presa.tex`, `Latex/paletta.tex`,
-> `Rampa/conv/`, `teoria/report_QA.md` (Domande 5–12, 16–19). Da trattare: convergenza sulla presa,
-> "metodi diretti" (soluzione esatta nota vs estrapolazione), pressione a parete $p_w/p^\circ$ con
-> i salti d'urto, e campo di moto della LS59.
+**Richardson (già impostata sul bump) applicata alla presa.** A differenza del bump (subsonico, senza urti, soluzione esatta $\bar S=0$ nota), nella **presa a doppia rampa** gli urti obliqui producono **entropia fisica non nulla**: non c'è soluzione esatta, quindi si usa la sola **estrapolazione di Richardson** sulla **norma $L_2$ dell'entropia**, con schema di Roe su 3 griglie self-simili ($l_c=1,\,0.5,\,0.25$; $r=2$). Valori: $u_h=1.443\cdot10^{-2}$, $u_{2h}=1.651\cdot10^{-2}$, $u_{4h}=1.973\cdot10^{-2}$ (decrescita monotòna). Estrapolazione: $u_{\rm esatto}\approx1.1$–$1.2\cdot10^{-2}$ (entropia fisica degli urti), **ordine effettivo $p_{\rm eff}\approx0.64<1$** (gli urti degradano l'ordine: presso una discontinuità lo schema cade al prim'ordine), **GCI $\sim1\%$** sulla griglia fine → sostanzialmente grid-independent (per i campi si usa la griglia intermedia, già convergente).
+
+**$p_{\rm wall}$ della doppia presa.** Si estrae $P_w/P^\circ$ sulla parete inferiore. La pressione parte da $\approx0.027$ ($M_\infty=3$), **cresce a gradini** attraverso i due urti obliqui (1ª rampa $\approx10^\circ$, 2ª rampa $\approx21.4^\circ$) fino al **picco $\approx0.29$** dove gli urti **si focalizzano al labbro**. Inviscido e RANS **concordano fino a $x\approx0.5$**; a valle divergono dall'esperimento per l'**interazione urto–strato limite (SBLI)** non catturata da Eulero.
+
+**Campo della LS59.** Coerente con le isentropiche fuori dagli urti: monte uniforme, ristagno al BA, forte accelerazione sul dorso fino a $M>1$, uscita supersonica, spike numerici ai bordi. La verifica $P_\infty\approx0.843$ (per $M=0.5$) è il **check standard** delle BC.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Eulero stima bene il lift ma non la drag della paletta — perché?</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/paletta.tex`, `teoria/report_QA.md`.
-> Idea attesa: il **lift** è dominato dalla **distribuzione di pressione** (ben colta anche da un
-> modello inviscido), mentre la **drag** ha una forte componente **viscosa/d'attrito** e di scia che
-> **Eulero non riproduce** (drag inviscida ≈ solo onda/pressione, manca lo skin friction).
+**Tesi.** Eulero stima bene la **portanza (lift)** ma male la **resistenza (drag)**, perché dipendono da meccanismi fisici diversi.
+
+**Perché il lift è buono.** Il lift è dominato dalla **distribuzione di pressione**, che Eulero riproduce fedelmente: il carico è l'**integrale della differenza di pressione tra intradosso ed estradosso**. Nella LS59 la depressione sul dorso nasce da **geometria e deflessione** (il lato convesso accelera e la pressione cala), fenomeno puramente non viscoso. Infatti il confronto $P_w/P^\circ$ Euler vs esperimento concorda bene sull'intradosso: il campo di pressione — e quindi il lift — è catturato **anche senza viscosità**.
+
+**Perché la drag è sbagliata.** La resistenza reale ha componenti che Eulero **non modella**:
+- **resistenza d'attrito** (skin friction), intrinsecamente viscosa;
+- **resistenza di pressione da separazione/perdite di scia**, legata allo strato limite.
+
+Vale il **paradosso di d'Alembert**: in un flusso inviscido, stazionario e senza urti la resistenza è **nulla**. L'unica resistenza che Eulero può dare è la **resistenza d'onda** (perdita di $p^\circ$ attraverso gli urti). Nella LS59 c'è solo un **debole urto transonico** ($M_n\approx1.1$, perdita $\propto(M_n^2-1)^3$, frazioni di percento), perciò la drag da Eulero è **fortemente sottostimata**: mancano attrito e perdite viscose. Per la drag corretta serve un modello **RANS**; per il lift Eulero è già adeguato.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Descrizione di ciò che si è eseguito e macro-differenze fra bump (dosso), paletta e presa</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `README.md` (tabella casi di studio), `Latex/bump.tex`,
-> `Latex/paletta.tex`, `Latex/doppia_presa.tex`. Da trattare: i **tre regimi** (subsonico $M=0.3$,
-> transonico $M=0.5$, supersonico $M=3$), urti/assenza di urti, mesh, scopo di ciascun caso.
+**Cosa si è eseguito.** Tre casi con lo stesso **solutore Euler 2D a volumi finiti** (schemi Lax–Friedrichs e Roe), più confronti Fluent (Euler/RANS) e ottimizzazione.
+
+**1) Bump (dosso).** Condotto convergente-divergente, **subsonico** $M_{\rm in}=0.3$, mesh strutturata. Campo **liscio e privo di urti**: $M$ accelera simmetricamente sull'apice ($M\approx0.46$) e recupera, monte-valle **speculari** (isentropico). Obiettivo: **verifica di convergenza** perché la **soluzione esatta è nota** ($\bar S=0$): l'entropia numerica misura direttamente l'errore. Si impara: ordine di convergenza, **Roe vs Lax–Friedrichs**, stabilità al variare della CFL.
+
+**2) Paletta LS59.** Cascata di turbina, **transonico** ($M_{\rm in}=0.5$, uscita $M_{\rm out}\approx1.2$). Niente studio di griglia (già convergente). Obiettivo: campi di Mach/pressione, **$M_{is}$ a parete** e **confronto con sperimentale e RANS**. Si impara: cosa cattura Eulero (carico, cuscinetto supersonico) e cosa no (scia viscosa, perdite).
+
+**3) Presa a doppia rampa.** **Supersonico** $M_{\rm in}=3$. Due urti obliqui ($\approx10^\circ$ e $\approx21.4^\circ$) che focalizzano al labbro; $M$ scende $3\to\approx1.35$ restando supersonico (geometria semplificata per mantenere il dominio iperbolico ed estrapolare all'outlet). Obiettivo: **urti supersonici**, **$p_{\rm wall}$** e convergenza con Richardson (entropia fisica non nulla).
+
+**Macro-differenze.** Regime (sub/trans/super), presenza di urti (no/debole/forti obliqui), disponibilità della soluzione esatta (solo bump), tipo di validazione (autoconsistenza vs sperimentale) e natura matematica (ellittica/iperbolica).
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Confronto Eulero vs RANS per la pala: cosa ci aspettavamo, riscontro dalla simulazione, confronti sull'analisi di convergenza (idem per la presa, meno dettagliato)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/paletta.tex`, `Latex/fluent.tex`,
-> `teoria/report_QA.md`. Da trattare: aspettative teoriche, accordo/disaccordo riscontrato,
-> confronto delle analisi di convergenza pala vs presa.
+**Cosa ci aspettavamo.** Che **Eulero** riproducesse il **campo principale** (pressione, carico, accelerazione transonica con cuscinetto supersonico ed eventuale debole urto) e che il **RANS** aggiungesse **strato limite, scia viscosa, separazione e perdite** ($p^\circ$) che Eulero non può contenere.
+
+**Riscontro.** Confermato. Il campo Euler-Roe è coerente con le isentropiche ($M_{\max}=1.49$, $P_{\max}=1.003$, $T_{\min}=0.678$). Sul confronto $P_w/P^\circ$: Euler-Roe, Euler-Fluent e RANS-Spalart–Allmaras **coincidono sull'intradosso** (flusso attaccato), mentre **divergono sull'estradosso presso il bordo di uscita**, dove solo il RANS si avvicina all'esperimento. Gli **spike numerici** al trailing edge ($T_{\max}=1.040>T^\circ$) diventano nel RANS una **scia diffusa e regolare**.
+
+**Analisi di convergenza.** Sulla **pala** l'analisi di griglia **non è ripetuta** (mesh già convergente): per Eulero la validazione è la coerenza isentropica; per il RANS servirebbe in più il controllo del **$y^+$** a parete (risoluzione dello strato limite). Sulla **presa** (meno dettagliato) si usa **Richardson** sulla norma $L_2$ dell'entropia: $p_{\rm eff}\approx0.64$ per gli urti, GCI $\sim1\%$. Differenza chiave: in Eulero l'entropia converge alla sola parte **fisica d'urto**, mentre un RANS deve risolvere anche i gradienti viscosi di parete, con requisiti di mesh più stringenti.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] Bump: commento sui campi di moto e confronto Lax–Friedrichs vs Roe sull'errore</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/bump.tex` (campi Mach/pressione Roe vs LF,
-> tabelle norma entropia), `Bump/conv/`. Aggancio diretto col toggle Richardson qui sopra (Roe più
-> accurato di LF sulle griglie fini).
+**Campo di moto.** Condotto con dosso, **subsonico** $M_{\rm in}=0.3$: il flusso accelera simmetricamente sull'apice fino a $M\approx0.46$ e decelera a valle, **senza mai raggiungere condizioni soniche** — campo ovunque subsonico e **privo di urti**. La pressione è il negativo del Mach ($P/P^\circ\approx0.86$ sull'apice) e la **simmetria monte-valle** conferma il comportamento **isentropico** atteso. Il campo di entropia, teoricamente nullo, misura la **sola dissipazione numerica**.
+
+**LF vs Roe sull'errore.** Sullo stesso campo liscio le soluzioni sono **quasi identiche** (Roe leggermente più nitido), ma sull'errore in norma $L_2$ dell'entropia emerge la differenza:
+
+| $h$ | LF | Roe |
+|---|---|---|
+| 0.020 | $2.88\cdot10^{-3}$ | $3.35\cdot10^{-3}$ |
+| 0.010 | $1.91\cdot10^{-3}$ | $1.79\cdot10^{-3}$ |
+| 0.005 | $1.22\cdot10^{-3}$ | $0.90\cdot10^{-3}$ |
+
+Sulle griglie **fini Roe è meno diffusivo** e dà errore più basso; sulla griglia più rada l'ordine si inverte. L'**ordine** (soluzione esatta nota, $\bar S=0$) è $p\approx0.96$ per Roe e $p\approx0.62$ per LF, entrambi $<1$ perché le griglie non sono ancora nel regime asintotico, ma Roe è **più vicino al teorico**. Motivo: LF aggiunge dissipazione $\propto\lambda_{\max}(u^R-u^L)$ uguale per tutte le onde; Roe **decompone il salto sugli autovettori** e smorza ogni onda correttamente → interfaccia più netta, meno smearing.
 
 </details>
 
 <details>
 <summary><strong>🟩 [E] LS59 (campo di moto e risultati)</strong></summary>
 
-> 📌 *Risposta da compilare.* Riferimento: `Latex/paletta.tex`, `Fluent/`, `teoria/report_QA.md`
-> (Domande 1–4).
+**Ingresso.** Uniforme a $M_\infty\approx0.5$; verifica BC: $P_\infty=(1.05)^{-3.5}\approx0.843$, coincidente col letto a monte (check di consistenza superato).
+
+**Ristagno al BA.** $M\to0$; $P_{\max}=1.003\approx P^\circ$ e $T\to T^\circ$: tutta l'energia cinetica torna pressione (isentropico, no urti a monte). Il piccolo $+0.3\%$ è overshoot di Roe.
+
+**Espansione nel canale palare.** Sul **dorso** (convesso) la corrente accelera per deflettere il flusso: la pressione cala fino a $P_{\min}=0.178$ e il Mach cresce fino a $M_{\max}=1.487$, formando un **cuscinetto supersonico** nella parte posteriore. È la differenza dorso/ventre a generare il **carico** della pala.
+
+**Bordo di fuga.** Punto singolare inviscido (Kutta non imposta): **debole urto/onde** di chiusura sul dorso transonico e **spike numerici** di Mach e temperatura ($T_{\max}=1.040>T^\circ$, overshoot). "Scia" inviscida = ricongiungimento dorso/ventre, non separazione (viscosa, solo in RANS).
+
+**$M_{is}$ a parete e confronto.** $P_w/P^\circ$ estratto sulle celle di parete: Euler-Roe/Euler-Fluent/RANS concordano con l'esperimento **sull'intradosso**; **discrepanze sull'estradosso al bordo di uscita** (effetti viscosi non modellati).
+
+**Risultati principali.** Coerenza isentropica $M$-$P$-$T$ (validazione), regime transonico confermato (ingresso subsonico, uscita supersonica $M_{\rm out}\approx1.2$), perdite d'urto **modeste** perché l'urto è debole; l'entropia numerica si concentra al bordo di fuga, principale sorgente di scarto con l'esperimento.
 
 </details>
